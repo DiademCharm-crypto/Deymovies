@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deymovies - Streaming</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1><a href="index.html" style="color: inherit; text-decoration: none;">DEYMOVIES</a></h1>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search movies..." onkeyup="handleSearch()">
+    </div>
+  </header>
+
+  <main class="container" id="movie-grid"></main>
+  <div class="pagination-container" id="pagination-controls"></div>
+
+  <script src="app.js"></script>
+  <script>
+    const itemsPerPage = 20;
+    let currentPage = 1;
+    let currentMovieList = [...movies];
+
+    const grid = document.getElementById('movie-grid');
+    const pagination = document.getElementById('pagination-controls');
+
+    function renderPage(page) {
+      currentPage = page;
+      grid.innerHTML = '';
+
+      if (currentMovieList.length === 0) {
+        grid.innerHTML = '<p class="no-results">No movies found matching your search.</p>';
+        pagination.innerHTML = '';
+        return;
+      }
+
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedMovies = currentMovieList.slice(startIndex, endIndex);
+
+      paginatedMovies.forEach(movie => {
+        grid.appendChild(createMovieCard(movie));
+      });
+
+      renderPaginationControls();
+    }
+
+    function renderPaginationControls() {
+      pagination.innerHTML = '';
+      const totalPages = Math.ceil(currentMovieList.length / itemsPerPage);
+
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn';
+      prevBtn.textContent = '« Prev';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        renderPage(currentPage - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      pagination.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.onclick = () => {
+          renderPage(i);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        pagination.appendChild(pageBtn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn';
+      nextBtn.textContent = 'Next »';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        renderPage(currentPage + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      pagination.appendChild(nextBtn);
+    }
+
+    function handleSearch() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      currentMovieList = movies.filter(movie =>
+        movie.title.toLowerCase().includes(query)
+      );
+      renderPage(1);
+    }
+
+    renderPage(1);
+  </script>
+</body>
+</html>
