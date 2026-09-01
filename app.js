@@ -2,10 +2,10 @@
 const featuredMovies = [
   { 
     id: "movie-10", 
-    title: "Rey Fortuno: Gamayg Tudlo", 
-    description: "After being separated for 15 years, the Sword of Power leads Prince Adam back to Eternia, where he discovers his home shattered under the fiendish rule of Skeletor.",
-    poster: "https://gcdnb.pbrd.co/images/hP7E46SmNmjU.jpg", 
-    backdrop: "https://gcdnb.pbrd.co/images/hP7E46SmNmjU.jpg",
+    title: "Toy Story 5", 
+    description: "Buzz, Woody, Jessie and the rest of the gang come face-to-face with Lilypad, a brand-new tablet device that arrives with her own disruptive ideas about what is best for Bonnie. Will playtime ever be the same?",
+    poster: "https://imgs.search.brave.com/h9zgQg2PUEtOhRulETUtiYpN3z4hS3XUXJ3XXA_yp4w/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2MzL2Nk/LzZiL2MzY2Q2YjI3/YzRkMDNiNjhhM2Ez/ZDk2NGZkNTkzY2Rk/LmpwZw", 
+    backdrop: "https://imgs.search.brave.com/h9zgQg2PUEtOhRulETUtiYpN3z4hS3XUXJ3XXA_yp4w/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2MzL2Nk/LzZiL2MzY2Q2YjI3/YzRkMDNiNjhhM2Ez/ZDk2NGZkNTkzY2Rk/LmpwZw",
     embedUrl: "https://www.youtube.com/embed/5PSNL1qE6VY" 
   },
   { 
