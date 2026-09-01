@@ -44,7 +44,7 @@ const movies = [
     id: "movie-3", 
     title: "Mutiny", 
     poster: "https://images.static-bluray.com/movies/covers/410477_large.jpg?t=1775747898", 
-    embedUrl: "https://www.youtube.com/embed/EXeTwQWrcwY" 
+    embedUrl: "https://cinema8.com/video/jXax7PlD" 
   },
   { 
     id: "movie-4", 
@@ -68,12 +68,12 @@ const movies = [
     id: "movie-7", 
     title: "Minions & Monsters", 
     poster: "https://images.static-bluray.com/movies/covers/415858_large.jpg?t=1785869849", 
-    embedUrl: "https://cinema8.com/video/PO8PwYyO" 
+    embedUrl: "https://cinema8.com/video/WDezkkzX" 
   },
   { 
     id: "movie-8", 
     title: "Obsession", 
-    poster: "https://imgs.search.brave.com/ySkkyiE_HCfd0FWPY3PV60XvjGONR4x1RQr0mP4sAKU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/LW9yZy93aWtpcGVk/aWEvZW4vdGh1bWIv/MC8wNS9PYnNlc3Np/b25fdGhlYXRyaWNh/bF9wb3N0ZXIuanBl/Zy8yNTBweC1PYnNl/c3Npb25fdGhlYXRyaWNh/bF9wb3N0ZXIuanBlZz91dG1fc291cmNlPWVuLndpa2lw/ZWRpYS5vcmcmdXRt/X2NhbXBhaWduPXBh/cnNlciZ1dG1fY29u/dGVudD10aHVtYm5h/aWw", 
+    poster: "https://imgs.search.brave.com/qplOF7u91YUhQwW1YNSv_590d0dDoj9vPnWoKmsYDxM/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/Y2luZW1hdGVyaWFs/LmNvbS9wLzI5N3gv/NzBieHhnZXcvb2Jz/ZXNzaW9uLW1vdmll/LXBvc3Rlci1tZC5q/cGc_dj0xNzczMjky/MDc2", 
     embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
   },
   { 
@@ -99,7 +99,79 @@ const movies = [
     title: "Moana: Live Action", 
     poster: "https://imgs.search.brave.com/VpyHgWzTLuLF9w5h__ZjEw3PL071nextd6nZcraNqjA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wcmV2/aWV3LnJlZGQuaXQv/bmV3LXBvc3Rlci1m/b3ItZGlzbmV5cy1s/aXZlLWFjdGlvbi1t/b2FuYS12MC10dHRy/OG4xbmp0cWcxLnBu/Zz93aWR0aD02NDAm/Y3JvcD1zbWFydCZh/dXRvPXdlYnAmcz1l/MDNiZTdlYTI1Zjdk/NGMyYzJmZmMxNmRm/ZTkwNDhiM2ExYWQ2/Nzgx", 
     embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
-  }
+  },
+    { 
+    id: "movie-13", 
+    title: "Coyote vs. Acme", 
+    poster: "https://imgs.search.brave.com/xCDb3Ky3fb0Pbpt86dGyUBlmkVAV8BoCxSlpiFG_M7A/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvZW4vdGh1bWIv/Yy9jMC9Db3lvdGVf/dnMuX0FjbWVfcG9z/dGVyLmpwZy8yNTBw/eC1Db3lvdGVfdnMu/X0FjbWVfcG9zdGVy/LmpwZz91dG1fc291/cmNlPWVuLndpa2lw/ZWRpYS5vcmcmdXRt/X2NhbXBhaWduPXBh/cnNlciZ1dG1fY29u/dGVudD10aHVtYm5h/aWw", 
+    embedUrl: "https://cinema8.com/video/PO8PwYyO" 
+  },
+  { 
+    id: "movie-14", 
+    title: "Colony", 
+    poster: "https://imgs.search.brave.com/8WXNHyEh0ZiR1bNrNb8cAvDx9uRhpxgjR_WIctYHKIs/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/Y2luZW1hdGVyaWFs/LmNvbS9wLzI5N3gv/dG5oYzlnNGwvdGhl/LWNvbG9ueS1jYW5h/ZGlhbi1tb3ZpZS1w/b3N0ZXItbWQuanBn/P3Y9MTQ1NjUzNzI1/NQ", 
+    embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
+  },
+  { 
+    id: "movie-15", 
+    title: "Ghost in the Cell", 
+    poster: "https://imgs.search.brave.com/jgTns-M62HQD31GyRCqOo9AyRFjUxZQXbDf6bnz8yKo/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NzEzckQzejRRaUwu/anBn", 
+    embedUrl: "https://www.youtube.com/embed/EXeTwQWrcwY" 
+  },
+  { 
+    id: "movie-16", 
+    title: "The Secret Woman", 
+    poster: "https://imgs.search.brave.com/oj_xZhgh-rBa1y1JrYzTiBuBYUP9nL4BoZ_a7Zhuspg/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/bW92aWVmb25lLmNv/bS9pbWFnZS1hc3Nl/dHMvMTYzMTgwNy81/RkM1dlVIRnowZmJK/T2QwYmh5ekpwQ1NM/cmMuanBnP2Q9NDgw/eDcyMCZxPTUw", 
+    embedUrl: "https://www.youtube.com/embed/5PSNL1qE6VY" 
+  },
+  { 
+    id: "movie-17", 
+    title: "Barreda", 
+    poster: "https://imgs.search.brave.com/XmG-m315QZDyb0VrM5fJXS-NZlETg4K-roswsCe5wag/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZS50bWRiLm9yZy90/L3AvdzM0Mi9obnIw/UWtaU0RMbHJKVHZV/MmVjY282NXdjSG8u/anBn", 
+    embedUrl: "https://www.youtube.com/embed/zSWdZVtXT7E" 
+  },
+  { 
+    id: "movie-18", 
+    title: "Buddy", 
+    poster: "https://imgs.search.brave.com/o4M4f5vbK3TD9i8qgqTOiryTThH3f3YSuVLo-c2Kwmg/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NTE0b2ZyUkJLekwu/anBn", 
+    embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
+  },
+  { 
+    id: "movie-19", 
+    title: "The Whisper Man", 
+    poster: "https://imgs.search.brave.com/B1Ln0L4od39f0q-RuIA4gCpxkbR5QKQ0i2zpYqBV0rk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zLm1v/dmllaW5zaWRlci5j/b20vaW1hZ2VzL3Ro/ZS13aGlzcGVyLW1h/bi9wLzE1MC8xMDAw/NTAwX20xNzg0MDQ4/MzgyLmpwZw", 
+    embedUrl: "https://cinema8.com/video/PO8PwYyO" 
+  },
+  { 
+    id: "movie-20", 
+    title: "Yellow Mirror", 
+    poster: "https://imgs.search.brave.com/O5n5dlJUgRhGLrRKoaNgo7-N93Mh1aNAiU9WCdZfSNM/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zdGF0/aWMuc2ltcHNvbnN3/aWtpLmNvbS9pbWFn/ZXMvdGh1bWIvNC80/Zi9ZZWxsb3dfTWly/cm9yX3Bvc3Rlcl8x/LnBuZy8yNTBweC1Z/ZWxsb3dfTWlycm9y/X3Bvc3Rlcl8xLnBu/Zw", 
+    embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
+  },
+  { 
+    id: "movie-21", 
+    title: "The Dog Stars", 
+    poster: "https://imgs.search.brave.com/Gs4f-bk4uJaeT8pJZMzTY2x1QYngb5RZP17eIPd9at4/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy5p/bXBhd2FyZHMuY29t/LzIwMjYvcG9zdGVy/cy9kb2dfc3RhcnMu/anBn", 
+    embedUrl: "https://www.youtube.com/embed/EXeTwQWrcwY" 
+  },
+  { 
+    id: "movie-22", 
+    title: "It Ends", 
+    poster: "https://i2.wp.com/image.tmdb.org/t/p/w185/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg?resize=178,267", 
+    embedUrl: "https://www.youtube.com/embed/5PSNL1qE6VY" 
+  },
+  { 
+    id: "movie-23", 
+    title: "Irumudi", 
+    poster: "https://imgs.search.brave.com/qFDmhIhu_WNMP7_XCXajYhbo_cQYrHKv9qYS4rdUYrk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9heHNt/d2lvcW1mM2MuY29t/cGF0Lm9iamVjdHN0/b3JhZ2UuYXAtaHlk/ZXJhYmFkLTEub3Jh/Y2xlY2xvdWQuY29t/L3N0YXRpYy5maWxt/eWZvY3VzLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyNi8w/Ni9Qcm9maWxlLVBp/Yy0yMDI2LTA2LTEw/VDA4NDQzOC4wNjIu/cG5n", 
+    embedUrl: "https://www.youtube.com/embed/zSWdZVtXT7E" 
+  },
+  { 
+    id: "movie-24", 
+    title: "Insidious: Out of the Further", 
+    poster: "https://imgs.search.brave.com/jm4zMsoLfH-sXmLkiVwKzG8aCHU4mktXNkKnRFa_uro/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy5p/bXBhd2FyZHMuY29t/LzIwMjYvcG9zdGVy/cy9pbnNpZGlvdXNf/b3V0X29mX3RoZV9m/dXJ0aGVyLmpwZw", 
+    embedUrl: "https://www.youtube.com/embed/YoHD9XEInc0" 
+  },
 ];
 
 function createMovieCard(movie) {
