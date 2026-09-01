@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <script>(function(s){s.dataset.zone='11702675',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-  <script>(function(s){s.dataset.zone='11702654',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
   <script src="https://5gvci.com/act/files/tag.min.js?z=11702637" data-cfasync="false" async></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Deymovies - Streaming</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,6 +16,19 @@
       <input type="text" id="search-input" placeholder="Search movies..." onkeyup="handleSearch()">
     </div>
   </header>
+
+  <section class="hero-slider" id="hero-slider">
+    <div class="hero-slide-wrapper">
+      <img id="hero-img" class="hero-img" src="" alt="Featured Movie" />
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h2 id="hero-title" class="hero-title"></h2>
+        <p id="hero-desc" class="hero-description"></p>
+        <button id="hero-btn" class="hero-play-btn">▶ Watch Now</button>
+      </div>
+    </div>
+    <div class="slider-dots" id="slider-dots"></div>
+  </section>
 
   <main class="container" id="movie-grid"></main>
   <div class="pagination-container" id="pagination-controls"></div>
@@ -30,6 +42,102 @@
     const grid = document.getElementById('movie-grid');
     const pagination = document.getElementById('pagination-controls');
 
+    // Hero Slider Controller
+    let currentSlide = 0;
+    let slideTimer;
+
+    function initHeroSlider() {
+      if (typeof featuredMovies === 'undefined' || featuredMovies.length === 0) return;
+
+      const dotsContainer = document.getElementById('slider-dots');
+      dotsContainer.innerHTML = '';
+
+      featuredMovies.forEach((_, index) => {
+        const dot = document.createElement('span');
+        dot.className = `dot ${index === 0 ? 'active' : ''}`;
+        dot.onclick = () => setSlide(index);
+        dotsContainer.appendChild(dot);
+      });
+
+      renderSlide(0);
+      startAutoSlide();
+    }
+
+    function renderSlide(index) {
+      const movie = featuredMovies[index];
+      const imgElement = document.getElementById('hero-img');
+      
+      imgElement.classList.add('fade-out');
+
+      setTimeout(() => {
+        imgElement.src = movie.backdrop || movie.poster;
+        document.getElementById('hero-title').textContent = movie.title;
+        document.getElementById('hero-desc').textContent = movie.description || '';
+        
+        imgElement.onerror = () => {
+          imgElement.src = 'https://via.placeholder.com/1200x500/141414/ffffff?text=Image+Unavailable';
+        };
+
+        imgElement.classList.remove('fade-out');
+      }, 200);
+
+      document.getElementById('hero-btn').onclick = () => {
+        window.location.href = `player.html?id=${movie.id}`;
+      };
+
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === index);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % featuredMovies.length;
+      renderSlide(currentSlide);
+    }
+
+    function setSlide(index) {
+      currentSlide = index;
+      renderSlide(currentSlide);
+      resetAutoSlide();
+    }
+
+    function startAutoSlide() {
+      slideTimer = setInterval(nextSlide, 5000);
+    }
+
+    function resetAutoSlide() {
+      clearInterval(slideTimer);
+      startAutoSlide();
+    }
+
+    // Touch Swipe Logic for Mobile (Android & iOS)
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const sliderContainer = document.getElementById('hero-slider');
+
+    sliderContainer.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    sliderContainer.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const swipeThreshold = 40;
+      if (touchEndX < touchStartX - swipeThreshold) {
+        nextSlide();
+        resetAutoSlide();
+      } else if (touchEndX > touchStartX + swipeThreshold) {
+        currentSlide = (currentSlide - 1 + featuredMovies.length) % featuredMovies.length;
+        renderSlide(currentSlide);
+        resetAutoSlide();
+      }
+    }
+
+    // Grid Rendering & Pagination
     function renderPage(page) {
       currentPage = page;
       grid.innerHTML = '';
@@ -97,6 +205,7 @@
       renderPage(1);
     }
 
+    initHeroSlider();
     renderPage(1);
   </script>
 </body>
