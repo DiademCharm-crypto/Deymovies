@@ -6,7 +6,7 @@
   <script src="https://5gvci.com/act/files/tag.min.js?z=11702637" data-cfasync="false" async></script>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DEYMOVIES - Playing Video</title>
 
   <!-- Website Favicon Icon -->
@@ -64,14 +64,18 @@
       <button id="server2-btn" class="server-btn" onclick="switchServer(2)">Server 2</button>
       <button id="server3-btn" class="server-btn" onclick="switchServer(3)">Server 3</button>
       <button id="server4-btn" class="server-btn" onclick="switchServer(4)">Server 4</button>
+      
+      <!-- Cross-Platform Fullscreen Trigger Button -->
+      <button class="fullscreen-trigger-btn" onclick="triggerDeviceFullscreen()">⛶ Fullscreen</button>
     </div>
 
     <div class="server-warning">
       ⚠️ <strong>Note:</strong> Third-party servers may contain external pop-ups or ads. Use an ad blocker for the best experience.
     </div>
 
-    <div class="video-container">
-      <iframe id="main-iframe" src="" allowfullscreen referrerpolicy="origin"></iframe>
+    <div class="video-container" id="playerContainer">
+      <button class="exit-pseudo-btn" id="exitPseudoBtn" onclick="triggerDeviceFullscreen()">✕ Exit Fullscreen</button>
+      <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="origin"></iframe>
     </div>
   </section>
 
@@ -144,6 +148,37 @@
     shuffled.forEach(movie => {
       grid.appendChild(createMovieCard(movie));
     });
+
+    // Cross-Device iOS / Android / Desktop Fullscreen Handler
+    function triggerDeviceFullscreen() {
+      const container = document.getElementById('playerContainer');
+      const exitBtn = document.getElementById('exitPseudoBtn');
+
+      // Native Web API check (Android, PC, iPadOS)
+      if (container.requestFullscreen) {
+        if (!document.fullscreenElement) {
+          container.requestFullscreen().catch(() => togglePseudoFullscreen(container, exitBtn));
+        } else {
+          document.exitFullscreen();
+        }
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else {
+        // iPhone/iOS Safari Fallback (Pseudo Fullscreen)
+        togglePseudoFullscreen(container, exitBtn);
+      }
+    }
+
+    function togglePseudoFullscreen(container, exitBtn) {
+      container.classList.toggle('ios-pseudo-fullscreen');
+      if (container.classList.contains('ios-pseudo-fullscreen')) {
+        exitBtn.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      } else {
+        exitBtn.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
 
     // Modal Controls
     function openRequestModal() {
