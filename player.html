@@ -46,7 +46,9 @@
         </text>
       </svg>
     </a>
-    <div class="search-container">
+    
+    <div class="header-actions">
+      <button class="request-btn" onclick="openRequestModal()">🍿 Request a Movie</button>
       <a href="index.html" class="back-btn">← Back to Home</a>
     </div>
   </header>
@@ -75,6 +77,21 @@
     <h3 class="section-heading">You Might Also Like</h3>
     <main class="container" id="random-grid"></main>
   </section>
+
+  <!-- Request Modal Popup -->
+  <div id="requestModal" class="modal-backdrop">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeRequestModal()">&times;</button>
+      <h3>🍿 Request A Movie</h3>
+      <p class="modal-desc">Can't find what you're looking for? Enter the movie or TV show title below and send it to us!</p>
+      
+      <form id="requestForm" onsubmit="handleRequestSubmit(event)">
+        <textarea id="requestInput" placeholder="Write movie title or request message here..." required></textarea>
+        <button type="submit" class="send-btn" id="sendBtn">Send Request</button>
+      </form>
+      <div id="formStatus" class="form-status"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
   <script>
@@ -125,6 +142,52 @@
     shuffled.forEach(movie => {
       grid.appendChild(createMovieCard(movie));
     });
+
+    // Modal Controls
+    function openRequestModal() {
+      document.getElementById('requestModal').style.display = 'flex';
+    }
+
+    function closeRequestModal() {
+      document.getElementById('requestModal').style.display = 'none';
+      document.getElementById('formStatus').innerText = '';
+    }
+
+    async function handleRequestSubmit(e) {
+      e.preventDefault();
+      const sendBtn = document.getElementById('sendBtn');
+      const status = document.getElementById('formStatus');
+      const text = document.getElementById('requestInput').value;
+
+      sendBtn.disabled = true;
+      sendBtn.innerText = 'Sending...';
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: 'f128f943-dee1-4f4f-9f27-0290cfd380df',
+            message: `New Movie Request: ${text}`
+          })
+        });
+
+        if (response.ok) {
+          status.style.color = '#4CAF50';
+          status.innerText = '✅ Thank you! Your request has been sent.';
+          document.getElementById('requestInput').value = '';
+          setTimeout(closeRequestModal, 2500);
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        status.style.color = '#ff1e27';
+        status.innerText = '⚠️ Unable to send. Please try again later.';
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = 'Send Request';
+      }
+    }
   </script>
 </body>
 </html>
