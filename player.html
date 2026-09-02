@@ -19,6 +19,17 @@
 
   <section class="player-wrapper">
     <h2 id="current-title" class="featured-title">Loading...</h2>
+    
+    <div class="server-controls">
+      <span class="server-label">Select Server:</span>
+      <button id="server1-btn" class="server-btn active" onclick="switchServer(1)">Main Server</button>
+      <button id="server2-btn" class="server-btn" onclick="switchServer(2)">Server 2 (VidNest)</button>
+    </div>
+
+    <div class="server-warning">
+      ⚠️ <strong>Note:</strong> Third-party servers (such as Server 2) may contain external pop-ups or ads. Use an ad blocker for the best experience.
+    </div>
+
     <div class="video-container">
       <iframe id="main-iframe" src="" allowfullscreen></iframe>
     </div>
@@ -37,9 +48,28 @@
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
     document.getElementById('current-title').textContent = currentMovie.title;
-    document.getElementById('main-iframe').src = currentMovie.embedUrl;
     document.title = `${currentMovie.title} - DEYMOVIES`;
 
+    const iframe = document.getElementById('main-iframe');
+    const s1Btn = document.getElementById('server1-btn');
+    const s2Btn = document.getElementById('server2-btn');
+
+    function switchServer(serverNum) {
+      if (serverNum === 1) {
+        iframe.src = currentMovie.embedUrl;
+        s1Btn.classList.add('active');
+        s2Btn.classList.remove('active');
+      } else if (serverNum === 2) {
+        iframe.src = `https://vidnest.fun/movie/${currentMovie.tmdbId}`;
+        s2Btn.classList.add('active');
+        s1Btn.classList.remove('active');
+      }
+    }
+
+    // Initialize with Main Server
+    switchServer(1);
+
+    // Suggestions Grid
     const grid = document.getElementById('random-grid');
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
