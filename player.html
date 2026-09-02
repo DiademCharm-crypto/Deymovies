@@ -22,16 +22,18 @@
     
     <div class="server-controls">
       <span class="server-label">Select Server:</span>
-      <button id="server1-btn" class="server-btn active" onclick="switchServer(1)">Main Server</button>
-      <button id="server2-btn" class="server-btn" onclick="switchServer(2)">Server 2 (VidNest)</button>
+      <button id="server1-btn" class="server-btn" onclick="switchServer(1)">Main Server</button>
+      <button id="server2-btn" class="server-btn" onclick="switchServer(2)">Server 2</button>
+      <button id="server3-btn" class="server-btn" onclick="switchServer(3)">Server 3</button>
+      <button id="server4-btn" class="server-btn" onclick="switchServer(4)">Server 4</button>
     </div>
 
     <div class="server-warning">
-      ⚠️ <strong>Note:</strong> Third-party servers (such as Server 2) may contain external pop-ups or ads. Use an ad blocker for the best experience.
+      ⚠️ <strong>Note:</strong> Third-party servers may contain external pop-ups or ads. Use an ad blocker for the best experience.
     </div>
 
     <div class="video-container">
-      <iframe id="main-iframe" src="" allowfullscreen></iframe>
+      <iframe id="main-iframe" src="" allowfullscreen referrerpolicy="origin"></iframe>
     </div>
   </section>
 
@@ -53,21 +55,40 @@
     const iframe = document.getElementById('main-iframe');
     const s1Btn = document.getElementById('server1-btn');
     const s2Btn = document.getElementById('server2-btn');
+    const s3Btn = document.getElementById('server3-btn');
+    const s4Btn = document.getElementById('server4-btn');
 
     function switchServer(serverNum) {
+      // Clear active styling
+      [s1Btn, s2Btn, s3Btn, s4Btn].forEach(btn => btn.classList.remove('active'));
+
       if (serverNum === 1) {
-        iframe.src = currentMovie.embedUrl;
+        // Main Server: Manual Embed
+        iframe.src = currentMovie.manualEmbed;
         s1Btn.classList.add('active');
-        s2Btn.classList.remove('active');
       } else if (serverNum === 2) {
-        iframe.src = `https://vidnest.fun/movie/${currentMovie.tmdbId}`;
+        // Server 2: CineSrc
+        iframe.src = `https://cinesrc.st/embed/movie/${currentMovie.tmdbId}`;
         s2Btn.classList.add('active');
-        s1Btn.classList.remove('active');
+      } else if (serverNum === 3) {
+        // Server 3: VidSrc
+        iframe.src = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
+        s3Btn.classList.add('active');
+      } else if (serverNum === 4) {
+        // Server 4: VidNest
+        iframe.src = `https://vidnest.fun/movie/${currentMovie.tmdbId}`;
+        s4Btn.classList.add('active');
       }
     }
 
-    // Initialize with Main Server
-    switchServer(1);
+    // Automatic Server Check on Load
+    if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
+      s1Btn.style.display = 'inline-block';
+      switchServer(1); // Play Main Server if manual link exists
+    } else {
+      s1Btn.style.display = 'none'; // Hide Main Server button if no manual link
+      switchServer(2); // Automatically fallback to Server 2 (CineSrc)
+    }
 
     // Suggestions Grid
     const grid = document.getElementById('random-grid');
