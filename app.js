@@ -31,6 +31,13 @@ const featuredMovies = [
 // Main Grid Movie Library
 const movies = [
   { 
+    id: "Love, Ngo", 
+    tmdbId: "1700944",
+    title: "Love, Ngo", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
+    manualEmbed: "https://cinema8.com/video/ADQ9884D"
+  },
+  { 
     id: "The Odyssey", 
     tmdbId: "1368337",
     title: "The Odyssey", 
