@@ -5,13 +5,47 @@
   <script src="https://5gvci.com/act/files/tag.min.js?z=11702637" data-cfasync="false" async></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Deymovies - Streaming</title>
+  <title>DEYMOVIES - Streaming</title>
+  
+  <!-- Website Favicon Icon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header>
-    <h1><a href="index.html" style="color: inherit; text-decoration: none;">DEYMOVIES</a></h1>
+    <a href="index.html" class="logo-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 90" class="site-logo">
+        <defs>
+          <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff1e27"/>
+            <stop offset="100%" stop-color="#b30006"/>
+          </linearGradient>
+          <linearGradient id="deymDark" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2a2a2a"/>
+            <stop offset="100%" stop-color="#141414"/>
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <g transform="translate(10, 10)">
+          <path d="M 35 0 L 65 15 L 65 55 L 35 70 L 5 55 L 5 15 Z" fill="url(#deymDark)" stroke="url(#deymRed)" stroke-width="2.5"/>
+          <path d="M 26 22 L 48 35 L 26 48 Z" fill="url(#deymRed)" filter="url(#glow)"/>
+          <path d="M 33 27 L 55 40 L 33 53 Z" fill="#ffffff" opacity="0.85"/>
+        </g>
+
+        <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="38" letter-spacing="3" fill="#ffffff">
+          DEY<tspan fill="url(#deymRed)">MOVIES</tspan>
+        </text>
+        <text x="92" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="10" letter-spacing="4" fill="#888888">
+          STREAMING PLATFORM
+        </text>
+      </svg>
+    </a>
     <div class="search-container">
       <input type="text" id="search-input" placeholder="Search movies..." onkeyup="handleSearch()">
     </div>
@@ -42,7 +76,6 @@
     const grid = document.getElementById('movie-grid');
     const pagination = document.getElementById('pagination-controls');
 
-    // Hero Slider Controller
     let currentSlide = 0;
     let slideTimer;
 
@@ -111,7 +144,6 @@
       startAutoSlide();
     }
 
-    // Touch Swipe Logic for Mobile
     let touchStartX = 0;
     let touchEndX = 0;
     const sliderContainer = document.getElementById('hero-slider');
@@ -137,7 +169,6 @@
       }
     }
 
-    // Grid Rendering & Pagination
     function renderPage(page) {
       currentPage = page;
       grid.innerHTML = '';

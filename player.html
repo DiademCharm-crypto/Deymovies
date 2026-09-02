@@ -6,12 +6,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DEYMOVIES - Playing Video</title>
+
+  <!-- Website Favicon Icon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header>
-    <h1><a href="index.html" style="color: inherit; text-decoration: none;">DEYMOVIES</a></h1>
+    <a href="index.html" class="logo-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 90" class="site-logo">
+        <defs>
+          <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff1e27"/>
+            <stop offset="100%" stop-color="#b30006"/>
+          </linearGradient>
+          <linearGradient id="deymDark" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2a2a2a"/>
+            <stop offset="100%" stop-color="#141414"/>
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <g transform="translate(10, 10)">
+          <path d="M 35 0 L 65 15 L 65 55 L 35 70 L 5 55 L 5 15 Z" fill="url(#deymDark)" stroke="url(#deymRed)" stroke-width="2.5"/>
+          <path d="M 26 22 L 48 35 L 26 48 Z" fill="url(#deymRed)" filter="url(#glow)"/>
+          <path d="M 33 27 L 55 40 L 33 53 Z" fill="#ffffff" opacity="0.85"/>
+        </g>
+
+        <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="38" letter-spacing="3" fill="#ffffff">
+          DEY<tspan fill="url(#deymRed)">MOVIES</tspan>
+        </text>
+        <text x="92" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="10" letter-spacing="4" fill="#888888">
+          STREAMING PLATFORM
+        </text>
+      </svg>
+    </a>
     <div class="search-container">
       <a href="index.html" class="back-btn">← Back to Home</a>
     </div>
@@ -59,38 +93,31 @@
     const s4Btn = document.getElementById('server4-btn');
 
     function switchServer(serverNum) {
-      // Clear active styling
       [s1Btn, s2Btn, s3Btn, s4Btn].forEach(btn => btn.classList.remove('active'));
 
       if (serverNum === 1) {
-        // Main Server: Manual Embed
         iframe.src = currentMovie.manualEmbed;
         s1Btn.classList.add('active');
       } else if (serverNum === 2) {
-        // Server 2: CineSrc
         iframe.src = `https://cinesrc.st/embed/movie/${currentMovie.tmdbId}`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
-        // Server 3: VidSrc
         iframe.src = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        // Server 4: VidNest
         iframe.src = `https://vidnest.fun/movie/${currentMovie.tmdbId}`;
         s4Btn.classList.add('active');
       }
     }
 
-    // Automatic Server Check on Load
     if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
       s1Btn.style.display = 'inline-block';
-      switchServer(1); // Play Main Server if manual link exists
+      switchServer(1);
     } else {
-      s1Btn.style.display = 'none'; // Hide Main Server button if no manual link
-      switchServer(2); // Automatically fallback to Server 2 (CineSrc)
+      s1Btn.style.display = 'none';
+      switchServer(2);
     }
 
-    // Suggestions Grid
     const grid = document.getElementById('random-grid');
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
