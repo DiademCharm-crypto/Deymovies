@@ -24,7 +24,7 @@ const featuredMovies = [
     description: "An epic journey across dangerous waters and uncharted lands as hero Odysseus seeks his path back home.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "https://demshots015.wistia.com/medias/g14ajl3bgy/analytics?utm_source=media-embed&utm_medium=link&utm_campaign=analytics-share"
+    manualEmbed: "https://cinema8.com/video/9X6wd1PJ"
   }
 ];
 
@@ -35,13 +35,14 @@ const movies = [
     tmdbId: "1368337",
     title: "The Odyssey", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "https://demshots015.wistia.com/medias/g14ajl3bgy/analytics?utm_source=media-embed&utm_medium=link&utm_campaign=analytics-share"
+    manualEmbed: "https://cinema8.com/video/9X6wd1PJ"
   },
   { 
     id: "Spider-Man: Brand New Day", 
     tmdbId: "969681",
     title: "Spider-Man: Brand New Day", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg"
+
   },
   { 
     id: "Mutiny", 
