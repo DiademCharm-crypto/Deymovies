@@ -471,12 +471,12 @@ header {
   text-align: center;
 }
 
-/* Fixed Video Container: Forces 16:9 Aspect Ratio to Prevent Android Stretching */
+/* Fixed Video Container: Enforces strict 16:9 bounds to prevent Android stretching */
 .video-container {
   position: relative;
   width: 100%;
-  max-width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 0;
+  padding-bottom: 56.25% !important; /* Strict 16:9 ratio lock */
   background-color: #000000;
   border-radius: 8px;
   overflow: hidden;
@@ -487,18 +487,10 @@ header {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
   border: 0;
-  object-fit: contain;
-}
-
-/* Fallback for older legacy browsers */
-@supports not (aspect-ratio: 16 / 9) {
-  .video-container {
-    height: 0;
-    padding-bottom: 56.25%;
-  }
 }
 
 /* Transparent Guard Overlay to block Google Drive Top-Right Pop-Out Button */
@@ -520,7 +512,6 @@ header {
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  aspect-ratio: auto !important;
   padding-bottom: 0 !important;
   z-index: 999999 !important;
   border-radius: 0 !important;
