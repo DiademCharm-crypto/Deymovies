@@ -471,14 +471,16 @@ header {
   text-align: center;
 }
 
-/* Video Player Frame with Aspect Ratio Preservation */
+/* Fixed Video Container: Forces 16:9 Aspect Ratio to Prevent Android Stretching */
 .video-container {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
   background-color: #000000;
   border-radius: 8px;
   overflow: hidden;
+  margin: 0 auto;
 }
 
 .video-container iframe {
@@ -488,6 +490,15 @@ header {
   width: 100%;
   height: 100%;
   border: 0;
+  object-fit: contain;
+}
+
+/* Fallback for older legacy browsers */
+@supports not (aspect-ratio: 16 / 9) {
+  .video-container {
+    height: 0;
+    padding-bottom: 56.25%;
+  }
 }
 
 /* Transparent Guard Overlay to block Google Drive Top-Right Pop-Out Button */
@@ -502,13 +513,14 @@ header {
   pointer-events: auto;
 }
 
-/* Pseudo Fullscreen Override */
+/* Fullscreen Override */
 .video-container.ios-pseudo-fullscreen {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  aspect-ratio: auto !important;
   padding-bottom: 0 !important;
   z-index: 999999 !important;
   border-radius: 0 !important;
