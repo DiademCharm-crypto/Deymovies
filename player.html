@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DEYMOVIES - Player</title>
+  <title>DEYMFLIX - Player</title>
   <link rel="stylesheet" href="style.css">
   
   <script>
@@ -16,11 +16,11 @@
   <!-- Top Navigation -->
   <header class="player-top-header">
     <a href="index.html" class="back-icon-btn">←</a>
-    <span style="font-weight: 700; font-size: 0.95rem;">DEYMOVIES</span>
+    <span style="font-weight: 700; font-size: 0.95rem;">DEYMFLIX</span>
   </header>
 
   <!-- Embedded Player -->
-  <div class="video-container">
+  <div class="video-container" id="playerContainer">
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
@@ -110,6 +110,24 @@
       `;
       grid.appendChild(card);
     });
+
+    // Auto Orientation Switch on Fullscreen Toggle
+    function handleFullscreenChange() {
+      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+      
+      if (isFullscreen) {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      } else {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      }
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
   </script>
 </body>
 </html>
