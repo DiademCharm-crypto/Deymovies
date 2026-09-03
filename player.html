@@ -120,7 +120,7 @@
       [s1Btn, s2Btn, s3Btn, s4Btn].forEach(btn => btn.classList.remove('active'));
 
       if (serverNum === 1) {
-        iframe.src = currentMovie.manualEmbed;
+        iframe.src = cleanDriveLink(currentMovie.manualEmbed);
         s1Btn.classList.add('active');
       } else if (serverNum === 2) {
         iframe.src = `https://cinesrc.st/embed/movie/${currentMovie.tmdbId}`;

@@ -1,3 +1,12 @@
+// Link Cleaner Utility: Converts any standard Google Drive share URL to an embeddable preview URL
+function cleanDriveLink(url) {
+  if (!url) return '';
+  if (url.includes('drive.google.com') && url.includes('/view')) {
+    return url.replace(/\/view.*$/, '/preview');
+  }
+  return url;
+}
+
 // Featured Hero Movies
 const featuredMovies = [
   { 
@@ -35,14 +44,14 @@ const movies = [
     tmdbId: "1700944",
     title: "Love, Ngo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://drive.google.com/file/d/1jzC-FNqoKrMx_p73iK746rpIQ7hLANOM/preview"
+    manualEmbed: "https://drive.google.com/file/d/1jzC-FNqoKrMx_p73iK746rpIQ7hLANOM/view"
   },
   { 
     id: "Call Me Mother", 
     tmdbId: "1510688",
     title: "Call Me Mother", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
-    manualEmbed: "https://drive.google.com/file/d/1hFh2c-1NZEHgQ49VW67d9a6vszOPT2-r/preview"
+    manualEmbed: "https://cinema8.com/video/zX0ERn9J"
   },
   { 
     id: "The Odyssey", 
@@ -56,7 +65,6 @@ const movies = [
     tmdbId: "969681",
     title: "Spider-Man: Brand New Day", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg"
-
   },
   { 
     id: "Mutiny", 
