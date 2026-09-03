@@ -35,14 +35,14 @@ const movies = [
     tmdbId: "1700944",
     title: "Love, Ngo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://drive.google.com/file/d/1yAhozDLERfnZeUvXNEoGilFZ5HB8SVMR/preview"
+    manualEmbed: "https://drive.google.com/file/d/1jzC-FNqoKrMx_p73iK746rpIQ7hLANOM/preview"
   },
   { 
     id: "Call Me Mother", 
     tmdbId: "1510688",
     title: "Call Me Mother", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
-    manualEmbed: "https://cinema8.com/video/zX0ERn9J"
+    manualEmbed: "https://drive.google.com/file/d/1hFh2c-1NZEHgQ49VW67d9a6vszOPT2-r/preview"
   },
   { 
     id: "The Odyssey", 
