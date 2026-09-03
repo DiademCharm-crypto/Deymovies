@@ -18,18 +18,10 @@
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Media Details & Action Card -->
+  <!-- Media Details & Movie Description Box -->
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
-    
-    <div class="quick-action-bar">
-      <div class="action-item" onclick="toggleDesktopFullscreen()" style="cursor: pointer;">
-        <span>⛶</span><span>Fullscreen</span>
-      </div>
-      <div class="action-item"><span>📥</span><span>Download</span></div>
-      <div class="action-item"><span>➕</span><span>My List</span></div>
-      <div class="action-item"><span>↗</span><span>Share</span></div>
-    </div>
+    <p id="current-description" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-top: 6px;">Loading synopsis...</p>
   </div>
 
   <!-- Servers / Sources Row -->
@@ -54,12 +46,73 @@
 
   <script src="app.js"></script>
   <script>
+    // Universal Back Button Navigation Override
+    (function () {
+      history.pushState(null, null, location.href);
+
+      window.addEventListener('popstate', function () {
+        window.location.replace('index.html');
+      });
+    })();
+
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
 
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
+    // Populate Movie Title
     document.getElementById('current-title').textContent = currentMovie.title;
+
+    const descElement = document.getElementById('current-description');
+
+    // -------------------------------------------------------------
+    // Multi-Source Broad Search Pipeline (app.js -> TMDB -> Wikipedia Search)
+    // -------------------------------------------------------------
+    async function loadBroadSynopsis() {
+      // Step 1: Check app.js local description
+      if (currentMovie.description && currentMovie.description.trim() !== '') {
+        descElement.textContent = currentMovie.description;
+        return;
+      }
+
+      // Step 2: Try TMDB API
+      if (currentMovie.tmdbId) {
+        try {
+          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=15d260044e350723365198253b23914f&language=en-US`);
+          if (tmdbRes.ok) {
+            const tmdbData = await tmdbRes.json();
+            if (tmdbData.overview && tmdbData.overview.trim() !== '') {
+              descElement.textContent = tmdbData.overview;
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Step 3: Option 3 - Wikipedia Auto-Search Query Fallback
+      try {
+        const queryTerm = encodeURIComponent(`${currentMovie.title} film`);
+        const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${queryTerm}&format=json&origin=*`);
+        const searchData = await searchRes.json();
+
+        if (searchData.query && searchData.query.search.length > 0) {
+          const pageTitle = searchData.query.search[0].title;
+          const summaryRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
+          if (summaryRes.ok) {
+            const summaryData = await summaryRes.json();
+            if (summaryData.extract && summaryData.extract.trim() !== '') {
+              descElement.textContent = summaryData.extract;
+              return;
+            }
+          }
+        }
+      } catch (e) {}
+
+      // Final Fallback if all sources fail
+      descElement.textContent = "No synopsis available for this title.";
+    }
+
+    loadBroadSynopsis();
 
     const iframe = document.getElementById('main-iframe');
     const s1Btn = document.getElementById('server1-btn');
@@ -68,15 +121,22 @@
     const s4Btn = document.getElementById('server4-btn');
     let toastTimeout;
 
+    // Toast Handler supporting Native Android Toast & Web Toast
     function showToast(message) {
-      const toast = document.getElementById('loading-toast');
-      toast.textContent = message;
-      toast.classList.add('show');
+      if (window.Android && typeof window.Android.showToast === 'function') {
+        window.Android.showToast(message);
+      }
 
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      const toast = document.getElementById('loading-toast');
+      if (toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
     }
 
     function switchServer(serverNum) {
@@ -115,6 +175,7 @@
       switchServer(2);
     }
 
+    // Recommendation Cards
     const grid = document.getElementById('random-grid');
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
@@ -133,41 +194,7 @@
       grid.appendChild(card);
     });
 
-    // Override browser back action to navigate directly back to index.html
-    history.pushState({ page: 'player' }, '', window.location.href);
-
-    window.addEventListener('popstate', function (event) {
-      window.location.href = 'index.html';
-    });
-
-    // Explicit Cross-Platform Fullscreen Trigger
-    function toggleDesktopFullscreen() {
-      const elem = document.getElementById('playerContainer');
-
-      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-          elem.mozRequestFullScreen();
-        } else if (elem.msRequestFullscreen) {
-          elem.msRequestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-      }
-    }
-
-    // Handle Orientation Lock for Mobile Devices
+    // Auto Orientation Switching for Fullscreen
     function handleFullscreenChange() {
       const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       
