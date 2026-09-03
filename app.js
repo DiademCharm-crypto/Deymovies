@@ -35,7 +35,7 @@ const movies = [
     tmdbId: "1700944",
     title: "Love, Ngo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://cinema8.com/video/ADQ9884D"
+    manualEmbed: "https://player.mediadelivery.net/embed/743086/776dcb6a-5ac4-4a47-a920-dd2b3ce29458?autoplay=true&loop=false&muted=true&preload=true&responsive=true"
   },
   { 
     id: "Call Me Mother", 
