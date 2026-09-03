@@ -13,9 +13,9 @@
 </head>
 <body style="padding-top: 0;">
 
-  <!-- Embedded Player -->
+  <!-- Embedded Player Container -->
   <div class="video-container" id="playerContainer">
-    <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
+    <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
   <!-- Media Details & Action Card -->
@@ -23,6 +23,9 @@
     <h1 id="current-title" class="media-title">Loading...</h1>
     
     <div class="quick-action-bar">
+      <div class="action-item" onclick="toggleDesktopFullscreen()" style="cursor: pointer;">
+        <span>⛶</span><span>Fullscreen</span>
+      </div>
       <div class="action-item"><span>📥</span><span>Download</span></div>
       <div class="action-item"><span>➕</span><span>My List</span></div>
       <div class="action-item"><span>↗</span><span>Share</span></div>
@@ -46,6 +49,9 @@
     <div class="list-recommendations" id="random-grid"></div>
   </section>
 
+  <!-- Loading Toast Element -->
+  <div id="loading-toast" class="toast-notification">Server is loading, please wait...</div>
+
   <script src="app.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -60,6 +66,18 @@
     const s2Btn = document.getElementById('server2-btn');
     const s3Btn = document.getElementById('server3-btn');
     const s4Btn = document.getElementById('server4-btn');
+    let toastTimeout;
+
+    function showToast(message) {
+      const toast = document.getElementById('loading-toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
     function switchServer(serverNum) {
       [s1Btn, s2Btn, s3Btn, s4Btn].forEach(btn => btn.classList.remove('active'));
@@ -80,7 +98,8 @@
         s4Btn.classList.add('active');
       }
 
-      // location.replace prevents server switches from creating additional browser history entries
+      showToast(`Server ${serverNum} is loading, please wait...`);
+
       if (iframe.contentWindow) {
         iframe.contentWindow.location.replace(targetUrl);
       } else {
@@ -121,9 +140,36 @@
       window.location.href = 'index.html';
     });
 
-    // Auto Orientation Switch on Fullscreen Toggle
+    // Explicit Cross-Platform Fullscreen Trigger
+    function toggleDesktopFullscreen() {
+      const elem = document.getElementById('playerContainer');
+
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    // Handle Orientation Lock for Mobile Devices
     function handleFullscreenChange() {
-      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       
       if (isFullscreen) {
         if (screen.orientation && screen.orientation.lock) {
@@ -138,6 +184,8 @@
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
   </script>
 </body>
 </html>
