@@ -74,6 +74,8 @@
     </div>
 
     <div class="video-container" id="playerContainer">
+      <!-- Click guard to block Google Drive top-right pop-out button -->
+      <div class="iframe-click-guard"></div>
       <button class="exit-pseudo-btn" id="exitPseudoBtn" onclick="triggerDeviceFullscreen()">✕ Exit Fullscreen</button>
       <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="origin"></iframe>
     </div>
