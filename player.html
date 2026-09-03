@@ -15,6 +15,10 @@
 
   <!-- Embedded Player Container -->
   <div class="video-container" id="playerContainer">
+    <!-- Native HTML5 Video Player for Direct Files with Autoplay -->
+    <video id="direct-video-player" controls autoplay muted playsinline crossorigin="anonymous" style="display: none;"></video>
+
+    <!-- Fallback iFrame for Third-Party Embed Sources -->
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
@@ -134,6 +138,7 @@
     loadBroadSynopsis();
 
     const iframe = document.getElementById('main-iframe');
+    const directPlayer = document.getElementById('direct-video-player');
     const s1Btn = document.getElementById('server1-btn');
     const s2Btn = document.getElementById('server2-btn');
     const s3Btn = document.getElementById('server3-btn');
@@ -167,23 +172,49 @@
       if (serverNum === 1) {
         targetUrl = cleanDriveLink(currentMovie.manualEmbed);
         s1Btn.classList.add('active');
+
+        // Check if URL is a direct stream file (.mp4, .mkv)
+        const lowerUrl = targetUrl.toLowerCase();
+        if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
+          iframe.style.display = 'none';
+          directPlayer.style.display = 'block';
+          directPlayer.src = targetUrl;
+          
+          // Trigger browser autoplay execution
+          directPlayer.play().catch(e => {
+            console.log("Autoplay blocked by browser policy:", e);
+          });
+
+          showToast(`Server 1 is loading, please wait...`);
+          return;
+        }
       } else if (serverNum === 2) {
         // Server 2: VidSrc SBS
-        targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
+        targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
         // Server 3: AutoEmbed
-        targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}`;
+        targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        // Server 4: Embed.su (MovieNight player with US city locations)
-        targetUrl = `https://embed.su/embed/movie/${currentMovie.tmdbId}`;
+        // Server 4: Embed.su
+        targetUrl = `https://embed.su/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s4Btn.classList.add('active');
       } else if (serverNum === 5) {
         // Server 5: VidSrc Pro
-        targetUrl = `https://vidsrc.pro/embed/movie/${currentMovie.tmdbId}`;
+        targetUrl = `https://vidsrc.pro/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s5Btn.classList.add('active');
       }
+
+      // Append autoplay query param if manual embed is an iframe link
+      if (serverNum === 1 && targetUrl) {
+        targetUrl += targetUrl.includes('?') ? '&autoplay=1' : '?autoplay=1';
+      }
+
+      // Switch view to iFrame player
+      directPlayer.pause();
+      directPlayer.style.display = 'none';
+      iframe.style.display = 'block';
 
       showToast(`Server ${serverNum} is loading, please wait...`);
 

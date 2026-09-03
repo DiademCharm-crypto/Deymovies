@@ -51,7 +51,7 @@ const movies = [
     tmdbId: "1510688",
     title: "Call Me Mother", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
-    manualEmbed: "https://cinema8.com/video/zX0ERn9J"
+    manualEmbed: "https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
   },
   { 
     id: "The Odyssey", 
