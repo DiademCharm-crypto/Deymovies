@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DEYMFLIX - Offline</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0f0f0f;
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .offline-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 300px;
+    }
+
+    .site-logo-svg {
+      width: 220px;
+      height: auto;
+    }
+
+    .error-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .error-desc {
+      font-size: 0.85rem;
+      color: #aaaaaa;
+      line-height: 1.4;
+    }
+
+    .reload-btn {
+      background-color: #e50914;
+      color: #ffffff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+      transition: background-color 0.2s ease;
+    }
+
+    .reload-btn:active {
+      background-color: #ff0f1b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="offline-container">
+    <!-- Brand Logo -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" class="site-logo-svg">
+      <defs>
+        <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff1e27"/>
+          <stop offset="100%" stop-color="#b30006"/>
+        </linearGradient>
+        <linearGradient id="deymDark" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2a2a2a"/>
+          <stop offset="100%" stop-color="#141414"/>
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+
+      <g transform="translate(5, 5)">
+        <path d="M 22 0 L 42 10 L 42 38 L 22 48 L 2 38 L 2 10 Z" fill="url(#deymDark)" stroke="url(#deymRed)" stroke-width="2"/>
+        <path d="M 16 14 L 31 23 L 16 32 Z" fill="url(#deymRed)" filter="url(#glow)"/>
+        <path d="M 21 17 L 35 25 L 21 33 Z" fill="#ffffff" opacity="0.85"/>
+      </g>
+
+      <text x="56" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" letter-spacing="2" fill="#ffffff">
+        DEYM<tspan fill="url(#deymRed)">FLIX</tspan>
+      </text>
+    </svg>
+
+    <div class="error-title">Connection Lost</div>
+    <div class="error-desc">Please check your internet connection and try again.</div>
+
+    <!-- Reload Button -->
+    <button class="reload-btn" onclick="retryConnection()">↻ Reload</button>
+  </div>
+
+  <script>
+    function retryConnection() {
+      // Redirect back to main website URL
+      window.location.href = "https://deymflix.eu.cc/index.html";
+    }
+  </script>
+</body>
+</html>

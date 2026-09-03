@@ -44,7 +44,7 @@ const movies = [
     tmdbId: "1700944",
     title: "Love, Ngo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://drive.google.com/file/d/1hFh2c-1NZEHgQ49VW67d9a6vszOPT2-r/view?usp=drive_link"
+    manualEmbed: "https://archive.org/embed/love.-ngo.-2026.1080p.-vmax.-web-dl.-aac.-2.0.-h-264-trickflix.-hc"
   },
   { 
     id: "Call Me Mother", 
@@ -591,22 +591,20 @@ const movies = [
 
 function createMovieCard(movie) {
   const card = document.createElement('div');
-  card.className = 'movie-card clickable';
+  card.className = 'poster-card';
   card.onclick = () => {
-    window.location.href = `player.html?id=${movie.id}`;
+    window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
   };
 
   const fallbackUrl = 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=No+Poster';
 
   card.innerHTML = `
-    <div class="thumbnail-placeholder">
-      <img src="${movie.poster}" 
-           alt="${movie.title}" 
-           class="movie-poster" 
-           loading="lazy" 
-           onerror="this.onerror=null;this.src='${fallbackUrl}';">
-    </div>
-    <div class="movie-title">${movie.title}</div>
+    <img src="${movie.poster}" 
+         alt="${movie.title}" 
+         loading="lazy" 
+         onerror="this.onerror=null;this.src='${fallbackUrl}';">
+    <div class="tag-badge-bottom">HD</div>
+    <div class="poster-card-title">${movie.title}</div>
   `;
   return card;
 }

@@ -1,105 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Monetag Ad Scripts -->
-  <script>(function(s){s.dataset.zone='11702675',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-  <script src="https://5gvci.com/act/files/tag.min.js?z=11702637" data-cfasync="false" async></script>
-
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DEYMOVIES - Playing Video</title>
-
-  <!-- Website Favicon Icon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
-  <!-- Version bumped to v=3.0 to bypass Android WebKit stylesheet cache -->
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DEYMOVIES - Player</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <script>
+    // Disable external window popups from video embed servers
+    window.open = function() { return null; };
+  </script>
 </head>
 <body>
 
-  <header>
-    <a href="index.html" class="logo-link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 90" class="site-logo">
-        <defs>
-          <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ff1e27"/>
-            <stop offset="100%" stop-color="#b30006"/>
-          </linearGradient>
-          <linearGradient id="deymDark" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#2a2a2a"/>
-            <stop offset="100%" stop-color="#141414"/>
-          </linearGradient>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-          </filter>
-        </defs>
-
-        <g transform="translate(10, 10)">
-          <path d="M 35 0 L 65 15 L 65 55 L 35 70 L 5 55 L 5 15 Z" fill="url(#deymDark)" stroke="url(#deymRed)" stroke-width="2.5"/>
-          <path d="M 26 22 L 48 35 L 26 48 Z" fill="url(#deymRed)" filter="url(#glow)"/>
-          <path d="M 33 27 L 55 40 L 33 53 Z" fill="#ffffff" opacity="0.85"/>
-        </g>
-
-        <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="38" letter-spacing="3" fill="#ffffff">
-          DEY<tspan fill="url(#deymRed)">MOVIES</tspan>
-        </text>
-        <text x="92" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="10" letter-spacing="4" fill="#888888">
-          STREAMING PLATFORM
-        </text>
-      </svg>
-    </a>
-    
-    <div class="header-actions">
-      <button class="request-btn" onclick="openRequestModal()">🍿 Request a Movie</button>
-      <a href="index.html" class="back-btn">← Back to Home</a>
-    </div>
+  <!-- Top Navigation -->
+  <header class="player-top-header">
+    <a href="index.html" class="back-icon-btn">←</a>
+    <span style="font-weight: 700; font-size: 0.95rem;">DEYMOVIES</span>
   </header>
 
-  <section class="player-wrapper">
-    <h2 id="current-title" class="featured-title">Loading...</h2>
+  <!-- Embedded Player -->
+  <div class="video-container">
+    <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
+  </div>
+
+  <!-- Media Details & Action Card -->
+  <div class="video-info-box">
+    <h1 id="current-title" class="media-title">Loading...</h1>
     
-    <div class="server-controls">
-      <span class="server-label">Select Server:</span>
-      <button id="server1-btn" class="server-btn" onclick="switchServer(1)">Main Server</button>
-      <button id="server2-btn" class="server-btn" onclick="switchServer(2)">Server 2</button>
-      <button id="server3-btn" class="server-btn" onclick="switchServer(3)">Server 3</button>
-      <button id="server4-btn" class="server-btn" onclick="switchServer(4)">Server 4</button>
-      
-      <!-- Cross-Platform Fullscreen Trigger Button -->
-      <button class="fullscreen-trigger-btn" onclick="triggerDeviceFullscreen()">⛶ Fullscreen</button>
-    </div>
-
-    <div class="server-warning">
-      ⚠️ <strong>Note:</strong> Third-party servers may contain external pop-ups or ads. Use an ad blocker for the best experience.
-    </div>
-
-    <div class="video-container" id="playerContainer">
-      <div class="iframe-click-guard"></div>
-      <button class="exit-pseudo-btn" id="exitPseudoBtn" onclick="triggerDeviceFullscreen()">✕ Exit Fullscreen</button>
-      <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="origin"></iframe>
-    </div>
-  </section>
-
-  <section class="suggestions-section">
-    <h3 class="section-heading">You Might Also Like</h3>
-    <main class="container" id="random-grid"></main>
-  </section>
-
-  <!-- Request Modal Popup -->
-  <div id="requestModal" class="modal-backdrop">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeRequestModal()">&times;</button>
-      <h3>🍿 Request A Movie</h3>
-      <p class="modal-desc">Can't find what you're looking for? Enter the movie or TV show title below and send it to us!</p>
-      
-      <form id="requestForm" onsubmit="handleRequestSubmit(event)">
-        <textarea id="requestInput" placeholder="Write movie title or request message here..." required></textarea>
-        <button type="submit" class="send-btn" id="sendBtn">Send Request</button>
-      </form>
-      <div id="formStatus" class="form-status"></div>
+    <div class="quick-action-bar">
+      <div class="action-item"><span>📥</span><span>Download</span></div>
+      <div class="action-item"><span>➕</span><span>My List</span></div>
+      <div class="action-item"><span>↗</span><span>Share</span></div>
     </div>
   </div>
+
+  <!-- Servers / Sources Row -->
+  <div class="episodes-section">
+    <h3 style="font-size: 0.9rem; font-weight: 700;">Select Server</h3>
+    <div class="episode-badges-grid">
+      <div id="server1-btn" class="ep-badge" onclick="switchServer(1)">1</div>
+      <div id="server2-btn" class="ep-badge" onclick="switchServer(2)">2</div>
+      <div id="server3-btn" class="ep-badge" onclick="switchServer(3)">3</div>
+      <div id="server4-btn" class="ep-badge" onclick="switchServer(4)">4</div>
+    </div>
+  </div>
+
+  <!-- Recommendations Horizontal List -->
+  <section class="content-section">
+    <h3 class="section-header-title">More Like This</h3>
+    <div class="list-recommendations" id="random-grid"></div>
+  </section>
 
   <script src="app.js"></script>
   <script>
@@ -109,7 +60,6 @@
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
     document.getElementById('current-title').textContent = currentMovie.title;
-    document.title = `${currentMovie.title} - DEYMOVIES`;
 
     const iframe = document.getElementById('main-iframe');
     const s1Btn = document.getElementById('server1-btn');
@@ -136,7 +86,7 @@
     }
 
     if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
-      s1Btn.style.display = 'inline-block';
+      s1Btn.style.display = 'flex';
       switchServer(1);
     } else {
       s1Btn.style.display = 'none';
@@ -147,88 +97,19 @@
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
 
-    shuffled.forEach(movie => {
-      grid.appendChild(createMovieCard(movie));
+    shuffled.slice(0, 8).forEach(movie => {
+      const card = document.createElement('div');
+      card.className = 'recommendation-card';
+      card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
+      card.innerHTML = `
+        <img src="${movie.poster}" alt="${movie.title}">
+        <div class="rec-info">
+          <span class="rec-title">${movie.title}</span>
+          <span class="rec-genre">Movie • HD</span>
+        </div>
+      `;
+      grid.appendChild(card);
     });
-
-    // Cross-Device Fullscreen Handler
-    function triggerDeviceFullscreen() {
-      const container = document.getElementById('playerContainer');
-      const exitBtn = document.getElementById('exitPseudoBtn');
-
-      if (container.requestFullscreen) {
-        if (!document.fullscreenElement) {
-          container.requestFullscreen().catch(() => togglePseudoFullscreen(container, exitBtn));
-        } else {
-          document.exitFullscreen();
-        }
-      } else if (container.webkitRequestFullscreen) {
-        if (!document.webkitFullscreenElement) {
-          container.webkitRequestFullscreen();
-        } else {
-          document.webkitExitFullscreen();
-        }
-      } else {
-        togglePseudoFullscreen(container, exitBtn);
-      }
-    }
-
-    function togglePseudoFullscreen(container, exitBtn) {
-      container.classList.toggle('ios-pseudo-fullscreen');
-      if (container.classList.contains('ios-pseudo-fullscreen')) {
-        exitBtn.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-      } else {
-        exitBtn.style.display = 'none';
-        document.body.style.overflow = 'auto';
-      }
-    }
-
-    // Modal Controls
-    function openRequestModal() {
-      document.getElementById('requestModal').style.display = 'flex';
-    }
-
-    function closeRequestModal() {
-      document.getElementById('requestModal').style.display = 'none';
-      document.getElementById('formStatus').innerText = '';
-    }
-
-    async function handleRequestSubmit(e) {
-      e.preventDefault();
-      const sendBtn = document.getElementById('sendBtn');
-      const status = document.getElementById('formStatus');
-      const text = document.getElementById('requestInput').value;
-
-      sendBtn.disabled = true;
-      sendBtn.innerText = 'Sending...';
-
-      try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            access_key: 'f128f943-dee1-4f4f-9f27-0290cfd380df',
-            message: `New Movie Request: ${text}`
-          })
-        });
-
-        if (response.ok) {
-          status.style.color = '#4CAF50';
-          status.innerText = '✅ Thank you! Your request has been sent.';
-          document.getElementById('requestInput').value = '';
-          setTimeout(closeRequestModal, 2500);
-        } else {
-          throw new Error('Failed');
-        }
-      } catch (err) {
-        status.style.color = '#ff1e27';
-        status.innerText = '⚠️ Unable to send. Please try again later.';
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerText = 'Send Request';
-      }
-    }
   </script>
 </body>
 </html>
