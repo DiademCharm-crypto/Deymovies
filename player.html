@@ -33,6 +33,7 @@
       <div id="server2-btn" class="ep-badge" onclick="switchServer(2)">2</div>
       <div id="server3-btn" class="ep-badge" onclick="switchServer(3)">3</div>
       <div id="server4-btn" class="ep-badge" onclick="switchServer(4)">4</div>
+      <div id="server5-btn" class="ep-badge" onclick="switchServer(5)">5</div>
     </div>
   </div>
 
@@ -47,7 +48,7 @@
 
   <script src="app.js"></script>
   <script>
-    // Universal Back Button Navigation Override
+    // Universal Back Button Navigation Override (Forces redirect to index.html)
     (function () {
       history.pushState(null, null, location.href);
 
@@ -85,7 +86,7 @@
       }
     }
 
-    // Multi-Source Synopsis Search Pipeline
+    // Multi-Source Synopsis Search Pipeline (app.js -> TMDB -> Wikipedia)
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -137,6 +138,7 @@
     const s2Btn = document.getElementById('server2-btn');
     const s3Btn = document.getElementById('server3-btn');
     const s4Btn = document.getElementById('server4-btn');
+    const s5Btn = document.getElementById('server5-btn');
     let toastTimeout;
 
     // Toast Handler
@@ -158,7 +160,7 @@
     }
 
     function switchServer(serverNum) {
-      [s1Btn, s2Btn, s3Btn, s4Btn].forEach(btn => btn.classList.remove('active'));
+      [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       let targetUrl = "";
 
@@ -166,15 +168,21 @@
         targetUrl = cleanDriveLink(currentMovie.manualEmbed);
         s1Btn.classList.add('active');
       } else if (serverNum === 2) {
-        targetUrl = `https://cinesrc.st/embed/movie/${currentMovie.tmdbId}`;
+        // Server 2: VidSrc SBS
+        targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
-        targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
+        // Server 3: AutoEmbed
+        targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        // Server 4 updated to 2embed (Bypasses Connection Refusal & Sandbox errors)
-        targetUrl = `https://www.2embed.cc/embed/${currentMovie.tmdbId}`;
+        // Server 4: Embed.su (MovieNight player with US city locations)
+        targetUrl = `https://embed.su/embed/movie/${currentMovie.tmdbId}`;
         s4Btn.classList.add('active');
+      } else if (serverNum === 5) {
+        // Server 5: VidSrc Pro
+        targetUrl = `https://vidsrc.pro/embed/movie/${currentMovie.tmdbId}`;
+        s5Btn.classList.add('active');
       }
 
       showToast(`Server ${serverNum} is loading, please wait...`);
