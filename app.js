@@ -44,7 +44,7 @@ const movies = [
     tmdbId: "1700944",
     title: "Love, Ngo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://archive.org/embed/love.-ngo.-2026.1080p.-vmax.-web-dl.-aac.-2.0.-h-264-trickflix.-hc"
+    manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4"
   },
   { 
     id: "Call Me Mother", 
