@@ -22,6 +22,11 @@
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
+  <!-- Slow Connection Warning Note (Placed between Video Player & Title Box) -->
+  <div id="network-note" class="network-warning-note" style="display: none;">
+    ⚠️ Slow connection? Reload the page or try another server.
+  </div>
+
   <!-- Media Details & Truncated Movie Description -->
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
@@ -71,6 +76,7 @@
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
+    const networkNote = document.getElementById('network-note');
 
     function checkSynopsisLength() {
       if (descElement.scrollHeight > descElement.clientHeight || descElement.textContent.length > 180) {
@@ -145,6 +151,17 @@
     const s4Btn = document.getElementById('server4-btn');
     const s5Btn = document.getElementById('server5-btn');
     let toastTimeout;
+    let slowConnectionTimer = null;
+
+    // Direct Video Player Event Listeners for Handling the Slow Connection Note
+    directPlayer.addEventListener('playing', () => {
+      clearTimeout(slowConnectionTimer);
+      networkNote.style.display = 'none';
+    });
+
+    directPlayer.addEventListener('waiting', () => {
+      networkNote.style.display = 'block';
+    });
 
     // Toast Handler
     function showToast(message) {
@@ -167,20 +184,22 @@
     function switchServer(serverNum) {
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
+      // Reset and display connection note while server loads
+      clearTimeout(slowConnectionTimer);
+      networkNote.style.display = 'block';
+
       let targetUrl = "";
 
       if (serverNum === 1) {
         targetUrl = cleanDriveLink(currentMovie.manualEmbed);
         s1Btn.classList.add('active');
 
-        // Check if URL is a direct stream file (.mp4, .mkv)
         const lowerUrl = targetUrl.toLowerCase();
         if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
           iframe.style.display = 'none';
           directPlayer.style.display = 'block';
           directPlayer.src = targetUrl;
           
-          // Trigger browser autoplay execution
           directPlayer.play().catch(e => {
             console.log("Autoplay blocked by browser policy:", e);
           });
@@ -189,29 +208,23 @@
           return;
         }
       } else if (serverNum === 2) {
-        // Server 2: VidSrc SBS
         targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
-        // Server 3: AutoEmbed
         targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        // Server 4: Embed.su
         targetUrl = `https://embed.su/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s4Btn.classList.add('active');
       } else if (serverNum === 5) {
-        // Server 5: VidSrc Pro
         targetUrl = `https://vidsrc.pro/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s5Btn.classList.add('active');
       }
 
-      // Append autoplay query param if manual embed is an iframe link
       if (serverNum === 1 && targetUrl) {
         targetUrl += targetUrl.includes('?') ? '&autoplay=1' : '?autoplay=1';
       }
 
-      // Switch view to iFrame player
       directPlayer.pause();
       directPlayer.style.display = 'none';
       iframe.style.display = 'block';
@@ -223,6 +236,11 @@
       } else {
         iframe.src = targetUrl;
       }
+
+      // Hide note automatically after 6 seconds for iframe embeds
+      slowConnectionTimer = setTimeout(() => {
+        networkNote.style.display = 'none';
+      }, 6000);
     }
 
     if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {

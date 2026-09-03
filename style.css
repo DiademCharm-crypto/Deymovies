@@ -284,7 +284,7 @@ body {
   }
 }
 
-/* Player View & Synopsis Controls */
+/* Player View & Container */
 .video-container {
   width: 100%;
   aspect-ratio: 16/9;
@@ -304,6 +304,19 @@ body {
   object-fit: contain !important;
   background: #000000;
   outline: none;
+}
+
+/* Slow Connection Warning Note (Standalone below player, above info box) */
+.network-warning-note {
+  margin: 10px 16px 0 16px;
+  padding: 8px 12px;
+  background-color: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.4);
+  color: #ff8888;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-align: center;
 }
 
 .video-info-box {
