@@ -18,10 +18,11 @@
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Media Details & Movie Description Box -->
+  <!-- Media Details & Truncated Movie Description -->
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
-    <p id="current-description" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-top: 6px;">Loading synopsis...</p>
+    <p id="current-description" class="synopsis-text">Loading synopsis...</p>
+    <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
   </div>
 
   <!-- Servers / Sources Row -->
@@ -60,22 +61,38 @@
 
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
-    // Populate Movie Title
+    // Populate Title
     document.getElementById('current-title').textContent = currentMovie.title;
 
     const descElement = document.getElementById('current-description');
+    const readMoreBtn = document.getElementById('toggle-synopsis-btn');
 
-    // -------------------------------------------------------------
-    // Multi-Source Broad Search Pipeline (app.js -> TMDB -> Wikipedia Search)
-    // -------------------------------------------------------------
+    function checkSynopsisLength() {
+      if (descElement.scrollHeight > descElement.clientHeight || descElement.textContent.length > 180) {
+        readMoreBtn.style.display = 'inline-block';
+      } else {
+        readMoreBtn.style.display = 'none';
+      }
+    }
+
+    function toggleSynopsis() {
+      if (descElement.classList.contains('expanded')) {
+        descElement.classList.remove('expanded');
+        readMoreBtn.textContent = 'Read More';
+      } else {
+        descElement.classList.add('expanded');
+        readMoreBtn.textContent = 'Show Less';
+      }
+    }
+
+    // Multi-Source Synopsis Search Pipeline
     async function loadBroadSynopsis() {
-      // Step 1: Check app.js local description
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
+        checkSynopsisLength();
         return;
       }
 
-      // Step 2: Try TMDB API
       if (currentMovie.tmdbId) {
         try {
           const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=15d260044e350723365198253b23914f&language=en-US`);
@@ -83,13 +100,13 @@
             const tmdbData = await tmdbRes.json();
             if (tmdbData.overview && tmdbData.overview.trim() !== '') {
               descElement.textContent = tmdbData.overview;
+              checkSynopsisLength();
               return;
             }
           }
         } catch (e) {}
       }
 
-      // Step 3: Option 3 - Wikipedia Auto-Search Query Fallback
       try {
         const queryTerm = encodeURIComponent(`${currentMovie.title} film`);
         const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${queryTerm}&format=json&origin=*`);
@@ -102,14 +119,15 @@
             const summaryData = await summaryRes.json();
             if (summaryData.extract && summaryData.extract.trim() !== '') {
               descElement.textContent = summaryData.extract;
+              checkSynopsisLength();
               return;
             }
           }
         }
       } catch (e) {}
 
-      // Final Fallback if all sources fail
       descElement.textContent = "No synopsis available for this title.";
+      readMoreBtn.style.display = 'none';
     }
 
     loadBroadSynopsis();
@@ -121,7 +139,7 @@
     const s4Btn = document.getElementById('server4-btn');
     let toastTimeout;
 
-    // Toast Handler supporting Native Android Toast & Web Toast
+    // Toast Handler
     function showToast(message) {
       if (window.Android && typeof window.Android.showToast === 'function') {
         window.Android.showToast(message);
@@ -154,7 +172,8 @@
         targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        targetUrl = `https://vidnest.fun/movie/${currentMovie.tmdbId}`;
+        // Server 4 updated to 2embed (Bypasses Connection Refusal & Sandbox errors)
+        targetUrl = `https://www.2embed.cc/embed/${currentMovie.tmdbId}`;
         s4Btn.classList.add('active');
       }
 

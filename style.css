@@ -23,7 +23,7 @@ body {
   padding-bottom: 30px;
 }
 
-/* Glassmorphism Header Bar with In-Line Logo & Button */
+/* Glassmorphism Header Bar */
 .top-nav {
   position: absolute;
   top: 0;
@@ -50,7 +50,7 @@ body {
   max-width: 150px;
 }
 
-/* Transparent Header Request Button with Red Outline */
+/* Transparent Header Request Button */
 .header-request-btn {
   background: transparent;
   color: var(--text-main);
@@ -72,7 +72,7 @@ body {
   color: #ffffff;
 }
 
-/* Floating Search Header */
+/* Search Bar Overlay */
 .search-overlay-bar {
   position: absolute;
   top: 52px;
@@ -156,7 +156,7 @@ body {
   background: var(--primary-red-hover);
 }
 
-/* Section Titles */
+/* Content Layout & Grids */
 .content-section {
   padding: 0 16px 20px 16px;
 }
@@ -168,7 +168,6 @@ body {
   color: #ffffff;
 }
 
-/* Top Picks Horizontal Scroll Row */
 .top-picks-scroll {
   display: flex;
   gap: 12px;
@@ -180,7 +179,6 @@ body {
   display: none; 
 }
 
-/* Uniform Compact Poster Cards */
 .poster-card {
   position: relative;
   background: var(--card-bg);
@@ -240,7 +238,7 @@ body {
   background: #141414;
 }
 
-/* Responsive Grid Sizing */
+/* Multi-Column Grid Sizing for Mobile & Desktop */
 .main-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
@@ -248,14 +246,12 @@ body {
   width: 100% !important;
 }
 
-/* Tablet Screens (>= 600px) */
 @media (min-width: 600px) {
   .main-grid {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 
-/* Laptop & Small Desktop Screens (>= 900px) */
 @media (min-width: 900px) {
   .main-grid {
     grid-template-columns: repeat(6, 1fr) !important;
@@ -263,7 +259,6 @@ body {
   }
 }
 
-/* Large Laptop Screens (>= 1200px) */
 @media (min-width: 1200px) {
   .main-grid {
     grid-template-columns: repeat(8, 1fr) !important;
@@ -289,7 +284,7 @@ body {
   }
 }
 
-/* Clean Player View Controls & Layout */
+/* Player View & Synopsis Controls */
 .video-container {
   width: 100%;
   aspect-ratio: 16/9;
@@ -313,23 +308,37 @@ body {
 .media-title {
   font-size: 1.1rem;
   font-weight: 800;
-  margin-bottom: 12px;
 }
 
-.quick-action-bar {
-  display: flex;
-  justify-content: space-around;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
-}
-
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.7rem;
+.synopsis-text {
+  font-size: 0.85rem;
   color: var(--text-muted);
-  gap: 4px;
+  line-height: 1.5;
+  margin-top: 6px;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.synopsis-text.expanded {
+  display: block;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.read-more-btn {
+  background: none;
+  border: none;
+  color: var(--primary-red);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 6px;
+  padding: 0;
 }
 
 .episodes-section {
@@ -368,7 +377,7 @@ body {
   border-color: var(--primary-red);
 }
 
-/* Recommendations List Component */
+/* Recommendations Row */
 .list-recommendations {
   display: flex;
   flex-direction: column;
@@ -407,7 +416,32 @@ body {
   color: var(--text-muted);
 }
 
-/* Pagination & Modal */
+/* Toast Banner */
+.toast-notification {
+  position: fixed;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(20, 20, 20, 0.95);
+  color: #ffffff;
+  border: 1px solid var(--primary-red);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.toast-notification.show {
+  bottom: 25px;
+}
+
+/* Modal & Pagination */
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -488,29 +522,4 @@ body {
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-}
-
-/* Toast Notification Banner */
-.toast-notification {
-  position: fixed;
-  bottom: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(20, 20, 20, 0.95);
-  color: #ffffff;
-  border: 1px solid var(--primary-red);
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  z-index: 9999;
-  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  pointer-events: none;
-}
-
-.toast-notification.show {
-  bottom: 25px;
 }
