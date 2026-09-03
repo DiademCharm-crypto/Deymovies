@@ -23,7 +23,7 @@ body {
   padding-bottom: 30px;
 }
 
-/* Header with Brand Logo */
+/* Glassmorphism Header Bar with In-Line Logo & Button */
 .top-nav {
   position: absolute;
   top: 0;
@@ -32,6 +32,7 @@ body {
   padding: 8px 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   z-index: 20;
   background: linear-gradient(180deg, rgba(15,15,15,0.95) 0%, transparent 100%);
 }
@@ -46,20 +47,42 @@ body {
 .site-logo-svg {
   height: 100%;
   width: auto;
-  max-width: 170px;
+  max-width: 150px;
+}
+
+/* Transparent Header Request Button with Red Outline */
+.header-request-btn {
+  background: transparent;
+  color: var(--text-main);
+  border: 1.5px solid var(--primary-red);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
+  transition: all 0.2s ease;
+}
+
+.header-request-btn:active {
+  background: var(--primary-red);
+  color: #ffffff;
 }
 
 /* Floating Search Header */
 .search-overlay-bar {
   position: absolute;
-  top: 50px;
+  top: 52px;
   left: 16px;
   right: 16px;
   z-index: 20;
 }
 
 .search-input-wrapper {
-  background: rgba(30, 30, 30, 0.7);
+  background: rgba(30, 30, 30, 0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -73,13 +96,13 @@ body {
   background: transparent;
   border: none;
   outline: none;
-  color: #fff;
+  color: #ffffff;
   font-size: 0.85rem;
   width: 100%;
 }
 
 .search-input-wrapper input::placeholder {
-  color: #bbb;
+  color: #bbbbbb;
 }
 
 /* Hero Section */
@@ -87,7 +110,7 @@ body {
   position: relative;
   width: 100%;
   height: 52vh;
-  background: #000;
+  background: #000000;
 }
 
 .hero-backdrop-img {
@@ -119,7 +142,7 @@ body {
 
 .hero-action-btn {
   background: var(--primary-red);
-  color: #fff;
+  color: #ffffff;
   border: none;
   padding: 8px 22px;
   border-radius: 20px;
@@ -133,33 +156,7 @@ body {
   background: var(--primary-red-hover);
 }
 
-/* Request Action Bar Section */
-.request-bar-section {
-  padding: 14px 16px;
-}
-
-.request-pill-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #1f1f1f, #141414);
-  color: var(--text-main);
-  border: 1px solid var(--primary-red);
-  padding: 10px 16px;
-  border-radius: 20px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.2);
-}
-
-.request-pill-btn:active {
-  background: var(--primary-red);
-}
-
-/* Content Sections */
+/* Section Titles */
 .content-section {
   padding: 0 16px 20px 16px;
 }
@@ -171,7 +168,7 @@ body {
   color: #ffffff;
 }
 
-/* Horizontal Scroll - Top Picks */
+/* Top Picks Horizontal Scroll Row */
 .top-picks-scroll {
   display: flex;
   gap: 12px;
@@ -179,9 +176,11 @@ body {
   scrollbar-width: none;
 }
 
-.top-picks-scroll::-webkit-scrollbar { display: none; }
+.top-picks-scroll::-webkit-scrollbar { 
+  display: none; 
+}
 
-/* Uniform Poster Cards (Top Picks & All Movies Grid) */
+/* Uniform Compact Poster Cards */
 .poster-card {
   position: relative;
   background: var(--card-bg);
@@ -190,6 +189,7 @@ body {
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .top-picks-scroll .poster-card {
@@ -208,7 +208,7 @@ body {
   top: 6px;
   left: 6px;
   background: var(--primary-red);
-  color: #fff;
+  color: #ffffff;
   font-weight: 900;
   font-size: 0.7rem;
   padding: 2px 6px;
@@ -240,12 +240,35 @@ body {
   background: #141414;
 }
 
-/* All Movies Grid Sizing - Fixed 3-Column Compact Card Size */
+/* Responsive Grid Sizing */
 .main-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 10px !important;
   width: 100% !important;
+}
+
+/* Tablet Screens (>= 600px) */
+@media (min-width: 600px) {
+  .main-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* Laptop & Small Desktop Screens (>= 900px) */
+@media (min-width: 900px) {
+  .main-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+/* Large Laptop Screens (>= 1200px) */
+@media (min-width: 1200px) {
+  .main-grid {
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 18px !important;
+  }
 }
 
 .main-grid .poster-card {
@@ -255,32 +278,22 @@ body {
 
 .main-grid .poster-card img {
   width: 100% !important;
-  height: 150px !important;
+  height: 180px !important;
   object-fit: cover !important;
   border-radius: 6px 6px 0 0 !important;
 }
 
-/* Player View Layout */
-.player-top-header {
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #141414;
-  border-bottom: 1px solid var(--border-color);
+@media (max-width: 480px) {
+  .main-grid .poster-card img {
+    height: 150px !important;
+  }
 }
 
-.back-icon-btn {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
+/* Clean Player View Controls & Layout */
 .video-container {
   width: 100%;
   aspect-ratio: 16/9;
-  background: #000;
+  background: #000000;
 }
 
 .video-container iframe {
@@ -331,7 +344,9 @@ body {
   margin-top: 10px;
 }
 
-.episode-badges-grid::-webkit-scrollbar { display: none; }
+.episode-badges-grid::-webkit-scrollbar { 
+  display: none; 
+}
 
 .ep-badge {
   flex: 0 0 42px;
@@ -344,15 +359,16 @@ body {
   font-weight: 700;
   font-size: 0.85rem;
   border: 1px solid var(--border-color);
+  cursor: pointer;
 }
 
 .ep-badge.active {
   background: var(--primary-red);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--primary-red);
 }
 
-/* List Item Layout for Recommendations */
+/* Recommendations List Component */
 .list-recommendations {
   display: flex;
   flex-direction: column;
@@ -366,6 +382,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border-color);
+  cursor: pointer;
 }
 
 .recommendation-card img {
@@ -400,11 +417,12 @@ body {
 
 .page-btn {
   background: #1f1f1f;
-  color: #fff;
+  color: #ffffff;
   border: 1px solid var(--border-color);
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .page-btn.active {
@@ -428,6 +446,7 @@ body {
   border: 1px solid var(--primary-red);
   border-radius: 12px;
   width: 100%;
+  max-width: 450px;
   padding: 20px;
   position: relative;
 }
@@ -440,6 +459,7 @@ body {
   border: none;
   color: var(--text-muted);
   font-size: 1.5rem;
+  cursor: pointer;
 }
 
 #requestInput {
@@ -447,19 +467,25 @@ body {
   height: 80px;
   background: var(--bg-dark);
   border: 1px solid var(--border-color);
-  color: #fff;
+  color: #ffffff;
   padding: 10px;
   border-radius: 6px;
   font-size: 0.85rem;
   margin: 10px 0;
+  outline: none;
+}
+
+#requestInput:focus {
+  border-color: var(--primary-red);
 }
 
 .send-btn {
   width: 100%;
   background: var(--primary-red);
-  color: #fff;
+  color: #ffffff;
   border: none;
   padding: 10px;
   border-radius: 6px;
   font-weight: bold;
+  cursor: pointer;
 }

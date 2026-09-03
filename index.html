@@ -10,7 +10,7 @@
 
   <!-- Hero Backdrop Section -->
   <section class="hero-wrapper" id="hero-slider">
-    <!-- Top Navigation with Brand Logo -->
+    <!-- Top Navigation Header: Brand Logo & In-Line Request Button -->
     <nav class="top-nav">
       <a href="index.html" class="brand-logo-link">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" class="site-logo-svg">
@@ -40,6 +40,11 @@
           </text>
         </svg>
       </a>
+
+      <!-- Transparent Red Outlined Request Button -->
+      <button class="header-request-btn" onclick="openRequestModal()">
+        🍿 Request a Movie
+      </button>
     </nav>
 
     <!-- Floating Search Bar -->
@@ -58,15 +63,8 @@
     </div>
   </section>
 
-  <!-- Request Movie Action Section -->
-  <div class="request-bar-section">
-    <button class="request-pill-btn" onclick="openRequestModal()">
-      🍿 Request a Movie
-    </button>
-  </div>
-
   <!-- Top Picks Section -->
-  <section class="content-section">
+  <section class="content-section" style="margin-top: 15px;">
     <h2 class="section-header-title">Top Picks</h2>
     <div class="top-picks-scroll" id="trending-grid"></div>
   </section>
