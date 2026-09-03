@@ -74,7 +74,6 @@
     </div>
 
     <div class="video-container" id="playerContainer">
-      <!-- Click guard to block Google Drive top-right pop-out button -->
       <div class="iframe-click-guard"></div>
       <button class="exit-pseudo-btn" id="exitPseudoBtn" onclick="triggerDeviceFullscreen()">✕ Exit Fullscreen</button>
       <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="origin"></iframe>
@@ -151,12 +150,11 @@
       grid.appendChild(createMovieCard(movie));
     });
 
-    // Cross-Device iOS / Android / Desktop Fullscreen Handler
+    // Cross-Device Fullscreen Handler
     function triggerDeviceFullscreen() {
       const container = document.getElementById('playerContainer');
       const exitBtn = document.getElementById('exitPseudoBtn');
 
-      // Native Web API check (Android, PC, iPadOS)
       if (container.requestFullscreen) {
         if (!document.fullscreenElement) {
           container.requestFullscreen().catch(() => togglePseudoFullscreen(container, exitBtn));
@@ -164,9 +162,12 @@
           document.exitFullscreen();
         }
       } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
+        if (!document.webkitFullscreenElement) {
+          container.webkitRequestFullscreen();
+        } else {
+          document.webkitExitFullscreen();
+        }
       } else {
-        // iPhone/iOS Safari Fallback (Pseudo Fullscreen)
         togglePseudoFullscreen(container, exitBtn);
       }
     }
