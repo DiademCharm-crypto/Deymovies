@@ -5,94 +5,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Player</title>
 
-  <!-- Anti-Caching Directives -->
+  <!-- Prevent Stale Cache -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!-- Versioned CSS Import to Prevent Stale Caches -->
-  <link rel="stylesheet" href="style.css?v=1.0.1">
-  
+  <link rel="stylesheet" href="style.css?v=3.0">
+
   <script>
-    // Disable external window popups from third-party video embed servers
+    // Prevent external popups from third-party embed frames
     window.open = function() { return null; };
-
-    // Prevent Right Click / Context Menu
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-
-    // Block DevTools Shortcuts (F12, Ctrl+Shift+I/J/C, Ctrl+U)
-    document.addEventListener('keydown', function(e) {
-      if (
-        e.keyCode === 123 || 
-        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-        (e.ctrlKey && e.keyCode === 85)
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    // Anti-DevTools Debugger Trap Loop
-    (function () {
-      function freezeDevTools() {
-        (function () {
-          return false;
-        })["constructor"]("debugger")();
-      }
-      setInterval(freezeDevTools, 100);
-    })();
   </script>
 </head>
 <body style="padding-top: 0;">
 
-  <!-- Embedded Player Container -->
+  <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
-    <!-- Native HTML5 Video Player for Direct Files -->
+    <!-- HTML5 Native Direct Video Player -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
-    <!-- Interactive Gesture & Custom Controls Overlay -->
-    <div id="player-gesture-overlay" class="player-overlay" style="display: none;">
-      <div id="left-tap-zone" class="tap-zone"></div>
-      <div id="right-tap-zone" class="tap-zone"></div>
+    <!-- Interactive On-Screen Stream Controls Overlay (Loklok Theme) -->
+    <div id="player-gesture-overlay" class="player-overlay active">
       
-      <!-- Animated Visual Feedback Badges -->
+      <!-- Top Title Bar Overlay -->
+      <div class="player-top-bar">
+        <button id="btn-back-nav" class="icon-btn-back" onclick="window.location.replace('index.html')">❮</button>
+        <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
+      </div>
+
+      <!-- Centered Streaming Playback Controls (Loklok Style SVG Icons) -->
+      <div class="center-controls-group">
+        <!-- Rewind 10s Icon -->
+        <button id="btn-rewind-center" class="center-ctrl-btn" title="Rewind 10s">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+            <path d="M12.5 3C7.81 3 4 6.81 4 11.5c0 1.93.65 3.71 1.74 5.14L4.16 18.2C2.81 16.36 2 14.03 2 11.5 2 5.7 6.7 1 12.5 1S23 5.7 23 11.5c0 5.25-3.86 9.6-8.9 10.38v-2.03c3.93-.75 6.9-4.18 6.9-8.35C21 6.81 17.19 3 12.5 3z"/>
+            <path d="M6 7l-5 4.5L6 16V7z"/>
+            <text x="12" y="15.5" font-size="8.5" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="currentColor">10</text>
+          </svg>
+        </button>
+
+        <!-- Center Large Play/Pause Icon -->
+        <button id="btn-play-pause-center" class="center-ctrl-btn play-btn-large" title="Play/Pause">
+          <svg id="svg-center-play" viewBox="0 0 24 24" width="30" height="30" fill="currentColor" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="svg-center-pause" viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+
+        <!-- Forward 10s Icon -->
+        <button id="btn-forward-center" class="center-ctrl-btn" title="Forward 10s">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+            <path d="M11.5 3C16.19 3 20 6.81 20 11.5c0 1.93-.65 3.71-1.74 5.14l1.58 1.56C21.19 16.36 22 14.03 22 11.5 22 5.7 17.3 1 11.5 1S1 5.7 1 11.5c0 5.25 3.86 9.6 8.9 10.38v-2.03C5.97 19.1 3 15.67 3 11.5 3 6.81 6.81 3 11.5 3z"/>
+            <path d="M18 7l5 4.5-5 4.5V7z"/>
+            <text x="11.5" y="15.5" font-size="8.5" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="currentColor">10</text>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Animated Tap Badges -->
       <div id="rewind-badge" class="seek-badge">◄◄ -10 Sec.</div>
       <div id="forward-badge" class="seek-badge">+10 Sec. ►►</div>
       <div id="speed-badge" class="speed-indicator-badge">2x Speed</div>
 
-      <!-- Custom Player Controls Bar -->
-      <div class="custom-player-controls">
-        <div class="left-controls">
-          <button id="btn-play-pause" class="ctrl-btn" title="Play/Pause">▶</button>
-          <button id="btn-rewind" class="ctrl-btn" title="Rewind 10s">↺ 10s</button>
-          <button id="btn-forward" class="ctrl-btn" title="Forward 10s">10s ↻</button>
-          <button id="btn-unmute" class="ctrl-btn" title="Mute/Unmute">🔊</button>
+      <!-- Bottom Timeline & Utility Bar -->
+      <div class="player-bottom-bar">
+        <div class="progress-bar-wrapper">
+          <input type="range" id="video-seekbar" min="0" max="100" value="0" step="0.1">
         </div>
-        <div class="right-controls">
-          <button id="btn-fullscreen" class="ctrl-btn" title="Fullscreen">⤢</button>
+        <div class="bottom-bar-controls">
+          <div class="time-display">
+            <span id="current-time-text">00:00</span> / <span id="total-duration-text">00:00</span>
+          </div>
+          <div class="right-utility-btns">
+            <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
+              <svg id="svg-volume-on" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              <svg id="svg-volume-off" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </button>
+            <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">⤢</button>
+          </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Fallback iFrame for Third-Party Embed Sources -->
+    <!-- Fallback iFrame for Third-Party Servers -->
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Slow Connection Warning Note -->
+  <!-- Slow Connection Warning -->
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page or try another server.
   </div>
 
-  <!-- Media Details & Truncated Movie Description -->
+  <!-- Movie Details Box -->
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
   </div>
 
-  <!-- Servers / Sources Row -->
+  <!-- Servers Row -->
   <div class="episodes-section">
     <h3 style="font-size: 0.9rem; font-weight: 700;">Select Server</h3>
     <div class="episode-badges-grid">
@@ -104,17 +114,16 @@
     </div>
   </div>
 
-  <!-- Recommendations Horizontal List -->
+  <!-- Recommendations List -->
   <section class="content-section">
     <h3 class="section-header-title">More Like This</h3>
     <div class="list-recommendations" id="random-grid"></div>
   </section>
 
-  <!-- Status Toast Notification Element -->
+  <!-- Universal Toast Container -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <!-- Versioned JS Imports -->
-  <script src="app.js?v=1.0.1"></script>
+  <script src="app.js?v=3.0"></script>
   <script>
     // Universal Back Button Navigation Override
     (function () {
@@ -129,6 +138,7 @@
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
     document.getElementById('current-title').textContent = currentMovie.title;
+    document.getElementById('overlay-movie-title').textContent = currentMovie.title;
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
@@ -173,25 +183,6 @@
         } catch (e) {}
       }
 
-      try {
-        const queryTerm = encodeURIComponent(`${currentMovie.title} film`);
-        const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${queryTerm}&format=json&origin=*`);
-        const searchData = await searchRes.json();
-
-        if (searchData.query && searchData.query.search.length > 0) {
-          const pageTitle = searchData.query.search[0].title;
-          const summaryRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-          if (summaryRes.ok) {
-            const summaryData = await summaryRes.json();
-            if (summaryData.extract && summaryData.extract.trim() !== '') {
-              descElement.textContent = summaryData.extract;
-              checkSynopsisLength();
-              return;
-            }
-          }
-        }
-      } catch (e) {}
-
       descElement.textContent = "No synopsis available for this title.";
       readMoreBtn.style.display = 'none';
     }
@@ -202,12 +193,23 @@
     const directPlayer = document.getElementById('direct-video-player');
     const playerContainer = document.getElementById('playerContainer');
     const playerOverlay = document.getElementById('player-gesture-overlay');
-    const btnPlayPause = document.getElementById('btn-play-pause');
-    const btnRewind = document.getElementById('btn-rewind');
-    const btnForward = document.getElementById('btn-forward');
+
+    const btnPlayPause = document.getElementById('btn-play-pause-center');
+    const svgCenterPlay = document.getElementById('svg-center-play');
+    const svgCenterPause = document.getElementById('svg-center-pause');
+
+    const btnRewind = document.getElementById('btn-rewind-center');
+    const btnForward = document.getElementById('btn-forward-center');
     const btnUnmute = document.getElementById('btn-unmute');
     const btnFullscreen = document.getElementById('btn-fullscreen');
-    
+
+    const seekbar = document.getElementById('video-seekbar');
+    const currentTimeText = document.getElementById('current-time-text');
+    const totalDurationText = document.getElementById('total-duration-text');
+
+    const svgVolumeOn = document.getElementById('svg-volume-on');
+    const svgVolumeOff = document.getElementById('svg-volume-off');
+
     const rewindBadge = document.getElementById('rewind-badge');
     const forwardBadge = document.getElementById('forward-badge');
     const speedBadge = document.getElementById('speed-badge');
@@ -220,7 +222,67 @@
 
     let toastTimeout;
     let slowConnectionTimer = null;
+    let autoHideTimer = null;
 
+    // Controls Hover & Touch Display Handler
+    function showControls() {
+      playerOverlay.classList.add('active');
+      clearTimeout(autoHideTimer);
+      
+      autoHideTimer = setTimeout(() => {
+        if (!directPlayer.paused && directPlayer.currentTime > 0) {
+          playerOverlay.classList.remove('active');
+        }
+      }, 2000);
+    }
+
+    // Cursor movement listener for PC/Laptop
+    playerContainer.addEventListener('mousemove', showControls);
+    playerContainer.addEventListener('click', (e) => {
+      if (playerOverlay.classList.contains('active') && e.target === playerOverlay) {
+        playerOverlay.classList.remove('active');
+      } else {
+        showControls();
+      }
+    });
+
+    // PC Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Ignore key events if typing inside an input box
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      switch (e.keyCode) {
+        case 32: // Spacebar -> Play / Pause
+          e.preventDefault();
+          togglePlayPause();
+          showControls();
+          break;
+        case 37: // Left Arrow -> Rewind 10s
+          e.preventDefault();
+          triggerRewind();
+          showControls();
+          break;
+        case 39: // Right Arrow -> Forward 10s
+          e.preventDefault();
+          triggerForward();
+          showControls();
+          break;
+        case 77: // M Key -> Mute / Unmute
+        case 109:
+          e.preventDefault();
+          toggleMute();
+          showControls();
+          break;
+        case 70: // F Key -> Fullscreen
+        case 102:
+          e.preventDefault();
+          toggleFullscreen();
+          showControls();
+          break;
+      }
+    });
+
+    // Slow Internet Connection Check
     function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
       networkNote.style.display = 'none';
@@ -236,10 +298,6 @@
     }
 
     function showToast(message) {
-      if (window.Android && typeof window.Android.showToast === 'function') {
-        window.Android.showToast(message);
-      }
-
       const toast = document.getElementById('loading-toast');
       if (toast) {
         toast.textContent = message;
@@ -252,13 +310,44 @@
       }
     }
 
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "00:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Direct Video Events
+    directPlayer.addEventListener('loadedmetadata', () => {
+      totalDurationText.textContent = formatTime(directPlayer.duration);
+    });
+
+    directPlayer.addEventListener('timeupdate', () => {
+      if (!isNaN(directPlayer.duration)) {
+        const pct = (directPlayer.currentTime / directPlayer.duration) * 100;
+        seekbar.value = pct;
+        currentTimeText.textContent = formatTime(directPlayer.currentTime);
+      }
+    });
+
+    seekbar.addEventListener('input', () => {
+      if (!isNaN(directPlayer.duration)) {
+        directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
+      }
+    });
+
     directPlayer.addEventListener('playing', () => {
       clearSlowConnectionNote();
-      btnPlayPause.textContent = '❚❚';
+      svgCenterPlay.style.display = 'none';
+      svgCenterPause.style.display = 'block';
+      showControls();
     });
 
     directPlayer.addEventListener('pause', () => {
-      btnPlayPause.textContent = '▶';
+      svgCenterPlay.style.display = 'block';
+      svgCenterPause.style.display = 'none';
+      playerOverlay.classList.add('active');
+      clearTimeout(autoHideTimer);
     });
 
     directPlayer.addEventListener('waiting', () => {
@@ -269,18 +358,35 @@
       clearSlowConnectionNote();
     });
 
+    function togglePlayPause() {
+      if (directPlayer.paused) {
+        directPlayer.play();
+      } else {
+        directPlayer.pause();
+      }
+    }
+
+    function toggleMute() {
+      directPlayer.muted = !directPlayer.muted;
+      svgVolumeOn.style.display = directPlayer.muted ? 'none' : 'block';
+      svgVolumeOff.style.display = directPlayer.muted ? 'block' : 'none';
+    }
+
     function attemptAutoUnmute() {
       directPlayer.muted = false;
       directPlayer.play().then(() => {
-        btnUnmute.textContent = '🔊';
+        svgVolumeOn.style.display = 'block';
+        svgVolumeOff.style.display = 'none';
       }).catch(() => {
         directPlayer.muted = true;
-        btnUnmute.textContent = '🔇';
+        svgVolumeOn.style.display = 'none';
+        svgVolumeOff.style.display = 'block';
         directPlayer.play();
 
         const unlockAudio = () => {
           directPlayer.muted = false;
-          btnUnmute.textContent = '🔊';
+          svgVolumeOn.style.display = 'block';
+          svgVolumeOff.style.display = 'none';
           document.removeEventListener('click', unlockAudio);
           document.removeEventListener('touchstart', unlockAudio);
         };
@@ -288,6 +394,26 @@
         document.addEventListener('touchstart', unlockAudio, { once: true });
       });
     }
+
+    btnPlayPause.onclick = (e) => {
+      e.stopPropagation();
+      togglePlayPause();
+    };
+
+    btnRewind.onclick = (e) => {
+      e.stopPropagation();
+      triggerRewind();
+    };
+
+    btnForward.onclick = (e) => {
+      e.stopPropagation();
+      triggerForward();
+    };
+
+    btnUnmute.onclick = (e) => {
+      e.stopPropagation();
+      toggleMute();
+    };
 
     btnFullscreen.onclick = (e) => {
       e.stopPropagation();
@@ -326,31 +452,6 @@
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
 
-    btnPlayPause.onclick = (e) => {
-      e.stopPropagation();
-      if (directPlayer.paused) {
-        directPlayer.play();
-      } else {
-        directPlayer.pause();
-      }
-    };
-
-    btnRewind.onclick = (e) => {
-      e.stopPropagation();
-      triggerRewind();
-    };
-
-    btnForward.onclick = (e) => {
-      e.stopPropagation();
-      triggerForward();
-    };
-
-    btnUnmute.onclick = (e) => {
-      e.stopPropagation();
-      directPlayer.muted = !directPlayer.muted;
-      btnUnmute.textContent = directPlayer.muted ? '🔇' : '🔊';
-    };
-
     function triggerRewind() {
       directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
       showSeekBadge(rewindBadge);
@@ -368,33 +469,8 @@
       setTimeout(() => badge.classList.remove('show'), 600);
     }
 
-    let lastTapTimeLeft = 0;
-    let lastTapTimeRight = 0;
     let longPressTimer = null;
     let is2xSpeedActive = false;
-
-    const leftZone = document.getElementById('left-tap-zone');
-    const rightZone = document.getElementById('right-tap-zone');
-
-    leftZone.addEventListener('click', (e) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTapTimeLeft;
-      if (tapLength < 300 && tapLength > 0) {
-        triggerRewind();
-        e.preventDefault();
-      }
-      lastTapTimeLeft = currentTime;
-    });
-
-    rightZone.addEventListener('click', (e) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTapTimeRight;
-      if (tapLength < 300 && tapLength > 0) {
-        triggerForward();
-        e.preventDefault();
-      }
-      lastTapTimeRight = currentTime;
-    });
 
     function start2xSpeed() {
       longPressTimer = setTimeout(() => {
@@ -471,6 +547,7 @@
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       startSlowConnectionCheck();
+      showControls();
 
       let targetUrl = "";
 
@@ -509,7 +586,7 @@
 
       directPlayer.pause();
       directPlayer.style.display = 'none';
-      playerOverlay.style.display = 'none';
+      playerOverlay.style.display = 'flex';
       iframe.style.display = 'block';
 
       showToast(`Server ${serverNum} loading...`);
