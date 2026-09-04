@@ -16,7 +16,7 @@ const featuredMovies = [
     description: "Buzz, Woody, Jessie and the rest of the gang come face-to-face with Lilypad, a brand-new tablet device that arrives with her own disruptive ideas about what is best for Bonnie.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    manualEmbed: "https://www.youtube.com/embed/5PSNL1qE6VY"
+    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://www.youtube.com/embed/5PSNL1qE6VY"
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -71,13 +71,14 @@ const movies = [
     tmdbId: "1288445",
     title: "Mutiny", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/pu2VxGlpGwffOx292w18b1tv96j.jpg",
-    manualEmbed: "https://cinema8.com/video/jXax7PlD"
+    manualEmbed: "https://video.deymflix.eu.cc/Mutiny.2026.1080p.WEBRip.10Bit.DDP5.1.x265-NeoNoir.mkv"
   },
   { 
     id: "The Last Sunrise", 
     tmdbId: "1516698",
     title: "The Last Sunrise", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg"
+    manualEmbed: "https://video.deymflix.eu.cc/The.Last.Sunrise.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
   },
   { 
     id: "Facing El Chapo", 
@@ -96,13 +97,14 @@ const movies = [
     tmdbId: "1315772",
     title: "Minions & Monsters", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/4LwvU9SZc8QQzW1X1FAPhNbXnEU.jpg",
-    manualEmbed: "https://cinema8.com/video/WDezkkzX"
+    manualEmbed: "https://video.deymflix.eu.cc/Minions.and.Monsters.2026.1080p.10bit.WEBRip.6CH.x265-PSA.mkv"
   },
   { 
     id: "Obsession", 
     tmdbId: "1339713",
     title: "Obsession", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg"
+    manualEmbed: "https://video.deymflix.eu.cc/Obsession.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://video.deymflix.eu.cc/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
   },
   { 
     id: "Rage of Stars", 
@@ -114,13 +116,14 @@ const movies = [
     id: "Toy Story 5", 
     tmdbId: "1084244",
     title: "Toy Story 5", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg"
+    poster: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
   },
   { 
     id: "Pinocchio: Unstrung", 
     tmdbId: "1232569",
     title: "Pinocchio: Unstrung", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eUJXk3bTvLBi5Zcb0BCedZU7lVL.jpg"
+    manualEmbed: "https://video.deymflix.eu.cc/Pinocchio.Unstrung.mp4"
   },
   { 
     id: "Moana: Live Action", 
@@ -133,6 +136,7 @@ const movies = [
     tmdbId: "1204680",
     title: "Coyote vs. Acme", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vhv7lBWYM0DUuNU2a0V7Rhq21dD.jpg"
+    manualEmbed: "https://video.deymflix.eu.cc/Coyote.vs.Acme.2026.1080p.DCP.DDP5.1.H264-AOC.mkv"
   },
   { 
     id: "Colony", 
