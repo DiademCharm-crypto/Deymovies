@@ -1,4 +1,4 @@
-// Link Cleaner Utility: Converts any standard Google Drive share URL to an embeddable preview URL
+// Link Cleaner Utility
 function cleanDriveLink(url) {
   if (!url) return '';
   if (url.includes('drive.google.com') && url.includes('/view')) {
@@ -633,19 +633,12 @@ function createMovieCard(movie, rankNumber = null) {
   return card;
 }
 
-// Global Pagination & Filter States
+// Global States
 let currentPage = 1;
 const itemsPerPage = 16;
 let filteredMoviesList = [];
 
-// DOM Element References
-const allMoviesGrid = document.getElementById('all-movies-grid');
-const pageNumbersGroup = document.getElementById('page-numbers-group');
-const prevPageBtn = document.getElementById('prev-page-btn');
-const nextPageBtn = document.getElementById('next-page-btn');
-const toastNotification = document.getElementById('loading-toast');
-
-// Document Ready Initialization
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   filteredMoviesList = [...movies];
   
@@ -653,10 +646,12 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTopPicks();
   renderFilipinoMovies();
   renderPaginatedMovies();
+  setupSearchHandlers();
 });
 
 // Toast Message Trigger
 function showToast(message) {
+  const toastNotification = document.getElementById('loading-toast');
   if (!toastNotification) return;
   toastNotification.textContent = message;
   toastNotification.classList.add('show');
@@ -683,7 +678,6 @@ function setupHeroBanner() {
   }
 }
 
-// Render Top Picks Horizontal Scroll Row
 function renderTopPicks() {
   const container = document.getElementById('top-picks-container');
   if (!container) return;
@@ -695,7 +689,6 @@ function renderTopPicks() {
   });
 }
 
-// Render Filipino Movies Horizontal Scroll Row
 function renderFilipinoMovies() {
   const container = document.getElementById('filipino-movies-container');
   if (!container) return;
@@ -709,8 +702,8 @@ function renderFilipinoMovies() {
   });
 }
 
-// Render Main Paginated Movie Grid
 function renderPaginatedMovies() {
+  const allMoviesGrid = document.getElementById('all-movies-grid');
   if (!allMoviesGrid) return;
   allMoviesGrid.innerHTML = '';
 
@@ -720,15 +713,22 @@ function renderPaginatedMovies() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const pageMovies = filteredMoviesList.slice(startIndex, startIndex + itemsPerPage);
 
-  pageMovies.forEach(movie => {
-    allMoviesGrid.appendChild(createMovieCard(movie));
-  });
+  if (pageMovies.length === 0) {
+    allMoviesGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #aaaaaa; padding: 50px 0; font-weight: 700; font-size: 1.1rem;">No matching movies found.</div>`;
+  } else {
+    pageMovies.forEach(movie => {
+      allMoviesGrid.appendChild(createMovieCard(movie));
+    });
+  }
 
   renderPaginationControls(totalPages);
 }
 
-// Render Centered Pagination with Smart Hide for Prev/Next
 function renderPaginationControls(totalPages) {
+  const pageNumbersGroup = document.getElementById('page-numbers-group');
+  const prevPageBtn = document.getElementById('prev-page-btn');
+  const nextPageBtn = document.getElementById('next-page-btn');
+
   if (!pageNumbersGroup) return;
   pageNumbersGroup.innerHTML = '';
 
@@ -744,16 +744,10 @@ function renderPaginationControls(totalPages) {
     pageNumbersGroup.appendChild(btn);
   }
 
-  // Dynamic Hide/Show for Prev/Next text buttons
-  if (prevPageBtn) {
-    prevPageBtn.style.display = currentPage === 1 ? 'none' : 'inline-block';
-  }
-  if (nextPageBtn) {
-    nextPageBtn.style.display = currentPage === totalPages ? 'none' : 'inline-block';
-  }
+  if (prevPageBtn) prevPageBtn.style.display = currentPage === 1 ? 'none' : 'inline-block';
+  if (nextPageBtn) nextPageBtn.style.display = currentPage === totalPages ? 'none' : 'inline-block';
 }
 
-// Page Navigation Logic
 function handlePageNav(direction) {
   const totalPages = Math.ceil(filteredMoviesList.length / itemsPerPage) || 1;
 
@@ -769,20 +763,134 @@ function handlePageNav(direction) {
 }
 
 function scrollToGridTop() {
-  if (allMoviesGrid) {
-    allMoviesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const gridMainSection = document.getElementById('grid-main-section');
+  if (gridMainSection) {
+    gridMainSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
-// Live Search Filter Functionality
-function filterMovies() {
-  const query = document.getElementById('search-input').value.toLowerCase().trim();
+/* ==========================================================================
+   NETFLIX-STYLE LIVE SEARCH AND ENTER/SUBMIT EXECUTION FIX
+   ========================================================================== */
+
+function setupSearchHandlers() {
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+
+  if (!searchInput) return;
+
+  // Live Typing Handlers for Hints Dropdown
+  const handleTyping = () => {
+    const query = searchInput.value.toLowerCase().trim();
+
+    if (query.length > 0) {
+      const matched = movies.filter(m => m.title.toLowerCase().includes(query)).slice(0, 5);
+      renderSuggestions(matched);
+    } else {
+      hideSuggestions();
+      resetHomeState();
+    }
+  };
+
+  searchInput.addEventListener('input', handleTyping);
+  searchInput.addEventListener('keyup', handleTyping);
+
+  // Clear Event (When pressing the X icon in mobile input)
+  searchInput.addEventListener('search', () => {
+    if (searchInput.value.trim() === '') {
+      hideSuggestions();
+      resetHomeState();
+    }
+  });
+
+  // Execute Search On Form Submit (Mobile "Search" & Desktop "Enter")
+  if (searchForm) {
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      searchInput.blur();
+      hideSuggestions();
+      executeSearch();
+    });
+  }
+
+  // Close dropdown on tap outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-overlay-bar')) {
+      hideSuggestions();
+    }
+  });
+}
+
+function renderSuggestions(matches) {
+  const searchSuggestionsBox = document.getElementById('search-suggestions-box');
+  if (!searchSuggestionsBox) return;
+
+  if (matches.length === 0) {
+    hideSuggestions();
+    return;
+  }
+
+  searchSuggestionsBox.innerHTML = '';
+  matches.forEach(movie => {
+    const item = document.createElement('div');
+    item.className = 'suggestion-item';
+    item.innerHTML = `
+      <img src="${movie.poster}" alt="${movie.title}">
+      <span class="suggestion-title">${movie.title}</span>
+    `;
+    item.onclick = () => {
+      window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
+    };
+    searchSuggestionsBox.appendChild(item);
+  });
+
+  searchSuggestionsBox.style.display = 'block';
+}
+
+function hideSuggestions() {
+  const searchSuggestionsBox = document.getElementById('search-suggestions-box');
+  if (searchSuggestionsBox) searchSuggestionsBox.style.display = 'none';
+}
+
+function executeSearch() {
+  const searchInput = document.getElementById('search-input');
+  const homeSectionsWrapper = document.getElementById('home-sections-wrapper');
+  const gridSectionTitle = document.getElementById('grid-section-title');
+
+  if (!searchInput) return;
+  const query = searchInput.value.toLowerCase().trim();
+
+  if (query === '') {
+    resetHomeState();
+    return;
+  }
+
+  // Hides Hero, Top Picks, Filipino Movies
+  if (homeSectionsWrapper) homeSectionsWrapper.classList.add('hide-for-search');
+
+  // Title Update
+  if (gridSectionTitle) gridSectionTitle.textContent = `Search Results for "${searchInput.value.trim()}"`;
+
+  // Filter Movies List
   filteredMoviesList = movies.filter(m => m.title.toLowerCase().includes(query));
+  currentPage = 1;
+  renderPaginatedMovies();
+  scrollToGridTop();
+}
+
+function resetHomeState() {
+  const homeSectionsWrapper = document.getElementById('home-sections-wrapper');
+  const gridSectionTitle = document.getElementById('grid-section-title');
+
+  if (homeSectionsWrapper) homeSectionsWrapper.classList.remove('hide-for-search');
+  if (gridSectionTitle) gridSectionTitle.textContent = 'All Movies';
+
+  filteredMoviesList = [...movies];
   currentPage = 1;
   renderPaginatedMovies();
 }
 
-// Header Request Modal Handlers
+// Request Modal
 function openRequestModal() {
   const modal = document.getElementById('request-modal');
   if (modal) modal.style.display = 'flex';
