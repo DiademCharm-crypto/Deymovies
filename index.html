@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DEYMFLIX</title>
+  <title>DEYMFLIX - Home</title>
 
-  <!-- Favicon -->
+  <!-- Favicon Link -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <!-- Anti-Cache Headers -->
@@ -13,82 +13,90 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=20.0">
+  <link rel="stylesheet" href="style.css?v=23.0">
 </head>
 <body>
 
   <!-- Top Navigation Header -->
   <header class="top-nav">
     <a href="index.html" class="brand-logo-link">
-      <img src="favicon.svg" alt="DEYMFLIX" class="site-logo-svg">
+      <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
       <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
-    <button id="header-request-btn" class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
+    <button class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
   </header>
 
-  <!-- Search Input Bar & Dropdown Container -->
+  <!-- Search Bar Overlay -->
   <div class="search-overlay-bar">
-    <form id="search-form" action="javascript:void(0);" class="search-input-wrapper">
-      <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off" enterkeyhint="search">
+    <form id="search-form" onsubmit="event.preventDefault();">
+      <div class="search-input-wrapper">
+        <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off">
+      </div>
     </form>
-    <!-- Movie Title Hints Box -->
     <div id="search-suggestions-box" class="search-suggestions-box" style="display: none;"></div>
   </div>
 
-  <!-- Homepage Section Wrapper (Hidden when displaying Search Results) -->
+  <!-- Main Content Sections Wrapper -->
   <div id="home-sections-wrapper">
-    <!-- Hero Featured Billboard Section -->
-    <section class="hero-wrapper" id="hero-section">
-      <img id="hero-backdrop" class="hero-backdrop-img" src="" alt="Featured Backdrop">
+    <!-- Hero Billboard Section -->
+    <div class="hero-wrapper">
+      <img id="hero-backdrop" class="hero-backdrop-img" src="" alt="Hero Backdrop">
       <div class="hero-fade-overlay"></div>
       <div class="hero-details-container">
-        <h1 id="hero-title" class="hero-title-text">Featured Movie</h1>
+        <h1 id="hero-title" class="hero-title-text"></h1>
         <button id="hero-play-btn" class="hero-action-btn">▶ Watch Now</button>
       </div>
-    </section>
+    </div>
 
-    <!-- Top Picks Section -->
+    <!-- Top Picks Row -->
     <section class="content-section">
       <h2 class="section-header-title">Top Picks</h2>
       <div class="top-picks-scroll" id="top-picks-container"></div>
     </section>
 
-    <!-- Filipino Movies Section -->
+    <!-- Filipino Movies Row -->
     <section class="content-section">
       <h2 class="section-header-title">Filipino Movies PH</h2>
       <div class="horizontal-scroll" id="filipino-movies-container"></div>
     </section>
   </div>
 
-  <!-- Main Movie Collection Grid Section -->
+  <!-- Main Grid Section -->
   <section class="content-section" id="grid-main-section">
-    <h2 class="section-header-title" id="grid-section-title">All Movies</h2>
-    <div id="all-movies-grid" class="main-grid"></div>
+    <h2 id="grid-section-title" class="section-header-title">All Movies</h2>
+    <div class="main-grid" id="all-movies-grid"></div>
 
-    <!-- Centered Pagination Control Bar -->
-    <div class="pagination-container" id="pagination-wrapper">
-      <button class="page-nav-btn" id="prev-page-btn" onclick="handlePageNav('prev')">❮ Prev</button>
+    <!-- Pagination Controls -->
+    <div class="pagination-container">
+      <button id="prev-page-btn" class="page-nav-btn" onclick="handlePageNav('prev')" style="display:none;">Previous</button>
       <div id="page-numbers-group" class="page-numbers-group"></div>
-      <button class="page-nav-btn" id="next-page-btn" onclick="handlePageNav('next')">Next ❯</button>
+      <button id="next-page-btn" class="page-nav-btn" onclick="handlePageNav('next')">Next</button>
     </div>
   </section>
 
-  <!-- Request Movie Dialog Modal -->
+  <!-- Request Modal Dialog -->
   <div id="request-modal" class="request-modal-backdrop" style="display: none;">
     <div class="request-modal-content">
       <span class="close-modal-btn" onclick="closeRequestModal()">&times;</span>
       <h3>Request a Movie</h3>
-      <p>Enter the title of the movie or show you want added:</p>
+      <p>Can't find what you're looking for? Let us know!</p>
       <div class="request-input-group">
-        <input type="text" id="modal-request-input" placeholder="Movie title here...">
-        <button onclick="submitMovieRequest()">Send</button>
+        <input type="text" id="modal-request-input" placeholder="Enter movie title...">
+        <button onclick="submitMovieRequest()">Submit</button>
       </div>
     </div>
   </div>
 
-  <!-- Universal Toast Notification Container -->
-  <div id="loading-toast" class="toast-notification">Notification</div>
+  <!-- Toast Notification -->
+  <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=20.0"></script>
+  <script src="app.js?v=23.0"></script>
+  <script>
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+  </script>
 </body>
 </html>

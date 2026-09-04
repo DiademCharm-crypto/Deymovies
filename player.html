@@ -5,35 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Player</title>
 
+  <!-- Favicon Link -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
   <!-- Anti-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=17.0">
+  <link rel="stylesheet" href="style.css?v=22.0">
 
   <script>
-    // Prevent external popups from third-party embed frames
     window.open = function() { return null; };
+
+    /* ==========================================================================
+       INSPECT ELEMENT / DEVTOOLS LOCK PROTECTION
+       ========================================================================== */
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.keyCode === 123 || 
+        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+        (e.ctrlKey && e.keyCode === 85) || 
+        (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+        (e.metaKey && e.keyCode === 85)
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    setInterval(function() {
+      const startTime = performance.now();
+      (function() {}.constructor("debugger")());
+      const endTime = performance.now();
+      if (endTime - startTime > 100) {
+        window.location.href = "index.html";
+      }
+    }, 1000);
   </script>
 </head>
 <body style="padding-top: 0;">
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
-    <!-- HTML5 Native Direct Video Player (Server 1 Only) -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
-    <!-- Interactive On-Screen Stream Controls Overlay (Server 1 Only) -->
     <div id="player-gesture-overlay" class="player-overlay active" style="display: none;">
       
-      <!-- Top Title Bar Overlay with Contextual Back Navigation -->
       <div class="player-top-bar">
         <button id="btn-back-nav" class="icon-btn-back" onclick="forceBackToHome()">❮</button>
         <span id="overlay-movie-title" class="overlay-title-text" onclick="forceBackToHome()">Loading...</span>
       </div>
 
-      <!-- Mobile Fullscreen Brightness & Volume Bars -->
       <div id="brightness-slider-container" class="vertical-slider-bar left-bar" style="display: none;">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
         <div class="v-track"><div id="brightness-fill" class="v-fill"></div></div>
@@ -44,7 +71,6 @@
         <div class="v-track"><div id="volume-fill" class="v-fill"></div></div>
       </div>
 
-      <!-- Centered Playback Controls -->
       <div class="center-controls-group">
         <button id="btn-rewind-center" class="center-ctrl-btn" title="Rewind 10s">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
@@ -68,11 +94,9 @@
         </button>
       </div>
 
-      <!-- Tap Seek Badges -->
       <div id="rewind-badge" class="loklok-seek-badge">-10 <span class="ring-icon">⟲</span></div>
       <div id="forward-badge" class="loklok-seek-badge"><span class="ring-icon">⟳</span> +10</div>
 
-      <!-- Bottom Timeline & Utility Bar -->
       <div class="player-bottom-bar">
         <div class="progress-bar-wrapper">
           <input type="range" id="video-seekbar" min="0" max="100" value="0" step="0.1">
@@ -97,11 +121,9 @@
 
     </div>
 
-    <!-- Fallback iFrame for Third-Party Servers (Servers 2–5) -->
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Network Warning -->
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page or try another server.
   </div>
@@ -125,23 +147,31 @@
     </div>
   </div>
 
-  <!-- Recommendations List -->
   <section class="content-section">
     <h3 class="section-header-title">More Like This</h3>
     <div class="list-recommendations" id="random-grid"></div>
   </section>
 
-  <!-- Universal Toast Container -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=17.0"></script>
+  <script src="app.js?v=22.0"></script>
   <script>
-    // Universal Force Exit
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
     function forceBackToHome() {
       const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       if (isFS) {
         exitFullscreen();
       }
+      const dp = document.getElementById('direct-video-player');
+      if(dp) { dp.pause(); dp.src = ""; }
+      const fr = document.getElementById('main-iframe');
+      if(fr) { fr.src = "about:blank"; }
+
       window.location.replace('index.html');
     }
 
@@ -151,15 +181,6 @@
         forceBackToHome();
       });
     })();
-
-    document.addEventListener('keydown', function(e) {
-      if (e.keyCode === 10009 || e.keyCode === 461 || e.keyCode === 27 || e.keyCode === 8) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-          e.preventDefault();
-          forceBackToHome();
-        }
-      }
-    });
 
     function exitFullscreen() {
       if (document.exitFullscreen) {
@@ -200,6 +221,7 @@
       }
     }
 
+    /* ENHANCED PRECISE SYNOPSIS FETCHING SOLUTION */
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -207,9 +229,12 @@
         return;
       }
 
+      const apiKey = '15d260044e350723365198253b23914f';
+
+      // 1. Query by explicit TMDB ID
       if (currentMovie.tmdbId) {
         try {
-          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=15d260044e350723365198253b23914f&language=en-US`);
+          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=${apiKey}&language=en-US`);
           if (tmdbRes.ok) {
             const tmdbData = await tmdbRes.json();
             if (tmdbData.overview && tmdbData.overview.trim() !== '') {
@@ -221,8 +246,25 @@
         } catch (e) {}
       }
 
-      descElement.textContent = "No synopsis available for this title.";
-      readMoreBtn.style.display = 'none';
+      // 2. Query by cleaned title search
+      try {
+        const cleanTitle = currentMovie.title.replace(/[\(\)\[\]]/g, '').trim();
+        const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
+        if (searchRes.ok) {
+          const searchData = await searchRes.json();
+          const match = searchData.results && searchData.results.find(r => r.overview && r.overview.trim() !== '');
+          if (match) {
+            descElement.textContent = match.overview;
+            checkSynopsisLength();
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 3. Contextual precise fallback
+      const originTag = currentMovie.isFilipino ? "Filipino cinema release" : "feature film";
+      descElement.textContent = `Watch "${currentMovie.title}", a ${originTag} available in high quality streaming on DEYMFLIX with multiple server options.`;
+      checkSynopsisLength();
     }
 
     loadBroadSynopsis();
@@ -273,7 +315,6 @@
       seekbar.style.background = `linear-gradient(to right, #e50914 0%, #e50914 ${val}%, rgba(255, 255, 255, 0.3) ${val}%, rgba(255, 255, 255, 0.3) 100%)`;
     }
 
-    // Fixed Android Tap Toggle Logic
     function showControls() {
       if (activeServer !== 1) return;
 
@@ -292,7 +333,6 @@
     function toggleOverlayControls(e) {
       if (activeServer !== 1) return;
 
-      // Prevent Android double-triggering
       const now = Date.now();
       if (now - lastTapTime < 300) {
         e.preventDefault();
@@ -312,7 +352,6 @@
       }
     }
 
-    // Android/Touch Event Listeners with double-tap protection
     playerOverlay.addEventListener('touchend', (e) => {
       if (!isGestureDragging) {
         toggleOverlayControls(e);
@@ -320,7 +359,6 @@
     });
 
     playerOverlay.addEventListener('click', (e) => {
-      // Ignore click on touch devices to avoid double toggling
       if (!('ontouchstart' in window)) {
         toggleOverlayControls(e);
       }
@@ -328,7 +366,6 @@
 
     playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
 
-    // Fullscreen Brightness & Volume Gestures (Android Fix)
     let touchStartY = 0;
     let isGestureDragging = false;
     let gestureType = null;
@@ -381,40 +418,6 @@
         volumeContainer.style.display = 'none';
         isGestureDragging = false;
       }, 1000);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (activeServer !== 1 || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      switch (e.keyCode) {
-        case 32:
-          e.preventDefault();
-          togglePlayPause();
-          showControls();
-          break;
-        case 37:
-          e.preventDefault();
-          triggerRewind();
-          showControls();
-          break;
-        case 39:
-          e.preventDefault();
-          triggerForward();
-          showControls();
-          break;
-        case 77:
-        case 109:
-          e.preventDefault();
-          toggleMute();
-          showControls();
-          break;
-        case 70:
-        case 102:
-          e.preventDefault();
-          toggleFullscreen();
-          showControls();
-          break;
-      }
     });
 
     function startSlowConnectionCheck() {
@@ -531,10 +534,10 @@
           svgVolumeOn.style.display = 'block';
           svgVolumeOff.style.display = 'none';
           document.removeEventListener('click', unlockAudio);
-          document.removeEventListener('touchend', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
         };
         document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchend', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
       });
     }
 

@@ -32,8 +32,7 @@ const featuredMovies = [
     title: "The Odyssey", 
     description: "An epic journey across dangerous waters and uncharted lands as hero Odysseus seeks his path back home.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "https://cinema8.com/video/9X6wd1PJ"
+    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg"
   }
 ];
 
@@ -74,7 +73,7 @@ const movies = [
     id: "The Odyssey", 
     tmdbId: "1368337",
     title: "The Odyssey", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg"
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -120,7 +119,7 @@ const movies = [
     tmdbId: "1339713",
     title: "Obsession", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Obsession.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://video.deymflix.eu.cc/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
+    manualEmbed: "https://video.deymflix.eu.cc/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
   },
   { 
     id: "Rage of Stars", 
@@ -182,7 +181,6 @@ const movies = [
     title: "Barreda", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Barreda.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
-
   },
   { 
     id: "Buddy", 
@@ -196,7 +194,6 @@ const movies = [
     title: "The Whisper Man", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/The.Whisper.Man.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
-
   },
   { 
     id: "Yellow Mirror", 
@@ -217,7 +214,6 @@ const movies = [
     title: "It Ends", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/It.Ends.2025.1080p.WEBRip.x264.AAC-%5BYTS.LT%5D.mp4"  
-
   },
   { 
     id: "Irumudi", 
@@ -317,7 +313,6 @@ const movies = [
     title: "Batman: Knightfall Part 1: Knightfall", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Batman.Knightfall.Part.1.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
-
   },
   { 
     id: "Motor City", 

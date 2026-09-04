@@ -24,7 +24,7 @@ body {
 }
 
 /* ==========================================================================
-   NAVIGATION HEADER (INDEX)
+   NAVIGATION HEADER & LOGO WITH BRAND TEXT (FIXED)
    ========================================================================== */
 
 .top-nav {
@@ -37,38 +37,41 @@ body {
   align-items: center;
   justify-content: space-between;
   z-index: 1000;
-  background: linear-gradient(180deg, rgba(15, 15, 15, 0.85) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(15, 15, 15, 0.95) 0%, transparent 100%);
   pointer-events: auto;
 }
 
 .brand-logo-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
   z-index: 1001;
   pointer-events: auto;
   cursor: pointer;
 }
 
-.site-logo-svg {
-  height: 26px;
-  width: 26px;
+.brand-logo-img {
+  height: 32px;
+  width: 32px;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.8));
 }
 
 .brand-title-text {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #ffffff !important;
   letter-spacing: 1px;
   text-transform: uppercase;
   line-height: 1;
+  display: inline-block;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
 
 .brand-title-text .highlight-red {
-  color: var(--primary-red);
+  color: var(--primary-red) !important;
 }
 
 .header-request-btn {
@@ -104,7 +107,7 @@ body {
 
 .search-overlay-bar {
   position: absolute;
-  top: 58px;
+  top: 62px;
   left: 16px;
   right: 16px;
   z-index: 900;
@@ -112,7 +115,7 @@ body {
 }
 
 .search-input-wrapper {
-  background: rgba(30, 30, 30, 0.75);
+  background: rgba(30, 30, 30, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -321,13 +324,22 @@ body {
   position: absolute;
   bottom: 32px;
   left: 6px;
-  background: rgba(0, 0, 0, 0.85);
-  color: var(--primary-red);
   font-size: 0.65rem;
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+.tag-badge-bottom.quality-hd {
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--primary-red);
   border: 1px solid var(--primary-red);
+}
+
+.tag-badge-bottom.quality-cam {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ff9800;
+  border: 1px solid #ff9800;
 }
 
 .poster-card-title {
@@ -421,7 +433,7 @@ body {
 }
 
 /* ==========================================================================
-   VIDEO PLAYER STYLES (PLAYER.HTML FIX)
+   VIDEO PLAYER STYLES (PLAYER.HTML)
    ========================================================================== */
 
 .video-container {
@@ -441,7 +453,6 @@ body {
   object-fit: contain;
 }
 
-/* Custom Player Gesture Controls Overlay */
 .player-overlay {
   position: absolute;
   inset: 0;
@@ -560,7 +571,6 @@ body {
   cursor: pointer;
 }
 
-/* Vertical Brightness & Volume Slider Indicators */
 .vertical-slider-bar {
   position: absolute;
   top: 50%;
@@ -627,7 +637,6 @@ body {
   font-weight: 600;
 }
 
-/* Details, Synopsis & Server Selection Box */
 .video-info-box {
   padding: 16px 20px;
 }
@@ -741,10 +750,6 @@ body {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
-
-/* ==========================================================================
-   REQUEST MODAL DIALOG & TOAST NOTIFICATION
-   ========================================================================== */
 
 .request-modal-backdrop {
   position: fixed;
