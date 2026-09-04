@@ -10,7 +10,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=13.0">
+  <link rel="stylesheet" href="style.css?v=16.0">
 
   <script>
     // Prevent external popups from third-party embed frames
@@ -21,19 +21,19 @@
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
-    <!-- HTML5 Native Direct Video Player -->
+    <!-- HTML5 Native Direct Video Player (Server 1 Only) -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
-    <!-- Interactive On-Screen Stream Controls Overlay -->
-    <div id="player-gesture-overlay" class="player-overlay active">
+    <!-- Interactive On-Screen Stream Controls Overlay (Server 1 Only) -->
+    <div id="player-gesture-overlay" class="player-overlay active" style="display: none;">
       
       <!-- Top Title Bar Overlay with Contextual Back Navigation -->
       <div class="player-top-bar">
-        <button id="btn-back-nav" class="icon-btn-back" onclick="handleBackNavigation()">❮</button>
-        <span id="overlay-movie-title" class="overlay-title-text" onclick="handleBackNavigation()">Loading...</span>
+        <button id="btn-back-nav" class="icon-btn-back" onclick="forceBackToHome()">❮</button>
+        <span id="overlay-movie-title" class="overlay-title-text" onclick="forceBackToHome()">Loading...</span>
       </div>
 
-      <!-- Mobile Fullscreen Gesture Indicators (Brightness & Volume Bars) -->
+      <!-- Mobile Fullscreen Brightness & Volume Bars -->
       <div id="brightness-slider-container" class="vertical-slider-bar left-bar" style="display: none;">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
         <div class="v-track"><div id="brightness-fill" class="v-fill"></div></div>
@@ -44,9 +44,8 @@
         <div class="v-track"><div id="volume-fill" class="v-fill"></div></div>
       </div>
 
-      <!-- Centered Streaming Playback Controls -->
+      <!-- Centered Playback Controls -->
       <div class="center-controls-group">
-        <!-- Rewind 10s Icon -->
         <button id="btn-rewind-center" class="center-ctrl-btn" title="Rewind 10s">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
             <path d="M12.5 3C7.81 3 4 6.81 4 11.5c0 1.93.65 3.71 1.74 5.14L4.16 18.2C2.81 16.36 2 14.03 2 11.5 2 5.7 6.7 1 12.5 1S23 5.7 23 11.5c0 5.25-3.86 9.6-8.9 10.38v-2.03c3.93-.75 6.9-4.18 6.9-8.35C21 6.81 17.19 3 12.5 3z"/>
@@ -55,13 +54,11 @@
           </svg>
         </button>
 
-        <!-- Center Large Play/Pause Icon -->
         <button id="btn-play-pause-center" class="center-ctrl-btn play-btn-large" title="Play/Pause">
           <svg id="svg-center-play" viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
           <svg id="svg-center-pause" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
 
-        <!-- Forward 10s Icon -->
         <button id="btn-forward-center" class="center-ctrl-btn" title="Forward 10s">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
             <path d="M11.5 3C16.19 3 20 6.81 20 11.5c0 1.93-.65 3.71-1.74 5.14l1.58 1.56C21.19 16.36 22 14.03 22 11.5 22 5.7 17.3 1 11.5 1S1 5.7 1 11.5c0 5.25 3.86 9.6 8.9 10.38v-2.03C5.97 19.1 3 15.67 3 11.5 3 6.81 6.81 3 11.5 3z"/>
@@ -71,7 +68,7 @@
         </button>
       </div>
 
-      <!-- Loklok Image-Matched Tap Badges -->
+      <!-- Tap Seek Badges -->
       <div id="rewind-badge" class="loklok-seek-badge">-10 <span class="ring-icon">⟲</span></div>
       <div id="forward-badge" class="loklok-seek-badge"><span class="ring-icon">⟳</span> +10</div>
 
@@ -85,13 +82,10 @@
             <span id="current-time-text">00:00:00</span> / <span id="total-duration-text">00:00:00</span>
           </div>
           <div class="right-utility-btns">
-            <!-- Mute Button -->
             <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
               <svg id="svg-volume-on" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
               <svg id="svg-volume-off" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
             </button>
-            
-            <!-- Fullscreen Button -->
             <button id="btn-fullscreen" class="ctrl-btn-small fullscreen-btn-large" title="Fullscreen (F)">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -103,11 +97,11 @@
 
     </div>
 
-    <!-- Fallback iFrame for Third-Party Servers -->
+    <!-- Fallback iFrame for Third-Party Servers (Servers 2–5) -->
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Slow Connection Warning -->
+  <!-- Network Warning -->
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page or try another server.
   </div>
@@ -140,28 +134,34 @@
   <!-- Universal Toast Container -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=13.0"></script>
+  <script src="app.js?v=16.0"></script>
   <script>
-    (function () {
-      history.pushState(null, null, location.href);
-      window.addEventListener('popstate', function () {
-        const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-        if (isFS) {
-          exitFullscreen();
-        } else {
-          window.location.replace('index.html');
-        }
-      });
-    })();
-
-    function handleBackNavigation() {
+    // Universal Cross-Device Force Exit Function
+    function forceBackToHome() {
       const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       if (isFS) {
         exitFullscreen();
-      } else {
-        window.location.replace('index.html');
       }
+      window.location.replace('index.html');
     }
+
+    // Intercept History Stack across PC, iOS, Android, Smart TV
+    (function () {
+      history.pushState(null, null, location.href);
+      window.addEventListener('popstate', function () {
+        forceBackToHome();
+      });
+    })();
+
+    // Smart TV Remote Key Intercepts (Back / Return / Escape)
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode === 10009 || e.keyCode === 461 || e.keyCode === 27 || e.keyCode === 8) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          forceBackToHome();
+        }
+      }
+    });
 
     function exitFullscreen() {
       if (document.exitFullscreen) {
@@ -268,13 +268,16 @@
     let slowConnectionTimer = null;
     let autoHideTimer = null;
     let currentBrightness = 100;
+    let activeServer = 1;
 
     function updateSeekbarBackground(val) {
       seekbar.style.background = `linear-gradient(to right, #e50914 0%, #e50914 ${val}%, rgba(255, 255, 255, 0.3) ${val}%, rgba(255, 255, 255, 0.3) 100%)`;
     }
 
-    // Explicit 1.5-Second Auto-Hide Control System
+    // 1.5-Second Auto-Hide Logic (Active ONLY on Server 1)
     function showControls() {
+      if (activeServer !== 1) return;
+
       playerOverlay.classList.add('active');
       clearTimeout(autoHideTimer);
 
@@ -288,6 +291,8 @@
     }
 
     playerOverlay.addEventListener('click', (e) => {
+      if (activeServer !== 1) return;
+
       if (e.target === playerOverlay) {
         if (playerOverlay.classList.contains('active')) {
           hideControls();
@@ -300,16 +305,17 @@
       }
     });
 
-    playerContainer.addEventListener('mousemove', showControls);
-    playerContainer.addEventListener('touchstart', showControls, { passive: true });
+    playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
+    playerContainer.addEventListener('touchstart', () => { if (activeServer === 1) showControls(); }, { passive: true });
 
-    // Fullscreen Brightness and Volume Touch Gestures
+    // Fullscreen Brightness & Volume Gestures (Server 1 Only)
     let touchStartY = 0;
     let isGestureDragging = false;
     let gestureType = null;
     let sliderHideTimer = null;
 
     playerOverlay.addEventListener('touchstart', (e) => {
+      if (activeServer !== 1) return;
       const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       if (e.touches.length === 1 && isFS) {
         touchStartY = e.touches[0].clientY;
@@ -320,7 +326,7 @@
     }, { passive: true });
 
     playerOverlay.addEventListener('touchmove', (e) => {
-      if (!isGestureDragging || e.touches.length !== 1) return;
+      if (activeServer !== 1 || !isGestureDragging || e.touches.length !== 1) return;
 
       const currentY = e.touches[0].clientY;
       const deltaY = touchStartY - currentY;
@@ -343,6 +349,7 @@
     }, { passive: true });
 
     playerOverlay.addEventListener('touchend', () => {
+      if (activeServer !== 1) return;
       isGestureDragging = false;
       sliderHideTimer = setTimeout(() => {
         brightnessContainer.style.display = 'none';
@@ -351,7 +358,7 @@
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (activeServer !== 1 || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       switch (e.keyCode) {
         case 32:
@@ -448,14 +455,16 @@
       clearSlowConnectionNote();
       svgCenterPlay.style.display = 'none';
       svgCenterPause.style.display = 'block';
-      showControls();
+      if (activeServer === 1) showControls();
     });
 
     directPlayer.addEventListener('pause', () => {
       svgCenterPlay.style.display = 'block';
       svgCenterPause.style.display = 'none';
-      playerOverlay.classList.add('active');
-      clearTimeout(autoHideTimer);
+      if (activeServer === 1) {
+        playerOverlay.classList.add('active');
+        clearTimeout(autoHideTimer);
+      }
     });
 
     directPlayer.addEventListener('waiting', () => {
@@ -561,11 +570,15 @@
       setTimeout(() => badge.classList.remove('show'), 600);
     }
 
+    // Switch Server Handler (No Extra History Entry Added)
     function switchServer(serverNum) {
+      activeServer = serverNum;
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       startSlowConnectionCheck();
-      showControls();
+
+      // Overwrite history entry without pushing new state
+      history.replaceState(null, null, location.href);
 
       let targetUrl = "";
 
@@ -576,15 +589,26 @@
         const lowerUrl = targetUrl.toLowerCase();
         if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
           iframe.style.display = 'none';
+          iframe.src = 'about:blank';
           directPlayer.style.display = 'block';
           playerOverlay.style.display = 'flex';
           directPlayer.src = targetUrl;
           
           attemptAutoUnmute();
+          showControls();
           showToast(`Server 1 loading...`);
           return;
         }
-      } else if (serverNum === 2) {
+      } 
+      
+      // Third-party servers (Servers 2–5): Hide custom overlay & reset frame
+      directPlayer.pause();
+      directPlayer.style.display = 'none';
+      playerOverlay.style.display = 'none';
+      playerOverlay.classList.remove('active');
+      clearTimeout(autoHideTimer);
+
+      if (serverNum === 2) {
         targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
@@ -598,17 +622,10 @@
         s5Btn.classList.add('active');
       }
 
-      if (serverNum === 1 && targetUrl) {
-        targetUrl += targetUrl.includes('?') ? '&autoplay=1' : '?autoplay=1';
-      }
-
-      directPlayer.pause();
-      directPlayer.style.display = 'none';
-      playerOverlay.style.display = 'flex';
       iframe.style.display = 'block';
-
       showToast(`Server ${serverNum} loading...`);
 
+      // Location replace prevents iframe navigation entries in browser history
       if (iframe.contentWindow) {
         iframe.contentWindow.location.replace(targetUrl);
       } else {
@@ -660,9 +677,6 @@
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-    // Trigger initial 1.5s countdown
-    showControls();
   </script>
 </body>
 </html>
