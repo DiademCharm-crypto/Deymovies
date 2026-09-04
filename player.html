@@ -13,44 +13,111 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=24.0">
+  <link rel="stylesheet" href="style.css?v=35.0">
 
+  <!-- BRAVE-STYLE NETWORK & WINDOW AD-BLOCK ENGINE -->
   <script>
-    window.open = function() { return null; };
+    (function () {
+      'use strict';
 
-    /* Context menu and keyboard inspection lock */
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
+      /* 1. Trap and Nullify Window Opening (Popups/Popunders) */
+      const dummyWindow = {
+        focus: function () {},
+        blur: function () {},
+        close: function () {},
+        postMessage: function () {},
+        closed: true
+      };
 
-    document.addEventListener('keydown', function(e) {
-      if (
-        e.keyCode === 123 || 
-        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-        (e.ctrlKey && e.keyCode === 85) || 
-        (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-        (e.metaKey && e.keyCode === 85)
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    });
+      window.open = function () {
+        console.warn('[DEYMFLIX Engine] Blocked window.open popup attempt.');
+        return dummyWindow;
+      };
 
-    setInterval(function() {
-      const startTime = performance.now();
-      (function() {}.constructor("debugger")());
-      const endTime = performance.now();
-      if (endTime - startTime > 100) {
-        window.location.href = "index.html";
-      }
-    }, 1000);
+      /* 2. Lock Top Window Location (Stops Parent Hijacking) */
+      try {
+        let originalLocation = window.location.href;
+        Object.defineProperty(window, 'location', {
+          configurable: false,
+          enumerable: true,
+          get: function() {
+            return document.location;
+          },
+          set: function(val) {
+            if (typeof val === 'string' && !val.includes(document.domain) && !val.startsWith('/') && !val.startsWith('#')) {
+              console.warn('[DEYMFLIX Engine] Prevented top-level location hijack to:', val);
+              return originalLocation;
+            }
+            document.location.href = val;
+          }
+        });
+      } catch (e) {}
+
+      /* 3. Global Window Unload Guard for Frame Redirects */
+      window.onbeforeunload = function (e) {
+        if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+          console.warn('[DEYMFLIX Engine] Intercepted top-level iframe redirect.');
+          e.preventDefault();
+          return (e.returnValue = 'Ad redirect blocked.');
+        }
+      };
+
+      /* 4. Global Link Anchor Guard */
+      document.addEventListener('click', function (e) {
+        const targetAnchor = e.target.closest('a');
+        if (targetAnchor) {
+          const href = targetAnchor.getAttribute('href');
+          if (
+            targetAnchor.target === '_blank' || 
+            (href && href.startsWith('http') && !href.includes(window.location.hostname))
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.warn('[DEYMFLIX Engine] Blocked external anchor redirect.');
+            return false;
+          }
+        }
+      }, true);
+
+      /* 5. Inspection Locks */
+      document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      document.addEventListener('keydown', function (e) {
+        if (
+          e.keyCode === 123 || 
+          (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+          (e.ctrlKey && e.keyCode === 85) || 
+          (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+          (e.metaKey && e.keyCode === 85)
+        ) {
+          e.preventDefault();
+          return false;
+        }
+      });
+    })();
   </script>
+
+  <style>
+    /* Click-Guard Interceptor Shield */
+    .adblock-trap-shield {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.001);
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body style="padding-top: 0;">
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
+
+    <!-- Invisible Click Trap Overlay to absorb third-party player popup clicks -->
+    <div id="iframe-ad-shield" class="adblock-trap-shield" onclick="handleShieldClick(event)" style="display: none;"></div>
 
     <div id="player-gesture-overlay" class="player-overlay active" style="display: none;">
       <div class="player-top-bar">
@@ -116,8 +183,6 @@
         </div>
       </div>
     </div>
-
-    <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
   <div id="network-note" class="network-warning-note" style="display: none;">
@@ -148,11 +213,27 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=24.0"></script>
+  <script src="app.js?v=35.0"></script>
   <script>
+    function destroyAllPlayers() {
+      window.onbeforeunload = null;
+      const dp = document.getElementById('direct-video-player');
+      if (dp) {
+        dp.pause();
+        dp.removeAttribute('src');
+        dp.load();
+      }
+      const fr = document.getElementById('main-iframe');
+      if (fr) {
+        fr.src = "about:blank";
+        fr.remove();
+      }
+    }
+
+    window.addEventListener('pagehide', destroyAllPlayers);
     window.addEventListener('pageshow', function(event) {
       if (event.persisted) {
-        window.location.reload();
+        window.location.replace('index.html');
       }
     });
 
@@ -161,21 +242,9 @@
       if (isFS) {
         exitFullscreen();
       }
-      const dp = document.getElementById('direct-video-player');
-      if(dp) { dp.pause(); dp.src = ""; }
-      const fr = document.getElementById('main-iframe');
-      if(fr) { fr.src = "about:blank"; }
-
+      destroyAllPlayers();
       window.location.replace('index.html');
     }
-
-    /* iPad Gesture Back Fix: Replaces State Instead Of Stacking History */
-    (function () {
-      history.replaceState({ page: 'player' }, null, location.href);
-      window.addEventListener('popstate', function () {
-        forceBackToHome();
-      });
-    })();
 
     function exitFullscreen() {
       if (document.exitFullscreen) {
@@ -197,6 +266,21 @@
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
     const networkNote = document.getElementById('network-note');
+    const adShield = document.getElementById('iframe-ad-shield');
+
+    let shieldClickCount = 0;
+    const maxShieldClicks = 2; // Absorbs first 2 clicks designed to trigger 2Embed popups
+
+    function handleShieldClick(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      shieldClickCount++;
+      console.warn(`[DEYMFLIX AdBlock] Swallowed ad trigger click ${shieldClickCount}/${maxShieldClicks}`);
+      
+      if (shieldClickCount >= maxShieldClicks) {
+        adShield.style.display = 'none';
+      }
+    }
 
     function checkSynopsisLength() {
       if (descElement.scrollHeight > descElement.clientHeight || descElement.textContent.length > 180) {
@@ -216,7 +300,6 @@
       }
     }
 
-    /* Description Loader using direct app.js fields */
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -261,7 +344,7 @@
 
     loadBroadSynopsis();
 
-    const iframe = document.getElementById('main-iframe');
+    let iframe = null;
     const directPlayer = document.getElementById('direct-video-player');
     const playerContainer = document.getElementById('playerContainer');
     const playerOverlay = document.getElementById('player-gesture-overlay');
@@ -492,10 +575,6 @@
       startSlowConnectionCheck();
     });
 
-    iframe.addEventListener('load', () => {
-      clearSlowConnectionNote();
-    });
-
     function togglePlayPause() {
       if (directPlayer.paused) {
         directPlayer.play();
@@ -591,23 +670,54 @@
       setTimeout(() => badge.classList.remove('show'), 600);
     }
 
+    /* Guard-Protected iFrame Generator */
+    function renderFreshIframe(targetUrl) {
+      let existingIframe = document.getElementById('main-iframe');
+      if (existingIframe) {
+        existingIframe.remove();
+      }
+
+      // Reset & activate ad-click trap layer
+      shieldClickCount = 0;
+      adShield.style.display = 'block';
+
+      const newIframe = document.createElement('iframe');
+      newIframe.id = 'main-iframe';
+      newIframe.allowFullscreen = true;
+      newIframe.allow = "autoplay; fullscreen *; picture-in-picture *";
+      
+      newIframe.style.width = '100%';
+      newIframe.style.height = '100%';
+      newIframe.style.border = 'none';
+      newIframe.style.display = 'block';
+      newIframe.src = targetUrl;
+
+      newIframe.addEventListener('load', () => {
+        clearSlowConnectionNote();
+      });
+
+      playerContainer.appendChild(newIframe);
+      iframe = newIframe;
+    }
+
     function switchServer(serverNum) {
       activeServer = serverNum;
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       startSlowConnectionCheck();
-      history.replaceState({ page: 'player' }, null, location.href);
 
       let targetUrl = "";
 
       if (serverNum === 1) {
+        adShield.style.display = 'none';
         targetUrl = cleanDriveLink(currentMovie.manualEmbed);
         s1Btn.classList.add('active');
 
         const lowerUrl = targetUrl.toLowerCase();
         if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
-          iframe.style.display = 'none';
-          iframe.src = 'about:blank';
+          const oldIframe = document.getElementById('main-iframe');
+          if (oldIframe) oldIframe.remove();
+
           directPlayer.style.display = 'block';
           playerOverlay.style.display = 'flex';
           directPlayer.src = targetUrl;
@@ -620,33 +730,30 @@
       } 
       
       directPlayer.pause();
+      directPlayer.removeAttribute('src');
+      directPlayer.load();
       directPlayer.style.display = 'none';
       playerOverlay.style.display = 'none';
       playerOverlay.classList.remove('active');
       clearTimeout(autoHideTimer);
 
+      /* Reliable Alternate Provider Sources */
       if (serverNum === 2) {
-        targetUrl = `https://vidsrc.sbs/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
+        targetUrl = `https://vidsrc.me/embed/movie?tmdb=${currentMovie.tmdbId}`;
         s2Btn.classList.add('active');
       } else if (serverNum === 3) {
-        targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
+        targetUrl = `https://player.autoembed.cc/embed/movie/${currentMovie.tmdbId}`;
         s3Btn.classList.add('active');
       } else if (serverNum === 4) {
-        targetUrl = `https://embed.su/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
+        targetUrl = `https://vidbinge.dev/embed/movie/${currentMovie.tmdbId}`;
         s4Btn.classList.add('active');
       } else if (serverNum === 5) {
-        targetUrl = `https://vidsrc.pro/embed/movie/${currentMovie.tmdbId}?autoplay=1`;
+        targetUrl = `https://www.2embed.cc/embed/${currentMovie.tmdbId}`;
         s5Btn.classList.add('active');
       }
 
-      iframe.style.display = 'block';
       showToast(`Server ${serverNum} loading...`);
-
-      if (iframe.contentWindow) {
-        iframe.contentWindow.location.replace(targetUrl);
-      } else {
-        iframe.src = targetUrl;
-      }
+      renderFreshIframe(targetUrl);
     }
 
     if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
