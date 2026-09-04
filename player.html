@@ -10,7 +10,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=16.0">
+  <link rel="stylesheet" href="style.css?v=17.0">
 
   <script>
     // Prevent external popups from third-party embed frames
@@ -134,9 +134,9 @@
   <!-- Universal Toast Container -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=16.0"></script>
+  <script src="app.js?v=17.0"></script>
   <script>
-    // Universal Cross-Device Force Exit Function
+    // Universal Force Exit
     function forceBackToHome() {
       const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       if (isFS) {
@@ -145,7 +145,6 @@
       window.location.replace('index.html');
     }
 
-    // Intercept History Stack across PC, iOS, Android, Smart TV
     (function () {
       history.pushState(null, null, location.href);
       window.addEventListener('popstate', function () {
@@ -153,7 +152,6 @@
       });
     })();
 
-    // Smart TV Remote Key Intercepts (Back / Return / Escape)
     document.addEventListener('keydown', function(e) {
       if (e.keyCode === 10009 || e.keyCode === 461 || e.keyCode === 27 || e.keyCode === 8) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
@@ -269,12 +267,13 @@
     let autoHideTimer = null;
     let currentBrightness = 100;
     let activeServer = 1;
+    let lastTapTime = 0;
 
     function updateSeekbarBackground(val) {
       seekbar.style.background = `linear-gradient(to right, #e50914 0%, #e50914 ${val}%, rgba(255, 255, 255, 0.3) ${val}%, rgba(255, 255, 255, 0.3) 100%)`;
     }
 
-    // 1.5-Second Auto-Hide Logic (Active ONLY on Server 1)
+    // Fixed Android Tap Toggle Logic
     function showControls() {
       if (activeServer !== 1) return;
 
@@ -290,8 +289,16 @@
       playerOverlay.classList.remove('active');
     }
 
-    playerOverlay.addEventListener('click', (e) => {
+    function toggleOverlayControls(e) {
       if (activeServer !== 1) return;
+
+      // Prevent Android double-triggering
+      const now = Date.now();
+      if (now - lastTapTime < 300) {
+        e.preventDefault();
+        return;
+      }
+      lastTapTime = now;
 
       if (e.target === playerOverlay) {
         if (playerOverlay.classList.contains('active')) {
@@ -303,12 +310,25 @@
       } else {
         showControls();
       }
+    }
+
+    // Android/Touch Event Listeners with double-tap protection
+    playerOverlay.addEventListener('touchend', (e) => {
+      if (!isGestureDragging) {
+        toggleOverlayControls(e);
+      }
+    });
+
+    playerOverlay.addEventListener('click', (e) => {
+      // Ignore click on touch devices to avoid double toggling
+      if (!('ontouchstart' in window)) {
+        toggleOverlayControls(e);
+      }
     });
 
     playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
-    playerContainer.addEventListener('touchstart', () => { if (activeServer === 1) showControls(); }, { passive: true });
 
-    // Fullscreen Brightness & Volume Gestures (Server 1 Only)
+    // Fullscreen Brightness & Volume Gestures (Android Fix)
     let touchStartY = 0;
     let isGestureDragging = false;
     let gestureType = null;
@@ -321,17 +341,23 @@
         touchStartY = e.touches[0].clientY;
         const screenWidth = window.innerWidth;
         gestureType = e.touches[0].clientX < screenWidth / 2 ? 'brightness' : 'volume';
-        isGestureDragging = true;
+        isGestureDragging = false;
       }
     }, { passive: true });
 
     playerOverlay.addEventListener('touchmove', (e) => {
-      if (activeServer !== 1 || !isGestureDragging || e.touches.length !== 1) return;
+      if (activeServer !== 1 || e.touches.length !== 1) return;
 
       const currentY = e.touches[0].clientY;
       const deltaY = touchStartY - currentY;
-      touchStartY = currentY;
+      
+      if (Math.abs(deltaY) > 8) {
+        isGestureDragging = true;
+      }
 
+      if (!isGestureDragging) return;
+
+      touchStartY = currentY;
       clearTimeout(sliderHideTimer);
 
       if (gestureType === 'brightness') {
@@ -350,10 +376,10 @@
 
     playerOverlay.addEventListener('touchend', () => {
       if (activeServer !== 1) return;
-      isGestureDragging = false;
       sliderHideTimer = setTimeout(() => {
         brightnessContainer.style.display = 'none';
         volumeContainer.style.display = 'none';
+        isGestureDragging = false;
       }, 1000);
     });
 
@@ -505,10 +531,10 @@
           svgVolumeOn.style.display = 'block';
           svgVolumeOff.style.display = 'none';
           document.removeEventListener('click', unlockAudio);
-          document.removeEventListener('touchstart', unlockAudio);
+          document.removeEventListener('touchend', unlockAudio);
         };
         document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('touchend', unlockAudio, { once: true });
       });
     }
 
@@ -570,14 +596,11 @@
       setTimeout(() => badge.classList.remove('show'), 600);
     }
 
-    // Switch Server Handler (No Extra History Entry Added)
     function switchServer(serverNum) {
       activeServer = serverNum;
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       startSlowConnectionCheck();
-
-      // Overwrite history entry without pushing new state
       history.replaceState(null, null, location.href);
 
       let targetUrl = "";
@@ -601,7 +624,6 @@
         }
       } 
       
-      // Third-party servers (Servers 2–5): Hide custom overlay & reset frame
       directPlayer.pause();
       directPlayer.style.display = 'none';
       playerOverlay.style.display = 'none';
@@ -625,7 +647,6 @@
       iframe.style.display = 'block';
       showToast(`Server ${serverNum} loading...`);
 
-      // Location replace prevents iframe navigation entries in browser history
       if (iframe.contentWindow) {
         iframe.contentWindow.location.replace(targetUrl);
       } else {
