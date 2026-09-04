@@ -524,6 +524,7 @@ body {
 .progress-bar-wrapper input[type="range"] {
   width: 100%;
   height: 4px;
+  appearance: none;
   -webkit-appearance: none;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
@@ -642,12 +643,14 @@ body {
   color: var(--text-muted);
   line-height: 1.4;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .synopsis-text.expanded {
+  line-clamp: unset;
   -webkit-line-clamp: unset;
 }
 

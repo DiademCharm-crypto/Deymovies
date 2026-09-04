@@ -16,7 +16,7 @@ const featuredMovies = [
     description: "Buzz, Woody, Jessie and the rest of the gang come face-to-face with Lilypad, a brand-new tablet device that arrives with her own disruptive ideas about what is best for Bonnie.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://www.youtube.com/embed/5PSNL1qE6VY"
+    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -75,7 +75,6 @@ const movies = [
     tmdbId: "1368337",
     title: "The Odyssey", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "https://cinema8.com/video/9X6wd1PJ"
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -133,7 +132,8 @@ const movies = [
     id: "Toy Story 5", 
     tmdbId: "1084244",
     title: "Toy Story 5", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
   },
   { 
     id: "Pinocchio: Unstrung", 
@@ -159,25 +159,30 @@ const movies = [
     id: "Colony", 
     tmdbId: "1375646",
     title: "Colony", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tN799oUR0f1gUKDYdMNrDaY7I51.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Colony%202026%201080p%20WebRip%20Opus%202%200%20x265-Lootera.mkv"
   },
   { 
     id: "Ghost in the Cell", 
     tmdbId: "1393326",
     title: "Ghost in the Cell", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Ghost.In.The.Cell.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
   },
   { 
     id: "The Secret Woman", 
     tmdbId: "1631807",
     title: "The Secret Woman", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/The%20Secret%20Woman%202026%201080p%20NF%20WEB-DL%20DUAL%20DDP5%201%20H%20264-FLUX.mkv"  
   },
   { 
     id: "Barreda", 
     tmdbId: "1471168",
     title: "Barreda", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Barreda.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
+
   },
   { 
     id: "Buddy", 
@@ -189,13 +194,16 @@ const movies = [
     id: "The Whisper Man", 
     tmdbId: "860508",
     title: "The Whisper Man", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/The.Whisper.Man.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
+
   },
   { 
     id: "Yellow Mirror", 
     tmdbId: "1729723",
     title: "Yellow Mirror", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Yellow%20Mirror%202026%20NORDiC%201080p%20WEB-DL%20H%20264%20DDP5%201-ADDICTION.mkv"  
   },
   { 
     id: "The Dog Stars", 
@@ -207,7 +215,9 @@ const movies = [
     id: "It Ends", 
     tmdbId: "1422011",
     title: "It Ends", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/It.Ends.2025.1080p.WEBRip.x264.AAC-%5BYTS.LT%5D.mp4"  
+
   },
   { 
     id: "Irumudi", 
@@ -243,7 +253,8 @@ const movies = [
     id: "Just Play Dead", 
     tmdbId: "1480574",
     title: "Just Play Dead", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/glALx6QaIgw1u4joXsnfHTjWi6D.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/glALx6QaIgw1u4joXsnfHTjWi6D.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Just.Play.Dead.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
   },
   { 
     id: "The Wrong Girls", 
@@ -255,13 +266,14 @@ const movies = [
     id: "I Want Your Sex", 
     tmdbId: "1288059",
     title: "I Want Your Sex", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/pR7SIX3AwqdoD96OI44oLG98e7g.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/pR7SIX3AwqdoD96OI44oLG98e7g.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/I%20Want%20Your%20Sex%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/I.Want.Your.Sex.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
   },
   { 
     id: "Gohan", 
     tmdbId: "1319522",
     title: "Gohan", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/4LwvU9SZc8QQzW1X1FAPhNbXnEU.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/nVq1Dn88NzVIVTDpGZeP7fxpLa1.jpg"
   },
   { 
     id: "The Weightmovie-32", 
@@ -303,7 +315,9 @@ const movies = [
     id: "Batman: Knightfall Part 1: Knightfall", 
     tmdbId: "1560520",
     title: "Batman: Knightfall Part 1: Knightfall", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Batman.Knightfall.Part.1.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"  
+
   },
   { 
     id: "Motor City", 
@@ -610,7 +624,7 @@ const movies = [
   }
 ];
 
-// Reusable Card Generator
+// Reusable Card Generator with Automatic Quality Labeling (HD / CAM)
 function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
   card.className = 'poster-card';
@@ -621,13 +635,18 @@ function createMovieCard(movie, rankNumber = null) {
   const fallbackUrl = 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=No+Poster';
   const rankHTML = rankNumber ? `<div class="rank-badge-box">#${rankNumber}</div>` : '';
 
+  // Automatic Quality Detection: Direct manualEmbed present -> HD, otherwise -> CAM
+  const hasDirectLink = movie.manualEmbed && movie.manualEmbed.trim() !== '';
+  const qualityLabel = hasDirectLink ? 'HD' : 'CAM';
+  const qualityClass = hasDirectLink ? 'quality-hd' : 'quality-cam';
+
   card.innerHTML = `
     ${rankHTML}
     <img src="${movie.poster}" 
          alt="${movie.title}" 
          loading="lazy" 
          onerror="this.onerror=null;this.src='${fallbackUrl}';">
-    <div class="tag-badge-bottom">HD</div>
+    <div class="tag-badge-bottom ${qualityClass}">${qualityLabel}</div>
     <div class="poster-card-title">${movie.title}</div>
   `;
   return card;
@@ -770,7 +789,7 @@ function scrollToGridTop() {
 }
 
 /* ==========================================================================
-   NETFLIX-STYLE LIVE SEARCH AND ENTER/SUBMIT EXECUTION FIX
+   NETFLIX-STYLE LIVE SEARCH AND ENTER/SUBMIT EXECUTION
    ========================================================================== */
 
 function setupSearchHandlers() {
