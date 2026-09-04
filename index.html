@@ -64,14 +64,20 @@
   </section>
 
   <!-- Top Picks Section -->
-  <section class="content-section" style="margin-top: 15px;">
+  <section class="content-section" id="top-picks-section" style="margin-top: 15px;">
     <h2 class="section-header-title">Top Picks</h2>
     <div class="top-picks-scroll" id="trending-grid"></div>
   </section>
 
+  <!-- Filipino Movies Section -->
+  <section class="content-section" id="filipino-movies-section">
+    <h2 class="section-header-title">Filipino Movies 🇵🇭</h2>
+    <div class="top-picks-scroll" id="filipino-grid"></div>
+  </section>
+
   <!-- All Movies Grid -->
   <section class="content-section">
-    <h2 class="section-header-title">All Movies</h2>
+    <h2 class="section-header-title" id="all-movies-heading">All Movies</h2>
     <main class="main-grid" id="movie-grid"></main>
     <div class="pagination-container" id="pagination-controls"></div>
   </section>
@@ -99,6 +105,9 @@
 
     const grid = document.getElementById('movie-grid');
     const pagination = document.getElementById('pagination-controls');
+    const topPicksSection = document.getElementById('top-picks-section');
+    const filipinoSection = document.getElementById('filipino-movies-section');
+    const allMoviesHeading = document.getElementById('all-movies-heading');
     let currentSlide = 0;
 
     function initHero() {
@@ -130,6 +139,25 @@
         card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
         card.innerHTML = `
           <div class="rank-badge-box">#${idx + 1}</div>
+          <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
+          <div class="tag-badge-bottom">HD</div>
+          <div class="poster-card-title">${movie.title}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderFilipinoSection() {
+      const container = document.getElementById('filipino-grid');
+      container.innerHTML = '';
+
+      const filipinoMovies = movies.filter(m => m.isFilipino);
+
+      filipinoMovies.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'poster-card';
+        card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
+        card.innerHTML = `
           <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
           <div class="tag-badge-bottom">HD</div>
           <div class="poster-card-title">${movie.title}</div>
@@ -176,8 +204,24 @@
     }
 
     function handleSearch() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      currentMovieList = movies.filter(m => m.title.toLowerCase().includes(query));
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+
+      if (query !== '') {
+        // Hide Top Picks and Filipino Movies sections during search
+        topPicksSection.style.display = 'none';
+        filipinoSection.style.display = 'none';
+        allMoviesHeading.textContent = `Search Results for "${query}"`;
+
+        currentMovieList = movies.filter(m => m.title.toLowerCase().includes(query));
+      } else {
+        // Restore sections when search bar is empty
+        topPicksSection.style.display = 'block';
+        filipinoSection.style.display = 'block';
+        allMoviesHeading.textContent = 'All Movies';
+
+        currentMovieList = [...movies];
+      }
+
       renderPage(1);
     }
 
@@ -228,6 +272,7 @@
 
     initHero();
     renderTrending();
+    renderFilipinoSection();
     renderPage(1);
   </script>
 </body>

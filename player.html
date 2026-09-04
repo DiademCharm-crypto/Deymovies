@@ -15,14 +15,38 @@
 
   <!-- Embedded Player Container -->
   <div class="video-container" id="playerContainer">
-    <!-- Native HTML5 Video Player for Direct Files with Autoplay -->
-    <video id="direct-video-player" controls autoplay muted playsinline crossorigin="anonymous" style="display: none;"></video>
+    <!-- Native HTML5 Video Player for Direct Files -->
+    <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
+
+    <!-- Interactive Gesture & Custom Controls Overlay -->
+    <div id="player-gesture-overlay" class="player-overlay" style="display: none;">
+      <div id="left-tap-zone" class="tap-zone"></div>
+      <div id="right-tap-zone" class="tap-zone"></div>
+      
+      <!-- Animated Visual Feedback Badges -->
+      <div id="rewind-badge" class="seek-badge">◄◄ -10 Sec.</div>
+      <div id="forward-badge" class="seek-badge">+10 Sec. ►►</div>
+      <div id="speed-badge" class="speed-indicator-badge">2x Speed</div>
+
+      <!-- Custom Player Controls Bar -->
+      <div class="custom-player-controls">
+        <div class="left-controls">
+          <button id="btn-play-pause" class="ctrl-btn" title="Play/Pause">▶</button>
+          <button id="btn-rewind" class="ctrl-btn" title="Rewind 10s">↺ 10s</button>
+          <button id="btn-forward" class="ctrl-btn" title="Forward 10s">10s ↻</button>
+          <button id="btn-unmute" class="ctrl-btn" title="Mute/Unmute">🔊</button>
+        </div>
+        <div class="right-controls">
+          <button id="btn-fullscreen" class="ctrl-btn" title="Fullscreen">⤢</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Fallback iFrame for Third-Party Embed Sources -->
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
   </div>
 
-  <!-- Slow Connection Warning Note (Placed between Video Player & Title Box) -->
+  <!-- Slow Connection Warning Note -->
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page or try another server.
   </div>
@@ -52,15 +76,14 @@
     <div class="list-recommendations" id="random-grid"></div>
   </section>
 
-  <!-- Loading Toast Element -->
-  <div id="loading-toast" class="toast-notification">Server is loading, please wait...</div>
+  <!-- Status Toast Notification Element -->
+  <div id="loading-toast" class="toast-notification">Loading...</div>
 
   <script src="app.js"></script>
   <script>
-    // Universal Back Button Navigation Override (Forces redirect to index.html)
+    // Universal Back Button Navigation Override
     (function () {
       history.pushState(null, null, location.href);
-
       window.addEventListener('popstate', function () {
         window.location.replace('index.html');
       });
@@ -68,10 +91,8 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
-
     const currentMovie = movies.find(m => m.id === movieId) || featuredMovies.find(m => m.id === movieId) || movies[0];
 
-    // Populate Title
     document.getElementById('current-title').textContent = currentMovie.title;
 
     const descElement = document.getElementById('current-description');
@@ -96,7 +117,6 @@
       }
     }
 
-    // Multi-Source Synopsis Search Pipeline (app.js -> TMDB -> Wikipedia)
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -145,25 +165,43 @@
 
     const iframe = document.getElementById('main-iframe');
     const directPlayer = document.getElementById('direct-video-player');
+    const playerContainer = document.getElementById('playerContainer');
+    const playerOverlay = document.getElementById('player-gesture-overlay');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const btnRewind = document.getElementById('btn-rewind');
+    const btnForward = document.getElementById('btn-forward');
+    const btnUnmute = document.getElementById('btn-unmute');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    
+    const rewindBadge = document.getElementById('rewind-badge');
+    const forwardBadge = document.getElementById('forward-badge');
+    const speedBadge = document.getElementById('speed-badge');
+
     const s1Btn = document.getElementById('server1-btn');
     const s2Btn = document.getElementById('server2-btn');
     const s3Btn = document.getElementById('server3-btn');
     const s4Btn = document.getElementById('server4-btn');
     const s5Btn = document.getElementById('server5-btn');
+
     let toastTimeout;
     let slowConnectionTimer = null;
 
-    // Direct Video Player Event Listeners for Handling the Slow Connection Note
-    directPlayer.addEventListener('playing', () => {
+    // Universal Loading Timer Handler
+    function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
       networkNote.style.display = 'none';
-    });
 
-    directPlayer.addEventListener('waiting', () => {
-      networkNote.style.display = 'block';
-    });
+      slowConnectionTimer = setTimeout(() => {
+        networkNote.style.display = 'block';
+      }, 2000);
+    }
 
-    // Toast Handler
+    function clearSlowConnectionNote() {
+      clearTimeout(slowConnectionTimer);
+      networkNote.style.display = 'none';
+    }
+
+    // Toast Message Handler
     function showToast(message) {
       if (window.Android && typeof window.Android.showToast === 'function') {
         window.Android.showToast(message);
@@ -177,16 +215,241 @@
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
           toast.classList.remove('show');
-        }, 3000);
+        }, 1500);
       }
     }
 
+    // Direct Video Player Events
+    directPlayer.addEventListener('playing', () => {
+      clearSlowConnectionNote();
+      btnPlayPause.textContent = '❚❚';
+    });
+
+    directPlayer.addEventListener('pause', () => {
+      btnPlayPause.textContent = '▶';
+    });
+
+    directPlayer.addEventListener('waiting', () => {
+      startSlowConnectionCheck();
+    });
+
+    // iFrame Event Listeners
+    iframe.addEventListener('load', () => {
+      clearSlowConnectionNote();
+    });
+
+    // Auto Unmute Logic
+    function attemptAutoUnmute() {
+      directPlayer.muted = false;
+      directPlayer.play().then(() => {
+        btnUnmute.textContent = '🔊';
+      }).catch(() => {
+        directPlayer.muted = true;
+        btnUnmute.textContent = '🔇';
+        directPlayer.play();
+
+        const unlockAudio = () => {
+          directPlayer.muted = false;
+          btnUnmute.textContent = '🔊';
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+        };
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+      });
+    }
+
+    // Fullscreen Toggle
+    btnFullscreen.onclick = (e) => {
+      e.stopPropagation();
+      toggleFullscreen();
+    };
+
+    function toggleFullscreen() {
+      const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+      if (!isFS) {
+        if (playerContainer.requestFullscreen) {
+          playerContainer.requestFullscreen();
+        } else if (playerContainer.webkitRequestFullscreen) {
+          playerContainer.webkitRequestFullscreen();
+        } else if (playerContainer.msRequestFullscreen) {
+          playerContainer.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    function updateFullscreenIcon() {
+      const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+      btnFullscreen.textContent = isFS ? '⤡' : '⤢';
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+    // Controls Buttons Handlers
+    btnPlayPause.onclick = (e) => {
+      e.stopPropagation();
+      if (directPlayer.paused) {
+        directPlayer.play();
+      } else {
+        directPlayer.pause();
+      }
+    };
+
+    btnRewind.onclick = (e) => {
+      e.stopPropagation();
+      triggerRewind();
+    };
+
+    btnForward.onclick = (e) => {
+      e.stopPropagation();
+      triggerForward();
+    };
+
+    btnUnmute.onclick = (e) => {
+      e.stopPropagation();
+      directPlayer.muted = !directPlayer.muted;
+      btnUnmute.textContent = directPlayer.muted ? '🔇' : '🔊';
+    };
+
+    function triggerRewind() {
+      directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
+      showSeekBadge(rewindBadge);
+      showToast('-10 Sec.');
+    }
+
+    function triggerForward() {
+      directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
+      showSeekBadge(forwardBadge);
+      showToast('+10 Sec.');
+    }
+
+    function showSeekBadge(badge) {
+      badge.classList.add('show');
+      setTimeout(() => badge.classList.remove('show'), 600);
+    }
+
+    // Double Tap & Long Press Gesture Listeners
+    let lastTapTimeLeft = 0;
+    let lastTapTimeRight = 0;
+    let longPressTimer = null;
+    let is2xSpeedActive = false;
+
+    const leftZone = document.getElementById('left-tap-zone');
+    const rightZone = document.getElementById('right-tap-zone');
+
+    leftZone.addEventListener('click', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTapTimeLeft;
+      if (tapLength < 300 && tapLength > 0) {
+        triggerRewind();
+        e.preventDefault();
+      }
+      lastTapTimeLeft = currentTime;
+    });
+
+    rightZone.addEventListener('click', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTapTimeRight;
+      if (tapLength < 300 && tapLength > 0) {
+        triggerForward();
+        e.preventDefault();
+      }
+      lastTapTimeRight = currentTime;
+    });
+
+    // Long Press 2x Playback Speed Trigger
+    function start2xSpeed() {
+      longPressTimer = setTimeout(() => {
+        directPlayer.playbackRate = 2.0;
+        speedBadge.style.display = 'block';
+        is2xSpeedActive = true;
+        showToast('2x Speed');
+      }, 400);
+    }
+
+    function stop2xSpeed() {
+      clearTimeout(longPressTimer);
+      if (is2xSpeedActive) {
+        directPlayer.playbackRate = 1.0;
+        speedBadge.style.display = 'none';
+        is2xSpeedActive = false;
+        showToast('Normal Speed');
+      }
+    }
+
+    playerOverlay.addEventListener('mousedown', start2xSpeed);
+    playerOverlay.addEventListener('mouseup', stop2xSpeed);
+    playerOverlay.addEventListener('mouseleave', stop2xSpeed);
+
+    // Multi-touch Pinch to Zoom Handler (Android / iPhone / iPad)
+    let initialPinchDistance = 0;
+    let isPinchZoomed = false;
+
+    playerOverlay.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        initialPinchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      } else if (e.touches.length === 1) {
+        start2xSpeed();
+      }
+    }, { passive: true });
+
+    playerOverlay.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && initialPinchDistance > 0) {
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const distanceDiff = currentDistance - initialPinchDistance;
+
+        // Pinch Out (Zoom In)
+        if (distanceDiff > 40 && !isPinchZoomed) {
+          isPinchZoomed = true;
+          directPlayer.style.objectFit = 'cover';
+          showToast('Zoomed In');
+          initialPinchDistance = currentDistance;
+        } 
+        // Pinch In (Zoom Out)
+        else if (distanceDiff < -40 && isPinchZoomed) {
+          isPinchZoomed = false;
+          directPlayer.style.objectFit = 'contain';
+          showToast('Zoomed Out');
+          initialPinchDistance = currentDistance;
+        }
+      }
+    }, { passive: true });
+
+    playerOverlay.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        initialPinchDistance = 0;
+      }
+      stop2xSpeed();
+    });
+
+    playerOverlay.addEventListener('touchcancel', (e) => {
+      initialPinchDistance = 0;
+      stop2xSpeed();
+    });
+
+    // Switch Server Function
     function switchServer(serverNum) {
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
-      // Reset and display connection note while server loads
-      clearTimeout(slowConnectionTimer);
-      networkNote.style.display = 'block';
+      startSlowConnectionCheck();
 
       let targetUrl = "";
 
@@ -198,13 +461,11 @@
         if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
           iframe.style.display = 'none';
           directPlayer.style.display = 'block';
+          playerOverlay.style.display = 'flex';
           directPlayer.src = targetUrl;
           
-          directPlayer.play().catch(e => {
-            console.log("Autoplay blocked by browser policy:", e);
-          });
-
-          showToast(`Server 1 is loading, please wait...`);
+          attemptAutoUnmute();
+          showToast(`Server 1 loading...`);
           return;
         }
       } else if (serverNum === 2) {
@@ -227,20 +488,16 @@
 
       directPlayer.pause();
       directPlayer.style.display = 'none';
+      playerOverlay.style.display = 'none';
       iframe.style.display = 'block';
 
-      showToast(`Server ${serverNum} is loading, please wait...`);
+      showToast(`Server ${serverNum} loading...`);
 
       if (iframe.contentWindow) {
         iframe.contentWindow.location.replace(targetUrl);
       } else {
         iframe.src = targetUrl;
       }
-
-      // Hide note automatically after 6 seconds for iframe embeds
-      slowConnectionTimer = setTimeout(() => {
-        networkNote.style.display = 'none';
-      }, 6000);
     }
 
     if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
@@ -251,7 +508,7 @@
       switchServer(2);
     }
 
-    // Recommendation Cards
+    // Recommendations List
     const grid = document.getElementById('random-grid');
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
@@ -270,7 +527,7 @@
       grid.appendChild(card);
     });
 
-    // Auto Orientation Switching for Fullscreen
+    // Device Landscape Lock in Fullscreen
     function handleFullscreenChange() {
       const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       

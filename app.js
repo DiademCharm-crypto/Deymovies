@@ -44,12 +44,13 @@ const movies = [
     tmdbId: "1510688",
     title: "The Runner", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
+    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
   },
   { 
     id: "Love, Ngo", 
     tmdbId: "1700944",
     title: "Love, Ngo", 
+    isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4"
   },
@@ -57,6 +58,7 @@ const movies = [
     id: "Call Me Mother", 
     tmdbId: "1510688",
     title: "Call Me Mother", 
+    isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
   },
@@ -64,6 +66,7 @@ const movies = [
     id: "Almost Us", 
     tmdbId: "1510688",
     title: "Almost Us", 
+    isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gQurSKUKrCFHa90ydVJRtSMyjLB.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
   },
