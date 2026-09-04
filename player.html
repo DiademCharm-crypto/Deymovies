@@ -4,11 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Player</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Anti-Caching Directives -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- Versioned CSS Import to Prevent Stale Caches -->
+  <link rel="stylesheet" href="style.css?v=1.0.1">
   
   <script>
     // Disable external window popups from third-party video embed servers
     window.open = function() { return null; };
+
+    // Prevent Right Click / Context Menu
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    // Block DevTools Shortcuts (F12, Ctrl+Shift+I/J/C, Ctrl+U)
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.keyCode === 123 || 
+        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+        (e.ctrlKey && e.keyCode === 85)
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // Anti-DevTools Debugger Trap Loop
+    (function () {
+      function freezeDevTools() {
+        (function () {
+          return false;
+        })["constructor"]("debugger")();
+      }
+      setInterval(freezeDevTools, 100);
+    })();
   </script>
 </head>
 <body style="padding-top: 0;">
@@ -79,7 +113,8 @@
   <!-- Status Toast Notification Element -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js"></script>
+  <!-- Versioned JS Imports -->
+  <script src="app.js?v=1.0.1"></script>
   <script>
     // Universal Back Button Navigation Override
     (function () {
@@ -186,7 +221,6 @@
     let toastTimeout;
     let slowConnectionTimer = null;
 
-    // Universal Loading Timer Handler
     function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
       networkNote.style.display = 'none';
@@ -201,7 +235,6 @@
       networkNote.style.display = 'none';
     }
 
-    // Toast Message Handler
     function showToast(message) {
       if (window.Android && typeof window.Android.showToast === 'function') {
         window.Android.showToast(message);
@@ -219,7 +252,6 @@
       }
     }
 
-    // Direct Video Player Events
     directPlayer.addEventListener('playing', () => {
       clearSlowConnectionNote();
       btnPlayPause.textContent = '❚❚';
@@ -233,12 +265,10 @@
       startSlowConnectionCheck();
     });
 
-    // iFrame Event Listeners
     iframe.addEventListener('load', () => {
       clearSlowConnectionNote();
     });
 
-    // Auto Unmute Logic
     function attemptAutoUnmute() {
       directPlayer.muted = false;
       directPlayer.play().then(() => {
@@ -259,7 +289,6 @@
       });
     }
 
-    // Fullscreen Toggle
     btnFullscreen.onclick = (e) => {
       e.stopPropagation();
       toggleFullscreen();
@@ -297,7 +326,6 @@
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
 
-    // Controls Buttons Handlers
     btnPlayPause.onclick = (e) => {
       e.stopPropagation();
       if (directPlayer.paused) {
@@ -340,7 +368,6 @@
       setTimeout(() => badge.classList.remove('show'), 600);
     }
 
-    // Double Tap & Long Press Gesture Listeners
     let lastTapTimeLeft = 0;
     let lastTapTimeRight = 0;
     let longPressTimer = null;
@@ -369,7 +396,6 @@
       lastTapTimeRight = currentTime;
     });
 
-    // Long Press 2x Playback Speed Trigger
     function start2xSpeed() {
       longPressTimer = setTimeout(() => {
         directPlayer.playbackRate = 2.0;
@@ -393,7 +419,6 @@
     playerOverlay.addEventListener('mouseup', stop2xSpeed);
     playerOverlay.addEventListener('mouseleave', stop2xSpeed);
 
-    // Multi-touch Pinch to Zoom Handler (Android / iPhone / iPad)
     let initialPinchDistance = 0;
     let isPinchZoomed = false;
 
@@ -416,15 +441,12 @@
         );
         const distanceDiff = currentDistance - initialPinchDistance;
 
-        // Pinch Out (Zoom In)
         if (distanceDiff > 40 && !isPinchZoomed) {
           isPinchZoomed = true;
           directPlayer.style.objectFit = 'cover';
           showToast('Zoomed In');
           initialPinchDistance = currentDistance;
-        } 
-        // Pinch In (Zoom Out)
-        else if (distanceDiff < -40 && isPinchZoomed) {
+        } else if (distanceDiff < -40 && isPinchZoomed) {
           isPinchZoomed = false;
           directPlayer.style.objectFit = 'contain';
           showToast('Zoomed Out');
@@ -445,7 +467,6 @@
       stop2xSpeed();
     });
 
-    // Switch Server Function
     function switchServer(serverNum) {
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
@@ -508,7 +529,6 @@
       switchServer(2);
     }
 
-    // Recommendations List
     const grid = document.getElementById('random-grid');
     const otherMovies = movies.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
@@ -527,7 +547,6 @@
       grid.appendChild(card);
     });
 
-    // Device Landscape Lock in Fullscreen
     function handleFullscreenChange() {
       const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
       
