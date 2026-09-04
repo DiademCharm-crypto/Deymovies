@@ -40,6 +40,13 @@ const featuredMovies = [
 // Main Grid Movie Library
 const movies = [
   { 
+    id: "The Runner", 
+    tmdbId: "1510688",
+    title: "The Runner", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
+  },
+  { 
     id: "Love, Ngo", 
     tmdbId: "1700944",
     title: "Love, Ngo", 
@@ -52,6 +59,13 @@ const movies = [
     title: "Call Me Mother", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
+  },
+  { 
+    id: "Almost Us", 
+    tmdbId: "1510688",
+    title: "Almost Us", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gQurSKUKrCFHa90ydVJRtSMyjLB.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
   },
   { 
     id: "The Odyssey", 
@@ -77,7 +91,7 @@ const movies = [
     id: "The Last Sunrise", 
     tmdbId: "1516698",
     title: "The Last Sunrise", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/The.Last.Sunrise.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
   },
   { 
@@ -103,7 +117,7 @@ const movies = [
     id: "Obsession", 
     tmdbId: "1339713",
     title: "Obsession", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Obsession.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4https://video.deymflix.eu.cc/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4"
   },
   { 
@@ -122,7 +136,7 @@ const movies = [
     id: "Pinocchio: Unstrung", 
     tmdbId: "1232569",
     title: "Pinocchio: Unstrung", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eUJXk3bTvLBi5Zcb0BCedZU7lVL.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eUJXk3bTvLBi5Zcb0BCedZU7lVL.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Pinocchio.Unstrung.mp4"
   },
   { 
@@ -135,7 +149,7 @@ const movies = [
     id: "Coyote vs. Acme", 
     tmdbId: "1204680",
     title: "Coyote vs. Acme", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vhv7lBWYM0DUuNU2a0V7Rhq21dD.jpg"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vhv7lBWYM0DUuNU2a0V7Rhq21dD.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Coyote.vs.Acme.2026.1080p.DCP.DDP5.1.H264-AOC.mkv"
   },
   { 
