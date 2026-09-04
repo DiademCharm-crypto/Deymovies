@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Player</title>
 
-  <!-- Prevent Stale Cache -->
+  <!-- Anti-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=13.0">
 
   <script>
     // Prevent external popups from third-party embed frames
@@ -24,16 +24,27 @@
     <!-- HTML5 Native Direct Video Player -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
-    <!-- Interactive On-Screen Stream Controls Overlay (Loklok Theme) -->
+    <!-- Interactive On-Screen Stream Controls Overlay -->
     <div id="player-gesture-overlay" class="player-overlay active">
       
-      <!-- Top Title Bar Overlay -->
+      <!-- Top Title Bar Overlay with Contextual Back Navigation -->
       <div class="player-top-bar">
-        <button id="btn-back-nav" class="icon-btn-back" onclick="window.location.replace('index.html')">❮</button>
-        <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
+        <button id="btn-back-nav" class="icon-btn-back" onclick="handleBackNavigation()">❮</button>
+        <span id="overlay-movie-title" class="overlay-title-text" onclick="handleBackNavigation()">Loading...</span>
       </div>
 
-      <!-- Centered Streaming Playback Controls (Loklok Style SVG Icons) -->
+      <!-- Mobile Fullscreen Gesture Indicators (Brightness & Volume Bars) -->
+      <div id="brightness-slider-container" class="vertical-slider-bar left-bar" style="display: none;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
+        <div class="v-track"><div id="brightness-fill" class="v-fill"></div></div>
+      </div>
+
+      <div id="volume-slider-container" class="vertical-slider-bar right-bar" style="display: none;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        <div class="v-track"><div id="volume-fill" class="v-fill"></div></div>
+      </div>
+
+      <!-- Centered Streaming Playback Controls -->
       <div class="center-controls-group">
         <!-- Rewind 10s Icon -->
         <button id="btn-rewind-center" class="center-ctrl-btn" title="Rewind 10s">
@@ -46,8 +57,8 @@
 
         <!-- Center Large Play/Pause Icon -->
         <button id="btn-play-pause-center" class="center-ctrl-btn play-btn-large" title="Play/Pause">
-          <svg id="svg-center-play" viewBox="0 0 24 24" width="30" height="30" fill="currentColor" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="svg-center-pause" viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          <svg id="svg-center-play" viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="svg-center-pause" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
 
         <!-- Forward 10s Icon -->
@@ -60,10 +71,9 @@
         </button>
       </div>
 
-      <!-- Animated Tap Badges -->
-      <div id="rewind-badge" class="seek-badge">◄◄ -10 Sec.</div>
-      <div id="forward-badge" class="seek-badge">+10 Sec. ►►</div>
-      <div id="speed-badge" class="speed-indicator-badge">2x Speed</div>
+      <!-- Loklok Image-Matched Tap Badges -->
+      <div id="rewind-badge" class="loklok-seek-badge">-10 <span class="ring-icon">⟲</span></div>
+      <div id="forward-badge" class="loklok-seek-badge"><span class="ring-icon">⟳</span> +10</div>
 
       <!-- Bottom Timeline & Utility Bar -->
       <div class="player-bottom-bar">
@@ -72,14 +82,21 @@
         </div>
         <div class="bottom-bar-controls">
           <div class="time-display">
-            <span id="current-time-text">00:00</span> / <span id="total-duration-text">00:00</span>
+            <span id="current-time-text">00:00:00</span> / <span id="total-duration-text">00:00:00</span>
           </div>
           <div class="right-utility-btns">
+            <!-- Mute Button -->
             <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
-              <svg id="svg-volume-on" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-              <svg id="svg-volume-off" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              <svg id="svg-volume-on" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              <svg id="svg-volume-off" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
             </button>
-            <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">⤢</button>
+            
+            <!-- Fullscreen Button -->
+            <button id="btn-fullscreen" class="ctrl-btn-small fullscreen-btn-large" title="Fullscreen (F)">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -123,15 +140,38 @@
   <!-- Universal Toast Container -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=13.0"></script>
   <script>
-    // Universal Back Button Navigation Override
     (function () {
       history.pushState(null, null, location.href);
       window.addEventListener('popstate', function () {
-        window.location.replace('index.html');
+        const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        if (isFS) {
+          exitFullscreen();
+        } else {
+          window.location.replace('index.html');
+        }
       });
     })();
+
+    function handleBackNavigation() {
+      const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+      if (isFS) {
+        exitFullscreen();
+      } else {
+        window.location.replace('index.html');
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
@@ -212,7 +252,11 @@
 
     const rewindBadge = document.getElementById('rewind-badge');
     const forwardBadge = document.getElementById('forward-badge');
-    const speedBadge = document.getElementById('speed-badge');
+
+    const brightnessContainer = document.getElementById('brightness-slider-container');
+    const brightnessFill = document.getElementById('brightness-fill');
+    const volumeContainer = document.getElementById('volume-slider-container');
+    const volumeFill = document.getElementById('volume-fill');
 
     const s1Btn = document.getElementById('server1-btn');
     const s2Btn = document.getElementById('server2-btn');
@@ -223,57 +267,115 @@
     let toastTimeout;
     let slowConnectionTimer = null;
     let autoHideTimer = null;
+    let currentBrightness = 100;
 
-    // Controls Hover & Touch Display Handler
+    function updateSeekbarBackground(val) {
+      seekbar.style.background = `linear-gradient(to right, #e50914 0%, #e50914 ${val}%, rgba(255, 255, 255, 0.3) ${val}%, rgba(255, 255, 255, 0.3) 100%)`;
+    }
+
+    // Explicit 1.5-Second Auto-Hide Control System
     function showControls() {
       playerOverlay.classList.add('active');
       clearTimeout(autoHideTimer);
-      
+
       autoHideTimer = setTimeout(() => {
-        if (!directPlayer.paused && directPlayer.currentTime > 0) {
-          playerOverlay.classList.remove('active');
-        }
-      }, 2000);
+        hideControls();
+      }, 1500);
     }
 
-    // Cursor movement listener for PC/Laptop
-    playerContainer.addEventListener('mousemove', showControls);
-    playerContainer.addEventListener('click', (e) => {
-      if (playerOverlay.classList.contains('active') && e.target === playerOverlay) {
-        playerOverlay.classList.remove('active');
+    function hideControls() {
+      playerOverlay.classList.remove('active');
+    }
+
+    playerOverlay.addEventListener('click', (e) => {
+      if (e.target === playerOverlay) {
+        if (playerOverlay.classList.contains('active')) {
+          hideControls();
+          clearTimeout(autoHideTimer);
+        } else {
+          showControls();
+        }
       } else {
         showControls();
       }
     });
 
-    // PC Keyboard Shortcuts
+    playerContainer.addEventListener('mousemove', showControls);
+    playerContainer.addEventListener('touchstart', showControls, { passive: true });
+
+    // Fullscreen Brightness and Volume Touch Gestures
+    let touchStartY = 0;
+    let isGestureDragging = false;
+    let gestureType = null;
+    let sliderHideTimer = null;
+
+    playerOverlay.addEventListener('touchstart', (e) => {
+      const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+      if (e.touches.length === 1 && isFS) {
+        touchStartY = e.touches[0].clientY;
+        const screenWidth = window.innerWidth;
+        gestureType = e.touches[0].clientX < screenWidth / 2 ? 'brightness' : 'volume';
+        isGestureDragging = true;
+      }
+    }, { passive: true });
+
+    playerOverlay.addEventListener('touchmove', (e) => {
+      if (!isGestureDragging || e.touches.length !== 1) return;
+
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY - currentY;
+      touchStartY = currentY;
+
+      clearTimeout(sliderHideTimer);
+
+      if (gestureType === 'brightness') {
+        currentBrightness = Math.max(20, Math.min(150, currentBrightness + (deltaY * 0.5)));
+        directPlayer.style.filter = `brightness(${currentBrightness}%)`;
+        brightnessFill.style.height = `${((currentBrightness - 20) / 130) * 100}%`;
+        brightnessContainer.style.display = 'flex';
+      } else if (gestureType === 'volume') {
+        let newVol = Math.max(0, Math.min(1, directPlayer.volume + (deltaY * 0.005)));
+        directPlayer.volume = newVol;
+        directPlayer.muted = newVol === 0;
+        volumeFill.style.height = `${newVol * 100}%`;
+        volumeContainer.style.display = 'flex';
+      }
+    }, { passive: true });
+
+    playerOverlay.addEventListener('touchend', () => {
+      isGestureDragging = false;
+      sliderHideTimer = setTimeout(() => {
+        brightnessContainer.style.display = 'none';
+        volumeContainer.style.display = 'none';
+      }, 1000);
+    });
+
     document.addEventListener('keydown', (e) => {
-      // Ignore key events if typing inside an input box
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       switch (e.keyCode) {
-        case 32: // Spacebar -> Play / Pause
+        case 32:
           e.preventDefault();
           togglePlayPause();
           showControls();
           break;
-        case 37: // Left Arrow -> Rewind 10s
+        case 37:
           e.preventDefault();
           triggerRewind();
           showControls();
           break;
-        case 39: // Right Arrow -> Forward 10s
+        case 39:
           e.preventDefault();
           triggerForward();
           showControls();
           break;
-        case 77: // M Key -> Mute / Unmute
+        case 77:
         case 109:
           e.preventDefault();
           toggleMute();
           showControls();
           break;
-        case 70: // F Key -> Fullscreen
+        case 70:
         case 102:
           e.preventDefault();
           toggleFullscreen();
@@ -282,7 +384,6 @@
       }
     });
 
-    // Slow Internet Connection Check
     function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
       networkNote.style.display = 'none';
@@ -311,13 +412,18 @@
     }
 
     function formatTime(seconds) {
-      if (isNaN(seconds)) return "00:00";
-      const mins = Math.floor(seconds / 60);
+      if (isNaN(seconds)) return "00:00:00";
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
       const secs = Math.floor(seconds % 60);
-      return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+      const hStr = hrs < 10 ? `0${hrs}` : hrs;
+      const mStr = mins < 10 ? `0${mins}` : mins;
+      const sStr = secs < 10 ? `0${secs}` : secs;
+
+      return `${hStr}:${mStr}:${sStr}`;
     }
 
-    // Direct Video Events
     directPlayer.addEventListener('loadedmetadata', () => {
       totalDurationText.textContent = formatTime(directPlayer.duration);
     });
@@ -326,6 +432,7 @@
       if (!isNaN(directPlayer.duration)) {
         const pct = (directPlayer.currentTime / directPlayer.duration) * 100;
         seekbar.value = pct;
+        updateSeekbarBackground(pct);
         currentTimeText.textContent = formatTime(directPlayer.currentTime);
       }
     });
@@ -333,6 +440,7 @@
     seekbar.addEventListener('input', () => {
       if (!isNaN(directPlayer.duration)) {
         directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
+        updateSeekbarBackground(seekbar.value);
       }
     });
 
@@ -430,118 +538,28 @@
           playerContainer.webkitRequestFullscreen();
         } else if (playerContainer.msRequestFullscreen) {
           playerContainer.msRequestFullscreen();
+        } else if (directPlayer.webkitEnterFullscreen) {
+          directPlayer.webkitEnterFullscreen();
         }
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
+        exitFullscreen();
       }
     }
-
-    function updateFullscreenIcon() {
-      const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-      btnFullscreen.textContent = isFS ? '⤡' : '⤢';
-    }
-
-    document.addEventListener('fullscreenchange', updateFullscreenIcon);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
-    document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
-    document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
 
     function triggerRewind() {
       directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
       showSeekBadge(rewindBadge);
-      showToast('-10 Sec.');
     }
 
     function triggerForward() {
       directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
       showSeekBadge(forwardBadge);
-      showToast('+10 Sec.');
     }
 
     function showSeekBadge(badge) {
       badge.classList.add('show');
       setTimeout(() => badge.classList.remove('show'), 600);
     }
-
-    let longPressTimer = null;
-    let is2xSpeedActive = false;
-
-    function start2xSpeed() {
-      longPressTimer = setTimeout(() => {
-        directPlayer.playbackRate = 2.0;
-        speedBadge.style.display = 'block';
-        is2xSpeedActive = true;
-        showToast('2x Speed');
-      }, 400);
-    }
-
-    function stop2xSpeed() {
-      clearTimeout(longPressTimer);
-      if (is2xSpeedActive) {
-        directPlayer.playbackRate = 1.0;
-        speedBadge.style.display = 'none';
-        is2xSpeedActive = false;
-        showToast('Normal Speed');
-      }
-    }
-
-    playerOverlay.addEventListener('mousedown', start2xSpeed);
-    playerOverlay.addEventListener('mouseup', stop2xSpeed);
-    playerOverlay.addEventListener('mouseleave', stop2xSpeed);
-
-    let initialPinchDistance = 0;
-    let isPinchZoomed = false;
-
-    playerOverlay.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
-        initialPinchDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-      } else if (e.touches.length === 1) {
-        start2xSpeed();
-      }
-    }, { passive: true });
-
-    playerOverlay.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 2 && initialPinchDistance > 0) {
-        const currentDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        const distanceDiff = currentDistance - initialPinchDistance;
-
-        if (distanceDiff > 40 && !isPinchZoomed) {
-          isPinchZoomed = true;
-          directPlayer.style.objectFit = 'cover';
-          showToast('Zoomed In');
-          initialPinchDistance = currentDistance;
-        } else if (distanceDiff < -40 && isPinchZoomed) {
-          isPinchZoomed = false;
-          directPlayer.style.objectFit = 'contain';
-          showToast('Zoomed Out');
-          initialPinchDistance = currentDistance;
-        }
-      }
-    }, { passive: true });
-
-    playerOverlay.addEventListener('touchend', (e) => {
-      if (e.touches.length < 2) {
-        initialPinchDistance = 0;
-      }
-      stop2xSpeed();
-    });
-
-    playerOverlay.addEventListener('touchcancel', (e) => {
-      initialPinchDistance = 0;
-      stop2xSpeed();
-    });
 
     function switchServer(serverNum) {
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
@@ -642,6 +660,9 @@
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Trigger initial 1.5s countdown
+    showControls();
   </script>
 </body>
 </html>

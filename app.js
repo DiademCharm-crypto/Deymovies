@@ -133,7 +133,7 @@ const movies = [
     id: "Toy Story 5", 
     tmdbId: "1084244",
     title: "Toy Story 5", 
-    poster: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4"
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg"
   },
   { 
     id: "Pinocchio: Unstrung", 
@@ -610,7 +610,8 @@ const movies = [
   }
 ];
 
-function createMovieCard(movie) {
+// Reusable Card Generator
+function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
   card.className = 'poster-card';
   card.onclick = () => {
@@ -618,8 +619,10 @@ function createMovieCard(movie) {
   };
 
   const fallbackUrl = 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=No+Poster';
+  const rankHTML = rankNumber ? `<div class="rank-badge-box">#${rankNumber}</div>` : '';
 
   card.innerHTML = `
+    ${rankHTML}
     <img src="${movie.poster}" 
          alt="${movie.title}" 
          loading="lazy" 
@@ -628,4 +631,175 @@ function createMovieCard(movie) {
     <div class="poster-card-title">${movie.title}</div>
   `;
   return card;
+}
+
+// Global Pagination & Filter States
+let currentPage = 1;
+const itemsPerPage = 16;
+let filteredMoviesList = [];
+
+// DOM Element References
+const allMoviesGrid = document.getElementById('all-movies-grid');
+const pageNumbersGroup = document.getElementById('page-numbers-group');
+const prevPageBtn = document.getElementById('prev-page-btn');
+const nextPageBtn = document.getElementById('next-page-btn');
+const toastNotification = document.getElementById('loading-toast');
+
+// Document Ready Initialization
+document.addEventListener('DOMContentLoaded', () => {
+  filteredMoviesList = [...movies];
+  
+  setupHeroBanner();
+  renderTopPicks();
+  renderFilipinoMovies();
+  renderPaginatedMovies();
+});
+
+// Toast Message Trigger
+function showToast(message) {
+  if (!toastNotification) return;
+  toastNotification.textContent = message;
+  toastNotification.classList.add('show');
+  setTimeout(() => {
+    toastNotification.classList.remove('show');
+  }, 2000);
+}
+
+// Hero Billboard Configurator
+function setupHeroBanner() {
+  if (featuredMovies && featuredMovies.length > 0) {
+    const featured = featuredMovies[0];
+    const heroBackdrop = document.getElementById('hero-backdrop');
+    const heroTitle = document.getElementById('hero-title');
+    const heroPlayBtn = document.getElementById('hero-play-btn');
+
+    if (heroBackdrop) heroBackdrop.src = featured.poster;
+    if (heroTitle) heroTitle.textContent = featured.title;
+    if (heroPlayBtn) {
+      heroPlayBtn.onclick = () => {
+        window.location.href = `player.html?id=${encodeURIComponent(featured.id)}`;
+      };
+    }
+  }
+}
+
+// Render Top Picks Horizontal Scroll Row
+function renderTopPicks() {
+  const container = document.getElementById('top-picks-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const picks = movies.slice(0, 10);
+  picks.forEach((movie, index) => {
+    container.appendChild(createMovieCard(movie, index + 1));
+  });
+}
+
+// Render Filipino Movies Horizontal Scroll Row
+function renderFilipinoMovies() {
+  const container = document.getElementById('filipino-movies-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const filipinoMovies = movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH');
+  const displayList = filipinoMovies.length > 0 ? filipinoMovies : movies.slice(1, 7);
+
+  displayList.forEach(movie => {
+    container.appendChild(createMovieCard(movie));
+  });
+}
+
+// Render Main Paginated Movie Grid
+function renderPaginatedMovies() {
+  if (!allMoviesGrid) return;
+  allMoviesGrid.innerHTML = '';
+
+  const totalPages = Math.ceil(filteredMoviesList.length / itemsPerPage) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const pageMovies = filteredMoviesList.slice(startIndex, startIndex + itemsPerPage);
+
+  pageMovies.forEach(movie => {
+    allMoviesGrid.appendChild(createMovieCard(movie));
+  });
+
+  renderPaginationControls(totalPages);
+}
+
+// Render Centered Pagination with Smart Hide for Prev/Next
+function renderPaginationControls(totalPages) {
+  if (!pageNumbersGroup) return;
+  pageNumbersGroup.innerHTML = '';
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+    btn.textContent = i;
+    btn.onclick = () => {
+      currentPage = i;
+      renderPaginatedMovies();
+      scrollToGridTop();
+    };
+    pageNumbersGroup.appendChild(btn);
+  }
+
+  // Dynamic Hide/Show for Prev/Next text buttons
+  if (prevPageBtn) {
+    prevPageBtn.style.display = currentPage === 1 ? 'none' : 'inline-block';
+  }
+  if (nextPageBtn) {
+    nextPageBtn.style.display = currentPage === totalPages ? 'none' : 'inline-block';
+  }
+}
+
+// Page Navigation Logic
+function handlePageNav(direction) {
+  const totalPages = Math.ceil(filteredMoviesList.length / itemsPerPage) || 1;
+
+  if (direction === 'prev' && currentPage > 1) {
+    currentPage--;
+    renderPaginatedMovies();
+    scrollToGridTop();
+  } else if (direction === 'next' && currentPage < totalPages) {
+    currentPage++;
+    renderPaginatedMovies();
+    scrollToGridTop();
+  }
+}
+
+function scrollToGridTop() {
+  if (allMoviesGrid) {
+    allMoviesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Live Search Filter Functionality
+function filterMovies() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  filteredMoviesList = movies.filter(m => m.title.toLowerCase().includes(query));
+  currentPage = 1;
+  renderPaginatedMovies();
+}
+
+// Header Request Modal Handlers
+function openRequestModal() {
+  const modal = document.getElementById('request-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRequestModal() {
+  const modal = document.getElementById('request-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function submitMovieRequest() {
+  const input = document.getElementById('modal-request-input');
+  if (input && input.value.trim() !== '') {
+    showToast(`Request sent for: "${input.value.trim()}"`);
+    input.value = '';
+    closeRequestModal();
+  } else {
+    showToast('Please enter a movie title.');
+  }
 }

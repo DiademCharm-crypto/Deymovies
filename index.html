@@ -4,276 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Anti-Cache Headers -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <link rel="stylesheet" href="style.css?v=14.0">
 </head>
 <body>
 
-  <!-- Hero Backdrop Section -->
-  <section class="hero-wrapper" id="hero-slider">
-    <!-- Top Navigation Header: Brand Logo & In-Line Request Button -->
-    <nav class="top-nav">
-      <a href="index.html" class="brand-logo-link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" class="site-logo-svg">
-          <defs>
-            <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ff1e27"/>
-              <stop offset="100%" stop-color="#b30006"/>
-            </linearGradient>
-            <linearGradient id="deymDark" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2a2a2a"/>
-              <stop offset="100%" stop-color="#141414"/>
-            </linearGradient>
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2" result="blur"/>
-              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-            </filter>
-          </defs>
+  <!-- Top Navigation Header using favicon.svg for the Logo -->
+  <header class="top-nav">
+    <a href="index.html" class="brand-logo-link">
+      <img src="favicon.svg" alt="DEYMFLIX" class="site-logo-svg">
+      <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
+    </a>
+    <button id="header-request-btn" class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
+  </header>
 
-          <g transform="translate(5, 5)">
-            <path d="M 22 0 L 42 10 L 42 38 L 22 48 L 2 38 L 2 10 Z" fill="url(#deymDark)" stroke="url(#deymRed)" stroke-width="2"/>
-            <path d="M 16 14 L 31 23 L 16 32 Z" fill="url(#deymRed)" filter="url(#glow)"/>
-            <path d="M 21 17 L 35 25 L 21 33 Z" fill="#ffffff" opacity="0.85"/>
-          </g>
-
-          <text x="56" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" letter-spacing="2" fill="#ffffff">
-            DEYM<tspan fill="url(#deymRed)">FLIX</tspan>
-          </text>
-        </svg>
-      </a>
-
-      <!-- Transparent Red Outlined Request Button -->
-      <button class="header-request-btn" onclick="openRequestModal()">
-        🍿 Request a Movie
-      </button>
-    </nav>
-
-    <!-- Floating Search Bar -->
-    <div class="search-overlay-bar">
-      <div class="search-input-wrapper">
-        <input type="text" id="search-input" placeholder="🔍 Search movies..." onkeyup="handleSearch()">
-      </div>
+  <!-- Search Input Overlay Bar -->
+  <div class="search-overlay-bar">
+    <div class="search-input-wrapper">
+      <input type="text" id="search-input" placeholder="Search movies..." onkeyup="filterMovies()">
     </div>
+  </div>
 
-    <img id="hero-img" class="hero-backdrop-img" src="" alt="Featured Poster" />
+  <!-- Hero Featured Billboard Section -->
+  <section class="hero-wrapper" id="hero-section">
+    <img id="hero-backdrop" class="hero-backdrop-img" src="" alt="Featured Backdrop">
     <div class="hero-fade-overlay"></div>
-
     <div class="hero-details-container">
-      <h1 id="hero-title" class="hero-title-text">Loading...</h1>
+      <h1 id="hero-title" class="hero-title-text">Featured Movie</h1>
       <button id="hero-play-btn" class="hero-action-btn">▶ Watch Now</button>
     </div>
   </section>
 
   <!-- Top Picks Section -->
-  <section class="content-section" id="top-picks-section" style="margin-top: 15px;">
+  <section class="content-section">
     <h2 class="section-header-title">Top Picks</h2>
-    <div class="top-picks-scroll" id="trending-grid"></div>
+    <div class="top-picks-scroll" id="top-picks-container"></div>
   </section>
 
   <!-- Filipino Movies Section -->
-  <section class="content-section" id="filipino-movies-section">
-    <h2 class="section-header-title">Filipino Movies 🇵🇭</h2>
-    <div class="top-picks-scroll" id="filipino-grid"></div>
-  </section>
-
-  <!-- All Movies Grid -->
   <section class="content-section">
-    <h2 class="section-header-title" id="all-movies-heading">All Movies</h2>
-    <main class="main-grid" id="movie-grid"></main>
-    <div class="pagination-container" id="pagination-controls"></div>
+    <h2 class="section-header-title">Filipino Movies PH</h2>
+    <div class="horizontal-scroll" id="filipino-movies-container"></div>
   </section>
 
-  <!-- Request Modal -->
-  <div id="requestModal" class="modal-backdrop">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeRequestModal()">&times;</button>
-      <h3>🍿 Request a Movie</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Enter the movie title below.</p>
-      
-      <form id="requestForm" onsubmit="handleRequestSubmit(event)">
-        <textarea id="requestInput" placeholder="Write movie title here..." required></textarea>
-        <button type="submit" class="send-btn" id="sendBtn">Send Request</button>
-      </form>
-      <div id="formStatus" style="font-size: 0.8rem; margin-top: 8px;"></div>
+  <!-- All Movies Collection Section -->
+  <section class="content-section">
+    <h2 class="section-header-title">All Movies</h2>
+    <div id="all-movies-grid" class="main-grid"></div>
+
+    <!-- Centered Pagination Bar -->
+    <div class="pagination-container" id="pagination-wrapper">
+      <button class="page-nav-btn" id="prev-page-btn" onclick="handlePageNav('prev')">❮ Prev</button>
+      <div id="page-numbers-group" class="page-numbers-group"></div>
+      <button class="page-nav-btn" id="next-page-btn" onclick="handlePageNav('next')">Next ❯</button>
+    </div>
+  </section>
+
+  <!-- Request Movie Dialog Modal -->
+  <div id="request-modal" class="request-modal-backdrop" style="display: none;">
+    <div class="request-modal-content">
+      <span class="close-modal-btn" onclick="closeRequestModal()">&times;</span>
+      <h3>Request a Movie</h3>
+      <p>Enter the title of the movie or show you want added:</p>
+      <div class="request-input-group">
+        <input type="text" id="modal-request-input" placeholder="Movie title here...">
+        <button onclick="submitMovieRequest()">Send</button>
+      </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
-  <script>
-    const itemsPerPage = 18;
-    let currentPage = 1;
-    let currentMovieList = [...movies];
+  <!-- Universal Toast Notification Container -->
+  <div id="loading-toast" class="toast-notification">Notification</div>
 
-    const grid = document.getElementById('movie-grid');
-    const pagination = document.getElementById('pagination-controls');
-    const topPicksSection = document.getElementById('top-picks-section');
-    const filipinoSection = document.getElementById('filipino-movies-section');
-    const allMoviesHeading = document.getElementById('all-movies-heading');
-    let currentSlide = 0;
-
-    function initHero() {
-      if (typeof featuredMovies === 'undefined' || featuredMovies.length === 0) return;
-      renderHero(0);
-      setInterval(() => {
-        currentSlide = (currentSlide + 1) % featuredMovies.length;
-        renderHero(currentSlide);
-      }, 6000);
-    }
-
-    function renderHero(index) {
-      const movie = featuredMovies[index];
-      document.getElementById('hero-img').src = movie.backdrop || movie.poster;
-      document.getElementById('hero-title').textContent = movie.title;
-
-      document.getElementById('hero-play-btn').onclick = () => {
-        window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
-      };
-    }
-
-    function renderTrending() {
-      const container = document.getElementById('trending-grid');
-      container.innerHTML = '';
-      
-      movies.slice(0, 10).forEach((movie, idx) => {
-        const card = document.createElement('div');
-        card.className = 'poster-card';
-        card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
-        card.innerHTML = `
-          <div class="rank-badge-box">#${idx + 1}</div>
-          <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
-          <div class="tag-badge-bottom">HD</div>
-          <div class="poster-card-title">${movie.title}</div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderFilipinoSection() {
-      const container = document.getElementById('filipino-grid');
-      container.innerHTML = '';
-
-      const filipinoMovies = movies.filter(m => m.isFilipino);
-
-      filipinoMovies.forEach(movie => {
-        const card = document.createElement('div');
-        card.className = 'poster-card';
-        card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
-        card.innerHTML = `
-          <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
-          <div class="tag-badge-bottom">HD</div>
-          <div class="poster-card-title">${movie.title}</div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderPage(page) {
-      currentPage = page;
-      grid.innerHTML = '';
-
-      if (currentMovieList.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No movies found.</p>';
-        pagination.innerHTML = '';
-        return;
-      }
-
-      const startIndex = (page - 1) * itemsPerPage;
-      const paginatedMovies = currentMovieList.slice(startIndex, startIndex + itemsPerPage);
-
-      paginatedMovies.forEach(movie => {
-        grid.appendChild(createMovieCard(movie));
-      });
-
-      renderPagination();
-    }
-
-    function renderPagination() {
-      pagination.innerHTML = '';
-      const totalPages = Math.ceil(currentMovieList.length / itemsPerPage);
-      if (totalPages <= 1) return;
-
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-        btn.textContent = i;
-        btn.onclick = () => {
-          renderPage(i);
-          window.scrollTo({ top: 350, behavior: 'smooth' });
-        };
-        pagination.appendChild(btn);
-      }
-    }
-
-    function handleSearch() {
-      const query = document.getElementById('search-input').value.trim().toLowerCase();
-
-      if (query !== '') {
-        // Hide Top Picks and Filipino Movies sections during search
-        topPicksSection.style.display = 'none';
-        filipinoSection.style.display = 'none';
-        allMoviesHeading.textContent = `Search Results for "${query}"`;
-
-        currentMovieList = movies.filter(m => m.title.toLowerCase().includes(query));
-      } else {
-        // Restore sections when search bar is empty
-        topPicksSection.style.display = 'block';
-        filipinoSection.style.display = 'block';
-        allMoviesHeading.textContent = 'All Movies';
-
-        currentMovieList = [...movies];
-      }
-
-      renderPage(1);
-    }
-
-    function openRequestModal() {
-      document.getElementById('requestModal').style.display = 'flex';
-    }
-
-    function closeRequestModal() {
-      document.getElementById('requestModal').style.display = 'none';
-      document.getElementById('formStatus').innerText = '';
-    }
-
-    async function handleRequestSubmit(e) {
-      e.preventDefault();
-      const sendBtn = document.getElementById('sendBtn');
-      const status = document.getElementById('formStatus');
-      const text = document.getElementById('requestInput').value;
-
-      sendBtn.disabled = true;
-      sendBtn.innerText = 'Sending...';
-
-      try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            access_key: 'f128f943-dee1-4f4f-9f27-0290cfd380df',
-            message: `New Movie Request: ${text}`
-          })
-        });
-
-        if (response.ok) {
-          status.style.color = '#4CAF50';
-          status.innerText = '✅ Sent successfully!';
-          document.getElementById('requestInput').value = '';
-          setTimeout(closeRequestModal, 2000);
-        } else {
-          throw new Error('Failed');
-        }
-      } catch (err) {
-        status.style.color = '#e50914';
-        status.innerText = '⚠️ Error sending request.';
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerText = 'Send Request';
-      }
-    }
-
-    initHero();
-    renderTrending();
-    renderFilipinoSection();
-    renderPage(1);
-  </script>
+  <script src="app.js?v=14.0"></script>
 </body>
 </html>
