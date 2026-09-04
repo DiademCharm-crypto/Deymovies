@@ -13,14 +13,12 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=22.0">
+  <link rel="stylesheet" href="style.css?v=24.0">
 
   <script>
     window.open = function() { return null; };
 
-    /* ==========================================================================
-       INSPECT ELEMENT / DEVTOOLS LOCK PROTECTION
-       ========================================================================== */
+    /* Context menu and keyboard inspection lock */
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
@@ -55,7 +53,6 @@
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
     <div id="player-gesture-overlay" class="player-overlay active" style="display: none;">
-      
       <div class="player-top-bar">
         <button id="btn-back-nav" class="icon-btn-back" onclick="forceBackToHome()">❮</button>
         <span id="overlay-movie-title" class="overlay-title-text" onclick="forceBackToHome()">Loading...</span>
@@ -118,7 +115,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <iframe id="main-iframe" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen *; picture-in-picture *" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"></iframe>
@@ -128,14 +124,12 @@
     ⚠️ Slow connection? Reload the page or try another server.
   </div>
 
-  <!-- Movie Details Box -->
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
   </div>
 
-  <!-- Servers Row -->
   <div class="episodes-section">
     <h3 style="font-size: 0.9rem; font-weight: 700;">Select Server</h3>
     <div class="episode-badges-grid">
@@ -154,7 +148,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=22.0"></script>
+  <script src="app.js?v=24.0"></script>
   <script>
     window.addEventListener('pageshow', function(event) {
       if (event.persisted) {
@@ -175,8 +169,9 @@
       window.location.replace('index.html');
     }
 
+    /* iPad Gesture Back Fix: Replaces State Instead Of Stacking History */
     (function () {
-      history.pushState(null, null, location.href);
+      history.replaceState({ page: 'player' }, null, location.href);
       window.addEventListener('popstate', function () {
         forceBackToHome();
       });
@@ -221,7 +216,7 @@
       }
     }
 
-    /* ENHANCED PRECISE SYNOPSIS FETCHING SOLUTION */
+    /* Description Loader using direct app.js fields */
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -231,7 +226,6 @@
 
       const apiKey = '15d260044e350723365198253b23914f';
 
-      // 1. Query by explicit TMDB ID
       if (currentMovie.tmdbId) {
         try {
           const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=${apiKey}&language=en-US`);
@@ -246,7 +240,6 @@
         } catch (e) {}
       }
 
-      // 2. Query by cleaned title search
       try {
         const cleanTitle = currentMovie.title.replace(/[\(\)\[\]]/g, '').trim();
         const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
@@ -261,9 +254,8 @@
         }
       } catch (e) {}
 
-      // 3. Contextual precise fallback
-      const originTag = currentMovie.isFilipino ? "Filipino cinema release" : "feature film";
-      descElement.textContent = `Watch "${currentMovie.title}", a ${originTag} available in high quality streaming on DEYMFLIX with multiple server options.`;
+      const originTag = currentMovie.isFilipino ? "Filipino movie" : "feature movie";
+      descElement.textContent = `Watch "${currentMovie.title}", a ${originTag} available in high quality streaming on DEYMFLIX.`;
       checkSynopsisLength();
     }
 
@@ -604,7 +596,7 @@
       [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
 
       startSlowConnectionCheck();
-      history.replaceState(null, null, location.href);
+      history.replaceState({ page: 'player' }, null, location.href);
 
       let targetUrl = "";
 
