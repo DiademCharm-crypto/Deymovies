@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Home</title>
 
-  <!-- Favicon Link -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
-  <!-- Anti-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=25.0">
+  <link rel="stylesheet" href="style.css?v=75.0">
 </head>
 <body>
 
@@ -23,7 +20,10 @@
       <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
       <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
-    <button class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button class="header-request-btn" onclick="window.location.href='reels.html'">🎬 Reels</button>
+      <button class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
+    </div>
   </header>
 
   <!-- Search Bar Overlay -->
@@ -38,7 +38,7 @@
 
   <!-- Main Content Sections Wrapper -->
   <div id="home-sections-wrapper">
-    <!-- Hero Billboard Section -->
+    <!-- Hero Billboard -->
     <div class="hero-wrapper">
       <img id="hero-backdrop" class="hero-backdrop-img" src="" alt="Hero Backdrop">
       <div class="hero-fade-overlay"></div>
@@ -48,31 +48,41 @@
       </div>
     </div>
 
-    <!-- Top Picks Row -->
+    <!-- 1. Top Picks Row (Moved First under Hero) -->
     <section class="content-section">
-      <h2 class="section-header-title">Top Picks</h2>
+      <div class="section-header-flex">
+        <h2 class="section-header-title">Top Picks</h2>
+      </div>
       <div class="top-picks-scroll" id="top-picks-container"></div>
     </section>
 
-    <!-- Filipino Movies Row -->
+    <!-- 2. AI Reels Section (Moved Under Top Picks) -->
     <section class="content-section">
-      <h2 class="section-header-title">Filipino Movies PH</h2>
+      <div class="section-header-flex">
+        <h2 class="section-header-title">AI Reels & Shorts</h2>
+        <a href="reels.html" class="see-all-link">View All ❯</a>
+      </div>
+      <div class="reels-horizontal-scroll" id="ai-reels-container"></div>
+    </section>
+
+    <!-- 3. Tagalog Movies Row -->
+    <section class="content-section">
+      <div class="section-header-flex">
+        <h2 class="section-header-title">Tagalog Movies PH</h2>
+        <a href="category.html?type=tagalog" class="see-all-link">View All ❯</a>
+      </div>
       <div class="horizontal-scroll" id="filipino-movies-container"></div>
     </section>
+
+    <!-- 4. All Movies Section (Horizontal Scroll Matching Other Categories) -->
+    <section class="content-section">
+      <div class="section-header-flex">
+        <h2 id="grid-section-title" class="section-header-title">All Movies</h2>
+        <a href="category.html?type=all" class="see-all-link">View All ❯</a>
+      </div>
+      <div class="horizontal-scroll" id="all-movies-grid"></div>
+    </section>
   </div>
-
-  <!-- Main Grid Section -->
-  <section class="content-section" id="grid-main-section">
-    <h2 id="grid-section-title" class="section-header-title">All Movies</h2>
-    <div class="main-grid" id="all-movies-grid"></div>
-
-    <!-- Pagination Controls -->
-    <div class="pagination-container">
-      <button id="prev-page-btn" class="page-nav-btn" onclick="handlePageNav('prev')" style="display:none;">Previous</button>
-      <div id="page-numbers-group" class="page-numbers-group"></div>
-      <button id="next-page-btn" class="page-nav-btn" onclick="handlePageNav('next')">Next</button>
-    </div>
-  </section>
 
   <!-- Request Modal Dialog -->
   <div id="request-modal" class="request-modal-backdrop" style="display: none;">
@@ -87,9 +97,9 @@
     </div>
   </div>
 
-  <!-- Toast Notification -->
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=25.0"></script>
+  <script src="reels-data.js?v=75.0"></script>
+  <script src="app.js?v=75.0"></script>
 </body>
 </html>

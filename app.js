@@ -36,7 +36,7 @@ const featuredMovies = [
   }
 ];
 
-// Main Grid Movie Library
+// Complete Movie Library
 const movies = [
   { 
     id: "The Runner", 
@@ -67,6 +67,14 @@ const movies = [
     title: "Almost Us", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gQurSKUKrCFHa90ydVJRtSMyjLB.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
+  },
+  { 
+    id: "Ma'am Chief: Shakedown in Seoul", 
+    tmdbId: "1191743",
+    title: "Ma'am Chief: Shakedown in Seoul", 
+    isFilipino: true,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uCUgMEGPbZrnGLDjDXRteffT9JM.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
   },
   { 
@@ -619,7 +627,6 @@ const movies = [
   }
 ];
 
-// Reusable Card Generator with Automatic Quality Labeling (HD / CAM)
 function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
   card.className = 'poster-card';
@@ -630,40 +637,32 @@ function createMovieCard(movie, rankNumber = null) {
   const fallbackUrl = 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=No+Poster';
   const rankHTML = rankNumber ? `<div class="rank-badge-box">#${rankNumber}</div>` : '';
 
-  // Automatic Quality Detection: Direct manualEmbed present -> HD, otherwise -> CAM
   const hasDirectLink = movie.manualEmbed && movie.manualEmbed.trim() !== '';
   const qualityLabel = hasDirectLink ? 'HD' : 'CAM';
   const qualityClass = hasDirectLink ? 'quality-hd' : 'quality-cam';
 
   card.innerHTML = `
     ${rankHTML}
+    <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
     <img src="${movie.poster}" 
          alt="${movie.title}" 
          loading="lazy" 
          onerror="this.onerror=null;this.src='${fallbackUrl}';">
-    <div class="tag-badge-bottom ${qualityClass}">${qualityLabel}</div>
-    <div class="poster-card-title">${movie.title}</div>
+    <div class="poster-card-overlay">
+      <div class="poster-card-title">${movie.title}</div>
+    </div>
   `;
   return card;
 }
 
-// Global States
-let currentPage = 1;
-const itemsPerPage = 16;
-let filteredMoviesList = [];
-
-// Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  filteredMoviesList = [...movies];
-  
   setupHeroBanner();
   renderTopPicks();
   renderFilipinoMovies();
-  renderPaginatedMovies();
+  renderAllMoviesGrid();
   setupSearchHandlers();
 });
 
-// Toast Message Trigger
 function showToast(message) {
   const toastNotification = document.getElementById('loading-toast');
   if (!toastNotification) return;
@@ -674,7 +673,6 @@ function showToast(message) {
   }, 2000);
 }
 
-// Hero Billboard Configurator
 function setupHeroBanner() {
   if (featuredMovies && featuredMovies.length > 0) {
     const featured = featuredMovies[0];
@@ -709,83 +707,24 @@ function renderFilipinoMovies() {
   container.innerHTML = '';
 
   const filipinoMovies = movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH');
-  const displayList = filipinoMovies.length > 0 ? filipinoMovies : movies.slice(1, 7);
+  const displayList = filipinoMovies.slice(0, 10);
 
   displayList.forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }
 
-function renderPaginatedMovies() {
+function renderAllMoviesGrid() {
   const allMoviesGrid = document.getElementById('all-movies-grid');
   if (!allMoviesGrid) return;
   allMoviesGrid.innerHTML = '';
 
-  const totalPages = Math.ceil(filteredMoviesList.length / itemsPerPage) || 1;
-  if (currentPage > totalPages) currentPage = totalPages;
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const pageMovies = filteredMoviesList.slice(startIndex, startIndex + itemsPerPage);
-
-  if (pageMovies.length === 0) {
-    allMoviesGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #aaaaaa; padding: 50px 0; font-weight: 700; font-size: 1.1rem;">No matching movies found.</div>`;
-  } else {
-    pageMovies.forEach(movie => {
-      allMoviesGrid.appendChild(createMovieCard(movie));
-    });
-  }
-
-  renderPaginationControls(totalPages);
+  // Display initial 16 movies in the homepage grid
+  const displayBatch = movies.slice(0, 16);
+  displayBatch.forEach(movie => {
+    allMoviesGrid.appendChild(createMovieCard(movie));
+  });
 }
-
-function renderPaginationControls(totalPages) {
-  const pageNumbersGroup = document.getElementById('page-numbers-group');
-  const prevPageBtn = document.getElementById('prev-page-btn');
-  const nextPageBtn = document.getElementById('next-page-btn');
-
-  if (!pageNumbersGroup) return;
-  pageNumbersGroup.innerHTML = '';
-
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement('button');
-    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-    btn.textContent = i;
-    btn.onclick = () => {
-      currentPage = i;
-      renderPaginatedMovies();
-      scrollToGridTop();
-    };
-    pageNumbersGroup.appendChild(btn);
-  }
-
-  if (prevPageBtn) prevPageBtn.style.display = currentPage === 1 ? 'none' : 'inline-block';
-  if (nextPageBtn) nextPageBtn.style.display = currentPage === totalPages ? 'none' : 'inline-block';
-}
-
-function handlePageNav(direction) {
-  const totalPages = Math.ceil(filteredMoviesList.length / itemsPerPage) || 1;
-
-  if (direction === 'prev' && currentPage > 1) {
-    currentPage--;
-    renderPaginatedMovies();
-    scrollToGridTop();
-  } else if (direction === 'next' && currentPage < totalPages) {
-    currentPage++;
-    renderPaginatedMovies();
-    scrollToGridTop();
-  }
-}
-
-function scrollToGridTop() {
-  const gridMainSection = document.getElementById('grid-main-section');
-  if (gridMainSection) {
-    gridMainSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-/* ==========================================================================
-   NETFLIX-STYLE LIVE SEARCH AND ENTER/SUBMIT EXECUTION
-   ========================================================================== */
 
 function setupSearchHandlers() {
   const searchInput = document.getElementById('search-input');
@@ -793,7 +732,6 @@ function setupSearchHandlers() {
 
   if (!searchInput) return;
 
-  // Live Typing Handlers for Hints Dropdown
   const handleTyping = () => {
     const query = searchInput.value.toLowerCase().trim();
 
@@ -807,17 +745,7 @@ function setupSearchHandlers() {
   };
 
   searchInput.addEventListener('input', handleTyping);
-  searchInput.addEventListener('keyup', handleTyping);
 
-  // Clear Event (When pressing the X icon in mobile input)
-  searchInput.addEventListener('search', () => {
-    if (searchInput.value.trim() === '') {
-      hideSuggestions();
-      resetHomeState();
-    }
-  });
-
-  // Execute Search On Form Submit (Mobile "Search" & Desktop "Enter")
   if (searchForm) {
     searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -826,13 +754,6 @@ function setupSearchHandlers() {
       executeSearch();
     });
   }
-
-  // Close dropdown on tap outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-overlay-bar')) {
-      hideSuggestions();
-    }
-  });
 }
 
 function renderSuggestions(matches) {
@@ -869,42 +790,29 @@ function hideSuggestions() {
 function executeSearch() {
   const searchInput = document.getElementById('search-input');
   const homeSectionsWrapper = document.getElementById('home-sections-wrapper');
-  const gridSectionTitle = document.getElementById('grid-section-title');
+  const allMoviesGrid = document.getElementById('all-movies-grid');
 
-  if (!searchInput) return;
+  if (!searchInput || !allMoviesGrid) return;
   const query = searchInput.value.toLowerCase().trim();
 
-  if (query === '') {
-    resetHomeState();
-    return;
-  }
-
-  // Hides Hero, Top Picks, Filipino Movies
   if (homeSectionsWrapper) homeSectionsWrapper.classList.add('hide-for-search');
 
-  // Title Update
-  if (gridSectionTitle) gridSectionTitle.textContent = `Search Results for "${searchInput.value.trim()}"`;
+  const filtered = movies.filter(m => m.title.toLowerCase().includes(query));
+  allMoviesGrid.innerHTML = '';
 
-  // Filter Movies List
-  filteredMoviesList = movies.filter(m => m.title.toLowerCase().includes(query));
-  currentPage = 1;
-  renderPaginatedMovies();
-  scrollToGridTop();
+  if (filtered.length === 0) {
+    allMoviesGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #aaaaaa; padding: 50px 0;">No matching movies found.</div>`;
+  } else {
+    filtered.forEach(m => allMoviesGrid.appendChild(createMovieCard(m)));
+  }
 }
 
 function resetHomeState() {
   const homeSectionsWrapper = document.getElementById('home-sections-wrapper');
-  const gridSectionTitle = document.getElementById('grid-section-title');
-
   if (homeSectionsWrapper) homeSectionsWrapper.classList.remove('hide-for-search');
-  if (gridSectionTitle) gridSectionTitle.textContent = 'All Movies';
-
-  filteredMoviesList = [...movies];
-  currentPage = 1;
-  renderPaginatedMovies();
+  renderAllMoviesGrid();
 }
 
-// Request Modal
 function openRequestModal() {
   const modal = document.getElementById('request-modal');
   if (modal) modal.style.display = 'flex';

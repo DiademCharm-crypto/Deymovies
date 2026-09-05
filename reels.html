@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DEYMFLIX - Reels</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css?v=54.0">
+
+  <style>
+    body {
+      background-color: #050505;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .reels-feed-container {
+      width: 100%;
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+    }
+
+    .reels-feed-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* REEL CARD CONTAINER - HANDLES PC ASPECT RATIO */
+    .reel-card {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* PC MODE FRAME CONTAINER - PREVENTS STRETCHING */
+    .reel-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: calc(100vh * (9 / 16)); /* Strict 9:16 Portrait Ratio */
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+    }
+
+    .reel-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* TOP HEADER - ALWAYS VISIBLE IN CLEAR MODE */
+    .reels-top-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+      pointer-events: auto;
+    }
+
+    .reels-back-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    /* REDUCED SMALLER TOP TITLE */
+    .reels-header-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.3px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80%;
+    }
+
+    /* SIDE ACTION BUTTONS - FADES IN CLEAR MODE */
+    .reels-actions-side {
+      position: absolute;
+      right: 16px;
+      bottom: 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      z-index: 90;
+      transition: opacity 0.5s ease;
+    }
+
+    .reel-action-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      outline: none;
+    }
+
+    .reel-action-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .reel-action-item:active .reel-action-btn {
+      transform: scale(0.9);
+    }
+
+    .reel-action-btn.liked svg {
+      fill: #e50914;
+      stroke: #e50914;
+    }
+
+    .reel-action-count {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    /* BOTTOM INFO SECTION */
+    .reel-info-bottom {
+      position: absolute;
+      bottom: 24px;
+      left: 16px;
+      right: 80px;
+      z-index: 90;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: opacity 0.5s ease;
+    }
+
+    .reel-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: #ffffff;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .reel-timestamp {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #e50914;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    }
+
+    /* CLEAR MODE FADE CLASS */
+    .fade-clear-mode {
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .clear-active .fade-clear-mode {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* 2X SPEED POPUP BADGE */
+    .speed-badge-overlay {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 20px;
+      z-index: 95;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* BUFFERING PROGRESS BAR */
+    .reel-buffering-bar {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      z-index: 80;
+      display: none;
+      overflow: hidden;
+    }
+
+    .reel-buffering-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: #e50914;
+      animation: bufferAnim 1.2s infinite linear;
+    }
+
+    @keyframes bufferAnim {
+      0% { left: -50%; }
+      100% { left: 100%; }
+    }
+
+    /* BOTTOM PLAYBACK PROGRESS BAR */
+    .reel-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      z-index: 100;
+    }
+
+    .reel-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #e50914;
+      transition: width 0.1s linear;
+    }
+
+    .play-pause-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 80;
+    }
+
+    .play-pause-indicator.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .floating-heart {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 85;
+      transform: translate(-50%, -50%) scale(0);
+      animation: heartPop 0.8s ease-out forwards;
+    }
+
+    @keyframes heartPop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.9; }
+      100% { transform: translate(-50%, -50%) scale(1) translateY(-60px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vertical Scroll Feed -->
+  <div class="reels-feed-container" id="reelsContainer"></div>
+
+  <!-- Shared Reels Data File -->
+  <script src="reels-data.js?v=54.0"></script>
+  <script>
+    const reelsContainer = document.getElementById('reelsContainer');
+    let clearModeTimer = null;
+    let speedHoldTimer = null;
+    let isLongPressing = false;
+    let activeCardIndex = 0;
+
+    function renderReels() {
+      reelsContainer.innerHTML = '';
+      const list = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+
+      list.forEach((reel, index) => {
+        const reelCard = document.createElement('div');
+        reelCard.className = 'reel-card';
+        reelCard.dataset.id = reel.id;
+        reelCard.dataset.index = index;
+
+        reelCard.innerHTML = `
+          <div class="reel-frame" id="frame-${index}">
+            <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline crossorigin="anonymous"></video>
+
+            <!-- 2x Speed Indicator Badge -->
+            <div class="speed-badge-overlay" id="speed-badge-${index}">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+              2x Speed
+            </div>
+
+            <!-- Buffering Loading Bar -->
+            <div class="reel-buffering-bar" id="buffer-${index}"></div>
+
+            <!-- Persistent Top Header (< Title) -->
+            <header class="reels-top-nav">
+              <button class="reels-back-btn" onclick="window.location.href='index.html'">❮</button>
+              <span class="reels-header-title">${reel.title}</span>
+            </header>
+
+            <div class="play-pause-indicator">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+
+            <!-- Fadeable Side Action Buttons -->
+            <div class="reels-actions-side fade-clear-mode">
+              <button class="reel-action-item" onclick="toggleLike(this, event)">
+                <div class="reel-action-btn">
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </div>
+                <span class="reel-action-count">${reel.likes || '12.4K'}</span>
+              </button>
+
+              <button class="reel-action-item" onclick="shareReel('${reel.title}', event)">
+                <div class="reel-action-btn">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
+                  </svg>
+                </div>
+                <span class="reel-action-count">Share</span>
+              </button>
+            </div>
+
+            <!-- Fadeable Bottom Info Block (Title & Timestamps) -->
+            <div class="reel-info-bottom fade-clear-mode">
+              <div class="reel-title">${reel.title}</div>
+              <div class="reel-timestamp" id="time-${index}">00:00:00 / 00:00:00</div>
+            </div>
+
+            <!-- Persistent Bottom Playback Seek Line -->
+            <div class="reel-progress-track">
+              <div class="reel-progress-fill" id="progress-${index}"></div>
+            </div>
+          </div>
+        `;
+
+        setupReelEvents(reelCard, index);
+        reelsContainer.appendChild(reelCard);
+      });
+    }
+
+    /* UPDATED FORMAT TIME FUNCTION (HOURS:MINUTES:SECONDS) */
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "00:00:00";
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+
+      const hStr = hrs < 10 ? `0${hrs}` : hrs;
+      const mStr = mins < 10 ? `0${mins}` : mins;
+      const sStr = secs < 10 ? `0${secs}` : secs;
+
+      return `${hStr}:${mStr}:${sStr}`;
+    }
+
+    function setupReelEvents(card, index) {
+      const video = card.querySelector('.reel-video');
+      const frame = card.querySelector('.reel-frame');
+      const indicator = card.querySelector('.play-pause-indicator');
+      const bufferBar = card.querySelector(`#buffer-${index}`);
+      const progressBar = card.querySelector(`#progress-${index}`);
+      const timeDisplay = card.querySelector(`#time-${index}`);
+      const speedBadge = card.querySelector(`#speed-badge-${index}`);
+
+      let lastTap = 0;
+
+      // Buffering Events
+      video.addEventListener('waiting', () => {
+        if (bufferBar) bufferBar.style.display = 'block';
+      });
+
+      video.addEventListener('playing', () => {
+        if (bufferBar) bufferBar.style.display = 'none';
+      });
+
+      // Update Time & Progress
+      video.addEventListener('timeupdate', () => {
+        if (!isNaN(video.duration)) {
+          const pct = (video.currentTime / video.duration) * 100;
+          if (progressBar) progressBar.style.width = `${pct}%`;
+          if (timeDisplay) timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        }
+      });
+
+      // LONG PRESS 2X SPEED LOGIC
+      function startSpeedUp() {
+        speedHoldTimer = setTimeout(() => {
+          isLongPressing = true;
+          video.playbackRate = 2.0;
+          if (speedBadge) speedBadge.style.display = 'flex';
+        }, 250);
+      }
+
+      function stopSpeedUp() {
+        clearTimeout(speedHoldTimer);
+        if (isLongPressing) {
+          isLongPressing = false;
+          video.playbackRate = 1.0;
+          if (speedBadge) speedBadge.style.display = 'none';
+        }
+      }
+
+      frame.addEventListener('mousedown', startSpeedUp);
+      frame.addEventListener('mouseup', stopSpeedUp);
+      frame.addEventListener('mouseleave', stopSpeedUp);
+
+      frame.addEventListener('touchstart', startSpeedUp, { passive: true });
+      frame.addEventListener('touchend', stopSpeedUp);
+
+      // RESET CLEAR MODE ON INTERACTION
+      frame.addEventListener('mousemove', resetClearModeTimer);
+      frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
+
+      // CLICK / TAP CONTROLS & DOUBLE TAP LIKE
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav')) return;
+
+        const now = Date.now();
+        const tapGap = now - lastTap;
+
+        if (tapGap < 300 && tapGap > 0) {
+          triggerHeartAnimation(card, e.clientX, e.clientY);
+          const likeBtn = card.querySelector('.reel-action-btn');
+          if (likeBtn) likeBtn.classList.add('liked');
+        } else {
+          setTimeout(() => {
+            if (Date.now() - lastTap >= 300 && !isLongPressing) {
+              if (video.paused) {
+                video.play();
+                showIndicator(indicator, false);
+              } else {
+                video.pause();
+                showIndicator(indicator, true);
+              }
+            }
+          }, 300);
+        }
+        lastTap = now;
+      });
+    }
+
+    // CLEAR MODE 2-SECOND FADE LOGIC
+    function resetClearModeTimer() {
+      const activeFrame = document.getElementById(`frame-${activeCardIndex}`);
+      if (!activeFrame) return;
+
+      activeFrame.classList.remove('clear-active');
+      clearTimeout(clearModeTimer);
+
+      clearModeTimer = setTimeout(() => {
+        activeFrame.classList.add('clear-active');
+      }, 2000);
+    }
+
+    function showIndicator(indicator, isPaused) {
+      indicator.innerHTML = isPaused ? 
+        `<svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>` : 
+        `<svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M8 5v14l11-7z"/></svg>`;
+      
+      indicator.classList.add('show');
+      setTimeout(() => indicator.classList.remove('show'), 600);
+    }
+
+    function triggerHeartAnimation(card, x, y) {
+      const rect = card.getBoundingClientRect();
+      const heart = document.createElement('div');
+      heart.className = 'floating-heart';
+      heart.style.left = `${x - rect.left}px`;
+      heart.style.top = `${y - rect.top}px`;
+      heart.innerHTML = `<svg viewBox="0 0 24 24" width="80" height="80" fill="#e50914"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+      
+      card.appendChild(heart);
+      setTimeout(() => heart.remove(), 800);
+    }
+
+    function toggleLike(button, e) {
+      e.stopPropagation();
+      const btn = button.querySelector('.reel-action-btn');
+      btn.classList.toggle('liked');
+    }
+
+    function shareReel(title, e) {
+      e.stopPropagation();
+      if (navigator.share) {
+        navigator.share({ title: title, url: window.location.href }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Reel link copied!');
+      }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('.reel-video');
+        const index = parseInt(entry.target.dataset.index);
+
+        if (entry.isIntersecting) {
+          activeCardIndex = index;
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
+          resetClearModeTimer();
+        } else {
+          if (video) video.pause();
+        }
+      });
+    }, { threshold: 0.6 });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderReels();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetId = urlParams.get('id');
+
+      if (targetId) {
+        const targetCard = document.querySelector(`[data-id="${targetId}"]`);
+        if (targetCard) {
+          targetCard.scrollIntoView();
+        }
+      }
+
+      document.querySelectorAll('.reel-card').forEach(card => observer.observe(card));
+    });
+  </script>
+</body>
+</html>
