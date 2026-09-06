@@ -6,22 +6,18 @@
   <title>DEYMFLIX - Reels</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=57.0">
+  <link rel="stylesheet" href="style.css?v=128.0">
 
   <style>
-    /* PREVENT SELECTION AND TOUCH CALLOUTS GLOBALLY */
     * {
       -webkit-touch-callout: none !important;
       -webkit-user-select: none !important;
-      -khtml-user-select: none !important;
-      -moz-user-select: none !important;
-      -ms-user-select: none !important;
       user-select: none !important;
       -webkit-tap-highlight-color: transparent !important;
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       background-color: #050505;
       margin: 0;
       padding: 0;
@@ -39,13 +35,13 @@
       overflow-y: scroll;
       scroll-snap-type: y mandatory;
       scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .reels-feed-container::-webkit-scrollbar {
       display: none;
     }
 
-    /* REEL CARD CONTAINER */
     .reel-card {
       position: relative;
       width: 100%;
@@ -60,7 +56,6 @@
       overflow: hidden;
     }
 
-    /* PC MODE FRAME CONTAINER */
     .reel-frame {
       position: relative;
       width: 100%;
@@ -80,7 +75,6 @@
       pointer-events: none !important;
     }
 
-    /* TOP HEADER */
     .reels-top-nav {
       position: absolute;
       top: 0;
@@ -121,7 +115,6 @@
       max-width: 80%;
     }
 
-    /* SIDE ACTION BUTTONS */
     .reels-actions-side {
       position: absolute;
       right: 16px;
@@ -159,10 +152,6 @@
       transition: transform 0.2s ease, background 0.2s ease;
     }
 
-    .reel-action-item:active .reel-action-btn {
-      transform: scale(0.9);
-    }
-
     .reel-action-btn.liked svg {
       fill: #e50914;
       stroke: #e50914;
@@ -174,7 +163,6 @@
       text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     }
 
-    /* BOTTOM INFO SECTION */
     .reel-info-bottom {
       position: absolute;
       bottom: calc(50px + env(safe-area-inset-bottom));
@@ -208,7 +196,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* CLEAR MODE FADE CLASS */
     .fade-clear-mode {
       opacity: 1;
       transition: opacity 0.5s ease;
@@ -219,7 +206,6 @@
       pointer-events: none !important;
     }
 
-    /* 2X SPEED POPUP BADGE */
     .speed-badge-overlay {
       position: absolute;
       top: 75px;
@@ -239,7 +225,6 @@
       backdrop-filter: blur(6px);
     }
 
-    /* CIRCULAR BUFFER SPINNER IN CENTER OF SCREEN */
     .reel-circular-spinner {
       position: absolute;
       top: 50%;
@@ -260,7 +245,6 @@
       100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    /* BOTTOM PLAYBACK PROGRESS BAR */
     .reel-progress-track {
       position: absolute;
       bottom: env(safe-area-inset-bottom, 0px);
@@ -283,17 +267,19 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.6);
-      width: 70px;
-      height: 70px;
+      width: 75px;
+      height: 75px;
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.25s ease;
-      z-index: 80;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 95;
     }
 
     .play-pause-indicator.show {
@@ -320,90 +306,120 @@
 </head>
 <body oncontextmenu="return false;">
 
-  <!-- Vertical Scroll Feed -->
   <div class="reels-feed-container" id="reelsContainer"></div>
 
-  <!-- Shared Reels Data File -->
-  <script src="reels-data.js?v=57.0"></script>
+  <script src="reels-data.js?v=128.0"></script>
   <script>
     const reelsContainer = document.getElementById('reelsContainer');
+    let historySequence = [];
+    let activeCardIndex = 0;
     let clearModeTimer = null;
     let speedHoldTimer = null;
     let isLongPressing = false;
-    let activeCardIndex = 0;
 
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    function renderReels() {
-      reelsContainer.innerHTML = '';
+    function initReelHistory() {
       const list = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+      if (list.length === 0) return;
 
-      list.forEach((reel, index) => {
-        const reelCard = document.createElement('div');
-        reelCard.className = 'reel-card';
-        reelCard.dataset.id = reel.id;
-        reelCard.dataset.index = index;
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetId = urlParams.get('id');
 
-        reelCard.innerHTML = `
-          <div class="reel-frame" id="frame-${index}">
-            <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline crossorigin="anonymous"></video>
+      let firstReel = list[0];
+      if (targetId) {
+        const found = list.find(r => r.id === targetId);
+        if (found) firstReel = found;
+      }
 
-            <!-- 2x Speed Indicator Badge -->
-            <div class="speed-badge-overlay" id="speed-badge-${index}">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-              2x Speed
-            </div>
+      historySequence.push(firstReel);
 
-            <!-- Circular Buffering Spinner -->
-            <div class="reel-circular-spinner" id="circle-spinner-${index}"></div>
+      // Pre-fill initial random sequence buffer
+      for (let i = 0; i < 5; i++) {
+        appendRandomReelToSequence();
+      }
 
-            <!-- Persistent Top Header (< Title) -->
-            <header class="reels-top-nav">
-              <button class="reels-back-btn" onclick="window.location.href='index.html'">❮</button>
-              <span class="reels-header-title">${reel.title}</span>
-            </header>
+      renderHistoryCards();
+    }
 
-            <div class="play-pause-indicator">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
-            </div>
+    function appendRandomReelToSequence() {
+      const list = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+      if (list.length === 0) return;
 
-            <!-- Fadeable Side Action Buttons -->
-            <div class="reels-actions-side fade-clear-mode">
-              <button class="reel-action-item" onclick="toggleLike(this, event)">
-                <div class="reel-action-btn">
-                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </div>
-                <span class="reel-action-count">${reel.likes || '12.4K'}</span>
-              </button>
+      const lastItem = historySequence[historySequence.length - 1];
+      const available = list.filter(r => !lastItem || r.id !== lastItem.id);
 
-              <button class="reel-action-item" onclick="shareReel('${reel.title}', event)">
-                <div class="reel-action-btn">
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2">
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
-                  </svg>
-                </div>
-                <span class="reel-action-count">Share</span>
-              </button>
-            </div>
+      const randomItem = available[Math.floor(Math.random() * available.length)];
+      historySequence.push(randomItem);
+    }
 
-            <!-- Fadeable Bottom Info Block (Title & Timestamps) -->
-            <div class="reel-info-bottom fade-clear-mode">
-              <div class="reel-title">${reel.title}</div>
-              <div class="reel-timestamp" id="time-${index}">00:00:00 / 00:00:00</div>
-            </div>
-
-            <!-- Persistent Bottom Playback Seek Line -->
-            <div class="reel-progress-track">
-              <div class="reel-progress-fill" id="progress-${index}"></div>
-            </div>
-          </div>
-        `;
-
-        setupReelEvents(reelCard, index);
-        reelsContainer.appendChild(reelCard);
+    function renderHistoryCards() {
+      reelsContainer.innerHTML = '';
+      historySequence.forEach((reel, index) => {
+        reelsContainer.appendChild(createReelCardElement(reel, index));
       });
+      observeReelCards();
+    }
+
+    function createReelCardElement(reel, index) {
+      const reelCard = document.createElement('div');
+      reelCard.className = 'reel-card';
+      reelCard.dataset.id = reel.id;
+      reelCard.dataset.index = index;
+
+      reelCard.innerHTML = `
+        <div class="reel-frame" id="frame-${index}">
+          <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline crossorigin="anonymous"></video>
+
+          <div class="speed-badge-overlay" id="speed-badge-${index}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+            2x Speed
+          </div>
+
+          <div class="reel-circular-spinner" id="circle-spinner-${index}"></div>
+
+          <header class="reels-top-nav">
+            <button class="reels-back-btn" onclick="window.location.href='index.html'">❮</button>
+            <span class="reels-header-title">${reel.title}</span>
+          </header>
+
+          <div class="play-pause-indicator" id="indicator-${index}">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+
+          <div class="reels-actions-side fade-clear-mode">
+            <button class="reel-action-item" onclick="toggleLike(this, event)">
+              <div class="reel-action-btn">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </div>
+              <span class="reel-action-count">${reel.likes || '12.4K'}</span>
+            </button>
+
+            <button class="reel-action-item" onclick="shareReel('${reel.title}', event)">
+              <div class="reel-action-btn">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
+                </svg>
+              </div>
+              <span class="reel-action-count">Share</span>
+            </button>
+          </div>
+
+          <div class="reel-info-bottom fade-clear-mode">
+            <div class="reel-title">${reel.title}</div>
+            <div class="reel-timestamp" id="time-${index}">00:00:00 / 00:00:00</div>
+          </div>
+
+          <div class="reel-progress-track">
+            <div class="reel-progress-fill" id="progress-${index}"></div>
+          </div>
+        </div>
+      `;
+
+      setupReelCardListeners(reelCard, index);
+      return reelCard;
     }
 
     function formatTime(seconds) {
@@ -419,10 +435,10 @@
       return `${hStr}:${mStr}:${sStr}`;
     }
 
-    function setupReelEvents(card, index) {
+    function setupReelCardListeners(card, index) {
       const video = card.querySelector('.reel-video');
       const frame = card.querySelector('.reel-frame');
-      const indicator = card.querySelector('.play-pause-indicator');
+      const indicator = card.querySelector(`#indicator-${index}`);
       const circleSpinner = card.querySelector(`#circle-spinner-${index}`);
       const progressBar = card.querySelector(`#progress-${index}`);
       const timeDisplay = card.querySelector(`#time-${index}`);
@@ -430,7 +446,6 @@
 
       let lastTap = 0;
 
-      // CIRCULAR SPINNER BUFFER EVENTS
       video.addEventListener('waiting', () => {
         if (circleSpinner) circleSpinner.style.display = 'block';
       });
@@ -516,6 +531,7 @@
     }
 
     function showIndicator(indicator, isPaused) {
+      if (!indicator) return;
       indicator.innerHTML = isPaused ? 
         `<svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>` : 
         `<svg viewBox="0 0 24 24" width="36" height="36" fill="#fff"><path d="M8 5v14l11-7z"/></svg>`;
@@ -552,38 +568,43 @@
       }
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target.querySelector('.reel-video');
-        const index = parseInt(entry.target.dataset.index);
+    let observer = null;
 
-        if (entry.isIntersecting) {
-          activeCardIndex = index;
-          if (video) {
-            video.currentTime = 0;
-            video.play().catch(() => {});
+    function observeReelCards() {
+      if (observer) observer.disconnect();
+
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target.querySelector('.reel-video');
+          const index = parseInt(entry.target.dataset.index);
+
+          if (entry.isIntersecting) {
+            activeCardIndex = index;
+            if (video) {
+              video.currentTime = 0;
+              video.play().catch(() => {});
+            }
+            resetClearModeTimer();
+
+            // Append random reel if reaching near bottom of current history sequence
+            if (index >= historySequence.length - 2) {
+              appendRandomReelToSequence();
+              const nextIndex = historySequence.length - 1;
+              const newCard = createReelCardElement(historySequence[nextIndex], nextIndex);
+              reelsContainer.appendChild(newCard);
+              observer.observe(newCard);
+            }
+          } else {
+            if (video) video.pause();
           }
-          resetClearModeTimer();
-        } else {
-          if (video) video.pause();
-        }
-      });
-    }, { threshold: 0.6 });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderReels();
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const targetId = urlParams.get('id');
-
-      if (targetId) {
-        const targetCard = document.querySelector(`[data-id="${targetId}"]`);
-        if (targetCard) {
-          targetCard.scrollIntoView();
-        }
-      }
+        });
+      }, { threshold: 0.6 });
 
       document.querySelectorAll('.reel-card').forEach(card => observer.observe(card));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initReelHistory();
     });
   </script>
 </body>
