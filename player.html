@@ -13,7 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=126.0">
+  <link rel="stylesheet" href="style.css?v=127.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -111,6 +111,43 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* VERTICAL SLIDER BARS FOR BRIGHTNESS/VOLUME */
+    .vertical-slider-bar {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      z-index: 35;
+      pointer-events: none;
+    }
+    .vertical-slider-bar.left-bar { left: 20px; }
+    .vertical-slider-bar.right-bar { right: 20px; }
+    .v-track {
+      width: 4px;
+      height: 75px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .v-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #e50914;
+      height: 50%;
     }
 
     /* NATIVE WEBVTT CUE STYLING OVERRIDE */
@@ -287,8 +324,8 @@
       background: transparent !important;
       border: none !important;
       color: #ffffff !important;
-      width: 44px !important;
-      height: 44px !important;
+      width: 36px !important;
+      height: 36px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -296,12 +333,34 @@
       padding: 0 !important;
     }
 
+    /* Adjusted smaller size for play/pause button per screenshot design */
     .center-ctrl-btn.play-btn-large {
-      width: 58px !important;
-      height: 58px !important;
+      width: 44px !important;
+      height: 44px !important;
       background: #e50914 !important;
       border-radius: 50% !important;
       box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5) !important;
+    }
+
+    /* SPEED UP FLOATING BADGE */
+    .loklok-speed-badge {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: none;
+      z-index: 40;
+      letter-spacing: 0.5px;
+    }
+    .loklok-speed-badge.show {
+      display: block;
     }
 
     /* SEEK BADGES */
@@ -401,14 +460,14 @@
     .ctrl-btn-small svg,
     .btn-bottom-play svg,
     .center-ctrl-btn svg {
-      width: 20px !important;
-      height: 20px !important;
+      width: 18px !important;
+      height: 18px !important;
       display: block !important;
     }
 
     .center-ctrl-btn.play-btn-large svg {
-      width: 26px !important;
-      height: 26px !important;
+      width: 20px !important;
+      height: 20px !important;
     }
 
     /* WARNING NOTE AND DETAILS BOX */
@@ -574,18 +633,18 @@
       }
 
       .center-ctrl-btn {
+        width: 48px !important;
+        height: 48px !important;
+      }
+
+      .center-ctrl-btn.play-btn-large {
         width: 64px !important;
         height: 64px !important;
       }
 
-      .center-ctrl-btn.play-btn-large {
-        width: 86px !important;
-        height: 86px !important;
-      }
-
       .center-ctrl-btn.play-btn-large svg {
-        width: 44px !important;
-        height: 44px !important;
+        width: 28px !important;
+        height: 28px !important;
       }
 
       .player-bottom-bar {
@@ -802,6 +861,9 @@
     <!-- Ad Shield Overlay -->
     <div id="iframe-ad-shield" class="ultimate-ad-shield" onclick="absorbAdClicks(event)" style="display: none;"></div>
 
+    <!-- Speed Up Floating Badge -->
+    <div id="speed-badge" class="loklok-speed-badge">2.0x Speed</div>
+
     <div id="player-gesture-overlay" class="player-overlay active">
       <!-- TOP-LEFT BACK HEADER -->
       <div class="player-top-bar" onclick="forceBackToHome()">
@@ -809,13 +871,13 @@
         <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
       </div>
 
-      <div id="brightness-slider-container" class="vertical-slider-bar left-bar" style="display: none;">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
+      <div id="brightness-slider-container" class="vertical-slider-bar left-bar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
         <div class="v-track"><div id="brightness-fill" class="v-fill"></div></div>
       </div>
 
-      <div id="volume-slider-container" class="vertical-slider-bar right-bar" style="display: none;">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+      <div id="volume-slider-container" class="vertical-slider-bar right-bar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
         <div class="v-track"><div id="volume-fill" class="v-fill"></div></div>
       </div>
 
@@ -924,7 +986,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=126.0"></script>
+  <script src="app.js?v=127.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -972,7 +1034,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
 
-    // Safe fallback configuration if movies array from app.js is undefined or empty
     const safeMoviesList = (typeof movies !== 'undefined' && Array.isArray(movies)) ? movies : [];
     const safeFeaturedList = (typeof featuredMovies !== 'undefined' && Array.isArray(featuredMovies)) ? featuredMovies : [];
 
@@ -983,7 +1044,7 @@
                            id: movieId || 'fallback', 
                            title: 'The Runner', 
                            tmdbId: 634649, 
-                           description: 'Watch this movie available in high quality streaming on DEYMFLIX.', 
+                           description: '', 
                            poster: 'https://via.placeholder.com/300x450?text=DEYMFLIX',
                            manualEmbed: ''
                          };
@@ -1025,7 +1086,6 @@
       }
     }
 
-    /* ENHANCED SYNOPSIS TOGGLE LOGIC */
     function checkSynopsisLength() {
       setTimeout(() => {
         if (descElement.scrollHeight > descElement.clientHeight || descElement.textContent.length > 150) {
@@ -1055,6 +1115,13 @@
 
       if (currentMovie.synopsis && currentMovie.synopsis.trim() !== '') {
         descElement.textContent = currentMovie.synopsis;
+        checkSynopsisLength();
+        return;
+      }
+
+      // Automatically fallback to a proper plot summary for "The Runner"
+      if (currentMovie.title.toLowerCase().includes('runner')) {
+        descElement.textContent = "In the psychological thriller The Runner, Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one—each second a test of how far a mother will go to save her child.";
         checkSynopsisLength();
         return;
       }
@@ -1268,6 +1335,7 @@
 
     const rewindBadge = document.getElementById('rewind-badge');
     const forwardBadge = document.getElementById('forward-badge');
+    const speedBadge = document.getElementById('speed-badge');
 
     const brightnessContainer = document.getElementById('brightness-slider-container');
     const brightnessFill = document.getElementById('brightness-fill');
@@ -1286,6 +1354,9 @@
     let currentBrightness = 100;
     let activeServer = 1;
     let lastTapTime = 0;
+    let normalPlaybackRate = 1.0;
+    let longPressTimer = null;
+    let isLongPressing = false;
 
     const playPathData = "M8 5v14l11-7z";
     const pausePathData = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
@@ -1334,7 +1405,7 @@
       }
       lastTapTime = now;
 
-      if (e.target === playerOverlay) {
+      if (e.target === playerOverlay || e.target === playerContainer) {
         if (playerOverlay.classList.contains('active')) {
           hideControls();
           clearTimeout(autoHideTimer);
@@ -1346,44 +1417,48 @@
       }
     }
 
-    playerOverlay.addEventListener('touchend', (e) => {
-      if (!isGestureDragging) {
-        toggleOverlayControls(e);
-      }
-    });
-
-    playerOverlay.addEventListener('click', (e) => {
-      if (!('ontouchstart' in window)) {
-        toggleOverlayControls(e);
-      }
-    });
-
-    playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
-
+    // GLOBAL EDGE SWIPE GESTURES & LONG PRESS 2X SPEED
     let touchStartY = 0;
     let isGestureDragging = false;
     let gestureType = null;
     let sliderHideTimer = null;
 
-    playerOverlay.addEventListener('touchstart', (e) => {
+    playerContainer.addEventListener('touchstart', (e) => {
       if (activeServer !== 1) return;
-      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-      if (e.touches.length === 1 && isFS) {
+      if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
         const screenWidth = window.innerWidth;
-        gestureType = e.touches[0].clientX < screenWidth / 2 ? 'brightness' : 'volume';
+        const clientX = e.touches[0].clientX;
+        gestureType = clientX < screenWidth / 2 ? 'brightness' : 'volume';
         isGestureDragging = false;
+
+        // Long press detection for 2x speed
+        isLongPressing = false;
+        clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(() => {
+          if (!isGestureDragging) {
+            isLongPressing = true;
+            directPlayer.playbackRate = 2.0;
+            speedBadge.classList.add('show');
+          }
+        }, 500);
       }
     }, { passive: true });
 
-    playerOverlay.addEventListener('touchmove', (e) => {
+    playerContainer.addEventListener('touchmove', (e) => {
       if (activeServer !== 1 || e.touches.length !== 1) return;
 
       const currentY = e.touches[0].clientY;
       const deltaY = touchStartY - currentY;
       
-      if (Math.abs(deltaY) > 8) {
+      if (Math.abs(deltaY) > 6) {
         isGestureDragging = true;
+        clearTimeout(longPressTimer);
+        if (isLongPressing) {
+          isLongPressing = false;
+          directPlayer.playbackRate = normalPlaybackRate;
+          speedBadge.classList.remove('show');
+        }
       }
 
       if (!isGestureDragging) return;
@@ -1405,14 +1480,49 @@
       }
     }, { passive: true });
 
-    playerOverlay.addEventListener('touchend', () => {
+    playerContainer.addEventListener('touchend', (e) => {
       if (activeServer !== 1) return;
+      clearTimeout(longPressTimer);
+
+      if (isLongPressing) {
+        isLongPressing = false;
+        directPlayer.playbackRate = normalPlaybackRate;
+        speedBadge.classList.remove('show');
+      }
+
+      if (!isGestureDragging) {
+        toggleOverlayControls(e);
+      }
+
       sliderHideTimer = setTimeout(() => {
         brightnessContainer.style.display = 'none';
         volumeContainer.style.display = 'none';
         isGestureDragging = false;
       }, 1000);
     });
+
+    // Mouse long press fallback for PC testing
+    playerContainer.addEventListener('mousedown', (e) => {
+      if (activeServer !== 1) return;
+      isLongPressing = false;
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        isLongPressing = true;
+        directPlayer.playbackRate = 2.0;
+        speedBadge.classList.add('show');
+      }, 600);
+    });
+
+    playerContainer.addEventListener('mouseup', () => {
+      clearTimeout(longPressTimer);
+      if (isLongPressing) {
+        isLongPressing = false;
+        directPlayer.playbackRate = normalPlaybackRate;
+        speedBadge.classList.remove('show');
+      }
+    });
+
+    playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
 
     function showLoadingSpinner() {
       loadingSpinner.style.display = 'flex';
@@ -1589,7 +1699,6 @@
       toggleFullscreen();
     };
 
-    /* FULLSCREEN TOGGLE WITH AUTO-ROTATE LANDSCAPE LOCK */
     function toggleFullscreen() {
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
