@@ -13,7 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=127.0">
+  <link rel="stylesheet" href="style.css?v=128.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -24,6 +24,8 @@
       color: #ffffff !important;
       width: 100% !important;
       overflow-x: hidden !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
     }
 
     /* VIDEO PLAYER CONTAINER LAYOUT FIXES */
@@ -36,7 +38,9 @@
       margin: 0 auto !important;
       overflow: hidden !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9) !important;
+      -webkit-user-select: none !important;
       user-select: none !important;
+      -webkit-touch-callout: none !important;
     }
 
     /* FULLSCREEN NATIVE OVERRIDES */
@@ -269,6 +273,8 @@
       transition: opacity 0.25s ease;
       z-index: 20 !important;
       box-sizing: border-box !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
     }
 
     .player-overlay.active {
@@ -287,6 +293,8 @@
       box-sizing: border-box !important;
       z-index: 30 !important;
       cursor: pointer !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
     }
 
     .icon-btn-back {
@@ -306,6 +314,8 @@
       color: #ffffff !important;
       cursor: pointer !important;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
     }
 
     /* CENTER CONTROL ICONS */
@@ -333,7 +343,6 @@
       padding: 0 !important;
     }
 
-    /* Adjusted smaller size for play/pause button per screenshot design */
     .center-ctrl-btn.play-btn-large {
       width: 44px !important;
       height: 44px !important;
@@ -358,6 +367,8 @@
       display: none;
       z-index: 40;
       letter-spacing: 0.5px;
+      -webkit-user-select: none;
+      user-select: none;
     }
     .loklok-speed-badge.show {
       display: block;
@@ -986,7 +997,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=127.0"></script>
+  <script src="app.js?v=128.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -1119,7 +1130,6 @@
         return;
       }
 
-      // Automatically fallback to a proper plot summary for "The Runner"
       if (currentMovie.title.toLowerCase().includes('runner')) {
         descElement.textContent = "In the psychological thriller The Runner, Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one—each second a test of how far a mother will go to save her child.";
         checkSynopsisLength();
@@ -1417,7 +1427,6 @@
       }
     }
 
-    // GLOBAL EDGE SWIPE GESTURES & LONG PRESS 2X SPEED
     let touchStartY = 0;
     let isGestureDragging = false;
     let gestureType = null;
@@ -1432,7 +1441,6 @@
         gestureType = clientX < screenWidth / 2 ? 'brightness' : 'volume';
         isGestureDragging = false;
 
-        // Long press detection for 2x speed
         isLongPressing = false;
         clearTimeout(longPressTimer);
         longPressTimer = setTimeout(() => {
@@ -1501,7 +1509,6 @@
       }, 1000);
     });
 
-    // Mouse long press fallback for PC testing
     playerContainer.addEventListener('mousedown', (e) => {
       if (activeServer !== 1) return;
       isLongPressing = false;
@@ -1525,8 +1532,11 @@
     playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
 
     function showLoadingSpinner() {
-      loadingSpinner.style.display = 'flex';
-      centerControlsGroup.style.setProperty('display', 'none', 'important');
+      // Only show spinner if the video hasn't loaded data yet or is genuinely stuck
+      if (directPlayer.readyState < 3 && directPlayer.paused) {
+        loadingSpinner.style.display = 'flex';
+        centerControlsGroup.style.setProperty('display', 'none', 'important');
+      }
     }
 
     function hideLoadingSpinner() {
@@ -1538,13 +1548,11 @@
 
     function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
-      showLoadingSpinner();
-
       slowConnectionTimer = setTimeout(() => {
         if (directPlayer.paused || directPlayer.readyState < 3) {
           networkNote.style.display = 'block';
         }
-      }, 3500);
+      }, 4000);
     }
 
     function showToast(message) {
@@ -1573,11 +1581,18 @@
       return `${hStr}:${mStr}:${sStr}`;
     }
 
-    directPlayer.addEventListener('loadstart', showLoadingSpinner);
+    directPlayer.addEventListener('loadstart', startSlowConnectionCheck);
     directPlayer.addEventListener('waiting', startSlowConnectionCheck);
     directPlayer.addEventListener('stalled', startSlowConnectionCheck);
     directPlayer.addEventListener('seeking', showLoadingSpinner);
+    
+    // Instantly clear loader once ready or playing
     directPlayer.addEventListener('canplay', hideLoadingSpinner);
+    directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
+    directPlayer.addEventListener('loadedmetadata', () => {
+      hideLoadingSpinner();
+      totalDurationText.textContent = formatTime(directPlayer.duration);
+    });
 
     directPlayer.addEventListener('playing', () => {
       hideLoadingSpinner();
@@ -1586,11 +1601,8 @@
     });
 
     directPlayer.addEventListener('play', () => {
+      hideLoadingSpinner();
       updatePlayStateUI(true);
-    });
-
-    directPlayer.addEventListener('loadedmetadata', () => {
-      totalDurationText.textContent = formatTime(directPlayer.duration);
     });
 
     directPlayer.addEventListener('timeupdate', () => {
