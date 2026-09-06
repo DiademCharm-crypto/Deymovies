@@ -75,7 +75,7 @@ const movies = [
     title: "Ma'am Chief: Shakedown in Seoul", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uCUgMEGPbZrnGLDjDXRteffT9JM.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv"
+    manualEmbed: "https://video.nbanaapp.eu.cc/Maam.Chief.Shakedown.in.Seoul.2023-1080p(1).mkv"
   },
   { 
     id: "The Odyssey", 
@@ -655,12 +655,12 @@ function createMovieCard(movie, rankNumber = null) {
   return card;
 }
 
-let heroSlideshowTimer = null;
-let currentHeroIndex = 0;
+let heroCarouselTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   setupHeroBanner();
   renderTopPicks();
+  renderAiReels();
   renderFilipinoMovies();
   renderAllMoviesGrid();
   setupSearchHandlers();
@@ -676,38 +676,50 @@ function showToast(message) {
   }, 2000);
 }
 
+// User-Scrollable and Auto-Scrolling Hero Billboard Track
 function setupHeroBanner() {
-  if (featuredMovies && featuredMovies.length > 0) {
-    displayHeroSlide(currentHeroIndex);
+  const heroWrapper = document.getElementById('hero-billboard-wrapper') || document.querySelector('.hero-wrapper');
+  if (!heroWrapper || !featuredMovies || featuredMovies.length === 0) return;
 
-    if (heroSlideshowTimer) clearInterval(heroSlideshowTimer);
-    heroSlideshowTimer = setInterval(() => {
-      currentHeroIndex = (currentHeroIndex + 1) % featuredMovies.length;
-      displayHeroSlide(currentHeroIndex);
-    }, 5000);
-  }
+  heroWrapper.innerHTML = `
+    <div class="hero-carousel-track" id="hero-carousel-track">
+      ${featuredMovies.map(item => `
+        <div class="hero-slide-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
+          <img class="hero-backdrop-img" src="${item.backdrop || item.poster}" alt="${item.title}" loading="lazy">
+          <div class="hero-fade-overlay"></div>
+          <div class="hero-details-container">
+            <h1 class="hero-title-text">${item.title}</h1>
+            <button class="hero-action-btn">▶ Watch Now</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const track = document.getElementById('hero-carousel-track');
+  if (!track) return;
+
+  startAutoScroll(track);
+
+  track.addEventListener('touchstart', () => clearInterval(heroCarouselTimer), { passive: true });
+  track.addEventListener('mousedown', () => clearInterval(heroCarouselTimer));
+  track.addEventListener('mouseleave', () => startAutoScroll(track));
+  track.addEventListener('touchend', () => startAutoScroll(track));
 }
 
-function displayHeroSlide(index) {
-  const featured = featuredMovies[index];
-  const heroBackdrop = document.getElementById('hero-backdrop');
-  const heroTitle = document.getElementById('hero-title');
-  const heroPlayBtn = document.getElementById('hero-play-btn');
+function startAutoScroll(track) {
+  if (heroCarouselTimer) clearInterval(heroCarouselTimer);
 
-  if (heroBackdrop) {
-    heroBackdrop.style.opacity = '0.3';
-    setTimeout(() => {
-      heroBackdrop.src = featured.poster;
-      heroBackdrop.style.opacity = '1';
-    }, 250);
-  }
+  heroCarouselTimer = setInterval(() => {
+    const slideWidth = track.firstElementChild ? track.firstElementChild.clientWidth : 0;
+    const maxScroll = track.scrollWidth - track.clientWidth;
 
-  if (heroTitle) heroTitle.textContent = featured.title;
-  if (heroPlayBtn) {
-    heroPlayBtn.onclick = () => {
-      window.location.href = `player.html?id=${encodeURIComponent(featured.id)}`;
-    };
-  }
+    if (track.scrollLeft >= maxScroll - 5) {
+      track.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      track.scrollBy({ left: slideWidth, behavior: 'smooth' });
+    }
+  }, 5000);
 }
 
 function renderTopPicks() {
@@ -718,6 +730,32 @@ function renderTopPicks() {
   const picks = movies.slice(0, 10);
   picks.forEach((movie, index) => {
     container.appendChild(createMovieCard(movie, index + 1));
+  });
+}
+
+function renderAiReels() {
+  const container = document.getElementById('ai-reels-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const reelsData = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+  if (reelsData.length === 0) return;
+
+  reelsData.slice(0, 12).forEach(reel => {
+    const card = document.createElement('div');
+    card.className = 'reel-thumb-card';
+    card.onclick = () => {
+      window.location.href = `reels.html?id=${encodeURIComponent(reel.id)}`;
+    };
+
+    card.innerHTML = `
+      <img src="${reel.poster || reel.thumbnail}" alt="${reel.title}" class="reel-thumb-img" loading="lazy">
+      <div class="reel-overlay-info">
+        <span class="reel-badge-tag">AI REEL</span>
+        <span class="reel-thumb-title">${reel.title}</span>
+      </div>
+    `;
+    container.appendChild(card);
   });
 }
 

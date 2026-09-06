@@ -10,203 +10,51 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=127.0">
-
-  <style>
-    .category-page-wrapper {
-      padding: 85px 16px 40px 16px;
-      width: 100%;
-      box-sizing: border-box;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .category-header-flow {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .category-inline-search {
-      position: relative;
-      width: 100%;
-    }
-
-    .category-inline-search input {
-      width: 100%;
-      background: rgba(30, 30, 30, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 10px 18px;
-      color: #ffffff;
-      font-size: 0.9rem;
-      outline: none;
-      box-sizing: border-box;
-      backdrop-filter: blur(8px);
-    }
-
-    .category-inline-search input::placeholder {
-      color: #888888;
-    }
-
-    .category-title-text {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #ffffff;
-      margin: 0;
-    }
-
-    .reels-grid-container {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
-      gap: 16px !important;
-      width: 100% !important;
-      flex: 1;
-    }
-
-    .reel-thumb-card {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 9 / 16;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      background: #181818;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .reel-thumb-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .reel-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .reel-overlay-info {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 24px 8px 8px 8px;
-      background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.9) 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .reel-badge-tag {
-      background: #e50914;
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 800;
-      padding: 2px 5px;
-      border-radius: 3px;
-      width: fit-content;
-    }
-
-    .reel-thumb-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .pagination-container {
-      margin-top: 30px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-    }
-
-    @media (min-width: 1024px) {
-      .category-page-wrapper {
-        padding: 110px 40px 40px 40px;
-      }
-
-      .category-inline-search input {
-        max-width: 600px;
-        padding: 14px 22px;
-        font-size: 1.05rem;
-        border-radius: 28px;
-      }
-
-      .category-title-text {
-        font-size: 2.2rem;
-      }
-
-      .reels-grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-        gap: 20px !important;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .category-page-wrapper {
-        padding: 75px 10px 30px 10px;
-      }
-
-      .reels-grid-container {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 8px !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css?v=138.0">
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
+  <!-- Top Navigation Header -->
   <header class="top-nav">
     <a href="index.html" class="brand-logo-link">
       <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
-      <span class="brand-title-text" id="header-brand-title">DEYM<span class="highlight-red">FLIX</span></span>
+      <span class="brand-title-text" id="nav-brand-title">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
+
+    <!-- Integrated Search Input Bar -->
+    <div class="search-overlay-bar">
+      <form id="search-form" onsubmit="event.preventDefault();">
+        <div class="search-input-wrapper">
+          <input type="search" id="search-input" placeholder="Search..." autocomplete="off">
+        </div>
+      </form>
+      <div id="search-suggestions-box" class="search-suggestions-box" style="display: none;"></div>
+    </div>
+
     <div style="display: flex; gap: 8px; align-items: center;">
-      <button class="header-request-btn" id="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
+      <button class="header-request-btn" id="category-request-btn" onclick="openRequestModal()">Request a Movie</button>
     </div>
   </header>
 
-  <!-- Category Container -->
+  <!-- Category Wrapper -->
   <div class="category-page-wrapper">
     <div class="category-header-flow">
-      <div class="category-inline-search">
-        <form id="category-search-form" onsubmit="event.preventDefault();">
-          <input type="search" id="category-search-input" placeholder="Search in this category..." autocomplete="off">
-        </form>
-        <div id="category-suggestions-box" class="search-suggestions-box" style="display: none;"></div>
-      </div>
-
-      <h1 id="category-page-title" class="category-title-text">All Movies</h1>
+      <h1 class="category-main-title" id="category-page-title">All Movies</h1>
     </div>
 
     <!-- Movie / Reel Content Grid -->
     <div class="main-grid" id="category-movies-grid"></div>
 
     <!-- Pagination Controls -->
-    <div class="pagination-container" id="category-pagination" style="display: flex;">
-      <button id="cat-prev-btn" class="page-nav-btn" onclick="changeCategoryPage(-1)">Previous</button>
-      <div id="cat-page-numbers" class="page-numbers-group"></div>
-      <button id="cat-next-btn" class="page-nav-btn" onclick="changeCategoryPage(1)">Next</button>
-    </div>
+    <div class="pagination-container" id="category-pagination" style="display: none;"></div>
   </div>
 
-  <!-- Request Modal -->
+  <!-- Request Modal Dialog -->
   <div id="request-modal" class="request-modal-backdrop" style="display: none;">
     <div class="request-modal-content">
       <span class="close-modal-btn" onclick="closeRequestModal()">&times;</span>
-      <h3 id="modal-heading-title">Request a Movie</h3>
-      <p id="modal-heading-desc">Can't find what you're looking for? Let us know!</p>
+      <h3 id="modal-title-text">Request a Movie</h3>
+      <p id="modal-desc-text">Can't find what you're looking for? Let us know!</p>
       <div class="request-input-group">
         <input type="text" id="modal-request-input" placeholder="Enter title...">
         <button onclick="submitMovieRequest()">Submit</button>
@@ -216,71 +64,75 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="reels-data.js?v=127.0"></script>
-  <script src="app.js?v=127.0"></script>
+  <script src="reels-data.js?v=138.0"></script>
+  <script src="app.js?v=138.0"></script>
   <script>
-    let activeCategoryList = [];
     let currentPage = 1;
-    const itemsPerPage = 25;
-    let isReelCategory = false;
+    // Updated to 24 items per page so desktop 6-column rows fill out completely
+    const itemsPerPage = 24; 
+    let currentCategoryType = 'all';
 
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const catType = urlParams.get('type') || 'all';
+      currentCategoryType = urlParams.get('type') || 'all';
 
-      const gridContainer = document.getElementById('category-movies-grid');
-      const titleElem = document.getElementById('category-page-title');
-      const brandTitle = document.getElementById('header-brand-title');
-      const requestBtn = document.getElementById('header-request-btn');
-      const modalHeadingTitle = document.getElementById('modal-heading-title');
-      const modalHeadingDesc = document.getElementById('modal-heading-desc');
-      const searchInput = document.getElementById('category-search-input');
-
-      if (catType === 'reels') {
-        isReelCategory = true;
-        if (brandTitle) brandTitle.innerHTML = 'DEYM<span class="highlight-red">REELS</span>';
-        if (titleElem) titleElem.textContent = 'DEYMREELS';
-        if (requestBtn) requestBtn.textContent = 'Request a Reel';
-        if (modalHeadingTitle) modalHeadingTitle.textContent = 'Request a Reel';
-        if (modalHeadingDesc) modalHeadingDesc.textContent = "Can't find a short video? Let us know!";
-        if (searchInput) searchInput.placeholder = "Search reels...";
-
-        gridContainer.className = 'reels-grid-container';
-        activeCategoryList = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
-      } else if (catType === 'tagalog') {
-        if (titleElem) titleElem.textContent = 'Tagalog Movies PH';
-        activeCategoryList = movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH');
-      } else {
-        if (titleElem) titleElem.textContent = 'All Movies';
-        activeCategoryList = [...movies];
-      }
-
-      renderCategoryPage(activeCategoryList, 1);
-      setupCategorySearch();
+      setupCategoryHeader(currentCategoryType);
+      renderCategoryContent();
     });
 
-    function renderCategoryPage(list, page = 1) {
-      currentPage = page;
-      const gridContainer = document.getElementById('category-movies-grid');
-      gridContainer.innerHTML = '';
+    function setupCategoryHeader(type) {
+      const pageTitle = document.getElementById('category-page-title');
+      const brandTitle = document.getElementById('nav-brand-title');
+      const reqBtn = document.getElementById('category-request-btn');
+      const modalTitle = document.getElementById('modal-title-text');
+      const searchInput = document.getElementById('search-input');
 
-      if (list.length === 0) {
-        gridContainer.innerHTML = `<div style="grid-column: 1 / -1; color: #888; text-align: center; padding: 50px 0; font-weight: 700;">No items found matching your search.</div>`;
-        document.getElementById('category-pagination').style.display = 'none';
-        return;
+      if (type === 'reels') {
+        if (pageTitle) pageTitle.textContent = 'DEYMREELS';
+        if (brandTitle) brandTitle.innerHTML = 'DEYM<span class="highlight-red">REELS</span>';
+        if (reqBtn) reqBtn.textContent = 'Request a Reel';
+        if (modalTitle) modalTitle.textContent = 'Request a Reel';
+        if (searchInput) searchInput.placeholder = 'Search reels...';
+      } else if (type === 'tagalog') {
+        if (pageTitle) pageTitle.textContent = 'Tagalog Movies PH';
+      } else {
+        if (pageTitle) pageTitle.textContent = 'All Movies';
+      }
+    }
+
+    function renderCategoryContent() {
+      const gridContainer = document.getElementById('category-movies-grid');
+      if (!gridContainer) return;
+
+      gridContainer.innerHTML = '';
+      let dataset = [];
+
+      if (currentCategoryType === 'reels') {
+        dataset = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+        gridContainer.className = 'reels-grid-container';
+      } else if (currentCategoryType === 'tagalog') {
+        dataset = movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH');
+        gridContainer.className = 'main-grid';
+      } else {
+        dataset = movies;
+        gridContainer.className = 'main-grid';
       }
 
-      const totalPages = Math.ceil(list.length / itemsPerPage);
-      const startIndex = (page - 1) * itemsPerPage;
-      const paginatedItems = list.slice(startIndex, startIndex + itemsPerPage);
+      const totalPages = Math.ceil(dataset.length / itemsPerPage);
+      if (currentPage > totalPages) currentPage = 1;
 
-      if (isReelCategory) {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedItems = dataset.slice(startIndex, startIndex + itemsPerPage);
+
+      if (currentCategoryType === 'reels') {
         paginatedItems.forEach(reel => {
           const card = document.createElement('div');
           card.className = 'reel-thumb-card';
-          card.onclick = () => window.location.href = `reels.html?id=${encodeURIComponent(reel.id)}`;
+          card.onclick = () => {
+            window.location.href = `reels.html?id=${encodeURIComponent(reel.id)}`;
+          };
           card.innerHTML = `
-            <img class="reel-thumb-img" src="${reel.poster}" alt="${reel.title}">
+            <img src="${reel.poster || reel.thumbnail}" alt="${reel.title}" class="reel-thumb-img" loading="lazy">
             <div class="reel-overlay-info">
               <span class="reel-badge-tag">REEL</span>
               <span class="reel-thumb-title">${reel.title}</span>
@@ -289,95 +141,77 @@
           gridContainer.appendChild(card);
         });
       } else {
-        paginatedItems.forEach(movie => {
-          gridContainer.appendChild(createMovieCard(movie));
+        paginatedItems.forEach((movie, idx) => {
+          const rank = currentCategoryType === 'top' ? startIndex + idx + 1 : null;
+          gridContainer.appendChild(createMovieCard(movie, rank));
         });
       }
 
-      renderPaginationControls(totalPages, list);
+      renderPaginationControls(totalPages);
     }
 
-    function renderPaginationControls(totalPages, fullList) {
-      const container = document.getElementById('category-pagination');
-      const numbersGroup = document.getElementById('cat-page-numbers');
-      const prevBtn = document.getElementById('cat-prev-btn');
-      const nextBtn = document.getElementById('cat-next-btn');
+    function renderPaginationControls(totalPages) {
+      const paginationBox = document.getElementById('category-pagination');
+      if (!paginationBox) return;
 
       if (totalPages <= 1) {
-        container.style.display = 'none';
+        paginationBox.style.display = 'none';
         return;
       }
 
-      container.style.display = 'flex';
-      numbersGroup.innerHTML = '';
+      paginationBox.style.display = 'flex';
+      paginationBox.innerHTML = '';
 
-      prevBtn.style.display = currentPage > 1 ? 'inline-block' : 'none';
-      nextBtn.style.display = currentPage < totalPages ? 'inline-block' : 'none';
+      if (currentPage > 1) {
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'page-nav-btn';
+        prevBtn.textContent = 'Prev';
+        prevBtn.onclick = () => { currentPage--; renderCategoryContent(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        paginationBox.appendChild(prevBtn);
+      }
 
-      for (let i = 1; i <= totalPages; i++) {
+      const numbersGroup = document.createElement('div');
+      numbersGroup.className = 'page-numbers-group';
+
+      const isMobile = window.innerWidth <= 600;
+
+      let startPage = 1;
+      let endPage = totalPages;
+
+      if (isMobile) {
+        const maxVisible = 3;
+        startPage = Math.max(1, currentPage - 1);
+        endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible) {
+          startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
         const pageBtn = document.createElement('button');
         pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
         pageBtn.textContent = i;
-        pageBtn.onclick = () => {
-          renderCategoryPage(fullList, i);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+        pageBtn.onclick = () => { currentPage = i; renderCategoryContent(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
         numbersGroup.appendChild(pageBtn);
       }
-    }
 
-    function changeCategoryPage(direction) {
-      const totalPages = Math.ceil(activeCategoryList.length / itemsPerPage);
-      const newPage = currentPage + direction;
-      if (newPage >= 1 && newPage <= totalPages) {
-        renderCategoryPage(activeCategoryList, newPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      paginationBox.appendChild(numbersGroup);
+
+      if (currentPage < totalPages) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'page-nav-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.onclick = () => { currentPage++; renderCategoryContent(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        paginationBox.appendChild(nextBtn);
       }
     }
 
-    function setupCategorySearch() {
-      const searchInput = document.getElementById('category-search-input');
-      const suggestionsBox = document.getElementById('category-suggestions-box');
-
-      if (!searchInput) return;
-
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase().trim();
-
-        if (query.length > 0) {
-          const filtered = activeCategoryList.filter(item => item.title.toLowerCase().includes(query));
-
-          const suggestions = filtered.slice(0, 5);
-          if (suggestions.length > 0 && suggestionsBox) {
-            suggestionsBox.innerHTML = '';
-            suggestions.forEach(item => {
-              const div = document.createElement('div');
-              div.className = 'suggestion-item';
-              div.innerHTML = `
-                <img src="${item.poster}" alt="${item.title}">
-                <span class="suggestion-title">${item.title}</span>
-              `;
-              div.onclick = () => {
-                if (isReelCategory) {
-                  window.location.href = `reels.html?id=${encodeURIComponent(item.id)}`;
-                } else {
-                  window.location.href = `player.html?id=${encodeURIComponent(item.id)}`;
-                }
-              };
-              suggestionsBox.appendChild(div);
-            });
-            suggestionsBox.style.display = 'block';
-          } else if (suggestionsBox) {
-            suggestionsBox.style.display = 'none';
-          }
-
-          renderCategoryPage(filtered, 1);
-        } else {
-          if (suggestionsBox) suggestionsBox.style.display = 'none';
-          renderCategoryPage(activeCategoryList, 1);
-        }
-      });
-    }
+    window.addEventListener('resize', () => {
+      const dataset = currentCategoryType === 'reels' ? (typeof aiReelsData !== 'undefined' ? aiReelsData : []) : movies;
+      const totalPages = Math.ceil(dataset.length / itemsPerPage);
+      renderPaginationControls(totalPages);
+    });
   </script>
 </body>
 </html>

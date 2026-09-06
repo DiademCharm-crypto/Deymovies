@@ -10,42 +10,36 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=127.0">
+  <link rel="stylesheet" href="style.css?v=139.0">
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
+  <!-- Top Navigation Header with Integrated Search -->
   <header class="top-nav">
     <a href="index.html" class="brand-logo-link">
       <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
       <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
+
+    <!-- Integrated Search Input Bar -->
+    <div class="search-overlay-bar">
+      <form id="search-form" onsubmit="event.preventDefault();">
+        <div class="search-input-wrapper">
+          <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off">
+        </div>
+      </form>
+      <div id="search-suggestions-box" class="search-suggestions-box" style="display: none;"></div>
+    </div>
+
     <div style="display: flex; gap: 8px; align-items: center;">
       <button class="header-request-btn" onclick="openRequestModal()">Request a Movie</button>
     </div>
   </header>
 
-  <!-- Search Bar Overlay -->
-  <div class="search-overlay-bar">
-    <form id="search-form" onsubmit="event.preventDefault();">
-      <div class="search-input-wrapper">
-        <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off">
-      </div>
-    </form>
-    <div id="search-suggestions-box" class="search-suggestions-box" style="display: none;"></div>
-  </div>
-
   <!-- Main Content Sections Wrapper -->
   <div id="home-sections-wrapper">
-    <!-- Hero Billboard -->
-    <div class="hero-wrapper">
-      <img id="hero-backdrop" class="hero-backdrop-img" src="" alt="Hero Backdrop">
-      <div class="hero-fade-overlay"></div>
-      <div class="hero-details-container">
-        <h1 id="hero-title" class="hero-title-text"></h1>
-        <button id="hero-play-btn" class="hero-action-btn">▶ Watch Now</button>
-      </div>
-    </div>
+    <!-- Hero Billboard Wrapper for Carousel Track -->
+    <div id="hero-billboard-wrapper" class="hero-wrapper"></div>
 
     <!-- 1. Top Picks Row -->
     <section class="content-section">
@@ -98,7 +92,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="reels-data.js?v=127.0"></script>
-  <script src="app.js?v=127.0"></script>
+  <script src="reels-data.js?v=139.0"></script>
+  <script src="app.js?v=139.0"></script>
 </body>
 </html>

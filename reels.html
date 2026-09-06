@@ -6,7 +6,7 @@
   <title>DEYMFLIX - Reels</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=128.0">
+  <link rel="stylesheet" href="style.css?v=130.0">
 
   <style>
     * {
@@ -308,7 +308,7 @@
 
   <div class="reels-feed-container" id="reelsContainer"></div>
 
-  <script src="reels-data.js?v=128.0"></script>
+  <script src="reels-data.js?v=130.0"></script>
   <script>
     const reelsContainer = document.getElementById('reelsContainer');
     let historySequence = [];
@@ -334,7 +334,6 @@
 
       historySequence.push(firstReel);
 
-      // Pre-fill initial random sequence buffer
       for (let i = 0; i < 5; i++) {
         appendRandomReelToSequence();
       }
@@ -586,7 +585,6 @@
             }
             resetClearModeTimer();
 
-            // Append random reel if reaching near bottom of current history sequence
             if (index >= historySequence.length - 2) {
               appendRandomReelToSequence();
               const nextIndex = historySequence.length - 1;

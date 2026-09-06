@@ -21,22 +21,24 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   padding-bottom: 40px;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
-   NAVIGATION HEADER & LOGO (BASE)
+   NAVIGATION HEADER & INTEGRATED SEARCH BAR
    ========================================================================== */
 .top-nav {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  padding: 14px 20px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
   z-index: 1000;
-  background: linear-gradient(180deg, rgba(15, 15, 15, 0.95) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.95) 0%, transparent 100%);
   pointer-events: auto;
 }
 
@@ -47,18 +49,19 @@ body {
   text-decoration: none;
   z-index: 1001;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .brand-logo-img {
-  height: 32px;
-  width: 32px;
+  height: 36px;
+  width: 36px;
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.8));
 }
 
 .brand-title-text {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 900;
   color: #ffffff !important;
   letter-spacing: 1px;
@@ -73,12 +76,12 @@ body {
 }
 
 .header-request-btn {
-  background: rgba(229, 9, 20, 0.2) !important;
+  background: rgba(229, 9, 20, 0.25) !important;
   color: #ffffff !important;
   border: 1.5px solid var(--primary-red) !important;
-  padding: 6px 16px;
+  padding: 8px 18px;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer !important;
   white-space: nowrap;
@@ -94,26 +97,23 @@ body {
   box-shadow: 0 0 15px rgba(229, 9, 20, 0.6);
 }
 
-/* ==========================================================================
-   SEARCH OVERLAY BAR & SUGGESTIONS
-   ========================================================================== */
 .search-overlay-bar {
-  position: absolute;
-  top: 62px;
-  left: 16px;
-  right: 16px;
+  position: relative;
+  flex: 1;
+  max-width: 820px;
+  margin: 0 auto;
   z-index: 900;
 }
 
 .search-input-wrapper {
-  background: rgba(30, 30, 30, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(25, 25, 25, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   display: flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 8px 18px;
   width: 100%;
 }
 
@@ -122,12 +122,12 @@ body {
   border: none;
   outline: none;
   color: #ffffff;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   width: 100%;
 }
 
 .search-input-wrapper input::placeholder {
-  color: #bbbbbb;
+  color: #a0a0a0;
 }
 
 .search-suggestions-box {
@@ -185,41 +185,69 @@ body {
 }
 
 /* ==========================================================================
-   HERO BILLBOARD
+   SCROLLABLE HERO CAROUSEL STYLING
    ========================================================================== */
 .hero-wrapper {
   position: relative !important;
   width: 100% !important;
-  height: 60vh !important;
-  max-height: 550px;
+  height: 58vh !important;
+  max-height: 560px;
   background: #000000;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-top: 0px !important;
+}
+
+.hero-carousel-track {
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  scroll-behavior: smooth !important;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-slide-item {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+  position: relative !important;
+  cursor: pointer;
 }
 
 .hero-backdrop-img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
+  object-position: center 20%;
   display: block;
 }
 
 .hero-fade-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(15,15,15,0.2) 0%, rgba(15,15,15,0.6) 65%, var(--bg-dark) 100%);
+  background: linear-gradient(180deg, rgba(15,15,15,0.1) 0%, rgba(15,15,15,0.5) 60%, var(--bg-dark) 100%);
+  pointer-events: none;
 }
 
 .hero-details-container {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
   z-index: 10;
+  pointer-events: none;
 }
 
 .hero-title-text {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   margin-bottom: 12px;
   text-shadow: 0 2px 10px rgba(0,0,0,0.9);
@@ -235,6 +263,7 @@ body {
   font-size: 0.9rem;
   box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
   cursor: pointer;
+  pointer-events: auto;
   transition: background 0.2s ease;
 }
 
@@ -243,7 +272,7 @@ body {
 }
 
 /* ==========================================================================
-   SECTION HEADERS & RIGHT ALIGNED VIEW ALL BUTTONS
+   CONTENT SECTIONS & MOVIE CARDS
    ========================================================================== */
 .content-section {
   padding: 0 20px 24px 20px;
@@ -284,9 +313,6 @@ body {
   box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
 }
 
-/* ==========================================================================
-   AI REELS HORIZONTAL ROW
-   ========================================================================== */
 .reels-horizontal-scroll {
   display: flex !important;
   gap: 12px !important;
@@ -301,9 +327,6 @@ body {
 }
 
 .reel-thumb-card {
-  flex: 0 0 110px !important;
-  width: 110px !important;
-  height: 180px;
   position: relative;
   border-radius: 12px;
   overflow: hidden;
@@ -311,6 +334,12 @@ body {
   background: #181818;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.reels-horizontal-scroll .reel-thumb-card {
+  flex: 0 0 110px !important;
+  width: 110px !important;
+  height: 180px !important;
 }
 
 .reel-thumb-card:hover {
@@ -328,7 +357,7 @@ body {
 .reel-overlay-info {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.95) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.92) 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -358,9 +387,6 @@ body {
   overflow: hidden;
 }
 
-/* ==========================================================================
-   HORIZONTAL SCROLL MOVIE CARDS & POSTERS
-   ========================================================================== */
 .top-picks-scroll,
 .horizontal-scroll {
   display: flex !important;
@@ -422,7 +448,6 @@ body {
   z-index: 10;
 }
 
-/* TOP RIGHT QUALITY BADGE */
 .tag-badge-top-right {
   position: absolute;
   top: 6px;
@@ -447,7 +472,6 @@ body {
   border: 1px solid #ff9800;
 }
 
-/* CENTERED OVERLAY FOR TITLE AT THE BOTTOM */
 .poster-card-overlay {
   position: absolute;
   inset: 0;
@@ -477,307 +501,114 @@ body {
 }
 
 /* ==========================================================================
-   CATEGORY PAGE GRID & PAGINATION (BASE)
+   CATEGORY PAGE WRAPPER & HEADERS
    ========================================================================== */
-.main-grid {
+.category-page-wrapper {
+  padding: 100px 40px 40px 40px;
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0;
+}
+
+.category-header-flow {
+  margin-bottom: 24px;
+}
+
+.category-main-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.reels-grid-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, 140px) !important;
-  justify-content: space-between !important;
-  gap: 14px !important;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  justify-content: flex-start !important;
+  gap: 20px !important;
   width: 100% !important;
 }
 
-.main-grid .poster-card {
-  width: 140px !important;
-  height: 210px !important;
+.reels-grid-container .reel-thumb-card {
+  width: 100% !important;
+  height: 250px !important;
+  flex: none !important;
 }
 
-.main-grid .poster-card img {
-  width: 140px !important;
-  height: 100% !important;
-  object-fit: cover !important;
+.main-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)) !important;
+  justify-content: flex-start !important;
+  gap: 22px !important;
+  width: 100% !important;
 }
 
+/* ==========================================================================
+   PAGINATION CONTROLS
+   ========================================================================== */
 .pagination-container {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 12px;
-  margin: 36px 0 20px 0;
-  width: 100%;
+  gap: 12px !important;
+  margin: 40px 0 20px 0 !important;
+  width: 100% !important;
 }
 
 .page-numbers-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 .page-btn {
-  background: var(--card-bg);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: var(--card-bg) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  padding: 0 12px !important;
+  transition: all 0.2s ease !important;
 }
 
 .page-btn.active,
 .page-btn:hover {
-  background: var(--primary-red);
-  border-color: var(--primary-red);
-  color: #ffffff;
+  background: var(--primary-red) !important;
+  border-color: var(--primary-red) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(229, 9, 20, 0.5) !important;
 }
 
 .page-nav-btn {
-  background: transparent !important;
-  border: none !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
   color: #ffffff !important;
-  padding: 8px 16px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
+  padding: 10px 18px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
 }
 
-/* ==========================================================================
-   PC / DESKTOP MODE ONLY
-   ========================================================================== */
-@media (min-width: 1024px) {
-  .top-nav {
-    padding: 20px 40px;
-  }
-
-  .brand-logo-img {
-    height: 48px;
-    width: 48px;
-  }
-
-  .brand-title-text {
-    font-size: 2.1rem;
-    letter-spacing: 2px;
-  }
-
-  .header-request-btn {
-    padding: 10px 24px;
-    font-size: 1rem;
-    border-radius: 24px;
-  }
-
-  .search-overlay-bar {
-    top: 85px;
-    left: 40px;
-    right: 40px;
-  }
-
-  .search-input-wrapper {
-    padding: 12px 20px;
-  }
-
-  .search-input-wrapper input {
-    font-size: 1.05rem;
-  }
-
-  .category-search-input-box {
-    max-width: 600px !important;
-    padding: 14px 22px !important;
-    font-size: 1.05rem !important;
-    border-radius: 28px !important;
-  }
-
-  .category-title-text {
-    font-size: 2.2rem !important;
-  }
-
-  .content-section {
-    padding: 0 40px 36px 40px;
-  }
-
-  .section-header-title {
-    font-size: 1.65rem;
-  }
-
-  .see-all-link {
-    font-size: 0.98rem !important;
-    padding: 6px 18px;
-    border-radius: 20px;
-  }
-
-  .top-picks-scroll,
-  .horizontal-scroll {
-    gap: 22px !important;
-    padding-bottom: 12px;
-  }
-
-  .top-picks-scroll .poster-card,
-  .horizontal-scroll .poster-card,
-  .poster-card {
-    flex: 0 0 185px !important;
-    width: 185px !important;
-    height: 275px !important;
-  }
-
-  .poster-card-overlay {
-    padding: 12px;
-  }
-
-  .poster-card-title {
-    font-size: 0.88rem;
-  }
-
-  .tag-badge-top-right {
-    top: 8px;
-    right: 8px;
-    font-size: 0.72rem;
-    padding: 3px 8px;
-  }
-
-  .rank-badge-box {
-    font-size: 0.85rem;
-    padding: 4px 10px;
-  }
-
-  .reels-horizontal-scroll {
-    gap: 20px !important;
-    min-height: 260px;
-  }
-
-  .reel-thumb-card {
-    flex: 0 0 155px !important;
-    width: 155px !important;
-    height: 250px !important;
-  }
-
-  .reel-thumb-title {
-    font-size: 0.88rem;
-  }
-
-  .reel-badge-tag {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-  }
-
-  .main-grid {
-    grid-template-columns: repeat(auto-fill, 185px) !important;
-    gap: 22px !important;
-  }
-
-  .main-grid .poster-card {
-    width: 185px !important;
-    height: 275px !important;
-  }
-
-  .reels-grid-container {
-    grid-template-columns: repeat(auto-fill, 165px) !important;
-    gap: 22px !important;
-  }
-
-  .reels-grid-container .reel-thumb-card {
-    width: 165px !important;
-    height: 260px !important;
-  }
-
-  .pagination-container {
-    gap: 18px;
-    margin: 48px 0 30px 0;
-  }
-
-  .page-numbers-group {
-    gap: 12px;
-  }
-
-  .page-btn {
-    width: 52px;
-    height: 52px;
-    font-size: 1.15rem;
-    border-radius: 12px;
-  }
-
-  .page-nav-btn {
-    font-size: 1.25rem;
-    padding: 10px 24px;
-  }
-
-  .hero-wrapper {
-    height: 72vh !important;
-    max-height: 700px;
-  }
-
-  .hero-title-text {
-    font-size: 3rem;
-  }
-
-  .hero-action-btn {
-    padding: 12px 32px;
-    font-size: 1.1rem;
-    border-radius: 24px;
-  }
+.page-nav-btn:hover {
+  background: var(--primary-red) !important;
+  border-color: var(--primary-red) !important;
 }
 
-/* ==========================================================================
-   MOBILE RESPONSIVE (3 POSTERS PER ROW)
-   ========================================================================== */
-@media (max-width: 600px) {
-  .content-section {
-    padding: 0 12px 20px 12px;
-  }
-
-  .main-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
-  .main-grid .poster-card {
-    width: 100% !important;
-    height: 175px !important;
-  }
-
-  .main-grid .poster-card img {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  .main-grid .poster-card-title {
-    font-size: 0.7rem;
-  }
-
-  .tag-badge-top-right {
-    top: 5px;
-    right: 5px;
-    font-size: 0.55rem;
-    padding: 1px 4px;
-  }
-
-  .reels-grid-container {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
-  .reels-grid-container .reel-thumb-card {
-    width: 100% !important;
-    height: 170px !important;
-  }
-}
-
-/* ==========================================================================
-   REQUEST MODAL & TOAST NOTIFICATIONS
-   ========================================================================== */
+/* Modal Window */
 .request-modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -863,3 +694,149 @@ body {
   bottom: 25px;
 }
 
+/* ==========================================================================
+   PC DESKTOP MODE OVERRIDES (UNIFORM BIGGER POSTER SIZING ACROSS HOMEPAGE)
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .top-nav {
+    padding: 18px 40px;
+  }
+
+  .brand-logo-img {
+    height: 40px;
+    width: 40px;
+  }
+
+  .brand-title-text {
+    font-size: 1.8rem;
+  }
+
+  .search-overlay-bar {
+    max-width: 1050px !important;
+    width: 100% !important;
+  }
+
+  .search-input-wrapper {
+    padding: 12px 24px !important;
+    border-radius: 28px !important;
+  }
+
+  .search-input-wrapper input {
+    font-size: 1.1rem !important;
+  }
+
+  .hero-wrapper {
+    height: 75vh !important;
+    max-height: 720px;
+  }
+
+  .hero-title-text {
+    font-size: 3.2rem;
+  }
+
+  .content-section {
+    padding: 0 40px 36px 40px;
+  }
+
+  .section-header-title {
+    font-size: 1.65rem;
+  }
+
+  /* Make all Homepage Horizontal Scrolls & Grids (Top Picks, Tagalog, All Movies) match Category size (210px x 315px) */
+  .top-picks-scroll .poster-card,
+  .horizontal-scroll .poster-card,
+  .poster-card {
+    flex: 0 0 210px !important;
+    width: 210px !important;
+    height: 315px !important;
+  }
+
+  /* Scale AI Reels & Shorts Posters on Homepage PC Mode to Match Height */
+  .reels-horizontal-scroll {
+    min-height: 315px !important;
+  }
+
+  .reels-horizontal-scroll .reel-thumb-card {
+    flex: 0 0 210px !important;
+    width: 210px !important;
+    height: 315px !important;
+  }
+
+  .reel-thumb-title {
+    font-size: 0.88rem !important;
+  }
+
+  .main-grid {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important;
+    gap: 24px !important;
+  }
+
+  .poster-card-title {
+    font-size: 0.88rem;
+  }
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 600px) {
+  .top-nav {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .search-overlay-bar {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .category-page-wrapper {
+    padding: 140px 14px 24px 14px !important;
+  }
+
+  .category-main-title {
+    font-size: 1.4rem;
+  }
+
+  .hero-wrapper {
+    height: 42vh !important;
+    min-height: 280px;
+  }
+
+  .content-section {
+    padding: 0 12px 20px 12px;
+  }
+
+  .reels-grid-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .reels-grid-container .reel-thumb-card {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  .main-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .main-grid .poster-card {
+    width: 100% !important;
+    height: 175px !important;
+  }
+
+  .page-nav-btn {
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .page-btn {
+    min-width: 36px !important;
+    height: 36px !important;
+    font-size: 0.82rem !important;
+  }
+}
