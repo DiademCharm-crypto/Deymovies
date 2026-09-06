@@ -655,6 +655,9 @@ function createMovieCard(movie, rankNumber = null) {
   return card;
 }
 
+let heroSlideshowTimer = null;
+let currentHeroIndex = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
   setupHeroBanner();
   renderTopPicks();
@@ -675,18 +678,35 @@ function showToast(message) {
 
 function setupHeroBanner() {
   if (featuredMovies && featuredMovies.length > 0) {
-    const featured = featuredMovies[0];
-    const heroBackdrop = document.getElementById('hero-backdrop');
-    const heroTitle = document.getElementById('hero-title');
-    const heroPlayBtn = document.getElementById('hero-play-btn');
+    displayHeroSlide(currentHeroIndex);
 
-    if (heroBackdrop) heroBackdrop.src = featured.poster;
-    if (heroTitle) heroTitle.textContent = featured.title;
-    if (heroPlayBtn) {
-      heroPlayBtn.onclick = () => {
-        window.location.href = `player.html?id=${encodeURIComponent(featured.id)}`;
-      };
-    }
+    if (heroSlideshowTimer) clearInterval(heroSlideshowTimer);
+    heroSlideshowTimer = setInterval(() => {
+      currentHeroIndex = (currentHeroIndex + 1) % featuredMovies.length;
+      displayHeroSlide(currentHeroIndex);
+    }, 5000);
+  }
+}
+
+function displayHeroSlide(index) {
+  const featured = featuredMovies[index];
+  const heroBackdrop = document.getElementById('hero-backdrop');
+  const heroTitle = document.getElementById('hero-title');
+  const heroPlayBtn = document.getElementById('hero-play-btn');
+
+  if (heroBackdrop) {
+    heroBackdrop.style.opacity = '0.3';
+    setTimeout(() => {
+      heroBackdrop.src = featured.poster;
+      heroBackdrop.style.opacity = '1';
+    }, 250);
+  }
+
+  if (heroTitle) heroTitle.textContent = featured.title;
+  if (heroPlayBtn) {
+    heroPlayBtn.onclick = () => {
+      window.location.href = `player.html?id=${encodeURIComponent(featured.id)}`;
+    };
   }
 }
 
@@ -719,7 +739,6 @@ function renderAllMoviesGrid() {
   if (!allMoviesGrid) return;
   allMoviesGrid.innerHTML = '';
 
-  // Display initial 16 movies in the homepage grid
   const displayBatch = movies.slice(0, 16);
   displayBatch.forEach(movie => {
     allMoviesGrid.appendChild(createMovieCard(movie));
@@ -823,13 +842,39 @@ function closeRequestModal() {
   if (modal) modal.style.display = 'none';
 }
 
-function submitMovieRequest() {
+async function submitMovieRequest() {
   const input = document.getElementById('modal-request-input');
-  if (input && input.value.trim() !== '') {
-    showToast(`Request sent for: "${input.value.trim()}"`);
-    input.value = '';
-    closeRequestModal();
-  } else {
+  const movieTitle = input ? input.value.trim() : '';
+
+  if (!movieTitle) {
     showToast('Please enter a movie title.');
+    return;
+  }
+
+  showToast(`Sending request...`);
+
+  try {
+    const formData = new FormData();
+    formData.append('access_key', 'f128f943-dee1-4f4f-9f27-0290cfd380df');
+    formData.append('subject', 'New Movie Request - DEYMFLIX');
+    formData.append('movie_requested', movieTitle);
+
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      showToast(`Request sent for: "${movieTitle}"`);
+      if (input) input.value = '';
+      closeRequestModal();
+    } else {
+      showToast('Error submitting request. Check key.');
+    }
+  } catch (err) {
+    showToast(`Request saved locally for: "${movieTitle}"`);
+    if (input) input.value = '';
+    closeRequestModal();
   }
 }

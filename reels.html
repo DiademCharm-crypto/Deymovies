@@ -6,23 +6,36 @@
   <title>DEYMFLIX - Reels</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=54.0">
+  <link rel="stylesheet" href="style.css?v=57.0">
 
   <style>
+    /* PREVENT SELECTION AND TOUCH CALLOUTS GLOBALLY */
+    * {
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      -khtml-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      box-sizing: border-box;
+    }
+
     body {
       background-color: #050505;
       margin: 0;
       padding: 0;
       overflow: hidden;
       height: 100vh;
+      height: 100dvh;
       width: 100vw;
-      user-select: none;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .reels-feed-container {
       width: 100%;
       height: 100vh;
+      height: 100dvh;
       overflow-y: scroll;
       scroll-snap-type: y mandatory;
       scrollbar-width: none;
@@ -32,11 +45,12 @@
       display: none;
     }
 
-    /* REEL CARD CONTAINER - HANDLES PC ASPECT RATIO */
+    /* REEL CARD CONTAINER */
     .reel-card {
       position: relative;
       width: 100%;
       height: 100vh;
+      height: 100dvh;
       scroll-snap-align: start;
       scroll-snap-stop: always;
       background: #000;
@@ -46,15 +60,16 @@
       overflow: hidden;
     }
 
-    /* PC MODE FRAME CONTAINER - PREVENTS STRETCHING */
+    /* PC MODE FRAME CONTAINER */
     .reel-frame {
       position: relative;
       width: 100%;
       height: 100%;
-      max-width: calc(100vh * (9 / 16)); /* Strict 9:16 Portrait Ratio */
+      max-width: calc(100dvh * (9 / 16));
       background: #000;
       overflow: hidden;
       box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+      touch-action: manipulation;
     }
 
     .reel-video {
@@ -62,15 +77,16 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none !important;
     }
 
-    /* TOP HEADER - ALWAYS VISIBLE IN CLEAR MODE */
+    /* TOP HEADER */
     .reels-top-nav {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      padding: 16px 20px;
+      padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -93,7 +109,6 @@
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
 
-    /* REDUCED SMALLER TOP TITLE */
     .reels-header-title {
       font-weight: 700;
       font-size: 0.9rem;
@@ -106,11 +121,11 @@
       max-width: 80%;
     }
 
-    /* SIDE ACTION BUTTONS - FADES IN CLEAR MODE */
+    /* SIDE ACTION BUTTONS */
     .reels-actions-side {
       position: absolute;
       right: 16px;
-      bottom: 90px;
+      bottom: calc(120px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -162,7 +177,7 @@
     /* BOTTOM INFO SECTION */
     .reel-info-bottom {
       position: absolute;
-      bottom: 24px;
+      bottom: calc(50px + env(safe-area-inset-bottom));
       left: 16px;
       right: 80px;
       z-index: 90;
@@ -175,7 +190,7 @@
     }
 
     .reel-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       line-height: 1.35;
       color: #ffffff;
@@ -224,39 +239,31 @@
       backdrop-filter: blur(6px);
     }
 
-    /* BUFFERING PROGRESS BAR */
-    .reel-buffering-bar {
+    /* CIRCULAR BUFFER SPINNER IN CENTER OF SCREEN */
+    .reel-circular-spinner {
       position: absolute;
-      bottom: 4px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: rgba(255, 255, 255, 0.2);
-      z-index: 80;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #e50914;
+      border-radius: 50%;
+      z-index: 85;
       display: none;
-      overflow: hidden;
+      animation: spinCircle 0.8s linear infinite;
     }
 
-    .reel-buffering-bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -50%;
-      width: 50%;
-      height: 100%;
-      background: #e50914;
-      animation: bufferAnim 1.2s infinite linear;
-    }
-
-    @keyframes bufferAnim {
-      0% { left: -50%; }
-      100% { left: 100%; }
+    @keyframes spinCircle {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
     /* BOTTOM PLAYBACK PROGRESS BAR */
     .reel-progress-track {
       position: absolute;
-      bottom: 0;
+      bottom: env(safe-area-inset-bottom, 0px);
       left: 0;
       width: 100%;
       height: 4px;
@@ -311,19 +318,21 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
   <!-- Vertical Scroll Feed -->
   <div class="reels-feed-container" id="reelsContainer"></div>
 
   <!-- Shared Reels Data File -->
-  <script src="reels-data.js?v=54.0"></script>
+  <script src="reels-data.js?v=57.0"></script>
   <script>
     const reelsContainer = document.getElementById('reelsContainer');
     let clearModeTimer = null;
     let speedHoldTimer = null;
     let isLongPressing = false;
     let activeCardIndex = 0;
+
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
 
     function renderReels() {
       reelsContainer.innerHTML = '';
@@ -345,8 +354,8 @@
               2x Speed
             </div>
 
-            <!-- Buffering Loading Bar -->
-            <div class="reel-buffering-bar" id="buffer-${index}"></div>
+            <!-- Circular Buffering Spinner -->
+            <div class="reel-circular-spinner" id="circle-spinner-${index}"></div>
 
             <!-- Persistent Top Header (< Title) -->
             <header class="reels-top-nav">
@@ -397,7 +406,6 @@
       });
     }
 
-    /* UPDATED FORMAT TIME FUNCTION (HOURS:MINUTES:SECONDS) */
     function formatTime(seconds) {
       if (isNaN(seconds)) return "00:00:00";
       const hrs = Math.floor(seconds / 3600);
@@ -415,23 +423,22 @@
       const video = card.querySelector('.reel-video');
       const frame = card.querySelector('.reel-frame');
       const indicator = card.querySelector('.play-pause-indicator');
-      const bufferBar = card.querySelector(`#buffer-${index}`);
+      const circleSpinner = card.querySelector(`#circle-spinner-${index}`);
       const progressBar = card.querySelector(`#progress-${index}`);
       const timeDisplay = card.querySelector(`#time-${index}`);
       const speedBadge = card.querySelector(`#speed-badge-${index}`);
 
       let lastTap = 0;
 
-      // Buffering Events
+      // CIRCULAR SPINNER BUFFER EVENTS
       video.addEventListener('waiting', () => {
-        if (bufferBar) bufferBar.style.display = 'block';
+        if (circleSpinner) circleSpinner.style.display = 'block';
       });
 
       video.addEventListener('playing', () => {
-        if (bufferBar) bufferBar.style.display = 'none';
+        if (circleSpinner) circleSpinner.style.display = 'none';
       });
 
-      // Update Time & Progress
       video.addEventListener('timeupdate', () => {
         if (!isNaN(video.duration)) {
           const pct = (video.currentTime / video.duration) * 100;
@@ -440,13 +447,13 @@
         }
       });
 
-      // LONG PRESS 2X SPEED LOGIC
-      function startSpeedUp() {
+      function startSpeedUp(e) {
+        if (e.cancelable) e.preventDefault();
         speedHoldTimer = setTimeout(() => {
           isLongPressing = true;
           video.playbackRate = 2.0;
           if (speedBadge) speedBadge.style.display = 'flex';
-        }, 250);
+        }, 220);
       }
 
       function stopSpeedUp() {
@@ -462,14 +469,13 @@
       frame.addEventListener('mouseup', stopSpeedUp);
       frame.addEventListener('mouseleave', stopSpeedUp);
 
-      frame.addEventListener('touchstart', startSpeedUp, { passive: true });
+      frame.addEventListener('touchstart', startSpeedUp, { passive: false });
       frame.addEventListener('touchend', stopSpeedUp);
+      frame.addEventListener('touchcancel', stopSpeedUp);
 
-      // RESET CLEAR MODE ON INTERACTION
       frame.addEventListener('mousemove', resetClearModeTimer);
       frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
 
-      // CLICK / TAP CONTROLS & DOUBLE TAP LIKE
       card.addEventListener('click', (e) => {
         if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav')) return;
 
@@ -497,7 +503,6 @@
       });
     }
 
-    // CLEAR MODE 2-SECOND FADE LOGIC
     function resetClearModeTimer() {
       const activeFrame = document.getElementById(`frame-${activeCardIndex}`);
       if (!activeFrame) return;

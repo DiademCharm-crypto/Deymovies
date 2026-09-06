@@ -10,21 +10,23 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=120.0">
+  <link rel="stylesheet" href="style.css?v=127.0">
 
   <style>
     .category-page-wrapper {
-      padding: 85px 20px 40px 20px;
+      padding: 85px 16px 40px 16px;
       width: 100%;
       box-sizing: border-box;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Fixed Flow Structure to prevent overlap */
     .category-header-flow {
       display: flex;
       flex-direction: column;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       position: relative;
     }
 
@@ -59,10 +61,73 @@
 
     .reels-grid-container {
       display: grid !important;
-      grid-template-columns: repeat(auto-fill, 140px) !important;
-      justify-content: space-between !important;
-      gap: 14px !important;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+      gap: 16px !important;
       width: 100% !important;
+      flex: 1;
+    }
+
+    .reel-thumb-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #181818;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .reel-thumb-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .reel-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .reel-overlay-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 8px 8px 8px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.9) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .reel-badge-tag {
+      background: #e50914;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 3px;
+      width: fit-content;
+    }
+
+    .reel-thumb-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pagination-container {
+      margin-top: 30px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
     }
 
     @media (min-width: 1024px) {
@@ -80,18 +145,28 @@
       .category-title-text {
         font-size: 2.2rem;
       }
+
+      .reels-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 20px !important;
+      }
     }
 
     @media (max-width: 600px) {
       .category-page-wrapper {
-        padding-top: 80px;
+        padding: 75px 10px 30px 10px;
+      }
+
+      .reels-grid-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Fixed Top Header Navigation -->
+  <!-- Top Header Navigation -->
   <header class="top-nav">
     <a href="index.html" class="brand-logo-link">
       <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
@@ -102,9 +177,8 @@
     </div>
   </header>
 
-  <!-- Category Main Container -->
+  <!-- Category Container -->
   <div class="category-page-wrapper">
-    <!-- Non-overlapping Static Layout Flow -->
     <div class="category-header-flow">
       <div class="category-inline-search">
         <form id="category-search-form" onsubmit="event.preventDefault();">
@@ -119,7 +193,7 @@
     <!-- Movie / Reel Content Grid -->
     <div class="main-grid" id="category-movies-grid"></div>
 
-    <!-- 25 Posters Per Page Pagination Controls -->
+    <!-- Pagination Controls -->
     <div class="pagination-container" id="category-pagination" style="display: flex;">
       <button id="cat-prev-btn" class="page-nav-btn" onclick="changeCategoryPage(-1)">Previous</button>
       <div id="cat-page-numbers" class="page-numbers-group"></div>
@@ -142,8 +216,8 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="reels-data.js?v=120.0"></script>
-  <script src="app.js?v=120.0"></script>
+  <script src="reels-data.js?v=127.0"></script>
+  <script src="app.js?v=127.0"></script>
   <script>
     let activeCategoryList = [];
     let currentPage = 1;
@@ -272,7 +346,7 @@
 
         if (query.length > 0) {
           const filtered = activeCategoryList.filter(item => item.title.toLowerCase().includes(query));
-          
+
           const suggestions = filtered.slice(0, 5);
           if (suggestions.length > 0 && suggestionsBox) {
             suggestionsBox.innerHTML = '';
