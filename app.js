@@ -876,7 +876,7 @@ function renderContinueWatching() {
     };
 
     card.innerHTML = `
-      <button class="remove-continue-btn" onclick="removeContinueWatching('${item.id}', event)" title="Remove">&times;</button>
+      <button class="remove-continue-btn" title="Remove">&times;</button>
       <img src="${item.poster}" alt="${item.title}" loading="lazy">
       <div class="poster-card-overlay">
         <div class="poster-card-title">${item.title}</div>
@@ -885,6 +885,16 @@ function renderContinueWatching() {
         <div style="width: ${item.progress}%; height: 100%; background: #e50914;"></div>
       </div>
     `;
+
+    // Remove button wired via closure so movie ids/titles containing
+    // apostrophes can never break the handler (inline onclick strings would).
+    const removeBtn = card.querySelector('.remove-continue-btn');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', (e) => {
+        removeContinueWatching(item.id, e);
+      });
+    }
+
     container.appendChild(card);
   });
 }
