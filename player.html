@@ -13,7 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=128.0">
+  <link rel="stylesheet" href="style.css?v=140.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -997,7 +997,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=128.0"></script>
+  <script src="app.js?v=140.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -1532,7 +1532,6 @@
     playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
 
     function showLoadingSpinner() {
-      // Only show spinner if the video hasn't loaded data yet or is genuinely stuck
       if (directPlayer.readyState < 3 && directPlayer.paused) {
         loadingSpinner.style.display = 'flex';
         centerControlsGroup.style.setProperty('display', 'none', 'important');
@@ -1585,13 +1584,21 @@
     directPlayer.addEventListener('waiting', startSlowConnectionCheck);
     directPlayer.addEventListener('stalled', startSlowConnectionCheck);
     directPlayer.addEventListener('seeking', showLoadingSpinner);
-    
-    // Instantly clear loader once ready or playing
+
     directPlayer.addEventListener('canplay', hideLoadingSpinner);
     directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
+    
+    // Auto-resume playback from saved point on load
     directPlayer.addEventListener('loadedmetadata', () => {
       hideLoadingSpinner();
       totalDurationText.textContent = formatTime(directPlayer.duration);
+
+      const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+      const existingProgress = savedData[currentMovie.id];
+
+      if (existingProgress && existingProgress.progress < 95) {
+        directPlayer.currentTime = existingProgress.currentTime;
+      }
     });
 
     directPlayer.addEventListener('playing', () => {
@@ -1605,6 +1612,7 @@
       updatePlayStateUI(true);
     });
 
+    // Save playback progress to localStorage continuously
     directPlayer.addEventListener('timeupdate', () => {
       if (!isNaN(directPlayer.duration)) {
         const currentTime = directPlayer.currentTime;
@@ -1612,6 +1620,20 @@
         seekbar.value = pct;
         updateSeekbarBackground(pct);
         currentTimeText.textContent = formatTime(currentTime);
+
+        if (currentTime > 5) {
+          const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+          savedData[currentMovie.id] = {
+            id: currentMovie.id,
+            title: currentMovie.title,
+            poster: currentMovie.poster,
+            currentTime: currentTime,
+            duration: directPlayer.duration,
+            progress: pct,
+            updatedAt: Date.now()
+          };
+          localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
+        }
 
         if (parsedSubtitleCues.length > 0) {
           const activeCue = parsedSubtitleCues.find(cue => currentTime >= cue.start && currentTime <= cue.end);

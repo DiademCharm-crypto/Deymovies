@@ -73,32 +73,3 @@ const aiReelsData = [
     likes: "12.4K"
   }
 ];
-
-function renderAIReelsRow() {
-  const container = document.getElementById('ai-reels-container');
-  if (!container || !Array.isArray(aiReelsData)) return;
-  container.innerHTML = '';
-
-  aiReelsData.forEach((reel) => {
-    const card = document.createElement('div');
-    card.className = 'reel-thumb-card';
-    card.onclick = () => {
-      window.location.href = `reels.html?id=${encodeURIComponent(reel.id)}`;
-    };
-
-    card.innerHTML = `
-      <img class="reel-thumb-img" src="${reel.poster}" alt="${reel.title}">
-      <div class="reel-overlay-info">
-        <span class="reel-badge-tag">AI REEL</span>
-        <span class="reel-thumb-title">${reel.title}</span>
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', renderAIReelsRow);
-} else {
-  renderAIReelsRow();
-}

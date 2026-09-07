@@ -55,7 +55,7 @@ const movies = [
   },
   { 
     id: "Call Me Mother", 
-    tmdbId: "1510688",
+    tmdbId: "1510689",
     title: "Call Me Mother", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
@@ -63,7 +63,7 @@ const movies = [
   },
   { 
     id: "Almost Us", 
-    tmdbId: "1510688",
+    tmdbId: "1510690",
     title: "Almost Us", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gQurSKUKrCFHa90ydVJRtSMyjLB.jpg",
@@ -280,21 +280,21 @@ const movies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/nVq1Dn88NzVIVTDpGZeP7fxpLa1.jpg"
   },
   { 
-    id: "The Weightmovie-32", 
+    id: "The Weight", 
     tmdbId: "1433583",
     title: "The Weight", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/8i5iZV50CoEtmDCFM7RSxCkpE8h.jpg"
   },
   { 
-    id: "The Mongooose", 
+    id: "The Mongoose", 
     tmdbId: "1294189",
-    title: "The Mongooose", 
+    title: "The Mongoose", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg"
   },
   { 
-    id: "The Gentleman Theif", 
+    id: "The Gentleman Thief", 
     tmdbId: "1458215",
-    title: "The Gentleman Theif", 
+    title: "The Gentleman Thief", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/oMutDMODnbCZf46w0dK4wncQmDB.jpg"
   },
   { 
@@ -512,9 +512,9 @@ const movies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/mE9E4nsGM91Cf4b1s6nOOdUAE9P.jpg"
   },
   { 
-    id: "The Isolate Theif", 
+    id: "The Isolate Thief", 
     tmdbId: "1404304",
-    title: "The Isolate Theif", 
+    title: "The Isolate Thief", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gmmCh2BvTKp0YGT2FYG0eOQJELi.jpg"
   },
   { 
@@ -597,7 +597,7 @@ const movies = [
   },
   { 
     id: "Neglected", 
-    tmdbId: "1185806",
+    tmdbId: "1185807",
     title: "Neglected", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/A0gqKFmJ7OArcFob49PErNvzN66.jpg"
   },
@@ -659,6 +659,7 @@ let heroCarouselTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   setupHeroBanner();
+  renderContinueWatching();
   renderTopPicks();
   renderAiReels();
   renderFilipinoMovies();
@@ -676,7 +677,58 @@ function showToast(message) {
   }, 2000);
 }
 
-// User-Scrollable and Auto-Scrolling Hero Billboard Track
+function renderContinueWatching() {
+  const section = document.getElementById('continue-watching-section');
+  const container = document.getElementById('continue-watching-container');
+  if (!section || !container) return;
+
+  const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  const items = Object.values(savedData)
+    .filter(item => item.progress < 95)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+
+  if (items.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  container.innerHTML = '';
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'poster-card';
+    card.style.position = 'relative';
+
+    card.onclick = () => {
+      window.location.href = `player.html?id=${encodeURIComponent(item.id)}`;
+    };
+
+    card.innerHTML = `
+      <button class="remove-continue-btn" onclick="removeContinueWatching('${item.id}', event)" title="Remove">&times;</button>
+      <img src="${item.poster}" alt="${item.title}" loading="lazy">
+      <div class="poster-card-overlay">
+        <div class="poster-card-title">${item.title}</div>
+      </div>
+      <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.2); z-index: 10;">
+        <div style="width: ${item.progress}%; height: 100%; background: #e50914;"></div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function removeContinueWatching(movieId, event) {
+  event.stopPropagation();
+
+  const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  delete savedData[movieId];
+
+  localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
+  renderContinueWatching();
+  showToast('Removed from Continue Watching');
+}
+
 function setupHeroBanner() {
   const heroWrapper = document.getElementById('hero-billboard-wrapper') || document.querySelector('.hero-wrapper');
   if (!heroWrapper || !featuredMovies || featuredMovies.length === 0) return;

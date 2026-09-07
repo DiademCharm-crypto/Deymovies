@@ -8,6 +8,10 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css?v=130.0">
 
+  <!-- FIREBASE COMPAT SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     * {
       -webkit-touch-callout: none !important;
@@ -83,29 +87,31 @@
       padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      z-index: 100;
-      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-      pointer-events: auto;
+      gap: 12px;
+      z-index: 150;
+      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+      pointer-events: auto !important;
     }
 
     .reels-back-btn {
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
       cursor: pointer;
-      padding: 0;
+      padding: 6px 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      pointer-events: auto !important;
+      z-index: 160;
     }
 
     .reels-header-title {
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: rgba(255, 255, 255, 0.9);
       letter-spacing: 0.3px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
@@ -113,6 +119,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 80%;
+      pointer-events: none;
     }
 
     .reels-actions-side {
@@ -123,7 +130,8 @@
       flex-direction: column;
       gap: 20px;
       align-items: center;
-      z-index: 90;
+      z-index: 150;
+      pointer-events: auto !important;
       transition: opacity 0.5s ease;
     }
 
@@ -136,6 +144,7 @@
       background: transparent;
       border: none;
       outline: none;
+      pointer-events: auto !important;
     }
 
     .reel-action-btn {
@@ -150,6 +159,7 @@
       margin-bottom: 4px;
       border: 1px solid rgba(255, 255, 255, 0.15);
       transition: transform 0.2s ease, background 0.2s ease;
+      pointer-events: auto !important;
     }
 
     .reel-action-btn.liked svg {
@@ -161,6 +171,7 @@
       font-size: 0.75rem;
       font-weight: 700;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      pointer-events: none;
     }
 
     .reel-info-bottom {
@@ -174,6 +185,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      pointer-events: none;
       transition: opacity 0.5s ease;
     }
 
@@ -223,6 +235,7 @@
       align-items: center;
       gap: 6px;
       backdrop-filter: blur(6px);
+      pointer-events: none;
     }
 
     .reel-circular-spinner {
@@ -238,6 +251,7 @@
       z-index: 85;
       display: none;
       animation: spinCircle 0.8s linear infinite;
+      pointer-events: none;
     }
 
     @keyframes spinCircle {
@@ -250,9 +264,10 @@
       bottom: env(safe-area-inset-bottom, 0px);
       left: 0;
       width: 100%;
-      height: 4px;
+      height: 6px;
       background: rgba(255, 255, 255, 0.25);
       z-index: 100;
+      cursor: pointer;
     }
 
     .reel-progress-fill {
@@ -292,7 +307,7 @@
       width: 80px;
       height: 80px;
       pointer-events: none;
-      z-index: 85;
+      z-index: 180;
       transform: translate(-50%, -50%) scale(0);
       animation: heartPop 0.8s ease-out forwards;
     }
@@ -302,22 +317,201 @@
       50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.9; }
       100% { transform: translate(-50%, -50%) scale(1) translateY(-60px); opacity: 0; }
     }
+
+    /* COMMENTS DRAWER MODAL */
+    .comments-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      display: none;
+    }
+
+    .comments-drawer-container {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      height: 60vh;
+      max-height: 520px;
+      background: #121212;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 210;
+      display: flex;
+      flex-direction: column;
+      transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
+      padding: 16px;
+    }
+
+    .comments-drawer-container.open {
+      bottom: 0;
+    }
+
+    .comments-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #262626;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .comments-close-btn {
+      background: transparent;
+      border: none;
+      color: #aaa;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .comments-body-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comment-card-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+
+    .comment-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .comment-author {
+      color: #e50914;
+      font-weight: 800;
+    }
+
+    .comment-text-body {
+      color: #ffffff;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .comment-actions-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .comment-action-btn {
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 0.72rem;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+
+    .comment-action-btn:hover {
+      color: #fff;
+    }
+
+    .comment-action-btn.delete:hover {
+      color: #e50914;
+    }
+
+    .comments-footer-input {
+      display: flex;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #262626;
+    }
+
+    .comments-footer-input input {
+      flex: 1;
+      background: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: #fff;
+      outline: none;
+      font-size: 0.88rem;
+    }
+
+    .comments-footer-input button {
+      background: #e50914;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
   <div class="reels-feed-container" id="reelsContainer"></div>
 
+  <!-- COMMENTS DRAWER MODAL -->
+  <div class="comments-drawer-backdrop" id="commentsBackdrop" onclick="closeCommentsModal()"></div>
+  <div class="comments-drawer-container" id="commentsContainer">
+    <div class="comments-header">
+      <span id="commentsHeaderCount">Comments (0)</span>
+      <button class="comments-close-btn" onclick="closeCommentsModal()">&times;</button>
+    </div>
+    <div class="comments-body-list" id="commentsList"></div>
+    <div class="comments-footer-input">
+      <input type="text" id="newCommentInput" placeholder="Add a comment...">
+      <button onclick="submitNewComment()">Post</button>
+    </div>
+  </div>
+
   <script src="reels-data.js?v=130.0"></script>
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCSejdiwh4Y6N6Pwl6QyLXPNYdUqz8vc1M",
+      authDomain: "deymflix.firebaseapp.com",
+      projectId: "deymflix",
+      storageBucket: "deymflix.firebasestorage.app",
+      messagingSenderId: "333198075783",
+      appId: "1:333198075783:web:91765cf2f3c09e3c119522",
+      measurementId: "G-H8KMTM5YYH"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentUserId = localStorage.getItem('deymflix_user_id');
+    if (!currentUserId) {
+      currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('deymflix_user_id', currentUserId);
+    }
+
     const reelsContainer = document.getElementById('reelsContainer');
     let historySequence = [];
     let activeCardIndex = 0;
     let clearModeTimer = null;
     let speedHoldTimer = null;
     let isLongPressing = false;
+    let currentActiveReelId = null;
+    let unsubscribeComments = null;
 
     document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function goBackToHome(e) {
+      if (e) e.stopPropagation();
+      window.location.href = 'index.html';
+    }
 
     function initReelHistory() {
       const list = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
@@ -360,11 +554,19 @@
       observeReelCards();
     }
 
+    function formatLikesValue(num) {
+      if (!num) return "0";
+      return num >= 1000 ? `${(num / 1000).toFixed(1)}K` : num.toString();
+    }
+
     function createReelCardElement(reel, index) {
       const reelCard = document.createElement('div');
       reelCard.className = 'reel-card';
       reelCard.dataset.id = reel.id;
       reelCard.dataset.index = index;
+
+      const userLikedKey = `liked_${reel.id}_${currentUserId}`;
+      const isUserLiked = localStorage.getItem(userLikedKey) === "true";
 
       reelCard.innerHTML = `
         <div class="reel-frame" id="frame-${index}">
@@ -378,7 +580,7 @@
           <div class="reel-circular-spinner" id="circle-spinner-${index}"></div>
 
           <header class="reels-top-nav">
-            <button class="reels-back-btn" onclick="window.location.href='index.html'">❮</button>
+            <button class="reels-back-btn" onclick="goBackToHome(event)" ontouchstart="goBackToHome(event)">❮</button>
             <span class="reels-header-title">${reel.title}</span>
           </header>
 
@@ -388,12 +590,21 @@
 
           <div class="reels-actions-side fade-clear-mode">
             <button class="reel-action-item" onclick="toggleLike(this, event)">
-              <div class="reel-action-btn">
+              <div class="reel-action-btn ${isUserLiked ? 'liked' : ''}" id="like-btn-${index}">
                 <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
               </div>
-              <span class="reel-action-count">${reel.likes || '12.4K'}</span>
+              <span class="reel-action-count" id="like-count-${index}">0</span>
+            </button>
+
+            <button class="reel-action-item" onclick="openCommentsModal('${reel.id}', event)">
+              <div class="reel-action-btn">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <span class="reel-action-count" id="comment-count-${reel.id}">0</span>
             </button>
 
             <button class="reel-action-item" onclick="shareReel('${reel.title}', event)">
@@ -418,6 +629,7 @@
       `;
 
       setupReelCardListeners(reelCard, index);
+      listenToReelStats(reel.id, index);
       return reelCard;
     }
 
@@ -444,6 +656,7 @@
       const speedBadge = card.querySelector(`#speed-badge-${index}`);
 
       let lastTap = 0;
+      let touchStartX = 0;
 
       video.addEventListener('waiting', () => {
         if (circleSpinner) circleSpinner.style.display = 'block';
@@ -462,6 +675,7 @@
       });
 
       function startSpeedUp(e) {
+        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav')) return;
         if (e.cancelable) e.preventDefault();
         speedHoldTimer = setTimeout(() => {
           isLongPressing = true;
@@ -483,28 +697,45 @@
       frame.addEventListener('mouseup', stopSpeedUp);
       frame.addEventListener('mouseleave', stopSpeedUp);
 
-      frame.addEventListener('touchstart', startSpeedUp, { passive: false });
+      frame.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
+        startSpeedUp(e);
+      }, { passive: false });
+
       frame.addEventListener('touchend', stopSpeedUp);
       frame.addEventListener('touchcancel', stopSpeedUp);
+
+      frame.addEventListener('touchmove', (e) => {
+        if (e.touches.length !== 1 || isNaN(video.duration)) return;
+        const deltaX = e.touches[0].clientX - touchStartX;
+
+        if (Math.abs(deltaX) > 20) {
+          touchStartX = e.touches[0].clientX;
+          video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + (deltaX * 0.05)));
+        }
+      }, { passive: true });
 
       frame.addEventListener('mousemove', resetClearModeTimer);
       frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
 
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav')) return;
+        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.comments-drawer-container')) return;
 
         const now = Date.now();
         const tapGap = now - lastTap;
 
         if (tapGap < 300 && tapGap > 0) {
           triggerHeartAnimation(card, e.clientX, e.clientY);
-          const likeBtn = card.querySelector('.reel-action-btn');
-          if (likeBtn) likeBtn.classList.add('liked');
+          const likeActionItem = card.querySelector('.reel-action-item');
+          const btn = card.querySelector(`#like-btn-${index}`);
+          if (!btn.classList.contains('liked')) {
+            toggleLike(likeActionItem, e);
+          }
         } else {
           setTimeout(() => {
             if (Date.now() - lastTap >= 300 && !isLongPressing) {
               if (video.paused) {
-                video.play();
+                video.play().catch(() => {});
                 showIndicator(indicator, false);
               } else {
                 video.pause();
@@ -551,14 +782,142 @@
       setTimeout(() => heart.remove(), 800);
     }
 
+    function listenToReelStats(reelId, index) {
+      db.collection('reels').doc(reelId).onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          const countLabel = document.getElementById(`like-count-${index}`);
+          if (countLabel) countLabel.textContent = formatLikesValue(data.likes || 0);
+        }
+      });
+    }
+
     function toggleLike(button, e) {
-      e.stopPropagation();
-      const btn = button.querySelector('.reel-action-btn');
-      btn.classList.toggle('liked');
+      if (e) e.stopPropagation();
+      const card = button.closest('.reel-card');
+      const reelId = card.dataset.id;
+      const index = card.dataset.index;
+      const btn = card.querySelector(`#like-btn-${index}`);
+
+      const userLikedKey = `liked_${reelId}_${currentUserId}`;
+      const isCurrentlyLiked = btn.classList.contains('liked');
+
+      if (!isCurrentlyLiked) {
+        btn.classList.add('liked');
+        localStorage.setItem(userLikedKey, "true");
+      } else {
+        btn.classList.remove('liked');
+        localStorage.setItem(userLikedKey, "false");
+      }
+
+      const reelRef = db.collection('reels').doc(reelId);
+      db.runTransaction((transaction) => {
+        return transaction.get(reelRef).then((doc) => {
+          if (!doc.exists) {
+            transaction.set(reelRef, { likes: isCurrentlyLiked ? 0 : 1 });
+          } else {
+            const currentLikes = doc.data().likes || 0;
+            const newLikes = !isCurrentlyLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
+            transaction.update(reelRef, { likes: newLikes });
+          }
+        });
+      });
+    }
+
+    function openCommentsModal(reelId, e) {
+      if (e) e.stopPropagation();
+      currentActiveReelId = reelId;
+
+      document.getElementById('commentsBackdrop').style.display = 'block';
+      document.getElementById('commentsContainer').classList.add('open');
+
+      if (unsubscribeComments) unsubscribeComments();
+
+      unsubscribeComments = db.collection('reels')
+        .doc(reelId)
+        .collection('comments')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot((snapshot) => {
+          const container = document.getElementById('commentsList');
+          const headerCount = document.getElementById('commentsHeaderCount');
+          container.innerHTML = '';
+
+          headerCount.textContent = `Comments (${snapshot.size})`;
+
+          const commentBtnCount = document.getElementById(`comment-count-${reelId}`);
+          if (commentBtnCount) commentBtnCount.textContent = snapshot.size;
+
+          snapshot.forEach((doc) => {
+            const c = doc.data();
+            const commentId = doc.id;
+            const isOwner = c.userId === currentUserId;
+
+            const item = document.createElement('div');
+            item.className = 'comment-card-item';
+            item.innerHTML = `
+              <div class="comment-content">
+                <span class="comment-author">${c.user || 'User'} ${isOwner ? '(You)' : ''}</span>
+                <span class="comment-text-body" id="text-${commentId}">${c.text || ''}</span>
+              </div>
+              ${isOwner ? `
+                <div class="comment-actions-group">
+                  <button class="comment-action-btn" onclick="editComment('${commentId}', '${(c.text || '').replace(/'/g, "\\'")}')">Edit</button>
+                  <button class="comment-action-btn delete" onclick="deleteComment('${commentId}')">Delete</button>
+                </div>
+              ` : ''}
+            `;
+            container.appendChild(item);
+          });
+        });
+    }
+
+    function closeCommentsModal() {
+      document.getElementById('commentsBackdrop').style.display = 'none';
+      document.getElementById('commentsContainer').classList.remove('open');
+      if (unsubscribeComments) unsubscribeComments();
+    }
+
+    function submitNewComment() {
+      const input = document.getElementById('newCommentInput');
+      const text = input.value.trim();
+      if (!text || !currentActiveReelId) return;
+
+      db.collection('reels').doc(currentActiveReelId).collection('comments').add({
+        userId: currentUserId,
+        user: 'User_' + currentUserId.substr(-4),
+        text: text,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        input.value = '';
+      });
+    }
+
+    function editComment(commentId, oldText) {
+      const updatedText = prompt("Edit your comment:", oldText);
+      if (updatedText && updatedText.trim() !== "" && updatedText !== oldText) {
+        db.collection('reels')
+          .doc(currentActiveReelId)
+          .collection('comments')
+          .doc(commentId)
+          .update({
+            text: updatedText.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+      }
+    }
+
+    function deleteComment(commentId) {
+      if (confirm("Are you sure you want to delete this comment?")) {
+        db.collection('reels')
+          .doc(currentActiveReelId)
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+      }
     }
 
     function shareReel(title, e) {
-      e.stopPropagation();
+      if (e) e.stopPropagation();
       if (navigator.share) {
         navigator.share({ title: title, url: window.location.href }).catch(() => {});
       } else {
