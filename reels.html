@@ -679,7 +679,6 @@
         }
       });
 
-      /* INTERACTIVE SEEKBAR SCRUBBING */
       function seekVideoToPosition(e) {
         e.stopPropagation();
         if (isNaN(video.duration)) return;
@@ -693,7 +692,6 @@
       progressTrack.addEventListener('click', seekVideoToPosition);
       progressTrack.addEventListener('touchmove', seekVideoToPosition, { passive: true });
 
-      /* LONG PRESS 2X SPEED */
       function startSpeedUp(e) {
         if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.reel-progress-track')) return;
         speedHoldTimer = setTimeout(() => {
@@ -723,7 +721,6 @@
       frame.addEventListener('mousemove', resetClearModeTimer);
       frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
 
-      /* TAP TO PLAY/PAUSE & DOUBLE TAP TO HEART */
       card.addEventListener('click', (e) => {
         if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.comments-drawer-container') || e.target.closest('.reel-progress-track')) return;
 
@@ -788,7 +785,6 @@
       setTimeout(() => heart.remove(), 800);
     }
 
-    /* REALTIME FIRESTORE LISTENER & LIKE TRANSACTIONS */
     function listenToReelStats(reelId, index) {
       db.collection('reels').doc(reelId).onSnapshot((doc) => {
         const countLabel = document.getElementById(`like-count-${index}`);
@@ -833,7 +829,6 @@
       });
     }
 
-    /* REALTIME COMMENTS SYSTEM */
     function openCommentsModal(reelId, e) {
       if (e) e.stopPropagation();
       currentActiveReelId = reelId;
