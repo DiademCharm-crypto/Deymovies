@@ -68,7 +68,7 @@
       background: #000;
       overflow: hidden;
       box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-      touch-action: manipulation;
+      touch-action: pan-y;
     }
 
     .reel-video {
@@ -125,7 +125,7 @@
     .reels-actions-side {
       position: absolute;
       right: 16px;
-      bottom: calc(120px + env(safe-area-inset-bottom));
+      bottom: calc(90px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -176,23 +176,23 @@
 
     .reel-info-bottom {
       position: absolute;
-      bottom: calc(50px + env(safe-area-inset-bottom));
+      bottom: calc(30px + env(safe-area-inset-bottom));
       left: 16px;
       right: 80px;
-      z-index: 90;
+      z-index: 110;
       color: #fff;
       text-shadow: 0 2px 6px rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       pointer-events: none;
       transition: opacity 0.5s ease;
     }
 
     .reel-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
-      line-height: 1.35;
+      line-height: 1.3;
       color: #ffffff;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -202,10 +202,33 @@
     }
 
     .reel-timestamp {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #e50914;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    }
+
+    .reel-progress-track {
+      position: absolute;
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      left: 16px;
+      right: 16px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      z-index: 120;
+      cursor: pointer;
+      pointer-events: auto !important;
+      touch-action: none;
+    }
+
+    .reel-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #e50914;
+      border-radius: 4px;
+      transition: width 0.1s linear;
+      pointer-events: none;
     }
 
     .fade-clear-mode {
@@ -257,24 +280,6 @@
     @keyframes spinCircle {
       0% { transform: translate(-50%, -50%) rotate(0deg); }
       100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    .reel-progress-track {
-      position: absolute;
-      bottom: env(safe-area-inset-bottom, 0px);
-      left: 0;
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.25);
-      z-index: 100;
-      cursor: pointer;
-    }
-
-    .reel-progress-fill {
-      height: 100%;
-      width: 0%;
-      background: #e50914;
-      transition: width 0.1s linear;
     }
 
     .play-pause-indicator {
@@ -555,7 +560,7 @@
     }
 
     function formatLikesValue(num) {
-      if (!num) return "0";
+      if (!num && num !== 0) return "0";
       return num >= 1000 ? `${(num / 1000).toFixed(1)}K` : num.toString();
     }
 
@@ -622,7 +627,7 @@
             <div class="reel-timestamp" id="time-${index}">00:00:00 / 00:00:00</div>
           </div>
 
-          <div class="reel-progress-track">
+          <div class="reel-progress-track" id="track-${index}">
             <div class="reel-progress-fill" id="progress-${index}"></div>
           </div>
         </div>
@@ -652,11 +657,11 @@
       const indicator = card.querySelector(`#indicator-${index}`);
       const circleSpinner = card.querySelector(`#circle-spinner-${index}`);
       const progressBar = card.querySelector(`#progress-${index}`);
+      const progressTrack = card.querySelector(`#track-${index}`);
       const timeDisplay = card.querySelector(`#time-${index}`);
       const speedBadge = card.querySelector(`#speed-badge-${index}`);
 
       let lastTap = 0;
-      let touchStartX = 0;
 
       video.addEventListener('waiting', () => {
         if (circleSpinner) circleSpinner.style.display = 'block';
@@ -674,9 +679,23 @@
         }
       });
 
+      /* INTERACTIVE SEEKBAR SCRUBBING */
+      function seekVideoToPosition(e) {
+        e.stopPropagation();
+        if (isNaN(video.duration)) return;
+        const rect = progressTrack.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clickX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        const pct = clickX / rect.width;
+        video.currentTime = pct * video.duration;
+      }
+
+      progressTrack.addEventListener('click', seekVideoToPosition);
+      progressTrack.addEventListener('touchmove', seekVideoToPosition, { passive: true });
+
+      /* LONG PRESS 2X SPEED */
       function startSpeedUp(e) {
-        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav')) return;
-        if (e.cancelable) e.preventDefault();
+        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.reel-progress-track')) return;
         speedHoldTimer = setTimeout(() => {
           isLongPressing = true;
           video.playbackRate = 2.0;
@@ -697,29 +716,16 @@
       frame.addEventListener('mouseup', stopSpeedUp);
       frame.addEventListener('mouseleave', stopSpeedUp);
 
-      frame.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
-        startSpeedUp(e);
-      }, { passive: false });
-
+      frame.addEventListener('touchstart', startSpeedUp, { passive: true });
       frame.addEventListener('touchend', stopSpeedUp);
       frame.addEventListener('touchcancel', stopSpeedUp);
-
-      frame.addEventListener('touchmove', (e) => {
-        if (e.touches.length !== 1 || isNaN(video.duration)) return;
-        const deltaX = e.touches[0].clientX - touchStartX;
-
-        if (Math.abs(deltaX) > 20) {
-          touchStartX = e.touches[0].clientX;
-          video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + (deltaX * 0.05)));
-        }
-      }, { passive: true });
 
       frame.addEventListener('mousemove', resetClearModeTimer);
       frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
 
+      /* TAP TO PLAY/PAUSE & DOUBLE TAP TO HEART */
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.comments-drawer-container')) return;
+        if (e.target.closest('.reels-actions-side') || e.target.closest('.reels-top-nav') || e.target.closest('.comments-drawer-container') || e.target.closest('.reel-progress-track')) return;
 
         const now = Date.now();
         const tapGap = now - lastTap;
@@ -782,12 +788,15 @@
       setTimeout(() => heart.remove(), 800);
     }
 
+    /* REALTIME FIRESTORE LISTENER & LIKE TRANSACTIONS */
     function listenToReelStats(reelId, index) {
       db.collection('reels').doc(reelId).onSnapshot((doc) => {
+        const countLabel = document.getElementById(`like-count-${index}`);
         if (doc.exists) {
           const data = doc.data();
-          const countLabel = document.getElementById(`like-count-${index}`);
           if (countLabel) countLabel.textContent = formatLikesValue(data.likes || 0);
+        } else {
+          if (countLabel) countLabel.textContent = "0";
         }
       });
     }
@@ -824,6 +833,7 @@
       });
     }
 
+    /* REALTIME COMMENTS SYSTEM */
     function openCommentsModal(reelId, e) {
       if (e) e.stopPropagation();
       currentActiveReelId = reelId;

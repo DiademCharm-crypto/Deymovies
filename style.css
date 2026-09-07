@@ -775,3 +775,33 @@ body {
     border-radius: 10px;
   }
 }
+
+/* ADDED / UPDATED IN style.css */
+@media (max-width: 768px) {
+  .top-nav {
+    padding: 12px 16px;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .brand-logo-link {
+    order: 1;
+  }
+
+  /* MOVED TO TOP RIGHT ON MOBILE & RESIZED SMALLER */
+  .header-request-btn {
+    order: 2;
+    margin-left: auto;
+    padding: 5px 12px !important;
+    font-size: 0.74rem !important;
+    border-radius: 16px !important;
+  }
+
+  .search-overlay-bar {
+    order: 3;
+    flex: 0 0 100% !important;
+    margin-top: 6px !important;
+  }
+}
