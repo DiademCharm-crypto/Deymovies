@@ -790,3 +790,126 @@ body {
     border-radius: 10px;
   }
 }
+
+/* REQUEST MODAL STYLING FIX */
+.request-input-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.request-input-group input {
+  flex: 1;
+  background: #1f1f1f;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.request-input-group input:focus {
+  border-color: var(--primary-red);
+}
+
+.request-input-group button {
+  background: var(--primary-red);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.request-input-group button:hover {
+  background: var(--primary-red-hover);
+}
+
+.request-modal-content h3 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.request-modal-content p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* BADGE QUALITY STYLES */
+.tag-badge-top-right {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.tag-badge-top-right.quality-hd {
+  background: rgba(0, 0, 0, 0.85);
+  color: #e50914;
+  border: 1px solid #e50914;
+}
+
+.tag-badge-top-right.quality-trailer {
+  background: rgba(0, 0, 0, 0.85);
+  color: #38ef7d;
+  border: 1px solid #38ef7d;
+}
+
+/* BADGE QUALITY STYLES */
+.tag-badge-top-right {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.tag-badge-top-right.quality-hd {
+  background: rgba(0, 0, 0, 0.85);
+  color: #e50914;
+  border: 1px solid #e50914;
+}
+
+.tag-badge-top-right.quality-trailer {
+  background: rgba(0, 0, 0, 0.85);
+  color: #38ef7d;
+  border: 1px solid #38ef7d;
+}
+
+/* NAVBAR HEADER POSITION SWAP */
+header, .navbar, .top-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+/* SEARCH BAR (Moved to the left side of the right controls) */
+.search-container, #search-form {
+  order: 1 !important;
+  margin-left: auto !important;
+}
+
+/* REQUEST MOVIE BUTTON (Moved to the far right) */
+.request-btn, #btn-request-movie, button[onclick*="openRequestModal"] {
+  order: 2 !important;
+  margin-left: 0 !important;
+}

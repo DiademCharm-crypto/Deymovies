@@ -13,7 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=140.0">
+  <link rel="stylesheet" href="style.css?v=150.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -60,24 +60,12 @@
     }
 
     #direct-video-player,
-    #main-iframe {
+    #trailer-iframe-player {
       width: 100% !important;
       height: 100% !important;
       object-fit: contain !important;
       border: none !important;
       display: block !important;
-    }
-
-    /* FULL-SCREEN CLICK ABSORBER OVERLAY */
-    .ultimate-ad-shield {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-      background: rgba(0, 0, 0, 0.001);
-      cursor: pointer;
     }
 
     /* ANIMATED LOADING BUFFER SPINNER */
@@ -152,18 +140,6 @@
       width: 100%;
       background: #e50914;
       height: 50%;
-    }
-
-    /* NATIVE WEBVTT CUE STYLING OVERRIDE */
-    ::cue {
-      background: rgba(0, 0, 0, 0.85) !important;
-      color: #ffffff !important;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-      font-size: 1.15rem !important;
-      font-weight: 600 !important;
-      border-radius: 4px !important;
-      padding: 4px 8px !important;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
     }
 
     /* CUSTOM ON-SCREEN SUBTITLE CONTAINER OVERLAY */
@@ -467,7 +443,6 @@
       justify-content: center !important;
     }
 
-    /* Unified sizing for single-path buttons */
     .ctrl-btn-small svg,
     .btn-bottom-play svg,
     .center-ctrl-btn svg {
@@ -481,7 +456,6 @@
       height: 20px !important;
     }
 
-    /* WARNING NOTE AND DETAILS BOX */
     .network-warning-note {
       width: calc(100% - 40px) !important;
       margin: 14px auto 0 auto !important;
@@ -495,7 +469,6 @@
       box-sizing: border-box !important;
     }
 
-    /* SYNOPSIS & DESCRIPTION BOX */
     .video-info-box {
       width: 100% !important;
       padding: 16px 20px 0 20px !important;
@@ -539,44 +512,6 @@
       display: inline-block !important;
     }
 
-    /* SERVER SELECTION BADGES */
-    .episodes-section {
-      width: 100% !important;
-      padding: 16px 20px !important;
-      box-sizing: border-box !important;
-    }
-
-    .episode-badges-grid {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 10px !important;
-      margin-top: 10px !important;
-    }
-
-    .ep-badge {
-      background: #181818 !important;
-      border: 1px solid #262626 !important;
-      color: #ffffff !important;
-      width: 38px !important;
-      height: 38px !important;
-      border-radius: 8px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      cursor: pointer !important;
-      font-weight: 800 !important;
-      font-size: 0.9rem !important;
-      transition: all 0.2s ease !important;
-    }
-
-    .ep-badge.active,
-    .ep-badge:hover {
-      background: #e50914 !important;
-      border-color: #e50914 !important;
-    }
-
-    /* RECOMMENDATION CARD LAYOUT */
     .list-recommendations {
       width: 100% !important;
       box-sizing: border-box !important;
@@ -699,15 +634,8 @@
         font-size: 0.95rem !important;
       }
 
-      .episodes-section h3,
       .section-header-title {
         font-size: 1.15rem !important;
-      }
-
-      .ep-badge {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 1.1rem !important;
       }
 
       .list-recommendations {
@@ -735,7 +663,6 @@
     /* MOBILE MODE LAYOUT & FULLSCREEN FIX */
     @media (max-width: 768px) {
       .video-info-box,
-      .episodes-section,
       .content-section {
         padding-left: 14px !important;
         padding-right: 14px !important;
@@ -780,64 +707,10 @@
     }
   </style>
 
-  <!-- ANTI-POPUP & REDIRECT SHIELD -->
+  <!-- SHIELD SCRIPT -->
   <script>
     (function () {
       'use strict';
-
-      const voidWindow = {
-        focus: function () {},
-        blur: function () {},
-        close: function () {},
-        postMessage: function () {},
-        closed: true
-      };
-
-      try {
-        Object.defineProperty(window, 'open', {
-          configurable: false,
-          writable: false,
-          value: function () {
-            console.warn('[DEYMFLIX Shield] Blocked window.open popup execution.');
-            return voidWindow;
-          }
-        });
-      } catch (e) {
-        window.open = function () { return voidWindow; };
-      }
-
-      try {
-        const origAnchorClick = HTMLAnchorElement.prototype.click;
-        HTMLAnchorElement.prototype.click = function () {
-          if (this.target === '_blank' || (this.href && !this.href.includes(window.location.hostname))) {
-            console.warn('[DEYMFLIX Shield] Blocked anchor programmatic ad click.');
-            return false;
-          }
-          return origAnchorClick.apply(this, arguments);
-        };
-      } catch (e) {}
-
-      window.onbeforeunload = function (e) {
-        if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
-          console.warn('[DEYMFLIX Shield] Blocked top-level frame navigation hijack.');
-          e.preventDefault();
-          return (e.returnValue = 'Ad redirect blocked.');
-        }
-      };
-
-      document.addEventListener('click', function (e) {
-        const a = e.target.closest('a');
-        if (a) {
-          const href = a.getAttribute('href');
-          if (a.target === '_blank' || (href && href.startsWith('http') && !href.includes(window.location.hostname))) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.warn('[DEYMFLIX Shield] Neutralized external link click.');
-            return false;
-          }
-        }
-      }, true);
-
       document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
       document.addEventListener('keydown', function (e) {
         if (
@@ -858,7 +731,15 @@
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
+    <!-- HTML5 Video Player (Used for direct video files / HD manual embeds) -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
+
+    <!-- YouTube Iframe Player with zero-cookie origin bypass -->
+    <iframe id="trailer-iframe-player" 
+            style="display: none;" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+    </iframe>
 
     <!-- Custom On-Screen Subtitle Container Overlay -->
     <div id="subtitle-display" class="custom-subtitle-display"></div>
@@ -868,9 +749,6 @@
       <div class="spinner-ring"></div>
       <div class="spinner-text">Buffering...</div>
     </div>
-
-    <!-- Ad Shield Overlay -->
-    <div id="iframe-ad-shield" class="ultimate-ad-shield" onclick="absorbAdClicks(event)" style="display: none;"></div>
 
     <!-- Speed Up Floating Badge -->
     <div id="speed-badge" class="loklok-speed-badge">2.0x Speed</div>
@@ -909,7 +787,7 @@
 
         <button id="btn-forward-center" class="center-ctrl-btn" title="Forward 10s">
           <svg viewBox="0 0 24 24" fill="#ffffff">
-            <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
+            <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69-6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
             <text x="12" y="14.5" font-size="7" font-weight="800" font-family="sans-serif" text-anchor="middle" fill="#ffffff">10</text>
           </svg>
         </button>
@@ -932,7 +810,6 @@
         </div>
         <div class="bottom-bar-controls">
           <div class="left-controls-group">
-            <!-- LOWER LEFT PLAY/PAUSE BUTTON -->
             <button id="btn-bottom-play-pause" class="btn-bottom-play" title="Play/Pause">
               <svg viewBox="0 0 24 24" fill="#ffffff">
                 <path id="svg-bottom-path" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -951,14 +828,14 @@
             </button>
 
             <!-- MUTE/UNMUTE BUTTON -->
-            <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
+            <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path id="svg-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
               </svg>
             </button>
 
             <!-- FULLSCREEN BUTTON -->
-            <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
+            <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
               </svg>
@@ -970,24 +847,13 @@
   </div>
 
   <div id="network-note" class="network-warning-note" style="display: none;">
-    ⚠️ Slow connection? Reload the page or try another server.
+    ⚠️ Slow connection? Reload the page to retry playback.
   </div>
 
   <div class="video-info-box">
     <h1 id="current-title" class="media-title">Loading...</h1>
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
-  </div>
-
-  <div class="episodes-section">
-    <h3 style="font-weight: 700; color: #ffffff; margin-bottom: 8px;">Select Server</h3>
-    <div class="episode-badges-grid">
-      <div id="server1-btn" class="ep-badge" onclick="switchServer(1)">1</div>
-      <div id="server2-btn" class="ep-badge" onclick="switchServer(2)">2</div>
-      <div id="server3-btn" class="ep-badge" onclick="switchServer(3)">3</div>
-      <div id="server4-btn" class="ep-badge" onclick="switchServer(4)">4</div>
-      <div id="server5-btn" class="ep-badge" onclick="switchServer(5)">5</div>
-    </div>
   </div>
 
   <section class="content-section" style="padding-bottom: 30px;">
@@ -997,20 +863,19 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=140.0"></script>
+  <script src="app.js?v=150.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
       const dp = document.getElementById('direct-video-player');
+      const tp = document.getElementById('trailer-iframe-player');
       if (dp) {
         dp.pause();
         dp.removeAttribute('src');
         dp.load();
       }
-      const fr = document.getElementById('main-iframe');
-      if (fr) {
-        fr.src = "about:blank";
-        fr.remove();
+      if (tp) {
+        tp.removeAttribute('src');
       }
     }
 
@@ -1057,7 +922,8 @@
                            tmdbId: 634649, 
                            description: '', 
                            poster: 'https://via.placeholder.com/300x450?text=DEYMFLIX',
-                           manualEmbed: ''
+                           manualEmbed: '',
+                           trailerEmbed: ''
                          };
 
     document.getElementById('current-title').textContent = currentMovie.title;
@@ -1066,7 +932,6 @@
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
     const networkNote = document.getElementById('network-note');
-    const adShield = document.getElementById('iframe-ad-shield');
     const loadingSpinner = document.getElementById('video-loading-spinner');
     const centerControlsGroup = document.getElementById('center-controls');
     const btnSubtitles = document.getElementById('btn-subtitles');
@@ -1074,8 +939,6 @@
     const subtitleOptionsContainer = document.getElementById('subtitle-options-container');
     const subtitleDisplay = document.getElementById('subtitle-display');
 
-    let absorbedClicks = 0;
-    const clickLimit = 3;
     let availableSubtitles = {}; 
     let parsedSubtitleCues = [];
 
@@ -1086,16 +949,6 @@
       'de': 'German',
       'tl': 'Tagalog'
     };
-
-    function absorbAdClicks(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      absorbedClicks++;
-      
-      if (absorbedClicks >= clickLimit) {
-        adShield.style.display = 'none';
-      }
-    }
 
     function checkSynopsisLength() {
       setTimeout(() => {
@@ -1130,12 +983,6 @@
         return;
       }
 
-      if (currentMovie.title.toLowerCase().includes('runner')) {
-        descElement.textContent = "In the psychological thriller The Runner, Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one—each second a test of how far a mother will go to save her child.";
-        checkSynopsisLength();
-        return;
-      }
-
       const apiKey = '15d260044e350723365198253b23914f';
 
       if (currentMovie.tmdbId) {
@@ -1151,20 +998,6 @@
           }
         } catch (e) {}
       }
-
-      try {
-        const cleanTitle = currentMovie.title.replace(/[\(\)\[\]]/g, '').trim();
-        const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
-        if (searchRes.ok) {
-          const searchData = await searchRes.json();
-          const match = searchData.results && searchData.results.find(r => r.overview && r.overview.trim() !== '');
-          if (match) {
-            descElement.textContent = match.overview;
-            checkSynopsisLength();
-            return;
-          }
-        }
-      } catch (e) {}
 
       const originTag = currentMovie.isFilipino ? "Filipino movie" : "feature movie";
       descElement.textContent = `Watch "${currentMovie.title}", a ${originTag} available in high quality streaming on DEYMFLIX.`;
@@ -1218,24 +1051,6 @@
           if (tmdbRes.ok) {
             const tmdbData = await tmdbRes.json();
             imdbId = tmdbData.imdb_id;
-          }
-        } catch (e) {}
-      }
-
-      if (!imdbId) {
-        try {
-          const cleanTitle = currentMovie.title.replace(/[\(\)\[\]]/g, '').trim();
-          const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
-          if (searchRes.ok) {
-            const searchData = await searchRes.json();
-            if (searchData.results && searchData.results.length > 0) {
-              const matchedTmdbId = searchData.results[0].id;
-              const idRes = await fetch(`https://api.themoviedb.org/3/movie/${matchedTmdbId}/external_ids?api_key=${apiKey}`);
-              if (idRes.ok) {
-                const idData = await idRes.json();
-                imdbId = idData.imdb_id;
-              }
-            }
           }
         } catch (e) {}
       }
@@ -1309,8 +1124,6 @@
         parsedSubtitleCues = parseSrtCues(rawSrt);
         btnSubtitles.classList.add('subtitle-active-btn');
         showToast(`Subtitles: ${languageNames[langCode] || langCode.toUpperCase()}`);
-      } else {
-        showToast(`No subtitles found`);
       }
     }
 
@@ -1326,8 +1139,8 @@
       }
     };
 
-    let iframe = null;
     const directPlayer = document.getElementById('direct-video-player');
+    const trailerPlayer = document.getElementById('trailer-iframe-player');
     const playerContainer = document.getElementById('playerContainer');
     const playerOverlay = document.getElementById('player-gesture-overlay');
 
@@ -1352,26 +1165,14 @@
     const volumeContainer = document.getElementById('volume-slider-container');
     const volumeFill = document.getElementById('volume-fill');
 
-    const s1Btn = document.getElementById('server1-btn');
-    const s2Btn = document.getElementById('server2-btn');
-    const s3Btn = document.getElementById('server3-btn');
-    const s4Btn = document.getElementById('server4-btn');
-    const s5Btn = document.getElementById('server5-btn');
-
     let toastTimeout;
     let slowConnectionTimer = null;
     let autoHideTimer = null;
     let currentBrightness = 100;
-    let activeServer = 1;
     let lastTapTime = 0;
-    let normalPlaybackRate = 1.0;
-    let longPressTimer = null;
-    let isLongPressing = false;
 
     const playPathData = "M8 5v14l11-7z";
     const pausePathData = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
-    const volOnData = "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z";
-    const volOffData = "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z";
 
     function updatePlayStateUI(isPlaying) {
       const centerPath = document.getElementById('svg-center-path');
@@ -1387,8 +1188,6 @@
     }
 
     function showControls() {
-      if (activeServer !== 1) return;
-
       playerOverlay.classList.add('active');
       clearTimeout(autoHideTimer);
 
@@ -1405,7 +1204,6 @@
     }
 
     function toggleOverlayControls(e) {
-      if (activeServer !== 1) return;
       if (subtitleMenu.contains(e.target) || e.target === btnSubtitles) return;
 
       const now = Date.now();
@@ -1433,40 +1231,23 @@
     let sliderHideTimer = null;
 
     playerContainer.addEventListener('touchstart', (e) => {
-      if (activeServer !== 1) return;
       if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
         const screenWidth = window.innerWidth;
         const clientX = e.touches[0].clientX;
         gestureType = clientX < screenWidth / 2 ? 'brightness' : 'volume';
         isGestureDragging = false;
-
-        isLongPressing = false;
-        clearTimeout(longPressTimer);
-        longPressTimer = setTimeout(() => {
-          if (!isGestureDragging) {
-            isLongPressing = true;
-            directPlayer.playbackRate = 2.0;
-            speedBadge.classList.add('show');
-          }
-        }, 500);
       }
     }, { passive: true });
 
     playerContainer.addEventListener('touchmove', (e) => {
-      if (activeServer !== 1 || e.touches.length !== 1) return;
+      if (e.touches.length !== 1) return;
 
       const currentY = e.touches[0].clientY;
       const deltaY = touchStartY - currentY;
       
       if (Math.abs(deltaY) > 6) {
         isGestureDragging = true;
-        clearTimeout(longPressTimer);
-        if (isLongPressing) {
-          isLongPressing = false;
-          directPlayer.playbackRate = normalPlaybackRate;
-          speedBadge.classList.remove('show');
-        }
       }
 
       if (!isGestureDragging) return;
@@ -1476,28 +1257,13 @@
 
       if (gestureType === 'brightness') {
         currentBrightness = Math.max(20, Math.min(150, currentBrightness + (deltaY * 0.5)));
-        directPlayer.style.filter = `brightness(${currentBrightness}%)`;
+        playerContainer.style.filter = `brightness(${currentBrightness}%)`;
         brightnessFill.style.height = `${((currentBrightness - 20) / 130) * 100}%`;
         brightnessContainer.style.display = 'flex';
-      } else if (gestureType === 'volume') {
-        let newVol = Math.max(0, Math.min(1, directPlayer.volume + (deltaY * 0.005)));
-        directPlayer.volume = newVol;
-        directPlayer.muted = newVol === 0;
-        volumeFill.style.height = `${newVol * 100}%`;
-        volumeContainer.style.display = 'flex';
       }
     }, { passive: true });
 
     playerContainer.addEventListener('touchend', (e) => {
-      if (activeServer !== 1) return;
-      clearTimeout(longPressTimer);
-
-      if (isLongPressing) {
-        isLongPressing = false;
-        directPlayer.playbackRate = normalPlaybackRate;
-        speedBadge.classList.remove('show');
-      }
-
       if (!isGestureDragging) {
         toggleOverlayControls(e);
       }
@@ -1509,49 +1275,13 @@
       }, 1000);
     });
 
-    playerContainer.addEventListener('mousedown', (e) => {
-      if (activeServer !== 1) return;
-      isLongPressing = false;
-      clearTimeout(longPressTimer);
-      longPressTimer = setTimeout(() => {
-        isLongPressing = true;
-        directPlayer.playbackRate = 2.0;
-        speedBadge.classList.add('show');
-      }, 600);
-    });
-
-    playerContainer.addEventListener('mouseup', () => {
-      clearTimeout(longPressTimer);
-      if (isLongPressing) {
-        isLongPressing = false;
-        directPlayer.playbackRate = normalPlaybackRate;
-        speedBadge.classList.remove('show');
-      }
-    });
-
-    playerContainer.addEventListener('mousemove', () => { if (activeServer === 1) showControls(); });
-
-    function showLoadingSpinner() {
-      if (directPlayer.readyState < 3 && directPlayer.paused) {
-        loadingSpinner.style.display = 'flex';
-        centerControlsGroup.style.setProperty('display', 'none', 'important');
-      }
-    }
+    playerContainer.addEventListener('mousemove', () => showControls());
 
     function hideLoadingSpinner() {
       loadingSpinner.style.display = 'none';
       networkNote.style.display = 'none';
       clearTimeout(slowConnectionTimer);
       centerControlsGroup.style.setProperty('display', 'flex', 'important');
-    }
-
-    function startSlowConnectionCheck() {
-      clearTimeout(slowConnectionTimer);
-      slowConnectionTimer = setTimeout(() => {
-        if (directPlayer.paused || directPlayer.readyState < 3) {
-          networkNote.style.display = 'block';
-        }
-      }, 4000);
     }
 
     function showToast(message) {
@@ -1573,165 +1303,88 @@
       const mins = Math.floor((seconds % 3600) / 60);
       const secs = Math.floor(seconds % 60);
 
-      const hStr = hrs < 10 ? `0${hrs}` : hrs;
-      const mStr = mins < 10 ? `0${mins}` : mins;
-      const sStr = secs < 10 ? `0${secs}` : secs;
-
-      return `${hStr}:${mStr}:${sStr}`;
+      return `${hrs < 10 ? '0' + hrs : hrs}:${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
     }
 
-    directPlayer.addEventListener('loadstart', startSlowConnectionCheck);
-    directPlayer.addEventListener('waiting', startSlowConnectionCheck);
-    directPlayer.addEventListener('stalled', startSlowConnectionCheck);
-    directPlayer.addEventListener('seeking', showLoadingSpinner);
+    // Determine playback source: manualEmbed (HD) vs trailerEmbed (YouTube/Iframe) vs fallback sample video
+    const hasManualEmbed = currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '';
+    const hasTrailerEmbed = currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '';
 
-    directPlayer.addEventListener('canplay', hideLoadingSpinner);
-    directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
-    
-    // Auto-resume playback from saved point on load
-    directPlayer.addEventListener('loadedmetadata', () => {
-      hideLoadingSpinner();
-      totalDurationText.textContent = formatTime(directPlayer.duration);
+    if (hasManualEmbed) {
+      directPlayer.style.display = 'block';
+      trailerPlayer.style.display = 'none';
 
-      const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
-      const existingProgress = savedData[currentMovie.id];
+      const playSource = (typeof cleanDriveLink === 'function') ? cleanDriveLink(currentMovie.manualEmbed) : currentMovie.manualEmbed;
+      directPlayer.src = playSource;
 
-      if (existingProgress && existingProgress.progress < 95) {
-        directPlayer.currentTime = existingProgress.currentTime;
-      }
-    });
-
-    directPlayer.addEventListener('playing', () => {
-      hideLoadingSpinner();
-      updatePlayStateUI(true);
-      if (activeServer === 1) showControls();
-    });
-
-    directPlayer.addEventListener('play', () => {
-      hideLoadingSpinner();
-      updatePlayStateUI(true);
-    });
-
-    // Save playback progress to localStorage continuously
-    directPlayer.addEventListener('timeupdate', () => {
-      if (!isNaN(directPlayer.duration)) {
-        const currentTime = directPlayer.currentTime;
-        const pct = (currentTime / directPlayer.duration) * 100;
-        seekbar.value = pct;
-        updateSeekbarBackground(pct);
-        currentTimeText.textContent = formatTime(currentTime);
-
-        if (currentTime > 5) {
-          const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
-          savedData[currentMovie.id] = {
-            id: currentMovie.id,
-            title: currentMovie.title,
-            poster: currentMovie.poster,
-            currentTime: currentTime,
-            duration: directPlayer.duration,
-            progress: pct,
-            updatedAt: Date.now()
-          };
-          localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
-        }
-
-        if (parsedSubtitleCues.length > 0) {
-          const activeCue = parsedSubtitleCues.find(cue => currentTime >= cue.start && currentTime <= cue.end);
-          if (activeCue) {
-            subtitleDisplay.innerHTML = `<span class="subtitle-line">${activeCue.text}</span>`;
-          } else {
-            subtitleDisplay.innerHTML = '';
-          }
-        } else {
-          subtitleDisplay.innerHTML = '';
-        }
-      }
-    });
-
-    seekbar.addEventListener('input', () => {
-      if (!isNaN(directPlayer.duration)) {
-        directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
-        updateSeekbarBackground(seekbar.value);
-      }
-    });
-
-    directPlayer.addEventListener('pause', () => {
-      hideLoadingSpinner();
-      updatePlayStateUI(false);
-      if (activeServer === 1) {
-        playerOverlay.classList.add('active');
-        clearTimeout(autoHideTimer);
-      }
-    });
-
-    function togglePlayPause() {
-      if (directPlayer.paused) {
-        directPlayer.play();
-      } else {
-        directPlayer.pause();
-      }
-    }
-
-    function toggleMute() {
-      directPlayer.muted = !directPlayer.muted;
-      const volPath = document.getElementById('svg-volume-path');
-      if (volPath) {
-        volPath.setAttribute('d', directPlayer.muted ? volOffData : volOnData);
-      }
-    }
-
-    function attemptAutoUnmute() {
-      directPlayer.muted = false;
-      directPlayer.play().then(() => {
-        const volPath = document.getElementById('svg-volume-path');
-        if (volPath) volPath.setAttribute('d', volOnData);
-      }).catch(() => {
-        directPlayer.muted = true;
-        const volPath = document.getElementById('svg-volume-path');
-        if (volPath) volPath.setAttribute('d', volOffData);
-        directPlayer.play();
-
-        const unlockAudio = () => {
-          directPlayer.muted = false;
-          const volPath = document.getElementById('svg-volume-path');
-          if (volPath) volPath.setAttribute('d', volOnData);
-          document.removeEventListener('click', unlockAudio);
-          document.removeEventListener('touchstart', unlockAudio);
-        };
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+      directPlayer.addEventListener('loadedmetadata', () => {
+        hideLoadingSpinner();
+        totalDurationText.textContent = formatTime(directPlayer.duration);
       });
+
+      directPlayer.addEventListener('timeupdate', () => {
+        if (!isNaN(directPlayer.duration)) {
+          const pct = (directPlayer.currentTime / directPlayer.duration) * 100;
+          seekbar.value = pct;
+          updateSeekbarBackground(pct);
+          currentTimeText.textContent = formatTime(directPlayer.currentTime);
+        }
+      });
+
+      seekbar.addEventListener('input', () => {
+        if (!isNaN(directPlayer.duration)) {
+          directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
+        }
+      });
+
+      btnPlayPauseCenter.onclick = (e) => {
+        e.stopPropagation();
+        if (directPlayer.paused) {
+          directPlayer.play();
+          updatePlayStateUI(true);
+        } else {
+          directPlayer.pause();
+          updatePlayStateUI(false);
+        }
+      };
+
+      directPlayer.play().catch(() => {});
+
+    } else if (hasTrailerEmbed) {
+      directPlayer.style.display = 'none';
+      trailerPlayer.style.display = 'block';
+
+      // Extract Youtube Video ID cleanly
+      let rawUrl = currentMovie.trailerEmbed.trim();
+      let videoId = rawUrl;
+
+      if (rawUrl.includes('v=')) {
+        videoId = rawUrl.split('v=')[1].split('&')[0];
+      } else if (rawUrl.includes('youtu.be/')) {
+        videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+      } else if (rawUrl.includes('/embed/')) {
+        videoId = rawUrl.split('/embed/')[1].split('?')[0];
+      }
+
+      // Bypass cookie and third-party domain restrictions
+      trailerPlayer.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&rel=0`;
+
+      hideLoadingSpinner();
+      totalDurationText.textContent = "TRAILER";
+      updatePlayStateUI(true);
+
+    } else {
+      directPlayer.style.display = 'block';
+      trailerPlayer.style.display = 'none';
+      directPlayer.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4";
+      
+      directPlayer.addEventListener('loadedmetadata', () => {
+        hideLoadingSpinner();
+        totalDurationText.textContent = formatTime(directPlayer.duration);
+      });
+
+      directPlayer.play().catch(() => {});
     }
-
-    btnPlayPauseCenter.onclick = (e) => {
-      e.stopPropagation();
-      togglePlayPause();
-    };
-
-    btnBottomPlayPause.onclick = (e) => {
-      e.stopPropagation();
-      togglePlayPause();
-    };
-
-    btnRewind.onclick = (e) => {
-      e.stopPropagation();
-      triggerRewind();
-    };
-
-    btnForward.onclick = (e) => {
-      e.stopPropagation();
-      triggerForward();
-    };
-
-    btnUnmute.onclick = (e) => {
-      e.stopPropagation();
-      toggleMute();
-    };
-
-    btnFullscreen.onclick = (e) => {
-      e.stopPropagation();
-      toggleFullscreen();
-    };
 
     function toggleFullscreen() {
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
@@ -1743,133 +1396,19 @@
                           playerContainer.msRequestFullscreen;
 
         if (requestFS) {
-          requestFS.call(playerContainer).then(() => {
-            if (screen.orientation && screen.orientation.lock) {
-              screen.orientation.lock('landscape').catch(err => {
-                console.warn('Orientation lock not supported or allowed:', err);
-              });
-            }
-          }).catch(err => {
-            console.warn('Fullscreen request failed:', err);
-          });
-        } else if (directPlayer && directPlayer.webkitEnterFullscreen) {
-          directPlayer.webkitEnterFullscreen();
+          requestFS.call(playerContainer).catch(() => {});
         }
       } else {
         exitFullscreen();
       }
     }
 
-    function triggerRewind() {
-      directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
-      showSeekBadge(rewindBadge);
-    }
+    btnFullscreen.onclick = (e) => {
+      e.stopPropagation();
+      toggleFullscreen();
+    };
 
-    function triggerForward() {
-      directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
-      showSeekBadge(forwardBadge);
-    }
-
-    function showSeekBadge(badge) {
-      badge.classList.add('show');
-      setTimeout(() => badge.classList.remove('show'), 600);
-    }
-
-    function renderFreshIframe(targetUrl) {
-      let existingIframe = document.getElementById('main-iframe');
-      if (existingIframe) {
-        existingIframe.remove();
-      }
-
-      absorbedClicks = 0;
-      adShield.style.display = 'block';
-      showLoadingSpinner();
-
-      const newIframe = document.createElement('iframe');
-      newIframe.id = 'main-iframe';
-      newIframe.allowFullscreen = true;
-      newIframe.allow = "autoplay; fullscreen *; picture-in-picture *";
-      
-      newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
-
-      newIframe.style.width = '100%';
-      newIframe.style.height = '100%';
-      newIframe.style.border = 'none';
-      newIframe.style.display = 'block';
-      newIframe.src = targetUrl;
-
-      newIframe.addEventListener('load', () => {
-        hideLoadingSpinner();
-      });
-
-      playerContainer.appendChild(newIframe);
-      iframe = newIframe;
-    }
-
-    function switchServer(serverNum) {
-      activeServer = serverNum;
-      [s1Btn, s2Btn, s3Btn, s4Btn, s5Btn].forEach(btn => btn.classList.remove('active'));
-
-      startSlowConnectionCheck();
-
-      let targetUrl = "";
-
-      if (serverNum === 1) {
-        adShield.style.display = 'none';
-        targetUrl = (typeof cleanDriveLink === 'function') ? cleanDriveLink(currentMovie.manualEmbed) : currentMovie.manualEmbed;
-        s1Btn.classList.add('active');
-
-        const lowerUrl = targetUrl ? targetUrl.toLowerCase() : '';
-        if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
-          const oldIframe = document.getElementById('main-iframe');
-          if (oldIframe) oldIframe.remove();
-
-          directPlayer.style.display = 'block';
-          playerOverlay.style.display = 'flex';
-          directPlayer.src = targetUrl;
-          
-          attemptAutoUnmute();
-          showControls();
-          showToast(`Server 1 loading...`);
-          return;
-        }
-      } 
-      
-      directPlayer.pause();
-      directPlayer.removeAttribute('src');
-      directPlayer.load();
-      directPlayer.style.display = 'none';
-      playerOverlay.style.display = 'none';
-      playerOverlay.classList.remove('active');
-      subtitleDisplay.innerHTML = '';
-      clearTimeout(autoHideTimer);
-
-      if (serverNum === 2) {
-        targetUrl = `https://vidsrc.me/embed/movie?tmdb=${currentMovie.tmdbId}`;
-        s2Btn.classList.add('active');
-      } else if (serverNum === 3) {
-        targetUrl = `https://vidsrc.pm/embed/movie/${currentMovie.tmdbId}`;
-        s3Btn.classList.add('active');
-      } else if (serverNum === 4) {
-        targetUrl = `https://vidbinge.dev/embed/movie/${currentMovie.tmdbId}`;
-        s4Btn.classList.add('active');
-      } else if (serverNum === 5) {
-        targetUrl = `https://www.2embed.cc/embed/${currentMovie.tmdbId}`;
-        s5Btn.classList.add('active');
-      }
-
-      showToast(`Server ${serverNum} loading...`);
-      renderFreshIframe(targetUrl);
-    }
-
-    if (currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '') {
-      s1Btn.style.display = 'flex';
-      switchServer(1);
-    } else {
-      s1Btn.style.display = 'none';
-      switchServer(2);
-    }
-
+    // Render Recommendations
     const grid = document.getElementById('random-grid');
     const otherMovies = safeMoviesList.filter(m => m.id !== currentMovie.id);
     const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
@@ -1878,35 +1417,18 @@
       const card = document.createElement('div');
       card.className = 'recommendation-card';
       card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
+      
+      const recLabel = (movie.manualEmbed && movie.manualEmbed.trim() !== '') ? 'HD' : 'TRAILER';
+
       card.innerHTML = `
         <img src="${movie.poster}" alt="${movie.title}">
         <div class="rec-info">
           <span class="rec-title">${movie.title}</span>
-          <span class="rec-genre">Movie • HD</span>
+          <span class="rec-genre">Movie • ${recLabel}</span>
         </div>
       `;
       grid.appendChild(card);
     });
-
-    function handleFullscreenChange() {
-      const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-      
-      if (isFullscreen) {
-        playerContainer.classList.add('fullscreen-active');
-      } else {
-        playerContainer.classList.remove('fullscreen-active');
-        if (screen.orientation && screen.orientation.unlock) {
-          try {
-            screen.orientation.unlock();
-          } catch (e) {}
-        }
-      }
-    }
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
   </script>
 </body>
 </html>
