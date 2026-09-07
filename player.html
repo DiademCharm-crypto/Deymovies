@@ -43,6 +43,86 @@
       -webkit-touch-callout: none !important;
     }
 
+    /* STANDALONE TRAILER TOP NAV BAR */
+    .trailer-top-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 20px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    /* UNMUTE OVERLAY BUTTON STYLING */
+    .unmute-banner-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 45;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .unmute-banner-btn:hover {
+      background: rgba(229, 9, 20, 0.85);
+      border-color: #e50914;
+      transform: scale(1.03);
+    }
+
+    /* HIDE CUSTOM OVERLAY IN TRAILER MODE TO ENABLE DIRECT IFRAME INTERACTION */
+    body.is-trailer-mode #player-gesture-overlay,
+    body.is-trailer-mode .center-controls-group,
+    body.is-trailer-mode .player-bottom-bar,
+    body.is-trailer-mode .vertical-slider-bar,
+    body.is-trailer-mode .custom-subtitle-display,
+    body.is-trailer-mode .subtitle-menu-modal,
+    body.is-trailer-mode .loklok-speed-badge,
+    body.is-trailer-mode .loklok-seek-badge {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
+    /* TRAILER IFRAME EXACT SIZING OVERRIDE */
+    #trailer-iframe-player {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      z-index: 10 !important;
+      background-color: #000000 !important;
+      display: block !important;
+      pointer-events: auto !important;
+    }
+
+    #direct-video-player {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      border: none !important;
+      display: block !important;
+    }
+
     /* FULLSCREEN NATIVE OVERRIDES */
     .video-container:fullscreen,
     .video-container:-webkit-full-screen,
@@ -57,15 +137,6 @@
       padding: 0 !important;
       border-radius: 0 !important;
       background-color: #000000 !important;
-    }
-
-    #direct-video-player,
-    #trailer-iframe-player {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: contain !important;
-      border: none !important;
-      display: block !important;
     }
 
     /* ANIMATED LOADING BUFFER SPINNER */
@@ -734,18 +805,29 @@
     <!-- HTML5 Video Player (Used for direct video files / HD manual embeds) -->
     <video id="direct-video-player" playsinline crossorigin="anonymous" style="display: none;"></video>
 
-    <!-- YouTube Iframe Player with zero-cookie origin bypass -->
+    <!-- YouTube & External Embed Iframe Player -->
     <iframe id="trailer-iframe-player" 
             style="display: none;" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             allowfullscreen>
     </iframe>
 
+    <!-- Interactive Tap to Unmute Overlay for Trailer Mode -->
+    <button id="unmute-banner" class="unmute-banner-btn" style="display: none;" onclick="userUnmuteTrailer()">
+      🔊 Tap to Unmute
+    </button>
+
+    <!-- Standalone Back Button for Trailer / Embed Mode -->
+    <div id="trailer-top-nav" class="trailer-top-nav" style="display: none;" onclick="forceBackToHome()">
+      <button class="icon-btn-back">❮</button>
+      <span id="trailer-movie-title" class="overlay-title-text">Loading...</span>
+    </div>
+
     <!-- Custom On-Screen Subtitle Container Overlay -->
     <div id="subtitle-display" class="custom-subtitle-display"></div>
 
     <!-- Animated Loading Buffer Overlay -->
-    <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: none;">
+    <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: flex;">
       <div class="spinner-ring"></div>
       <div class="spinner-text">Buffering...</div>
     </div>
@@ -865,6 +947,8 @@
 
   <script src="app.js?v=150.0"></script>
   <script>
+    const TMDB_API_KEY = '15d260044e350723365198253b23914f';
+
     function destroyAllPlayers() {
       window.onbeforeunload = null;
       const dp = document.getElementById('direct-video-player');
@@ -928,6 +1012,7 @@
 
     document.getElementById('current-title').textContent = currentMovie.title;
     document.getElementById('overlay-movie-title').textContent = currentMovie.title;
+    document.getElementById('trailer-movie-title').textContent = currentMovie.title;
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
@@ -938,6 +1023,7 @@
     const subtitleMenu = document.getElementById('subtitle-menu');
     const subtitleOptionsContainer = document.getElementById('subtitle-options-container');
     const subtitleDisplay = document.getElementById('subtitle-display');
+    const unmuteBanner = document.getElementById('unmute-banner');
 
     let availableSubtitles = {}; 
     let parsedSubtitleCues = [];
@@ -983,11 +1069,9 @@
         return;
       }
 
-      const apiKey = '15d260044e350723365198253b23914f';
-
       if (currentMovie.tmdbId) {
         try {
-          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=${apiKey}&language=en-US`);
+          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=${TMDB_API_KEY}&language=en-US`);
           if (tmdbRes.ok) {
             const tmdbData = await tmdbRes.json();
             if (tmdbData.overview && tmdbData.overview.trim() !== '') {
@@ -1041,13 +1125,12 @@
     async function scanOnlineSubtitles() {
       availableSubtitles = {};
       const targetLangs = ['en', 'es', 'fr', 'de', 'tl'];
-      const apiKey = '15d260044e350723365198253b23914f';
 
       let imdbId = null;
 
       if (currentMovie.tmdbId) {
         try {
-          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}/external_ids?api_key=${apiKey}`);
+          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}/external_ids?api_key=${TMDB_API_KEY}`);
           if (tmdbRes.ok) {
             const tmdbData = await tmdbRes.json();
             imdbId = tmdbData.imdb_id;
@@ -1143,6 +1226,7 @@
     const trailerPlayer = document.getElementById('trailer-iframe-player');
     const playerContainer = document.getElementById('playerContainer');
     const playerOverlay = document.getElementById('player-gesture-overlay');
+    const trailerTopNav = document.getElementById('trailer-top-nav');
 
     const btnPlayPauseCenter = document.getElementById('btn-play-pause-center');
     const btnBottomPlayPause = document.getElementById('btn-bottom-play-pause');
@@ -1188,6 +1272,7 @@
     }
 
     function showControls() {
+      if (document.body.classList.contains('is-trailer-mode')) return;
       playerOverlay.classList.add('active');
       clearTimeout(autoHideTimer);
 
@@ -1204,6 +1289,7 @@
     }
 
     function toggleOverlayControls(e) {
+      if (document.body.classList.contains('is-trailer-mode')) return;
       if (subtitleMenu.contains(e.target) || e.target === btnSubtitles) return;
 
       const now = Date.now();
@@ -1231,6 +1317,7 @@
     let sliderHideTimer = null;
 
     playerContainer.addEventListener('touchstart', (e) => {
+      if (document.body.classList.contains('is-trailer-mode')) return;
       if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
         const screenWidth = window.innerWidth;
@@ -1241,6 +1328,7 @@
     }, { passive: true });
 
     playerContainer.addEventListener('touchmove', (e) => {
+      if (document.body.classList.contains('is-trailer-mode')) return;
       if (e.touches.length !== 1) return;
 
       const currentY = e.touches[0].clientY;
@@ -1264,6 +1352,7 @@
     }, { passive: true });
 
     playerContainer.addEventListener('touchend', (e) => {
+      if (document.body.classList.contains('is-trailer-mode')) return;
       if (!isGestureDragging) {
         toggleOverlayControls(e);
       }
@@ -1281,7 +1370,6 @@
       loadingSpinner.style.display = 'none';
       networkNote.style.display = 'none';
       clearTimeout(slowConnectionTimer);
-      centerControlsGroup.style.setProperty('display', 'flex', 'important');
     }
 
     function showToast(message) {
@@ -1306,15 +1394,69 @@
       return `${hrs < 10 ? '0' + hrs : hrs}:${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
     }
 
-    // Determine playback source: manualEmbed (HD) vs trailerEmbed (YouTube/Iframe) vs fallback sample video
-    const hasManualEmbed = currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '';
-    const hasTrailerEmbed = currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '';
+    // Automatically remove buffering overlay & show Unmute prompt when YouTube trailer iframe renders
+    trailerPlayer.addEventListener('load', () => {
+      hideLoadingSpinner();
+      if (document.body.classList.contains('is-trailer-mode')) {
+        unmuteBanner.style.display = 'flex';
+      }
+    });
 
-    if (hasManualEmbed) {
+    function userUnmuteTrailer() {
+      trailerPlayer.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      unmuteBanner.style.display = 'none';
+      showToast("Audio Unmuted");
+    }
+
+    /**
+     * GUARANTEED TRAILER LOADER WITH MUTED AUTOPLAY PARAMS
+     */
+    async function loadTrailerByTmdbId(tmdbId) {
+      const fallbackYoutubeId = "JfVOs4VSpmA"; 
+      let targetVideoId = fallbackYoutubeId;
+
+      if (currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '') {
+        let rawUrl = currentMovie.trailerEmbed.trim();
+        if (rawUrl.includes('v=')) {
+          targetVideoId = rawUrl.split('v=')[1].split('&')[0];
+        } else if (rawUrl.includes('youtu.be/')) {
+          targetVideoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        } else if (rawUrl.includes('/embed/')) {
+          targetVideoId = rawUrl.split('/embed/')[1].split('?')[0];
+        } else {
+          targetVideoId = rawUrl;
+        }
+      } else if (tmdbId) {
+        try {
+          const response = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/videos?api_key=${TMDB_API_KEY}&language=en-US`);
+          if (response.ok) {
+            const data = await response.json();
+            const trailer = data.results.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')) || data.results[0];
+
+            if (trailer && trailer.key) {
+              targetVideoId = trailer.key;
+            }
+          }
+        } catch (err) {
+          console.error('TMDB Trailer Error:', err);
+        }
+      }
+
+      trailerPlayer.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      trailerPlayer.src = `https://www.youtube-nocookie.com/embed/${targetVideoId}?autoplay=1&mute=1&controls=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+    }
+
+    const rawManual = currentMovie.manualEmbed ? currentMovie.manualEmbed.trim() : '';
+
+    if (rawManual !== '') {
+      // 1. PLAY DIRECT STREAM FILE (.mp4 / .mkv)
+      document.body.classList.remove('is-trailer-mode');
+      unmuteBanner.style.display = 'none';
       directPlayer.style.display = 'block';
       trailerPlayer.style.display = 'none';
+      if (trailerTopNav) trailerTopNav.style.display = 'none';
 
-      const playSource = (typeof cleanDriveLink === 'function') ? cleanDriveLink(currentMovie.manualEmbed) : currentMovie.manualEmbed;
+      const playSource = (typeof cleanDriveLink === 'function') ? cleanDriveLink(rawManual) : rawManual;
       directPlayer.src = playSource;
 
       directPlayer.addEventListener('loadedmetadata', () => {
@@ -1350,40 +1492,15 @@
 
       directPlayer.play().catch(() => {});
 
-    } else if (hasTrailerEmbed) {
+    } else {
+      // 2. ENTER TRAILER MODE WITH UNMUTE OVERLAY PROMPT
+      document.body.classList.add('is-trailer-mode');
       directPlayer.style.display = 'none';
       trailerPlayer.style.display = 'block';
-
-      // Extract Youtube Video ID cleanly
-      let rawUrl = currentMovie.trailerEmbed.trim();
-      let videoId = rawUrl;
-
-      if (rawUrl.includes('v=')) {
-        videoId = rawUrl.split('v=')[1].split('&')[0];
-      } else if (rawUrl.includes('youtu.be/')) {
-        videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
-      } else if (rawUrl.includes('/embed/')) {
-        videoId = rawUrl.split('/embed/')[1].split('?')[0];
-      }
-
-      // Bypass cookie and third-party domain restrictions
-      trailerPlayer.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&rel=0`;
-
-      hideLoadingSpinner();
+      if (trailerTopNav) trailerTopNav.style.display = 'flex';
       totalDurationText.textContent = "TRAILER";
-      updatePlayStateUI(true);
 
-    } else {
-      directPlayer.style.display = 'block';
-      trailerPlayer.style.display = 'none';
-      directPlayer.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4";
-      
-      directPlayer.addEventListener('loadedmetadata', () => {
-        hideLoadingSpinner();
-        totalDurationText.textContent = formatTime(directPlayer.duration);
-      });
-
-      directPlayer.play().catch(() => {});
+      loadTrailerByTmdbId(currentMovie.tmdbId);
     }
 
     function toggleFullscreen() {

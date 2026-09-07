@@ -11,7 +11,7 @@ function cleanDriveLink(url) {
   return url;
 }
 
-// Featured Hero Movies
+
 const featuredMovies = [
   { 
     id: "Toy Story 5", 
@@ -41,11 +41,11 @@ const featuredMovies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
     manualEmbed: "",
-    trailerEmbed: "https://www.youtube.com/watch?v=Mzw2ttJD2qQ"
+    trailerEmbed: "https://www.youtube.com/watch?v=Sk6LZrA2JSQ"
   }
 ];
 
-// Complete Movie Library
+
 const movies = [
   { 
     id: "The Runner", 
@@ -97,7 +97,7 @@ const movies = [
     title: "The Odyssey", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
     manualEmbed: "",
-    trailerEmbed: "https://www.youtube.com/watch?v=Mzw2ttJD2qQ"
+    trailerEmbed: "https://www.youtube.com/watch?v=Sk6LZrA2JSQ"
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -105,7 +105,7 @@ const movies = [
     title: "Spider-Man: Brand New Day", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
     manualEmbed: "",
-    trailerEmbed: ""
+    trailerEmbed: "https://www.youtube.com/watch?v=daXaTug8rL4"
   },
   { 
     id: "Mutiny", 
@@ -161,7 +161,7 @@ const movies = [
     title: "Rage of Stars", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/oLld47ZT1I3iecM3OWhIphohQUJ.jpg",
     manualEmbed: "",
-    trailerEmbed: ""
+    trailerEmbed: "https://www.youtube.com/watch?v=F5bYhuO2Rkg"
   },
   { 
     id: "Toy Story 5", 
