@@ -6,7 +6,7 @@
   <title>DEYMFLIX - Reels</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=151.0">
+  <link rel="stylesheet" href="style.css?v=153.0">
 
   <!-- FIREBASE COMPAT SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -519,6 +519,7 @@
 
     const reelsContainer = document.getElementById('reelsContainer');
     let historySequence = [];
+    let resumeReelId = null;
     let activeCardIndex = 0;
     let clearModeTimer = null;
     let speedHoldTimer = null;
@@ -533,6 +534,57 @@
       window.location.href = 'index.html';
     }
 
+    // ── REEL WATCH PROGRESS (Continue Watching history) ──────────
+    function getReelHistory() {
+      try { return JSON.parse(localStorage.getItem('deymflix_reel_history') || '{}'); } catch (e) { return {}; }
+    }
+
+    function saveReelHistory(history) {
+      try { localStorage.setItem('deymflix_reel_history', JSON.stringify(history)); } catch (e) {}
+    }
+
+    function saveReelProgress(reel, currentTime, duration) {
+      if (!reel || !reel.id || !duration || isNaN(duration) || duration <= 0) return;
+      if (currentTime < 3) return;
+      const progress = (currentTime / duration) * 100;
+      const history = getReelHistory();
+      if (progress >= 95) {
+        // Finished reels drop out of the "continue watching" history.
+        if (history[reel.id]) {
+          delete history[reel.id];
+          saveReelHistory(history);
+        }
+        return;
+      }
+      history[reel.id] = {
+        id: reel.id,
+        title: reel.title || '',
+        poster: reel.poster || '',
+        currentTime: currentTime,
+        duration: duration,
+        progress: progress,
+        updatedAt: Date.now()
+      };
+      saveReelHistory(history);
+    }
+
+    function saveAllReelProgress() {
+      const listAll = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+      document.querySelectorAll('.reel-video').forEach((video) => {
+        const card = video.closest('.reel-card');
+        if (!card) return;
+        const reel = listAll.find(r => r.id === card.dataset.id);
+        if (reel && !isNaN(video.duration) && video.duration > 0) {
+          saveReelProgress(reel, video.currentTime, video.duration);
+        }
+      });
+    }
+
+    window.addEventListener('pagehide', saveAllReelProgress);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) saveAllReelProgress();
+    });
+
     function initReelHistory() {
       const list = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
       if (list.length === 0) return;
@@ -542,8 +594,26 @@
 
       let firstReel = list[0];
       if (targetId) {
+        // Opened from a specific card (e.g. Watch History): start that reel.
         const found = list.find(r => r.id === targetId);
-        if (found) firstReel = found;
+        if (found) {
+          firstReel = found;
+          resumeReelId = found.id;
+        }
+      } else {
+        // No target: continue the most recently watched unfinished reel so
+        // users pick up exactly where they left off after leaving the site.
+        const history = getReelHistory();
+        const candidates = Object.values(history)
+          .filter(h => h && h.progress < 95 && h.currentTime > 3)
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        if (candidates.length > 0) {
+          const found = list.find(r => r.id === candidates[0].id);
+          if (found) {
+            firstReel = found;
+            resumeReelId = found.id;
+          }
+        }
       }
 
       historySequence.push(firstReel);
@@ -676,6 +746,10 @@
       const timeDisplay = card.querySelector(`#time-${index}`);
       const speedBadge = card.querySelector(`#speed-badge-${index}`);
 
+      const allReels = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+      const reel = allReels.find(r => r.id === card.dataset.id) || {};
+      let lastHistorySave = 0;
+
       let lastTap = 0;
 
       video.addEventListener('waiting', () => {
@@ -691,8 +765,38 @@
           const pct = (video.currentTime / video.duration) * 100;
           if (progressBar) progressBar.style.width = `${pct}%`;
           if (timeDisplay) timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+
+          // Save watch progress (throttled) for "Continue Watching" history.
+          const now = Date.now();
+          if (now - lastHistorySave > 2000) {
+            lastHistorySave = now;
+            saveReelProgress(reel, video.currentTime, video.duration);
+          }
         }
       });
+
+      video.addEventListener('pause', () => {
+        if (!isNaN(video.duration) && video.currentTime > 3) {
+          saveReelProgress(reel, video.currentTime, video.duration);
+        }
+      });
+
+      // Resume the reel from its saved position (either opened via
+      // reels.html?id=... or auto-continued from watch history).
+      if (resumeReelId && card.dataset.id === resumeReelId) {
+        const saved = getReelHistory()[reel.id];
+        if (saved && saved.currentTime > 3 && saved.progress < 95) {
+          const tryResume = () => {
+            if (video.currentTime === 0) {
+              try { video.currentTime = saved.currentTime; } catch (e) {}
+            }
+            video.removeEventListener('loadedmetadata', tryResume);
+            video.removeEventListener('canplay', tryResume);
+          };
+          video.addEventListener('loadedmetadata', tryResume);
+          video.addEventListener('canplay', tryResume);
+        }
+      }
 
       function seekVideoToPosition(e) {
         e.stopPropagation();

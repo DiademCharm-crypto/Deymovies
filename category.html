@@ -10,7 +10,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=151.0">
+  <link rel="stylesheet" href="style.css?v=153.0">
 </head>
 <body>
 
@@ -39,7 +39,13 @@
   <!-- Category View Main Section -->
   <main class="content-section category-main-wrapper">
     <div class="section-header-flex">
-      <h2 id="category-title" class="section-header-title">Loading Category...</h2>
+      <div class="section-header-left">
+        <h2 id="category-title" class="section-header-title">Loading Category...</h2>
+        <button id="btn-reel-history" class="reel-history-btn" onclick="openReelHistory()" style="display: none;">
+          <span>🕘</span> Watch History
+          <span id="reel-history-count" class="reel-history-count" style="display: none;"></span>
+        </button>
+      </div>
     </div>
 
     <!-- Responsive Grid Container -->
@@ -48,6 +54,17 @@
     <!-- Pagination Navigation Controls -->
     <div class="pagination-wrapper" id="pagination-wrapper"></div>
   </main>
+
+  <!-- REEL WATCH HISTORY MODAL -->
+  <div id="reel-history-modal" class="reel-history-modal" onclick="if (event.target === this) closeReelHistory()">
+    <div class="reel-history-card">
+      <div class="reel-history-header">
+        <h3>🕘 Continue Watching Reels</h3>
+        <button class="reel-history-close" onclick="closeReelHistory()" title="Close">&times;</button>
+      </div>
+      <div class="reel-history-list" id="reel-history-list"></div>
+    </div>
+  </div>
 
   <!-- Request Modal -->
   <div id="request-modal" class="request-modal-backdrop" style="display: none;">
@@ -65,7 +82,7 @@
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
   <script src="reels-data.js?v=151.0"></script>
-  <script src="app.js?v=151.0"></script>
+  <script src="app.js?v=153.0"></script>
   <script>
     let currentPage = 1;
     const itemsPerPage = 18; // 18 items per page
@@ -91,12 +108,17 @@
         titleElement.textContent = 'AI Reels & Shorts';
         gridContainer.classList.add('reels-grid-mode');
         itemsList = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+        renderReelHistoryCount();
       } else if (categoryType === 'tagalog') {
         titleElement.textContent = 'Tagalog Movies PH';
         itemsList = typeof movies !== 'undefined' ? movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH') : [];
+        const historyBtn = document.getElementById('btn-reel-history');
+        if (historyBtn) historyBtn.style.display = 'none';
       } else {
         titleElement.textContent = 'All Movies';
         itemsList = typeof movies !== 'undefined' ? movies : [];
+        const historyBtn = document.getElementById('btn-reel-history');
+        if (historyBtn) historyBtn.style.display = 'none';
       }
 
       // Calculate total pages & slice array
@@ -129,6 +151,79 @@
       renderPaginationControls(totalPages, paginationWrapper);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // ── REEL WATCH HISTORY (AI Reels mode only) ──────────────────
+    function getReelHistory() {
+      try { return JSON.parse(localStorage.getItem('deymflix_reel_history') || '{}'); } catch (e) { return {}; }
+    }
+
+    function getUnfinishedReels() {
+      const history = getReelHistory();
+      const reelIds = new Set((typeof aiReelsData !== 'undefined' ? aiReelsData : []).map(r => r.id));
+      return Object.values(history)
+        .filter(h => h && reelIds.has(h.id) && h.progress < 95 && h.currentTime > 3)
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    }
+
+    function renderReelHistoryCount() {
+      const btn = document.getElementById('btn-reel-history');
+      const countEl = document.getElementById('reel-history-count');
+      if (!btn) return;
+      const unfinished = getUnfinishedReels();
+      btn.style.display = unfinished.length > 0 ? 'inline-flex' : 'none';
+      if (countEl) {
+        countEl.textContent = unfinished.length;
+        countEl.style.display = unfinished.length > 0 ? 'inline-flex' : 'none';
+      }
+    }
+
+    function openReelHistory() {
+      const modal = document.getElementById('reel-history-modal');
+      const list = document.getElementById('reel-history-list');
+      if (!modal || !list) return;
+
+      const unfinished = getUnfinishedReels();
+
+      if (unfinished.length === 0) {
+        list.innerHTML = '<div class="reel-history-empty">No watch history yet.<br>Watch a reel and it will show up here so you can continue where you left off.</div>';
+      } else {
+        list.innerHTML = '';
+        unfinished.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'reel-history-item';
+          row.innerHTML = `
+            <img src="${item.poster}" alt="${item.title}" class="reel-history-thumb" loading="lazy">
+            <div class="reel-history-info">
+              <div class="reel-history-title">${item.title}</div>
+              <div class="reel-history-progress-track"><div class="reel-history-progress-fill" style="width:${Math.max(2, Math.min(100, item.progress))}%"></div></div>
+              <div class="reel-history-pct">${Math.round(item.progress)}% watched</div>
+            </div>
+            <button class="reel-history-remove" title="Remove from history" onclick="removeReelHistory('${item.id.replace(/'/g, "\\'")}', event)">&times;</button>
+          `;
+          row.onclick = () => { window.location.href = 'reels.html?id=' + encodeURIComponent(item.id); };
+          list.appendChild(row);
+        });
+      }
+      modal.classList.add('open');
+    }
+
+    function closeReelHistory() {
+      const modal = document.getElementById('reel-history-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function removeReelHistory(id, event) {
+      event.stopPropagation();
+      const history = getReelHistory();
+      delete history[id];
+      try { localStorage.setItem('deymflix_reel_history', JSON.stringify(history)); } catch (e) {}
+      renderReelHistoryCount();
+      openReelHistory();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeReelHistory();
+    });
 
     function renderPaginationControls(totalPages, container) {
       if (!container) return;

@@ -27,7 +27,7 @@ const featuredMovies = [
     id: "Spider-Man: Brand New Day", 
     tmdbId: "969681", 
     title: "Spider-Man: Brand New Day", 
-    description: "Peter Parker navigates a refreshed world as old threats re-emerge and test his limits in an unfamiliar landscape.",
+    description: "Spider-Man: Brand New Day is a 2026 American superhero film based on the Marvel Comics character Spider-Man. Produced by Columbia Pictures, Marvel Studios, and Pascal Pictures, and distributed by Sony Pictures Releasing, it is the 38th film in the Marvel Cinematic Universe (MCU) and the fourth film in the MCU Spider-Man film series following Spider-Man: No Way Home (2021). In the film, Parker is on his own and dedicated to protecting New York City as the hero Spider-Man. His personal struggles and overworking cause his superpowers to evolve while he faces a new telepathic threat.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
     manualEmbed: "",
@@ -37,7 +37,7 @@ const featuredMovies = [
     id: "The Odyssey", 
     tmdbId: "1368337", 
     title: "The Odyssey", 
-    description: "An epic journey across dangerous waters and uncharted lands as hero Odysseus seeks his path back home.",
+    description: "The Odyssey is a 2026 epic action fantasy film written and directed by Christopher Nolan, who produced it with his wife Emma Thomas. An adaptation of Homer's ancient Greek epic poem the Odyssey, it stars an ensemble cast including Matt Damon, Tom Holland, Anne Hathaway, Robert Pattinson, Lupita Nyong'o, Samantha Morton, Zendaya, and Charlize Theron. In the film, Odysseus (Damon), the Greek king of Ithaca, undergoes a long and perilous journey home after the Trojan War and encounters mythical beings as he attempts to reunite with his wife Penelope (Hathaway).",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
     manualEmbed: "",
@@ -47,6 +47,13 @@ const featuredMovies = [
 
 
 const movies = [
+  // ── OPTIONAL QUALITY SOURCES ─────────────────────────────
+  // To enable the quality button on the player (for users with slow
+  // internet), add a lower-quality copy of the file to a movie:
+  //   manualEmbed:   ".../Movie.2026.1080p....mp4"  (default / best)
+  //   manualEmbedHd: ".../Movie.2026.720p....mp4"   (optional, less data)
+  //   manualEmbedSd: ".../Movie.2026.480p....mp4"   (optional, slow internet)
+  // The button only appears when a movie has more than one source.
   { 
     id: "The Runner", 
     tmdbId: "1510688",
@@ -98,14 +105,14 @@ const movies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uCUgMEGPbZrnGLDjDXRteffT9JM.jpg",
     manualEmbed: "https://video.nbanaapp.eu.cc/Maam.Chief.Shakedown.in.Seoul.2023-1080p(1).mkv",
     trailerEmbed: ""
-  },
-  { 
+  },  { 
     id: "The Odyssey", 
-    tmdbId: "1368337",
+    tmdbId: "1368337", 
     title: "The Odyssey", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "",
-    trailerEmbed: "https://www.youtube.com/watch?v=Sk6LZrA2JSQ"
+    description: "The Odyssey is a 2026 epic action fantasy film written and directed by Christopher Nolan, who produced it with his wife Emma Thomas. An adaptation of Homer's ancient Greek epic poem the Odyssey, it stars an ensemble cast including Matt Damon, Tom Holland, Anne Hathaway, Robert Pattinson, Lupita Nyong'o, Samantha Morton, Zendaya, and Charlize Theron. In the film, Odysseus (Damon), the Greek king of Ithaca, undergoes a long and perilous journey home after the Trojan War and encounters mythical beings as he attempts to reunite with his wife Penelope (Hathaway).",
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
+    manualEmbed: "", 
+    trailerEmbed: "https://www.youtube.com/watch?v=Sk6LZrA2JSQ" 
   },
   { 
     id: "Spider-Man: Brand New Day", 
@@ -1149,3 +1156,18 @@ async function submitMovieRequest() {
     closeRequestModal();
   }
 }
+
+// ── DEVELOPER INFO MODAL ──────────────────────────────────
+function openDeveloperInfo() {
+  const modal = document.getElementById('developer-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeDeveloperInfo() {
+  const modal = document.getElementById('developer-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDeveloperInfo();
+});

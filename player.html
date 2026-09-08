@@ -13,7 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=151.0">
+  <link rel="stylesheet" href="style.css?v=153.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -275,13 +275,18 @@
     }
 
     /* TOP-LEFT BACK HEADER (< Title) */
+    /* Only the back button + title area is clickable; without this the bar
+       stretches across the full player width and clicking the top middle or
+       top right also navigates back. */
     .player-top-bar {
       display: flex !important;
       align-items: center !important;
       gap: 8px !important;
       padding: 16px 20px !important;
       color: #ffffff !important;
-      width: auto !important;
+      align-self: flex-start !important;
+      width: fit-content !important;
+      max-width: 100% !important;
       box-sizing: border-box !important;
       z-index: 30 !important;
       cursor: pointer !important;
@@ -468,49 +473,57 @@
       display: block !important;
     }
 
-    /* SUBTITLE (CC) BUTTON & PANEL */
-    #btn-subtitles svg {
-      width: 20px !important;
-      height: 20px !important;
-    }
-
+    /* SETTINGS (QUALITY + CAPTIONS) BUTTON & PANEL */
     .subtitle-active-badge {
       color: #e50914 !important;
     }
 
-    .subtitle-panel {
+    .settings-btn {
+      flex-direction: column !important;
+      gap: 2px !important;
+    }
+    .settings-btn svg {
+      width: 16px !important;
+      height: 16px !important;
+    }
+    .settings-btn-label {
+      font-size: 0.5rem !important;
+      font-weight: 800 !important;
+      line-height: 1 !important;
+      letter-spacing: 0.3px !important;
+    }
+
+    .settings-panel {
       position: absolute !important;
       right: 14px !important;
       bottom: 66px !important;
       width: 270px !important;
-      max-height: 330px !important;
+      max-height: calc(100% - 110px) !important;
       background: rgba(18, 18, 18, 0.97) !important;
       border: 1px solid rgba(255, 255, 255, 0.15) !important;
       border-radius: 10px !important;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
-      z-index: 45 !important;
+      z-index: 46 !important;
       padding: 12px !important;
       box-sizing: border-box !important;
       display: none;
       flex-direction: column !important;
-      gap: 8px !important;
+      gap: 10px !important;
       color: #ffffff !important;
       font-size: 0.85rem !important;
+      overflow-y: auto !important;
     }
-
-    .subtitle-panel.open {
+    .settings-panel.open {
       display: flex !important;
     }
-
-    .subtitle-panel-header {
+    .settings-panel-header {
       display: flex !important;
       justify-content: space-between !important;
       align-items: center !important;
       font-weight: 800 !important;
       font-size: 0.9rem !important;
     }
-
-    .subtitle-panel-close {
+    .settings-panel-close {
       background: transparent !important;
       border: none !important;
       color: #aaaaaa !important;
@@ -519,8 +532,21 @@
       line-height: 1 !important;
       padding: 0 2px !important;
     }
-
-    .subtitle-panel select {
+    .settings-section {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    .settings-section-title {
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.8px !important;
+      text-transform: uppercase !important;
+      color: #e50914 !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      padding-bottom: 4px !important;
+    }
+    .settings-panel select {
       width: 100% !important;
       background: #1f1f1f !important;
       color: #ffffff !important;
@@ -587,6 +613,46 @@
       display: block !important;
     }
 
+    .quality-options {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+    }
+    .quality-option {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 6px !important;
+      padding: 8px 10px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+    }
+    .quality-option.active {
+      border-color: #e50914 !important;
+      background: rgba(229, 9, 20, 0.15) !important;
+    }
+    .quality-option-info {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1px !important;
+      text-align: left !important;
+    }
+    .quality-option-label {
+      font-weight: 800 !important;
+      font-size: 0.82rem !important;
+    }
+    .quality-option-hint {
+      font-size: 0.68rem !important;
+      color: #aaaaaa !important;
+    }
+    .quality-option-check {
+      color: #e50914 !important;
+      font-weight: 900 !important;
+      font-size: 1rem !important;
+    }
+
     .center-ctrl-btn.play-btn-large svg {
       width: 20px !important;
       height: 20px !important;
@@ -618,6 +684,35 @@
       font-weight: 800 !important;
       margin-bottom: 6px !important;
       color: #ffffff !important;
+    }
+
+    /* TITLE ROW WITH AUTO-DETECTED GENRE CHIPS */
+    .title-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      flex-wrap: wrap !important;
+    }
+
+    .genre-badge {
+      display: none;
+      align-items: center !important;
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+      margin-bottom: 6px !important;
+    }
+
+    .genre-chip {
+      font-size: 0.62rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.6px !important;
+      text-transform: uppercase !important;
+      color: #e50914 !important;
+      border: 1px solid rgba(229, 9, 20, 0.5) !important;
+      background: rgba(229, 9, 20, 0.1) !important;
+      padding: 2px 9px !important;
+      border-radius: 20px !important;
+      white-space: nowrap !important;
     }
 
     .synopsis-text {
@@ -752,6 +847,14 @@
         height: 28px !important;
       }
 
+      .settings-btn svg {
+        width: 24px !important;
+        height: 24px !important;
+      }
+      .settings-btn-label {
+        font-size: 0.65rem !important;
+      }
+
       .time-display {
         font-size: 1.05rem !important;
         font-weight: 700 !important;
@@ -763,6 +866,10 @@
 
       .media-title {
         font-size: 1.8rem !important;
+      }
+
+      .genre-chip {
+        font-size: 0.72rem !important;
       }
 
       .synopsis-text {
@@ -1005,44 +1112,54 @@
               </svg>
             </button>
 
+            <!-- SETTINGS (QUALITY + CAPTIONS) BUTTON -->
+            <button id="btn-settings" class="ctrl-btn-small settings-btn" title="Settings">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+              </svg>
+              <span id="quality-btn-label" class="settings-btn-label">Auto</span>
+            </button>
+
             <!-- FULLSCREEN BUTTON -->
             <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
               </svg>
             </button>
-
-            <!-- SUBTITLE (CC) BUTTON -->
-            <button id="btn-subtitles" class="ctrl-btn-small" title="Subtitles">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/>
-              </svg>
-            </button>
           </div>
         </div>
       </div>
 
-      <!-- SUBTITLE PANEL -->
-      <div id="subtitle-panel" class="subtitle-panel">
-        <div class="subtitle-panel-header">
-          <span>Subtitles</span>
-          <button id="btn-subtitle-panel-close" class="subtitle-panel-close" title="Close">&times;</button>
+      <!-- SETTINGS PANEL (VIDEO QUALITY + CAPTIONS) -->
+      <div id="settings-panel" class="settings-panel">
+        <div class="settings-panel-header">
+          <span>Settings</span>
+          <button id="btn-settings-close" class="settings-panel-close" title="Close">&times;</button>
         </div>
-        <select id="subtitle-language">
-          <option value="en" selected>English</option>
-          <option value="es">Spanish</option>
-          <option value="fil">Filipino</option>
-          <option value="tl">Tagalog</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="pt">Portuguese</option>
-          <option value="hi">Hindi</option>
-          <option value="zh">Chinese</option>
-        </select>
-        <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
-        <div id="subtitle-status" class="subtitle-status"></div>
-        <div id="subtitle-results" class="subtitle-results"></div>
-        <button id="btn-subtitle-off" class="subtitle-off-btn">Turn Off Subtitles</button>
+
+        <div id="settings-quality-section" class="settings-section">
+          <div class="settings-section-title">Video Quality</div>
+          <div id="quality-options" class="quality-options"></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Captions</div>
+          <select id="subtitle-language">
+            <option value="en" selected>English</option>
+            <option value="es">Spanish</option>
+            <option value="fil">Filipino</option>
+            <option value="tl">Tagalog</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="pt">Portuguese</option>
+            <option value="hi">Hindi</option>
+            <option value="zh">Chinese</option>
+          </select>
+          <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
+          <div id="subtitle-status" class="subtitle-status"></div>
+          <div id="subtitle-results" class="subtitle-results"></div>
+          <button id="btn-subtitle-off" class="subtitle-off-btn">Turn Off Subtitles</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1052,7 +1169,10 @@
   </div>
 
   <div class="video-info-box">
-    <h1 id="current-title" class="media-title">Loading...</h1>
+    <div class="title-row">
+      <h1 id="current-title" class="media-title">Loading...</h1>
+      <div id="genre-label" class="genre-badge" style="display: none;"></div>
+    </div>
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
   </div>
@@ -1064,7 +1184,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="app.js?v=151.0"></script>
+  <script src="app.js?v=153.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -1182,6 +1302,135 @@
       }
     }
 
+    // ── SYNOPSIS / DESCRIPTION LOADER ─────────────────────────────
+    // Source order (first hit wins):
+    //   1. Hardcoded movie.description / movie.synopsis (most accurate when present)
+    //   2. TMDB overview (works once TMDB_API_KEY below is a valid key)
+    //   3. Wikipedia plot summary (free, no key) with year + film guards for accuracy
+    // Results are cached in localStorage so revisits are instant.
+    const TMDB_API_KEY = '15d260044e350723365198253b23914f';
+
+    function fetchWithTimeout(url, ms) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), ms);
+      return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    }
+
+    // Release year is usually embedded in the stream URL (e.g. "The.Runner.2026.1080p...").
+    // Decode first: "%202026" in an encoded URL would otherwise read as "2020".
+    function getMovieYear(movie) {
+      let hay = ((movie.manualEmbed || '') + ' ' + (movie.trailerEmbed || ''));
+      try { hay = decodeURIComponent(hay); } catch (e) {}
+      const m = hay.match(/(19|20)\d{2}/);
+      return m ? m[0] : '';
+    }
+
+    function synopsisCacheGet(movieId) {
+      try {
+        const cache = JSON.parse(localStorage.getItem('deymflix_synopsis_cache') || '{}');
+        if (cache[movieId] && cache[movieId].text) return cache[movieId].text;
+      } catch (e) {}
+      return '';
+    }
+
+    function synopsisCacheSet(movieId, text) {
+      try {
+        const cache = JSON.parse(localStorage.getItem('deymflix_synopsis_cache') || '{}');
+        cache[movieId] = { text: text, ts: Date.now() };
+        localStorage.setItem('deymflix_synopsis_cache', JSON.stringify(cache));
+      } catch (e) {}
+    }
+
+    async function fetchWikipediaSummary(title) {
+      try {
+        const res = await fetchWithTimeout(
+          'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title) + '?origin=*',
+          5000
+        );
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (!data || data.type !== 'standard' || !data.extract) return null;
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Guards against grabbing the wrong page (an older film, the poem "The
+    // Odyssey", a TV series, etc.): the page must clearly be about a film and,
+    // when the release year is known, the page or its text must mention it.
+    function wikipediaExtractPasses(summary, year, titleHasYear) {
+      const hay = (summary.description || '') + ' ' + summary.extract;
+      if (!/film|movie/i.test(hay)) return false;
+      if (year && !titleHasYear && summary.extract.indexOf(year) === -1) return false;
+      return true;
+    }
+
+    // Search results must still look like OUR movie (e.g. "Almost Us" must not
+    // match "Toxic (2026 film)"). Requires a meaningful word of the movie title
+    // to appear in the candidate article's title.
+    function wikipediaSearchMatches(resultTitle, movieTitle) {
+      const stop = new Set(['the', 'a', 'an', 'and', 'of', 'in', 'on', 'to', 'for', 'with', 'vs', 'versus', 'live', 'action']);
+      const tokens = movieTitle.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+        .filter(t => t.length >= 4 && !stop.has(t));
+      if (tokens.length === 0) return true;
+      const lowerResult = resultTitle.toLowerCase();
+      return tokens.some(t => lowerResult.indexOf(t) !== -1);
+    }
+
+    // Keeps the last Wikipedia extract used for the synopsis so the genre
+    // detector can reuse it instead of fetching the page twice.
+    let lastWikipediaExtract = '';
+
+    async function loadWikipediaSynopsis(movie) {
+      const title = movie.title || '';
+      if (!title) return '';
+      const year = getMovieYear(movie);
+
+      // 1) Direct article candidates, most specific first.
+      const candidates = [];
+      if (year) candidates.push(title + ' (' + year + ' film)');
+      candidates.push(title + ' (film)');
+      candidates.push(title);
+
+      for (const cand of candidates) {
+        const summary = await fetchWikipediaSummary(cand);
+        if (summary && wikipediaExtractPasses(summary, year, cand.indexOf(year) !== -1)) {
+          lastWikipediaExtract = summary.extract.trim();
+          return lastWikipediaExtract;
+        }
+      }
+
+      // 2) Search fallback for titles whose article name differs
+      //    (e.g. "Moana: Live Action" -> "Moana (2026 film)").
+      const q = (title + ' ' + (year || '') + ' film').trim();
+      try {
+        const res = await fetchWithTimeout(
+          'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(q) +
+          '&srlimit=3&format=json&origin=*',
+          5000
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const results = (data.query && data.query.search) || [];
+          const tried = new Set(candidates);
+          for (const r of results) {
+            if (tried.has(r.title)) continue;
+            tried.add(r.title);
+            if (year && r.title.indexOf(year) === -1) continue;
+            if (!wikipediaSearchMatches(r.title, title)) continue;
+            const summary = await fetchWikipediaSummary(r.title);
+            if (summary && wikipediaExtractPasses(summary, year, r.title.indexOf(year) !== -1)) {
+              lastWikipediaExtract = summary.extract.trim();
+              return lastWikipediaExtract;
+            }
+          }
+        }
+      } catch (e) {}
+
+      return '';
+    }
+
     async function loadBroadSynopsis() {
       if (currentMovie.description && currentMovie.description.trim() !== '') {
         descElement.textContent = currentMovie.description;
@@ -1195,20 +1444,41 @@
         return;
       }
 
-      const apiKey = '15d260044e350723365198253b23914f';
+      // Cached synopsis -> instant, no network.
+      const cached = synopsisCacheGet(currentMovie.id);
+      if (cached) {
+        descElement.textContent = cached;
+        checkSynopsisLength();
+        return;
+      }
 
-      if (currentMovie.tmdbId) {
+      let synopsis = '';
+
+      // TMDB overview (works once TMDB_API_KEY is a valid key).
+      if (currentMovie.tmdbId && TMDB_API_KEY) {
         try {
-          const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${currentMovie.tmdbId}?api_key=${apiKey}&language=en-US`);
+          const tmdbRes = await fetchWithTimeout(
+            'https://api.themoviedb.org/3/movie/' + currentMovie.tmdbId + '?api_key=' + TMDB_API_KEY + '&language=en-US',
+            5000
+          );
           if (tmdbRes.ok) {
             const tmdbData = await tmdbRes.json();
             if (tmdbData.overview && tmdbData.overview.trim() !== '') {
-              descElement.textContent = tmdbData.overview;
-              checkSynopsisLength();
-              return;
+              synopsis = tmdbData.overview.trim();
             }
           }
         } catch (e) {}
+      }
+
+      if (!synopsis) {
+        synopsis = await loadWikipediaSynopsis(currentMovie);
+      }
+
+      if (synopsis) {
+        descElement.textContent = synopsis;
+        synopsisCacheSet(currentMovie.id, synopsis);
+        checkSynopsisLength();
+        return;
       }
 
       const originTag = currentMovie.isFilipino ? "Filipino movie" : "feature movie";
@@ -1216,7 +1486,101 @@
       checkSynopsisLength();
     }
 
-    loadBroadSynopsis();
+    // ── AUTO-DETECTED GENRE BADGE ────────────────────────────────
+    // Genres are parsed out of the synopsis text ("a 2026 American action
+    // thriller film" -> Action · Thriller). Works for hardcoded descriptions,
+    // TMDB overviews and Wikipedia extracts alike; results are cached.
+    const GENRE_PATTERNS = [
+      ['Sci-Fi', /\bsci-?fi\b|\bscience fiction\b/i],
+      ['Action', /\baction\b/i],
+      ['Adventure', /\badventure\b/i],
+      ['Comedy', /\bcomedy\b/i],
+      ['Drama', /\bdrama\b/i],
+      ['Fantasy', /\bfantasy\b/i],
+      ['Horror', /\bhorror\b/i],
+      ['Thriller', /\bthriller\b/i],
+      ['Romance', /\bromance\b|\bromantic\b/i],
+      ['Mystery', /\bmystery\b/i],
+      ['Crime', /\bcrime\b/i],
+      ['Animation', /\banimat(?:ed|ion)\b/i],
+      ['Musical', /\bmusical\b/i],
+      ['Western', /\bwestern\b/i],
+      ['War', /\bwar (?:film|drama|epic|movie)\b/i],
+      ['Biography', /\bbiograph(?:y|ical)\b/i],
+      ['Documentary', /\bdocumentary\b/i],
+      ['Family', /\bfamily (?:film|adventure|comedy|drama)\b/i],
+      ['Superhero', /\bsuperhero\b/i]
+    ];
+
+    function detectGenres(text) {
+      if (!text) return [];
+      // "live-action" would otherwise match "Action".
+      const cleaned = text.replace(/live[- ]action/gi, ' ');
+      const found = [];
+      for (const [label, re] of GENRE_PATTERNS) {
+        const m = cleaned.match(re);
+        if (m) found.push({ label: label, idx: m.index });
+      }
+      found.sort((a, b) => a.idx - b.idx);
+      const labels = found.map(f => f.label);
+      return [...new Set(labels)].slice(0, 3);
+    }
+
+    async function loadMovieGenre() {
+      const badge = document.getElementById('genre-label');
+      if (!badge) return;
+
+      const setGenre = (genres) => {
+        if (genres && genres.length > 0) {
+          badge.innerHTML = '';
+          genres.forEach((g) => {
+            const chip = document.createElement('span');
+            chip.className = 'genre-chip';
+            chip.textContent = g;
+            badge.appendChild(chip);
+          });
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      };
+
+      // 1) Cached result.
+      try {
+        const cache = JSON.parse(localStorage.getItem('deymflix_genre_cache') || '{}');
+        if (cache[currentMovie.id]) {
+          setGenre(cache[currentMovie.id]);
+          return;
+        }
+      } catch (e) {}
+
+      // 2) Hardcoded description / synopsis.
+      let genres = detectGenres(currentMovie.description || currentMovie.synopsis || '');
+
+      // 3) Wikipedia extract already fetched for the synopsis.
+      if (genres.length === 0 && lastWikipediaExtract) {
+        genres = detectGenres(lastWikipediaExtract);
+      }
+
+      // 4) Dedicated Wikipedia lookup (e.g. description without genre words).
+      if (genres.length === 0) {
+        const extract = await loadWikipediaSynopsis(currentMovie);
+        if (extract) genres = detectGenres(extract);
+      }
+
+      if (genres.length > 0) {
+        try {
+          const cache = JSON.parse(localStorage.getItem('deymflix_genre_cache') || '{}');
+          cache[currentMovie.id] = genres;
+          localStorage.setItem('deymflix_genre_cache', JSON.stringify(cache));
+        } catch (e) {}
+      }
+      setGenre(genres);
+    }
+
+    loadBroadSynopsis().then(() => {
+      loadMovieGenre();
+    });
 
     let iframe = null;
     const directPlayer = document.getElementById('direct-video-player');
@@ -1281,8 +1645,8 @@
     }
 
     function hideControls() {
-      const subtitlePanelEl = document.getElementById('subtitle-panel');
-      if (subtitlePanelEl && subtitlePanelEl.classList.contains('open')) return;
+      const settingsPanelEl = document.getElementById('settings-panel');
+      if (settingsPanelEl && settingsPanelEl.classList.contains('open')) return;
       playerOverlay.classList.remove('active');
     }
 
@@ -1409,18 +1773,25 @@
 
     playerContainer.addEventListener('mousemove', () => { showControls(); });
 
+    // Toggles the buffering UI: shows the spinner and hides the play/pause
+    // buttons while the video is loading, restores them when playback is ready.
+    function setBufferingUI(on) {
+      const spinner = document.getElementById('video-loading-spinner');
+      const group = document.getElementById('center-controls');
+      const bottomBtn = document.getElementById('btn-bottom-play-pause');
+      if (spinner) spinner.style.display = on ? 'flex' : 'none';
+      if (group) group.style.setProperty('display', on ? 'none' : 'flex', 'important');
+      if (bottomBtn) bottomBtn.style.display = on ? 'none' : '';
+    }
+
     function showLoadingSpinner() {
-      if (directPlayer.readyState < 3 && directPlayer.paused) {
-        loadingSpinner.style.display = 'flex';
-        centerControlsGroup.style.setProperty('display', 'none', 'important');
-      }
+      setBufferingUI(true);
     }
 
     function hideLoadingSpinner() {
-      loadingSpinner.style.display = 'none';
+      setBufferingUI(false);
       networkNote.style.display = 'none';
       clearTimeout(slowConnectionTimer);
-      centerControlsGroup.style.setProperty('display', 'flex', 'important');
     }
 
     function startSlowConnectionCheck() {
@@ -1459,15 +1830,17 @@
     }
 
     directPlayer.addEventListener('loadstart', startSlowConnectionCheck);
-    directPlayer.addEventListener('waiting', startSlowConnectionCheck);
-    directPlayer.addEventListener('stalled', startSlowConnectionCheck);
+    directPlayer.addEventListener('waiting', () => { showLoadingSpinner(); startSlowConnectionCheck(); });
+    directPlayer.addEventListener('stalled', () => { showLoadingSpinner(); startSlowConnectionCheck(); });
     directPlayer.addEventListener('seeking', showLoadingSpinner);
+    directPlayer.addEventListener('seeked', hideLoadingSpinner);
 
     directPlayer.addEventListener('canplay', hideLoadingSpinner);
     directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
 
     directPlayer.addEventListener('loadedmetadata', () => {
-      hideLoadingSpinner();
+      // Keep the buffering spinner up while a quality switch is in progress.
+      if (!isQualitySwitch) hideLoadingSpinner();
       totalDurationText.textContent = formatTime(directPlayer.duration);
 
       const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
@@ -1521,6 +1894,8 @@
     });
 
     directPlayer.addEventListener('pause', () => {
+      // Keep the buffering UI intact while a quality switch is in progress.
+      if (isQualitySwitch) return;
       hideLoadingSpinner();
       updatePlayStateUI(false);
       playerOverlay.classList.add('active');
@@ -1596,28 +1971,27 @@
       toggleFullscreen();
     };
 
-    // ── SUBTITLE (CC) CONTROL ──────────────────────────────────
-    const btnSubtitles = document.getElementById('btn-subtitles');
-    const subtitlePanel = document.getElementById('subtitle-panel');
+    // ── SETTINGS (QUALITY + CAPTIONS) CONTROL ────────────────────
+    const settingsPanel = document.getElementById('settings-panel');
     const subtitleStatus = document.getElementById('subtitle-status');
     const subtitleResults = document.getElementById('subtitle-results');
-    const btnSubtitleClose = document.getElementById('btn-subtitle-panel-close');
     const btnSubtitleSearch = document.getElementById('btn-subtitle-search');
     const btnSubtitleOff = document.getElementById('btn-subtitle-off');
 
-    function toggleSubtitlePanel() {
-      if (!subtitlePanel) return;
-      if (subtitlePanel.classList.contains('open')) {
-        closeSubtitlePanel();
+    function toggleSettingsPanel() {
+      if (!settingsPanel) return;
+      if (settingsPanel.classList.contains('open')) {
+        closeSettingsPanel();
       } else {
-        subtitlePanel.classList.add('open');
+        renderQualityMenu();
+        settingsPanel.classList.add('open');
         showControls();
         clearTimeout(autoHideTimer);
       }
     }
 
-    function closeSubtitlePanel() {
-      if (subtitlePanel) subtitlePanel.classList.remove('open');
+    function closeSettingsPanel() {
+      if (settingsPanel) settingsPanel.classList.remove('open');
     }
 
     function srtToVtt(srt) {
@@ -1651,7 +2025,8 @@
 
       subtitleActive = true;
       if (btnSubtitleOff) btnSubtitleOff.classList.add('show');
-      if (btnSubtitles) btnSubtitles.classList.add('subtitle-active-badge');
+      const settingsBtn = document.getElementById('btn-settings');
+      if (settingsBtn) settingsBtn.classList.add('subtitle-active-badge');
     }
 
     function turnOffSubtitles() {
@@ -1659,7 +2034,8 @@
       if (existing) existing.remove();
       subtitleActive = false;
       if (btnSubtitleOff) btnSubtitleOff.classList.remove('show');
-      if (btnSubtitles) btnSubtitles.classList.remove('subtitle-active-badge');
+      const settingsBtn = document.getElementById('btn-settings');
+      if (settingsBtn) settingsBtn.classList.remove('subtitle-active-badge');
       showToast('Subtitles off');
     }
 
@@ -1746,18 +2122,6 @@
       }
     }
 
-    if (btnSubtitles) {
-      btnSubtitles.onclick = (e) => {
-        e.stopPropagation();
-        toggleSubtitlePanel();
-      };
-    }
-    if (btnSubtitleClose) {
-      btnSubtitleClose.onclick = (e) => {
-        e.stopPropagation();
-        closeSubtitlePanel();
-      };
-    }
     if (btnSubtitleSearch) {
       btnSubtitleSearch.onclick = (e) => {
         e.stopPropagation();
@@ -1768,6 +2132,191 @@
       btnSubtitleOff.onclick = (e) => {
         e.stopPropagation();
         turnOffSubtitles();
+      };
+    }
+
+    // ── VIDEO QUALITY (HD/SD) CONTROL ────────────────────────────
+    // The quality button appears automatically for a movie once it has more
+    // than one source. Add optional fields to a movie in app.js to enable it:
+    //   manualEmbed:  ".../Movie.2026.1080p....mp4"  (default / best source)
+    //   manualEmbedHd: ".../Movie.2026.720p....mp4"  (optional, uses less data)
+    //   manualEmbedSd: ".../Movie.2026.480p....mp4"  (optional, best for slow internet)
+    let qualityOptions = [];
+    let activeQualityIndex = 0;
+    let previousQualityIndex = 0;
+    let isQualitySwitch = false;
+
+    function buildQualityOptions() {
+      const opts = [];
+      const seen = new Set();
+      const push = (label, url, hint) => {
+        if (!url || typeof url !== 'string' || url.trim() === '') return;
+        if (seen.has(url)) return;
+        seen.add(url);
+        opts.push({ label: label, url: url, hint: hint });
+      };
+      push('Auto', currentMovie.manualEmbed, 'Best available quality');
+      push('1080p', currentMovie.manualEmbed, 'Full HD');
+      push('720p', currentMovie.manualEmbedHd, 'Uses less data');
+      push('480p', currentMovie.manualEmbedSd, 'Best for slow internet');
+      return opts;
+    }
+
+    function renderQualityMenu() {
+      const container = document.getElementById('quality-options');
+      if (!container) return;
+      container.innerHTML = '';
+      qualityOptions.forEach((opt, i) => {
+        const row = document.createElement('div');
+        row.className = 'quality-option' + (i === activeQualityIndex ? ' active' : '');
+
+        const info = document.createElement('div');
+        info.className = 'quality-option-info';
+        const label = document.createElement('span');
+        label.className = 'quality-option-label';
+        label.textContent = opt.label;
+        const hint = document.createElement('span');
+        hint.className = 'quality-option-hint';
+        hint.textContent = opt.hint || '';
+        info.appendChild(label);
+        info.appendChild(hint);
+
+        const check = document.createElement('span');
+        check.className = 'quality-option-check';
+        check.textContent = i === activeQualityIndex ? '✓' : '';
+
+        row.appendChild(info);
+        row.appendChild(check);
+        row.onclick = (e) => {
+          e.stopPropagation();
+          switchQuality(i);
+        };
+        container.appendChild(row);
+      });
+    }
+
+    function applyQualitySelection() {
+      const opt = qualityOptions[activeQualityIndex];
+      if (!opt) return;
+      const labelEl = document.getElementById('quality-btn-label');
+      const btn = document.getElementById('btn-settings');
+      if (labelEl) labelEl.textContent = opt.label;
+      if (btn) btn.title = 'Settings — Quality: ' + opt.label;
+      localStorage.setItem('deymflix_quality_pref', opt.label);
+    }
+
+    function setupQualityControl() {
+      qualityOptions = buildQualityOptions();
+
+      // The settings button is always available (captions); only show the
+      // quality section when the movie actually has more than one source.
+      const qualitySection = document.getElementById('settings-quality-section');
+      if (qualitySection) {
+        qualitySection.style.display = qualityOptions.length >= 2 ? 'flex' : 'none';
+      }
+      if (qualityOptions.length < 2) return;
+
+      // Restore the user's saved quality preference (e.g. "480p" for slow internet).
+      const pref = localStorage.getItem('deymflix_quality_pref') || 'Auto';
+      const prefIdx = qualityOptions.findIndex(o => o.label === pref);
+
+      // Initial selection is the movie's default source (Auto).
+      activeQualityIndex = 0;
+      applyQualitySelection();
+      renderQualityMenu();
+
+      // If the saved preference is a lower quality, apply it right away.
+      if (prefIdx > 0) {
+        switchQuality(prefIdx);
+      }
+    }
+
+    function switchQuality(index) {
+      if (index === activeQualityIndex) {
+        closeSettingsPanel();
+        return;
+      }
+      const opt = qualityOptions[index];
+      if (!opt) return;
+
+      const resumeTime = directPlayer.currentTime || 0;
+      const wasPlaying = !directPlayer.paused;
+      previousQualityIndex = activeQualityIndex;
+      activeQualityIndex = index;
+      applyQualitySelection();
+      renderQualityMenu();
+
+      isQualitySwitch = true;
+      showLoadingSpinner();
+
+      const onMetadata = () => {
+        directPlayer.removeEventListener('loadedmetadata', onMetadata);
+        directPlayer.removeEventListener('error', onError);
+        isQualitySwitch = false;
+        try { directPlayer.currentTime = resumeTime; } catch (e) {}
+        if (subtitleActive) {
+          for (let i = 0; i < directPlayer.textTracks.length; i++) {
+            directPlayer.textTracks[i].mode = 'showing';
+          }
+        }
+        if (wasPlaying) {
+          directPlayer.play().catch(() => {
+            hideLoadingSpinner();
+            updatePlayStateUI(false);
+          });
+        } else {
+          hideLoadingSpinner();
+          updatePlayStateUI(false);
+        }
+      };
+
+      const onError = () => {
+        directPlayer.removeEventListener('loadedmetadata', onMetadata);
+        directPlayer.removeEventListener('error', onError);
+        isQualitySwitch = false;
+        activeQualityIndex = previousQualityIndex;
+        applyQualitySelection();
+        renderQualityMenu();
+
+        // Restore the previously working source so playback keeps going.
+        const prevOpt = qualityOptions[previousQualityIndex];
+        if (prevOpt) {
+          directPlayer.src = prevOpt.url;
+          directPlayer.load();
+          const restoreMeta = () => {
+            directPlayer.removeEventListener('loadedmetadata', restoreMeta);
+            try { directPlayer.currentTime = resumeTime; } catch (e) {}
+            if (wasPlaying) {
+              directPlayer.play().catch(() => {});
+            }
+          };
+          directPlayer.addEventListener('loadedmetadata', restoreMeta);
+        }
+        hideLoadingSpinner();
+        showToast('This quality failed to load.');
+      };
+
+      directPlayer.addEventListener('loadedmetadata', onMetadata);
+      directPlayer.addEventListener('error', onError);
+
+      directPlayer.src = opt.url;
+      directPlayer.load();
+      closeSettingsPanel();
+      showToast('Switching to ' + opt.label + '…');
+    }
+
+    const btnSettings = document.getElementById('btn-settings');
+    if (btnSettings) {
+      btnSettings.onclick = (e) => {
+        e.stopPropagation();
+        toggleSettingsPanel();
+      };
+    }
+    const btnSettingsClose = document.getElementById('btn-settings-close');
+    if (btnSettingsClose) {
+      btnSettingsClose.onclick = (e) => {
+        e.stopPropagation();
+        closeSettingsPanel();
       };
     }
 
@@ -1911,8 +2460,9 @@
         
         attemptAutoUnmute();
         showControls();
-        const ccDirect = document.getElementById('btn-subtitles');
-        if (ccDirect) ccDirect.style.display = '';
+        const settingsBtn = document.getElementById('btn-settings');
+        if (settingsBtn) settingsBtn.style.display = 'flex';
+        setupQualityControl();
         return;
       }
 
@@ -1948,8 +2498,8 @@
         // so add a dedicated floating back button for this mode
         ensureTrailerBackButton();
 
-        const ccTrailer = document.getElementById('btn-subtitles');
-        if (ccTrailer) ccTrailer.style.display = 'none';
+        const settingsTrailer = document.getElementById('btn-settings');
+        if (settingsTrailer) settingsTrailer.style.display = 'none';
 
         // Check if user click card exists
         let startCard = document.getElementById('trailer-start-overlay');
@@ -1985,8 +2535,8 @@
       playerOverlay.style.setProperty('display', 'flex', 'important');
       adShield.style.setProperty('display', 'block', 'important');
 
-      const ccEmbed = document.getElementById('btn-subtitles');
-      if (ccEmbed) ccEmbed.style.display = 'none';
+      const settingsEmbed = document.getElementById('btn-settings');
+      if (settingsEmbed) settingsEmbed.style.display = 'none';
 
       renderFreshIframe(targetUrl, false);
     }

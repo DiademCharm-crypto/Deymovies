@@ -10,7 +10,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=151.0">
+  <link rel="stylesheet" href="style.css?v=153.0">
 </head>
 <body>
 
@@ -49,10 +49,10 @@
       <div class="horizontal-scroll" id="continue-watching-container"></div>
     </section>
 
-    <!-- 1. Top Picks Row -->
+    <!-- 1. Recently Added Row -->
     <section class="content-section">
       <div class="section-header-flex">
-        <h2 class="section-header-title">Top Picks</h2>
+        <h2 class="section-header-title">Recently Added</h2>
       </div>
       <div class="top-picks-scroll" id="top-picks-container"></div>
     </section>
@@ -98,9 +98,43 @@
     </div>
   </div>
 
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">DEYM<em>FLIX</em></span>
+        <p class="footer-tagline">Premium movies &amp; trailers — stream anywhere, anytime.</p>
+      </div>
+      <div class="footer-dev">
+        <button class="dev-info-btn" onclick="openDeveloperInfo()" title="Developer Info">
+          <img src="developer.png" alt="Developer photo" class="dev-avatar" loading="lazy">
+          <span class="dev-info-text">
+            <strong>Developer Info</strong>
+            <small>Tap to view</small>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <span>© 2026 DEYMFLIX. <strong>All Rights Reserved.</strong></span>
+    </div>
+  </footer>
+
+  <!-- DEVELOPER INFO MODAL -->
+  <div id="developer-modal" class="dev-modal" onclick="if (event.target === this) closeDeveloperInfo()">
+    <div class="dev-modal-card">
+      <button class="dev-modal-close" onclick="closeDeveloperInfo()" title="Close">&times;</button>
+      <img src="developer.png" alt="Diadem Charm Beronas" class="dev-modal-photo">
+      <h3 class="dev-modal-name">Diadem Charm Beronas</h3>
+      <p class="dev-modal-role">Web Developer · Designer</p>
+      <p class="dev-modal-country">📍 Philippines</p>
+      <p class="dev-modal-note">The mind behind DEYMFLIX — crafting clean, fast, and enjoyable streaming experiences for everyone.</p>
+    </div>
+  </div>
+
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
   <script src="reels-data.js?v=151.0"></script>
-  <script src="app.js?v=151.0"></script>
+  <script src="app.js?v=153.0"></script>
 </body>
 </html>
