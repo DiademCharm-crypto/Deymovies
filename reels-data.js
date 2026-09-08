@@ -1,6 +1,86 @@
 // AI Reels & Shorts Data Source
 const aiReelsData = [
   {
+    id: "The-Broken-Vow-of-the Sea-God's-Son",
+    title: "The Broken Vow of the Sea God's Son",
+    author: "@deymflix_official",
+    poster: "https://media.anyshort.net/c/v3/ee/ee8210b05ba2f628e44c6aabc54f78b49b38b468e88ab85d1f1a9f1d8d9dadae.webp",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/ai2/(Exclusive)+The+Broken+Vow+of+the+Sea+God+S+Son+FULL+Drama+2026.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "After-Divorce,-I-Ruined-My-Ex",
+    title: "After Divorce, I Ruined My Ex",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/eBBIQ1gdvg3yUnG7G/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/After+Divorce%2C+I+Ruined+My+Ex.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Chatty-Fated-Lover",
+    title: "Chatty Fated Lover",
+    author: "@deymflix_official",
+    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMVHwxTQ1lE-6DAPaFQI-mOJU7chnDYRXUAwpE2WAdvw&s",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/Chatty+Fated+Lover+Full+Movie.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Married-a-Vagrant,-Became-the-Sea-Queen",
+    title: "Married a Vagrant, Became the Sea Queen",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/eBXXI1gd-IHBF9Df4/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/Married+a+Vagrant%2C+Became+the+Sea+Queen+Full+Movie.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "My-Orphaned-beloved",
+    title: "My Orphaned beloved",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/e8Tmo1gdczMx4PJNY/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/My+orphaned+beloved+Full+Series+Short+Drama+English.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "The-Billionaire's-Secret-Roommate",
+    title: "The Billionaire's Secret Roommate",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/cX4zg1gcEzoI2os6s/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/The+Billionaire.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "The-Mute-Wife-He-Destroyed-to-Protect",
+    title: "The Mute Wife He Destroyed to Protect",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1781676220_AMhwH6aR2X.jpg?x-oss-process=image/resize,w_400,image/format,webp",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/The+Mute+Wife+He+Destroyed+to+Protect+Full+Story+Part+1+1+Short+Drama+%5BFull.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "The-Reborn-Luna",
+    title: "The Reborn Luna",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/d_5gc1gdXtIt8Imwl/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/The+Reborn+Luna+Full+Ep.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Two-Alphas-Wanted-Me,-But-I-Chose-the-Crown",
+    title: "Two Alphas Wanted Me, But I Chose the Crown",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/eBB3M1gdvvCayrdTH/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/Two+Alphas+Wanted+Me%2C+But+I+Chose+the+Crown+-+Full+Drama+English+Sub+2026.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "The-Vampire-King",
+    title: "The Vampire King",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/e9CVA1gdfmgqG1zaU/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/ai2/The+Vampire+King.mp4",
+    likes: "12.4K"
+  },
+  {
     id: "The-Billionaire's-Illegal-Obsession",
     title: "The Billionaire's Illegal Obsession",
     author: "@deymflix_official",
