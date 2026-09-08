@@ -56,6 +56,14 @@ const movies = [
     trailerEmbed: ""
   },
   { 
+    id: "Moana: Live Action", 
+    tmdbId: "1108427",
+    title: "Moana: Live Action", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
+    trailerEmbed: ""
+  },
+  { 
     id: "Love, Ngo", 
     tmdbId: "1700944",
     title: "Love, Ngo", 
@@ -177,14 +185,6 @@ const movies = [
     title: "Pinocchio: Unstrung", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eUJXk3bTvLBi5Zcb0BCedZU7lVL.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Pinocchio.Unstrung.mp4",
-    trailerEmbed: ""
-  },
-  { 
-    id: "Moana: Live Action", 
-    tmdbId: "1108427",
-    title: "Moana: Live Action", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
-    manualEmbed: "",
     trailerEmbed: ""
   },
   { 
