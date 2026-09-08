@@ -13,7 +13,16 @@ function cleanDriveLink(url) {
 
 
 const featuredMovies = [
-  { 
+    { 
+    id: "Moana:-Live-Action", 
+    tmdbId: "1108427", 
+    title: "Moana: Live Action",
+    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10", 
+    backdrop: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
+    trailerEmbed: ""
+    },
+    { 
     id: "Toy Story 5", 
     tmdbId: "1084244", 
     title: "Toy Story 5", 
@@ -24,24 +33,13 @@ const featuredMovies = [
     trailerEmbed: ""
   },
   { 
-    id: "Spider-Man: Brand New Day", 
-    tmdbId: "969681", 
-    title: "Spider-Man: Brand New Day", 
-    description: "Spider-Man: Brand New Day is a 2026 American superhero film based on the Marvel Comics character Spider-Man. Produced by Columbia Pictures, Marvel Studios, and Pascal Pictures, and distributed by Sony Pictures Releasing, it is the 38th film in the Marvel Cinematic Universe (MCU) and the fourth film in the MCU Spider-Man film series following Spider-Man: No Way Home (2021). In the film, Parker is on his own and dedicated to protecting New York City as the hero Spider-Man. His personal struggles and overworking cause his superpowers to evolve while he faces a new telepathic threat.",
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg", 
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
-    manualEmbed: "",
+    id: "The Runner", 
+    tmdbId: "1510688", 
+    title: "The Runner", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg", 
+    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
+    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
-  },
-  { 
-    id: "The Odyssey", 
-    tmdbId: "1368337", 
-    title: "The Odyssey", 
-    description: "The Odyssey is a 2026 epic action fantasy film written and directed by Christopher Nolan, who produced it with his wife Emma Thomas. An adaptation of Homer's ancient Greek epic poem the Odyssey, it stars an ensemble cast including Matt Damon, Tom Holland, Anne Hathaway, Robert Pattinson, Lupita Nyong'o, Samantha Morton, Zendaya, and Charlize Theron. In the film, Odysseus (Damon), the Greek king of Ithaca, undergoes a long and perilous journey home after the Trojan War and encounters mythical beings as he attempts to reunite with his wife Penelope (Hathaway).",
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg", 
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
-    manualEmbed: "",
-    trailerEmbed: "https://www.youtube.com/watch?v=Sk6LZrA2JSQ"
   }
 ];
 
