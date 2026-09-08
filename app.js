@@ -320,7 +320,7 @@ const movies = [
     tmdbId: "1226699",
     title: "The Wrong Girls", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/iEJshwO6g4WKTP4HJgCHRTJMWEd.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Wrong%20Girls%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Wrong.Girls.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -336,7 +336,7 @@ const movies = [
     tmdbId: "1319522",
     title: "Gohan", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/nVq1Dn88NzVIVTDpGZeP7fxpLa1.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Gohan%20(2026)%20%5B720p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Gohan.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -344,7 +344,7 @@ const movies = [
     tmdbId: "1433583",
     title: "The Weight", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/8i5iZV50CoEtmDCFM7RSxCkpE8h.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II/The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II.mkv",
     trailerEmbed: ""
   },
   { 
@@ -352,7 +352,7 @@ const movies = [
     tmdbId: "1294189",
     title: "The Mongoose", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Mongoose%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Mongoose.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -368,7 +368,7 @@ const movies = [
     tmdbId: "1705729",
     title: "Man of War", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vt0RqHlqfUzeiBEVQvp43yY2076.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Man%20Of%20War%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Man.Of.War.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -376,7 +376,7 @@ const movies = [
     tmdbId: "1439808",
     title: "Hadestown: The Musical", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/iJNVygzkuOSCOdCPNI1nLSeF7sz.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Hadestown%20The%20Musical%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Hadestown.The.Musical.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -384,7 +384,7 @@ const movies = [
     tmdbId: "1469342",
     title: "Her Private Hell", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kiFacg75KVjy0AM3S4QmbPas8zL.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Her%20Private%20Hell%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Her.Private.Hell.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -400,7 +400,7 @@ const movies = [
     tmdbId: "87513",
     title: "Motor City", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/dx2dblJL3GAKcXXXPjC2FSaMTWW.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Motor%20City%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Motor.City.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -416,7 +416,7 @@ const movies = [
     tmdbId: "1432706",
     title: "Bury the Devil", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/yQ3GeVsebrhOPIBhIdoSslbndEv.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Bury%20The%20Devil%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Bury.The.Devil.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -432,7 +432,7 @@ const movies = [
     tmdbId: "1339175",
     title: "The Birthday Party", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sXN4IvB4hM2AYYx9BhdzhokrjvH.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Birthday%20Party%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Birthday.Party.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -440,7 +440,7 @@ const movies = [
     tmdbId: "1314826",
     title: "Yellow Eyes", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tdIqb0g8fimv2bXIEZdWu6Zfywt.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Yellow%20Eyes%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Yellow.Eyes.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -456,7 +456,7 @@ const movies = [
     tmdbId: "79084",
     title: "Pose", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5f23i30nFJz0nrd3DGheOCqXa2P.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Pose%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.LT%5D/Pose.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.LT%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -464,7 +464,7 @@ const movies = [
     tmdbId: "1281195",
     title: "Truly Naked", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/y23B9EnC0LDw8zMKlpXJauyLH7k.jpg",
-    manualEmbed: "https://cinema8.com/video/jXax7PlD",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Truly%20Naked%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Truly.Naked.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -472,7 +472,7 @@ const movies = [
     tmdbId: "1493400",
     title: "Camp Rock 3", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/rS7byWK9cfPfdLeFNlRIaJxH9mN.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH/Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH.mkv",
     trailerEmbed: ""
   },
   { 
@@ -544,7 +544,7 @@ const movies = [
     tmdbId: "1361969",
     title: "All Night Wrong", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/jFN9LcCG4a02wRWm2qfJ6nLY8BO.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/All%20Night%20Wrong%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/All.Night.Wrong.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.srt",
     trailerEmbed: ""
   },
   { 
@@ -568,7 +568,7 @@ const movies = [
     tmdbId: "1596260",
     title: "Night Nurse", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/cvj1d5avMYRxK8FVpq07UqLrcbZ.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Night%20Nurse%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Night.Nurse.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -576,7 +576,7 @@ const movies = [
     tmdbId: "1457515",
     title: "Air Force Elite: Thunderbirds", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hsJtBhMxNDGzW5KcQ9qz3EQGnEt.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Air%20Force%20Elite%20Thunderbirds%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.MX%5D/Air.Force.Elite.Thunderbirds.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.MX%5D.mp4.fdmdownload",
     trailerEmbed: ""
   },
   { 
@@ -584,7 +584,7 @@ const movies = [
     tmdbId: "1363387",
     title: "Saccharine", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bCHPB5WZy4T0Rerh1GTuQLzU0rF.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Saccharine%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Saccharine.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -592,7 +592,7 @@ const movies = [
     tmdbId: "1308767",
     title: "Young Washington", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6CdoTKnRQHJkjRGxTefFGkPQplB.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Young%20Washington%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Young.Washington.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -624,7 +624,7 @@ const movies = [
     tmdbId: "1612018",
     title: "Jackass: Best and Last", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tfgccePxnswMqhmtxafliLlcCVR.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Jackass%20Best%20And%20Last%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Jackass.Best.And.Last.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -640,7 +640,7 @@ const movies = [
     tmdbId: "1469164",
     title: "Casa Grande", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/mE9E4nsGM91Cf4b1s6nOOdUAE9P.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Casa%20Grande%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Casa.Grande.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -656,7 +656,7 @@ const movies = [
     tmdbId: "1368166",
     title: "Housemaid", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/cWsBscZzwu5brg9YjNkGewRUvJX.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Housemaid%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Housemaid.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -664,7 +664,7 @@ const movies = [
     tmdbId: "1594914",
     title: "Lucky Strike", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/7AEBdyGYXumXWmMFeynE8227KeZ.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Lucky%20Strike%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Lucky.Strike.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -704,7 +704,7 @@ const movies = [
     tmdbId: "1307118",
     title: "Soulm8te", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bNErActDctl6cdUGw9pnjSCmyhQ.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/SOULM8TE%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/SOULM8TE.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -712,7 +712,7 @@ const movies = [
     tmdbId: "1596278",
     title: "Time and Water", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1hksIYHtsHCG70nZKbnrYBPk600.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Time%20And%20Water%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Time.And.Water.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -720,7 +720,7 @@ const movies = [
     tmdbId: "1517868",
     title: "Maddie's Secret", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vADal7sH7E9xFr4w2k4V3EPSzF6.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Maddies%20Secret%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Maddies.Secret.2025.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -728,7 +728,7 @@ const movies = [
     tmdbId: "964849",
     title: "Nightborn", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/e9ALgOANOJbcFpw84MbafK3xvD2.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Nightborn%202026%20720p%20AMZN%20WEB-DL%20DDP5%201%20H%20264-SCOPE/Nightborn%202026%20720p%20AMZN%20WEB-DL%20DDP5%201%20H%20264-SCOPE.mkv.fdmdownload",
     trailerEmbed: ""
   },
   { 
@@ -736,7 +736,7 @@ const movies = [
     tmdbId: "1399525",
     title: "Rose of Nevada", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/aDBZ2PGgUbcGjyX7ZCXLOk4AFQH.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Rose%20Of%20Nevada%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Rose.Of.Nevada.2025.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -744,7 +744,7 @@ const movies = [
     tmdbId: "1698575",
     title: "Snoopy Presents: There's No Place Like Home Snoopy", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES/Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES.mkv",
     trailerEmbed: ""
   },
   { 
@@ -752,7 +752,7 @@ const movies = [
     tmdbId: "1409853",
     title: "The Devil's Mouth", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/dx2dblJL3GAKcXXXPjC2FSaMTWW.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20The%20Devils%20Mouth%20(2026)%201080p%20BluRay%205.1-LAMA/The.Devils.Mouth.2026.1080p.BluRay.x264.AAC5.1-LAMA.mp4",
     trailerEmbed: ""
   },
   { 
@@ -760,7 +760,7 @@ const movies = [
     tmdbId: "1185807",
     title: "Neglected", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/A0gqKFmJ7OArcFob49PErNvzN66.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Neglected%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Neglected.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -776,7 +776,7 @@ const movies = [
     tmdbId: "1564614",
     title: "Leviticus", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gnAsZvBygplNpp8PtjoTEYv3VPB.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Leviticus%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Leviticus.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   },
   { 
@@ -792,7 +792,7 @@ const movies = [
     tmdbId: "1081003",
     title: "Supergirl", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uhzRnTW4DM13UQBvZP3eVNzQTuz.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://video.nbanaapp.eu.cc/Supergirl%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Supergirl.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: ""
   }
 ];

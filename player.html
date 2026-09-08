@@ -468,6 +468,125 @@
       display: block !important;
     }
 
+    /* SUBTITLE (CC) BUTTON & PANEL */
+    #btn-subtitles svg {
+      width: 20px !important;
+      height: 20px !important;
+    }
+
+    .subtitle-active-badge {
+      color: #e50914 !important;
+    }
+
+    .subtitle-panel {
+      position: absolute !important;
+      right: 14px !important;
+      bottom: 66px !important;
+      width: 270px !important;
+      max-height: 330px !important;
+      background: rgba(18, 18, 18, 0.97) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+      z-index: 45 !important;
+      padding: 12px !important;
+      box-sizing: border-box !important;
+      display: none;
+      flex-direction: column !important;
+      gap: 8px !important;
+      color: #ffffff !important;
+      font-size: 0.85rem !important;
+    }
+
+    .subtitle-panel.open {
+      display: flex !important;
+    }
+
+    .subtitle-panel-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      font-weight: 800 !important;
+      font-size: 0.9rem !important;
+    }
+
+    .subtitle-panel-close {
+      background: transparent !important;
+      border: none !important;
+      color: #aaaaaa !important;
+      font-size: 1.3rem !important;
+      cursor: pointer !important;
+      line-height: 1 !important;
+      padding: 0 2px !important;
+    }
+
+    .subtitle-panel select {
+      width: 100% !important;
+      background: #1f1f1f !important;
+      color: #ffffff !important;
+      border: 1px solid #333333 !important;
+      border-radius: 6px !important;
+      padding: 6px 8px !important;
+      font-size: 0.82rem !important;
+    }
+
+    .subtitle-search-btn {
+      background: #e50914 !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 8px !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+      font-size: 0.82rem !important;
+    }
+
+    .subtitle-results {
+      overflow-y: auto !important;
+      max-height: 170px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+    }
+
+    .subtitle-result-item {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 6px !important;
+      padding: 6px 8px !important;
+      cursor: pointer !important;
+      font-size: 0.75rem !important;
+      line-height: 1.3 !important;
+      word-break: break-word !important;
+    }
+
+    .subtitle-result-item:hover {
+      border-color: #e50914 !important;
+    }
+
+    .subtitle-status {
+      font-size: 0.75rem !important;
+      color: #cccccc !important;
+      min-height: 1em !important;
+      line-height: 1.3 !important;
+    }
+
+    .subtitle-off-btn {
+      background: transparent !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      color: #ffffff !important;
+      border-radius: 6px !important;
+      padding: 7px !important;
+      cursor: pointer !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      display: none;
+    }
+
+    .subtitle-off-btn.show {
+      display: block !important;
+    }
+
     .center-ctrl-btn.play-btn-large svg {
       width: 20px !important;
       height: 20px !important;
@@ -892,8 +1011,38 @@
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
               </svg>
             </button>
+
+            <!-- SUBTITLE (CC) BUTTON -->
+            <button id="btn-subtitles" class="ctrl-btn-small" title="Subtitles">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/>
+              </svg>
+            </button>
           </div>
         </div>
+      </div>
+
+      <!-- SUBTITLE PANEL -->
+      <div id="subtitle-panel" class="subtitle-panel">
+        <div class="subtitle-panel-header">
+          <span>Subtitles</span>
+          <button id="btn-subtitle-panel-close" class="subtitle-panel-close" title="Close">&times;</button>
+        </div>
+        <select id="subtitle-language">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fil">Filipino</option>
+          <option value="tl">Tagalog</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="pt">Portuguese</option>
+          <option value="hi">Hindi</option>
+          <option value="zh">Chinese</option>
+        </select>
+        <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
+        <div id="subtitle-status" class="subtitle-status"></div>
+        <div id="subtitle-results" class="subtitle-results"></div>
+        <button id="btn-subtitle-off" class="subtitle-off-btn">Turn Off Subtitles</button>
       </div>
     </div>
   </div>
@@ -967,6 +1116,12 @@
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
     const playerMode = urlParams.get('mode'); // Optional 'trailer' flag
+
+    // ── OPENSUBTITLES.COM CONFIG (auto subtitles) ──────────────
+    // Free API key: https://www.opensubtitles.com/ → Apps & API.
+    // Paste your key below; online search stays disabled until set.
+    const OPENSUBTITLES_API_KEY = '';
+    let subtitleActive = false;
 
     const safeMoviesList = (typeof movies !== 'undefined' && Array.isArray(movies)) ? movies : [];
     const safeFeaturedList = (typeof featuredMovies !== 'undefined' && Array.isArray(featuredMovies)) ? featuredMovies : [];
@@ -1126,6 +1281,8 @@
     }
 
     function hideControls() {
+      const subtitlePanelEl = document.getElementById('subtitle-panel');
+      if (subtitlePanelEl && subtitlePanelEl.classList.contains('open')) return;
       playerOverlay.classList.remove('active');
     }
 
@@ -1439,6 +1596,181 @@
       toggleFullscreen();
     };
 
+    // ── SUBTITLE (CC) CONTROL ──────────────────────────────────
+    const btnSubtitles = document.getElementById('btn-subtitles');
+    const subtitlePanel = document.getElementById('subtitle-panel');
+    const subtitleStatus = document.getElementById('subtitle-status');
+    const subtitleResults = document.getElementById('subtitle-results');
+    const btnSubtitleClose = document.getElementById('btn-subtitle-panel-close');
+    const btnSubtitleSearch = document.getElementById('btn-subtitle-search');
+    const btnSubtitleOff = document.getElementById('btn-subtitle-off');
+
+    function toggleSubtitlePanel() {
+      if (!subtitlePanel) return;
+      if (subtitlePanel.classList.contains('open')) {
+        closeSubtitlePanel();
+      } else {
+        subtitlePanel.classList.add('open');
+        showControls();
+        clearTimeout(autoHideTimer);
+      }
+    }
+
+    function closeSubtitlePanel() {
+      if (subtitlePanel) subtitlePanel.classList.remove('open');
+    }
+
+    function srtToVtt(srt) {
+      return 'WEBVTT\n\n' + srt
+        .replace(/\r/g, '')
+        .replace(/^\d+:\d+:\d+,\d+\s+-->\s+\d+:\d+:\d+,\d+.*$/gm, (line) => line.replace(/,/g, '.'))
+        .trim() + '\n';
+    }
+
+    function enableSubtitleTrack(vttText, label) {
+      const existing = directPlayer.querySelector('track');
+      if (existing) existing.remove();
+
+      const blob = new Blob([vttText], { type: 'text/vtt' });
+      const url = URL.createObjectURL(blob);
+      const track = document.createElement('track');
+      track.kind = 'subtitles';
+      track.label = label || 'Subtitles';
+      track.srclang = 'en';
+      track.src = url;
+      track.default = true;
+      directPlayer.appendChild(track);
+
+      const forceShow = () => {
+        for (let i = 0; i < directPlayer.textTracks.length; i++) {
+          directPlayer.textTracks[i].mode = 'showing';
+        }
+      };
+      track.addEventListener('load', forceShow);
+      setTimeout(forceShow, 500);
+
+      subtitleActive = true;
+      if (btnSubtitleOff) btnSubtitleOff.classList.add('show');
+      if (btnSubtitles) btnSubtitles.classList.add('subtitle-active-badge');
+    }
+
+    function turnOffSubtitles() {
+      const existing = directPlayer.querySelector('track');
+      if (existing) existing.remove();
+      subtitleActive = false;
+      if (btnSubtitleOff) btnSubtitleOff.classList.remove('show');
+      if (btnSubtitles) btnSubtitles.classList.remove('subtitle-active-badge');
+      showToast('Subtitles off');
+    }
+
+    async function searchOnlineSubtitles() {
+      if (subtitleStatus) subtitleStatus.textContent = '';
+      if (subtitleResults) subtitleResults.innerHTML = '';
+
+      if (!OPENSUBTITLES_API_KEY) {
+        if (subtitleStatus) {
+          subtitleStatus.textContent = 'No API key set. Paste your opensubtitles.com key in OPENSUBTITLES_API_KEY (player.html).';
+        }
+        return;
+      }
+
+      const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
+      const query = currentMovie.title;
+
+      try {
+        if (subtitleStatus) subtitleStatus.textContent = 'Searching "' + query + '" (' + lang + ')…';
+
+        const loginRes = await fetch('https://api.opensubtitles.com/api/v1/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Api-Key': OPENSUBTITLES_API_KEY },
+          body: JSON.stringify({ api_key: OPENSUBTITLES_API_KEY })
+        });
+        if (!loginRes.ok) throw new Error('OpenSubtitles login failed (' + loginRes.status + ')');
+        const loginData = await loginRes.json();
+        const token = loginData.token;
+
+        const searchRes = await fetch('https://api.opensubtitles.com/api/v1/subtitles?query=' + encodeURIComponent(query) + '&languages=' + encodeURIComponent(lang) + '&type=movie&limit=15', {
+          headers: { 'Api-Key': OPENSUBTITLES_API_KEY, 'Authorization': 'Bearer ' + token }
+        });
+        if (!searchRes.ok) throw new Error('OpenSubtitles search failed (' + searchRes.status + ')');
+        const data = await searchRes.json();
+
+        if (!data.data || data.data.length === 0) {
+          if (subtitleStatus) subtitleStatus.textContent = 'No subtitles found for "' + query + '" in ' + lang + '.';
+          return;
+        }
+
+        if (subtitleStatus) subtitleStatus.textContent = data.data.length + ' result(s) — tap one to load:';
+        data.data.forEach((item) => {
+          const attrs = item.attributes || {};
+          const fileId = attrs.files && attrs.files.length > 0 ? attrs.files[0].file_id : null;
+          const release = attrs.release_name || attrs.file_name || ('Subtitle #' + item.id);
+          const div = document.createElement('div');
+          div.className = 'subtitle-result-item';
+          div.textContent = release + ' · ' + (attrs.language || lang);
+          div.onclick = () => {
+            if (!fileId) {
+              if (subtitleStatus) subtitleStatus.textContent = 'No downloadable file for this result.';
+              return;
+            }
+            downloadAndEnableSubtitle(fileId, attrs.language || lang);
+          };
+          if (subtitleResults) subtitleResults.appendChild(div);
+        });
+      } catch (err) {
+        if (subtitleStatus) subtitleStatus.textContent = 'Search error: ' + err.message;
+      }
+    }
+
+    async function downloadAndEnableSubtitle(fileId, label) {
+      try {
+        if (subtitleStatus) subtitleStatus.textContent = 'Downloading subtitle…';
+        const dlRes = await fetch('https://api.opensubtitles.com/api/v1/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Api-Key': OPENSUBTITLES_API_KEY },
+          body: JSON.stringify({ file_id: fileId })
+        });
+        if (!dlRes.ok) throw new Error('Download failed (' + dlRes.status + ')');
+        const dlData = await dlRes.json();
+        if (!dlData.link) throw new Error('No subtitle link returned');
+
+        const srtRes = await fetch(dlData.link);
+        if (!srtRes.ok) throw new Error('Subtitle fetch failed (' + srtRes.status + ')');
+        const srtText = await srtRes.text();
+
+        enableSubtitleTrack(srtToVtt(srtText), label);
+        if (subtitleStatus) subtitleStatus.textContent = 'Subtitles enabled (' + label + ').';
+        showToast('Subtitles on: ' + label);
+      } catch (err) {
+        if (subtitleStatus) subtitleStatus.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    if (btnSubtitles) {
+      btnSubtitles.onclick = (e) => {
+        e.stopPropagation();
+        toggleSubtitlePanel();
+      };
+    }
+    if (btnSubtitleClose) {
+      btnSubtitleClose.onclick = (e) => {
+        e.stopPropagation();
+        closeSubtitlePanel();
+      };
+    }
+    if (btnSubtitleSearch) {
+      btnSubtitleSearch.onclick = (e) => {
+        e.stopPropagation();
+        searchOnlineSubtitles();
+      };
+    }
+    if (btnSubtitleOff) {
+      btnSubtitleOff.onclick = (e) => {
+        e.stopPropagation();
+        turnOffSubtitles();
+      };
+    }
+
     function toggleFullscreen() {
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
@@ -1579,6 +1911,8 @@
         
         attemptAutoUnmute();
         showControls();
+        const ccDirect = document.getElementById('btn-subtitles');
+        if (ccDirect) ccDirect.style.display = '';
         return;
       }
 
@@ -1614,6 +1948,9 @@
         // so add a dedicated floating back button for this mode
         ensureTrailerBackButton();
 
+        const ccTrailer = document.getElementById('btn-subtitles');
+        if (ccTrailer) ccTrailer.style.display = 'none';
+
         // Check if user click card exists
         let startCard = document.getElementById('trailer-start-overlay');
         if (!startCard) {
@@ -1647,6 +1984,9 @@
 
       playerOverlay.style.setProperty('display', 'flex', 'important');
       adShield.style.setProperty('display', 'block', 'important');
+
+      const ccEmbed = document.getElementById('btn-subtitles');
+      if (ccEmbed) ccEmbed.style.display = 'none';
 
       renderFreshIframe(targetUrl, false);
     }
