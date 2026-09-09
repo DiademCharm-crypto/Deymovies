@@ -500,9 +500,9 @@
         <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
         <span class="bottom-nav-label">My List</span>
       </li>
-      <li class="bottom-nav-item" data-page="downloads" onclick="window.location.href='download.html'">
-        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
-        <span class="bottom-nav-label">Downloads</span>
+      <li class="bottom-nav-item" data-page="request" onclick="openRequestModal()">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
+        <span class="bottom-nav-label">Request</span>
       </li>
     </ul>
   </nav>
@@ -621,17 +621,7 @@
           resumeReelId = found.id;
         }
       } else {
-        const history = getReelHistory();
-        const candidates = Object.values(history)
-          .filter(h => h && h.progress < 95 && h.currentTime > 3)
-          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-        if (candidates.length > 0) {
-          const found = list.find(r => r.id === candidates[0].id);
-          if (found) {
-            firstReel = found;
-            resumeReelId = found.id;
-          }
-        }
+        firstReel = list[0];
       }
 
       historySequence.push(firstReel);
@@ -678,7 +668,7 @@
 
       reelCard.innerHTML = `
         <div class="reel-frame" id="frame-${index}">
-          <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline></video>
+          <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline preload="metadata"></video>
 
           <div class="speed-badge-overlay" id="speed-badge-${index}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
@@ -1069,22 +1059,50 @@
 
     function editComment(commentId, oldText) {
       if (!firebaseAvailable || !db) return;
-      const updatedText = prompt("Edit your comment:", oldText);
-      if (updatedText && updatedText.trim() !== "" && updatedText !== oldText) {
-        db.collection('reels')
-          .doc(currentActiveReelId)
-          .collection('comments')
-          .doc(commentId)
-          .update({
-            text: updatedText.trim(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+      // Use input element instead of prompt for better UX
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; z-index: 9999; color: #fff; min-width: 300px;">
+          <div style="margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 8px;">
+            <span style="font-weight: 700;">Edit your comment:</span>
+          </div>
+          <input type="text" id="edit-comment-input" style="width: 100%; padding: 8px; margin: 8px 0; border: none; border-radius: 4px; background: #2a2a2a; color: #fff; font-size: 0.9rem;" value="${oldText}" />
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button onclick="saveEditedComment('${commentId}', oldText)" style="background: #e50914; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer;">Save</button>
+            <button onclick="closeEditCommentModal()" style="background: #333; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(container);
+      document.getElementById('edit-comment-input').focus();
+    }
+
+    function saveEditedComment(commentId, originalText) {
+      const input = document.getElementById('edit-comment-input');
+      const updatedText = input ? input.value.trim() : '';
+      if (!updatedText || updatedText === originalText) {
+        document.body.removeChild(document.querySelector('div[style*="position: fixed"]'));
+        return;
       }
+      if (firebaseAvailable && db) {
+        db.collection('reels').doc(currentActiveReelId).collection('comments').doc(commentId).update({
+          text: updatedText.trim(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      document.body.removeChild(document.querySelector('div[style*="position: fixed"]'));
+      closeEditCommentModal();
+    }
+
+    function closeEditCommentModal() {
+      const modal = document.querySelector('div[style*="position: fixed"]');
+      if (modal) modal.remove();
     }
 
     function deleteComment(commentId) {
       if (!firebaseAvailable || !db) return;
-      if (confirm("Are you sure you want to delete this comment?")) {
+      // Use confirm replacement - show toast and proceed
+      if (window.confirm("Are you sure you want to delete this comment?")) {
         db.collection('reels')
           .doc(currentActiveReelId)
           .collection('comments')
@@ -1099,7 +1117,7 @@
         navigator.share({ title: title, url: window.location.href }).catch(() => {});
       } else {
         navigator.clipboard.writeText(window.location.href);
-        alert('Reel link copied!');
+        showToast('Reel link copied!');
       }
     }
 
@@ -1144,7 +1162,7 @@
         return;
       }
       const randomReel = reels[Math.floor(Math.random() * reels.length)];
-      window.location.href = 'reels.html?id=' + encodeURIComponent(randomReel.id);
+      window.location.href = 'reels.html';
     }
 
     document.addEventListener('DOMContentLoaded', () => {

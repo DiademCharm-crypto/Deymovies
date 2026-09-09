@@ -1421,15 +1421,7 @@
 
     updateBookmarkBtn();
 
-    // ============ DOWNLOAD FUNCTIONALITY ============
-    function initDownload() {
-      if (!currentMovie || !currentMovie.manualEmbed) {
-        showToast('No video available for download');
-        return;
-      }
-
-      // Already downloaded / in progress — no popup needed
-      const downloads = getDownloads();
+    // ============ SUBTITLE FUNCTIONALITY ============
       const active = getActiveDownloads();
       if (downloads.some(d => d.movieId === currentMovie.id)) {
         showToast('Already in downloads');

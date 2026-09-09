@@ -1,5 +1,5 @@
 :root {
-  --bg-dark: #0f0f0f;
+  --bg-dark: #0d0d0d;
   --card-bg: #181818;
   --primary-red: #e50914;
   --primary-red-hover: #ff0f1b;
@@ -68,12 +68,11 @@ body {
 .brand-title-text {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #ffffff !important;
+  color: #ffffff;
   letter-spacing: 1px;
   text-transform: uppercase;
   line-height: 1;
   display: inline-block;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
 
 .brand-title-text .highlight-red {
@@ -112,7 +111,6 @@ body {
 }
 
 .search-input-wrapper {
-  background: rgba(25, 25, 25, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.12);
