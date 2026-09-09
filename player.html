@@ -458,6 +458,74 @@
       color: #e50914 !important;
     }
 
+    /* Download Modal */
+    .download-modal {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      background: rgba(0, 0, 0, 0.9) !important;
+      display: none !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 99999 !important;
+    }
+    .download-modal.show {
+      display: flex !important;
+    }
+    .download-modal-content {
+      background: #1a1a1a !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 12px !important;
+      padding: 20px !important;
+      width: 300px !important;
+      text-align: center !important;
+      color: #ffffff !important;
+    }
+    .download-modal-title {
+      font-size: 1rem !important;
+      font-weight: 800 !important;
+      margin-bottom: 12px !important;
+    }
+    .download-modal-text {
+      font-size: 0.75rem !important;
+      color: #aaaaaa !important;
+      margin-bottom: 16px !important;
+      line-height: 1.4 !important;
+    }
+    .download-modal-progress {
+      width: 100% !important;
+      height: 6px !important;
+      background: #333 !important;
+      border-radius: 3px !important;
+      overflow: hidden !important;
+      margin-bottom: 12px !important;
+    }
+    .download-modal-progress-fill {
+      width: 0% !important;
+      height: 100% !important;
+      background: #e50914 !important;
+      transition: width 0.3s !important;
+    }
+    .download-modal-btn {
+      background: #e50914 !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 10px 24px !important;
+      border-radius: 6px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      margin: 4px !important;
+    }
+    .download-modal-btn.cancel {
+      background: #333 !important;
+    }
+    .download-modal-btn:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+
     .settings-btn {
       flex-direction: column !important;
       gap: 2px !important;
@@ -475,22 +543,22 @@
 
     .settings-panel {
       position: absolute !important;
-      right: 14px !important;
-      bottom: 66px !important;
-      width: 270px !important;
-      max-height: calc(100% - 110px) !important;
+      right: 8px !important;
+      bottom: 50px !important;
+      width: 170px !important;
+      max-height: calc(100% - 70px) !important;
       background: rgba(18, 18, 18, 0.97) !important;
       border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      border-radius: 10px !important;
+      border-radius: 8px !important;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
       z-index: 46 !important;
-      padding: 12px !important;
+      padding: 8px !important;
       box-sizing: border-box !important;
       display: none;
       flex-direction: column !important;
-      gap: 10px !important;
+      gap: 6px !important;
       color: #ffffff !important;
-      font-size: 0.85rem !important;
+      font-size: 0.65rem !important;
       overflow-y: auto !important;
     }
     .settings-panel.open {
@@ -501,13 +569,13 @@
       justify-content: space-between !important;
       align-items: center !important;
       font-weight: 800 !important;
-      font-size: 0.9rem !important;
+      font-size: 0.7rem !important;
     }
     .settings-panel-close {
       background: transparent !important;
       border: none !important;
       color: #aaaaaa !important;
-      font-size: 1.3rem !important;
+      font-size: 1rem !important;
       cursor: pointer !important;
       line-height: 1 !important;
       padding: 0 2px !important;
@@ -515,36 +583,36 @@
     .settings-section {
       display: flex !important;
       flex-direction: column !important;
-      gap: 8px !important;
+      gap: 4px !important;
     }
     .settings-section-title {
-      font-size: 0.72rem !important;
+      font-size: 0.6rem !important;
       font-weight: 800 !important;
-      letter-spacing: 0.8px !important;
+      letter-spacing: 0.5px !important;
       text-transform: uppercase !important;
       color: #e50914 !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-      padding-bottom: 4px !important;
+      padding-bottom: 3px !important;
     }
     .settings-panel select {
       width: 100% !important;
       background: #1f1f1f !important;
       color: #ffffff !important;
       border: 1px solid #333333 !important;
-      border-radius: 6px !important;
-      padding: 6px 8px !important;
-      font-size: 0.82rem !important;
+      border-radius: 4px !important;
+      padding: 4px 6px !important;
+      font-size: 0.65rem !important;
     }
 
     .subtitle-search-btn {
       background: #e50914 !important;
       color: #ffffff !important;
       border: none !important;
-      border-radius: 6px !important;
-      padding: 8px !important;
+      border-radius: 4px !important;
+      padding: 5px !important;
       font-weight: 800 !important;
       cursor: pointer !important;
-      font-size: 0.82rem !important;
+      font-size: 0.65rem !important;
     }
 
     .subtitle-results {
@@ -596,18 +664,18 @@
     .quality-options {
       display: flex !important;
       flex-direction: column !important;
-      gap: 6px !important;
+      gap: 4px !important;
     }
     .quality-option {
       background: rgba(255, 255, 255, 0.05) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-radius: 6px !important;
-      padding: 8px 10px !important;
+      border-radius: 4px !important;
+      padding: 5px 6px !important;
       cursor: pointer !important;
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
-      gap: 8px !important;
+      gap: 4px !important;
     }
     .quality-option.active {
       border-color: #e50914 !important;
@@ -621,10 +689,10 @@
     }
     .quality-option-label {
       font-weight: 800 !important;
-      font-size: 0.82rem !important;
+      font-size: 0.65rem !important;
     }
     .quality-option-hint {
-      font-size: 0.68rem !important;
+      font-size: 0.55rem !important;
       color: #aaaaaa !important;
     }
     .quality-option-check {
@@ -690,6 +758,83 @@
       padding: 2px 9px !important;
       border-radius: 20px !important;
       white-space: nowrap !important;
+    }
+
+    .title-actions {
+      display: flex !important;
+      gap: 8px !important;
+      margin-left: auto !important;
+      flex-shrink: 0 !important;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #ffffff !important;
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .action-btn.bookmarked {
+      background: rgba(229, 9, 20, 0.2) !important;
+      border-color: #e50914 !important;
+      color: #e50914 !important;
+    }
+
+    .settings-btn {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dl-confirm-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dl-confirm-btn.confirm {
+      background: #e50914;
+      color: #ffffff;
+    }
+
+    .dl-confirm-btn.confirm:hover {
+      background: #ff0f1b;
+    }
+
+    .dl-confirm-btn.cancel-dl {
+      background: rgba(255, 255, 255, 0.1);
+      color: #cccccc;
+    }
+
+    .dl-confirm-btn.cancel-dl:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    @keyframes dlFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes dlPopIn {
+      from { opacity: 0; transform: scale(0.92) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .synopsis-text {
@@ -925,6 +1070,30 @@
         opacity: 1 !important;
       }
     }
+
+    @media (min-width: 1024px) {
+      .settings-panel {
+        width: 300px !important;
+        padding: 14px !important;
+        gap: 12px !important;
+        font-size: 0.9rem !important;
+        right: 16px !important;
+        bottom: 70px !important;
+      }
+
+      .settings-panel-header {
+        font-size: 1rem !important;
+      }
+
+      .settings-section-title {
+        font-size: 0.8rem !important;
+      }
+
+      .settings-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+    }
   </style>
 
   <!-- ANTI-POPUP & REDIRECT SHIELD -->
@@ -1074,7 +1243,6 @@
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
               </svg>
-              <span id="quality-btn-label" class="settings-btn-label">Auto</span>
             </button>
 
             <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
@@ -1128,6 +1296,11 @@
     <div class="title-row">
       <h1 id="current-title" class="media-title">Loading...</h1>
       <div id="genre-label" class="genre-badge" style="display: none;"></div>
+      <div class="title-actions">
+        <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to My List">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+      </div>
     </div>
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
@@ -1140,8 +1313,10 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
+  <!-- SCRIPT INCLUSIONS -->
   <script src="security.js"></script>
   <script src="app.js?v=153.0"></script>
+  <script src="episodes.js?v=1.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -1207,7 +1382,7 @@
                            id: movieId || 'fallback', 
                            title: 'The Runner', 
                            tmdbId: 634649, 
-                           description: '', 
+                           synopsis: '', 
                            poster: 'https://via.placeholder.com/300x450?text=DEYMFLIX',
                            manualEmbed: '',
                            trailerEmbed: ''
@@ -1215,6 +1390,112 @@
 
     document.getElementById('current-title').textContent = currentMovie.title;
     document.getElementById('overlay-movie-title').textContent = currentMovie.title;
+
+    // Bookmark button state
+    function updateBookmarkBtn() {
+      const list = getMyList();
+      const btn = document.getElementById('bookmark-btn');
+      if (!btn) return;
+      const isBookmarked = list.some(m => m.id === currentMovie.id);
+      btn.classList.toggle('bookmarked', isBookmarked);
+      btn.title = isBookmarked ? 'Remove from My List' : 'Add to My List';
+    }
+
+    function getMyList() {
+      try { return JSON.parse(localStorage.getItem('deymflix_my_list') || '[]'); } catch { return []; }
+    }
+
+    window.toggleBookmark = function() {
+      let list = getMyList();
+      const idx = list.findIndex(m => m.id === currentMovie.id);
+      if (idx >= 0) {
+        list.splice(idx, 1);
+        showToast('Removed from My List');
+      } else {
+        list.unshift({ id: currentMovie.id, title: currentMovie.title, poster: currentMovie.poster });
+        showToast('Added to My List');
+      }
+      localStorage.setItem('deymflix_my_list', JSON.stringify(list));
+      updateBookmarkBtn();
+    };
+
+    updateBookmarkBtn();
+
+    // ============ DOWNLOAD FUNCTIONALITY ============
+    function initDownload() {
+      if (!currentMovie || !currentMovie.manualEmbed) {
+        showToast('No video available for download');
+        return;
+      }
+
+      // Already downloaded / in progress — no popup needed
+      const downloads = getDownloads();
+      const active = getActiveDownloads();
+      if (downloads.some(d => d.movieId === currentMovie.id)) {
+        showToast('Already in downloads');
+        return;
+      }
+      if (Object.values(active).some(d => d.movieId === currentMovie.id)) {
+        showToast('Download already in progress');
+        return;
+      }
+
+      openDownloadConfirm();
+    }
+    window.initDownload = initDownload;
+
+    function openDownloadConfirm() {
+      const backdrop = document.getElementById('dl-confirm-backdrop');
+      if (!backdrop) return;
+      document.getElementById('dl-confirm-movie').textContent = currentMovie.title;
+      backdrop.classList.add('show');
+    }
+
+    function closeDownloadConfirm() {
+      const backdrop = document.getElementById('dl-confirm-backdrop');
+      if (backdrop) backdrop.classList.remove('show');
+    }
+
+    function confirmDownload() {
+      closeDownloadConfirm();
+      window.startVideoDownload({
+        id: currentMovie.id,
+        title: currentMovie.title,
+        poster: currentMovie.poster,
+        url: currentMovie.manualEmbed
+      });
+      updateDownloadBtn();
+    }
+    window.confirmDownload = confirmDownload;
+    window.closeDownloadConfirm = closeDownloadConfirm;
+
+    // Update download button state
+    function updateDownloadBtn() {
+      const btn = document.getElementById('download-btn');
+      if (!btn) return;
+      const downloads = getDownloads();
+      const active = getActiveDownloads();
+      const isDownloaded = downloads.some(d => d.movieId === currentMovie.id);
+      const isDownloading = Object.values(active).some(d => d.movieId === currentMovie.id);
+      if (isDownloaded) {
+        btn.classList.add('bookmarked');
+        btn.classList.remove('downloading');
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+        btn.title = 'Downloaded';
+      } else if (isDownloading) {
+        btn.classList.add('downloading');
+        btn.classList.remove('bookmarked');
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        btn.title = 'Downloading...';
+      } else {
+        btn.classList.remove('bookmarked', 'downloading');
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+        btn.title = 'Download Video';
+      }
+    }
+    updateDownloadBtn();
+    // Periodically update button state
+    setInterval(updateDownloadBtn, 2000);
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
@@ -1367,12 +1648,6 @@
     }
 
     async function loadBroadSynopsis() {
-      if (currentMovie.description && currentMovie.description.trim() !== '') {
-        descElement.textContent = currentMovie.description;
-        checkSynopsisLength();
-        return;
-      }
-
       if (currentMovie.synopsis && currentMovie.synopsis.trim() !== '') {
         descElement.textContent = currentMovie.synopsis;
         checkSynopsisLength();
@@ -1481,7 +1756,7 @@
         }
       } catch (e) {}
 
-      let genres = detectGenres(currentMovie.description || currentMovie.synopsis || '');
+      let genres = detectGenres(currentMovie.synopsis || '');
 
       if (genres.length === 0 && lastWikipediaExtract) {
         genres = detectGenres(lastWikipediaExtract);
@@ -2437,23 +2712,83 @@
 
     loadEmbed();
 
-    const grid = document.getElementById('random-grid');
-    const otherMovies = safeMoviesList.filter(m => m.id !== currentMovie.id);
-    const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
+    // Genre-based recommendations
+    async function loadRecommendations() {
+      const grid = document.getElementById('random-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
 
-    shuffled.slice(0, 10).forEach(movie => {
-      const card = document.createElement('div');
-      card.className = 'recommendation-card';
-      card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
-      card.innerHTML = `
-        <img src="${movie.poster}" alt="${movie.title}">
-        <div class="rec-info">
-          <span class="rec-title">${movie.title}</span>
-          <span class="rec-genre">Movie • HD</span>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
+      // Get current movie genres
+      let currentGenres = [];
+      try {
+        const cache = JSON.parse(localStorage.getItem('deymflix_genre_cache') || '{}');
+        if (cache[currentMovie.id]) {
+          currentGenres = cache[currentMovie.id];
+        }
+      } catch (e) {}
+
+      if (currentGenres.length === 0) {
+        currentGenres = detectGenres(currentMovie.synopsis || '');
+        if (currentGenres.length === 0 && lastWikipediaExtract) {
+          currentGenres = detectGenres(lastWikipediaExtract);
+        }
+      }
+
+      // Score movies by genre similarity
+      const otherMovies = safeMoviesList.filter(m => m.id !== currentMovie.id);
+      const scoredMovies = otherMovies.map(movie => {
+        let score = 0;
+        // Check if movie has synopsis to detect genres
+        const movieGenres = detectGenres(movie.synopsis || movie.description || '');
+        
+        // Score based on shared genres
+        currentGenres.forEach(cg => {
+          movieGenres.forEach(mg => {
+            if (cg.toLowerCase() === mg.toLowerCase()) score += 10;
+          });
+        });
+
+        // Bonus for Filipino movies if current is Filipino
+        if (currentMovie.isFilipino && movie.isFilipino) score += 5;
+
+        // Small random factor for variety
+        score += Math.random() * 2;
+
+        return { movie, score };
+      });
+
+      // Sort by score and take top 10
+      scoredMovies.sort((a, b) => b.score - a.score);
+      const recommendations = scoredMovies.slice(0, 10).map(sm => sm.movie);
+
+      // If no genre matches, fall back to random
+      if (recommendations.length === 0 || (scoredMovies.length > 0 && scoredMovies[0].score < 2)) {
+        const shuffled = [...otherMovies].sort(() => 0.5 - Math.random());
+        recommendations.length = 0;
+        recommendations.push(...shuffled.slice(0, 10));
+      }
+
+      recommendations.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'recommendation-card';
+        card.onclick = () => window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
+        
+        // Detect movie genres for display
+        const movieGenres = detectGenres(movie.synopsis || movie.description || '');
+        const genreText = movie.isFilipino ? 'Filipino' : (movieGenres.length > 0 ? movieGenres[0] : 'Movie');
+        
+        card.innerHTML = `
+          <img src="${movie.poster}" alt="${movie.title}">
+          <div class="rec-info">
+            <span class="rec-title">${movie.title}</span>
+            <span class="rec-genre">${genreText} • HD</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    loadRecommendations();
 
     function handleFullscreenChange() {
       const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
