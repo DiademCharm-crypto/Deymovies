@@ -43,9 +43,6 @@
       -webkit-touch-callout: none !important;
     }
 
-    /* HEIGHT FALLBACK FOR BROWSERS WITHOUT aspect-ratio SUPPORT */
-    /* If aspect-ratio is unsupported the container collapses to 0px tall and
-       embedded YouTube frames end up audio-only with invisible video. */
     @supports not (aspect-ratio: 16 / 9) {
       .video-container {
         height: min(56.25vw, 90vh) !important;
@@ -137,10 +134,6 @@
       text-shadow: 0 2px 6px rgba(0,0,0,0.9);
     }
 
-    /* FLOATING BACK BUTTON FOR TRAILER MODE */
-    /* Trailer mode hides the player overlay (which normally holds the back
-       button), so this dedicated button stays on top of the start card
-       and the YouTube iframe. */
     .trailer-back-btn {
       position: absolute !important;
       top: max(12px, env(safe-area-inset-top)) !important;
@@ -164,7 +157,6 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
     }
 
-    /* FULL-SCREEN CLICK ABSORBER OVERLAY */
     .ultimate-ad-shield {
       position: absolute;
       top: 0;
@@ -176,7 +168,6 @@
       cursor: pointer;
     }
 
-    /* ANIMATED LOADING BUFFER SPINNER */
     .loading-spinner-overlay {
       position: absolute;
       top: 50%;
@@ -213,7 +204,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* VERTICAL SLIDER BARS FOR BRIGHTNESS/VOLUME */
     .vertical-slider-bar {
       position: absolute;
       top: 50%;
@@ -250,7 +240,6 @@
       height: 50%;
     }
 
-    /* PLAYER OVERLAY CONTROLS */
     .player-overlay {
       position: absolute !important;
       inset: 0 !important;
@@ -274,10 +263,6 @@
       pointer-events: auto !important;
     }
 
-    /* TOP-LEFT BACK HEADER (< Title) */
-    /* Only the back button + title area is clickable; without this the bar
-       stretches across the full player width and clicking the top middle or
-       top right also navigates back. */
     .player-top-bar {
       display: flex !important;
       align-items: center !important;
@@ -315,7 +300,6 @@
       user-select: none !important;
     }
 
-    /* CENTER CONTROL ICONS */
     .center-controls-group {
       position: absolute !important;
       top: 50% !important;
@@ -348,7 +332,6 @@
       box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5) !important;
     }
 
-    /* SPEED UP FLOATING BADGE */
     .loklok-speed-badge {
       position: absolute;
       top: 20px;
@@ -371,7 +354,6 @@
       display: block;
     }
 
-    /* SEEK BADGES */
     .loklok-seek-badge {
       position: absolute !important;
       top: 50% !important;
@@ -464,7 +446,6 @@
       justify-content: center !important;
     }
 
-    /* Unified sizing for single-path buttons */
     .ctrl-btn-small svg,
     .btn-bottom-play svg,
     .center-ctrl-btn svg {
@@ -473,7 +454,6 @@
       display: block !important;
     }
 
-    /* SETTINGS (QUALITY + CAPTIONS) BUTTON & PANEL */
     .subtitle-active-badge {
       color: #e50914 !important;
     }
@@ -658,7 +638,6 @@
       height: 20px !important;
     }
 
-    /* WARNING NOTE AND DETAILS BOX */
     .network-warning-note {
       width: calc(100% - 40px) !important;
       margin: 14px auto 0 auto !important;
@@ -672,7 +651,6 @@
       box-sizing: border-box !important;
     }
 
-    /* SYNOPSIS & DESCRIPTION BOX */
     .video-info-box {
       width: 100% !important;
       padding: 16px 20px 0 20px !important;
@@ -686,7 +664,6 @@
       color: #ffffff !important;
     }
 
-    /* TITLE ROW WITH AUTO-DETECTED GENRE CHIPS */
     .title-row {
       display: flex !important;
       align-items: center !important;
@@ -745,7 +722,6 @@
       display: inline-block !important;
     }
 
-    /* RECOMMENDATION CARD LAYOUT */
     .list-recommendations {
       width: 100% !important;
       box-sizing: border-box !important;
@@ -792,7 +768,6 @@
       color: #aaaaaa !important;
     }
 
-    /* PC MODE ENLARGED CONTROLS OVERRIDES (min-width: 769px) */
     @media (min-width: 769px) {
       .player-top-bar {
         padding: 24px 30px !important;
@@ -906,7 +881,6 @@
       }
     }
 
-    /* MOBILE MODE LAYOUT & FULLSCREEN FIX */
     @media (max-width: 768px) {
       .video-info-box,
       .content-section {
@@ -1010,20 +984,6 @@
           }
         }
       }, true);
-
-      document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-      document.addEventListener('keydown', function (e) {
-        if (
-          e.keyCode === 123 || 
-          (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-          (e.ctrlKey && e.keyCode === 85) || 
-          (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-          (e.metaKey && e.keyCode === 85)
-        ) {
-          e.preventDefault();
-          return false;
-        }
-      });
     })();
   </script>
 </head>
@@ -1094,7 +1054,6 @@
         </div>
         <div class="bottom-bar-controls">
           <div class="left-controls-group">
-            <!-- LOWER LEFT PLAY/PAUSE BUTTON -->
             <button id="btn-bottom-play-pause" class="btn-bottom-play" title="Play/Pause">
               <svg viewBox="0 0 24 24" fill="#ffffff">
                 <path id="svg-bottom-path" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -1105,14 +1064,12 @@
             </div>
           </div>
           <div class="right-utility-btns">
-            <!-- MUTE/UNMUTE BUTTON -->
             <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path id="svg-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
               </svg>
             </button>
 
-            <!-- SETTINGS (QUALITY + CAPTIONS) BUTTON -->
             <button id="btn-settings" class="ctrl-btn-small settings-btn" title="Settings">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
@@ -1120,7 +1077,6 @@
               <span id="quality-btn-label" class="settings-btn-label">Auto</span>
             </button>
 
-            <!-- FULLSCREEN BUTTON -->
             <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -1184,6 +1140,7 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
+  <script src="security.js"></script>
   <script src="app.js?v=153.0"></script>
   <script>
     function destroyAllPlayers() {
@@ -1235,11 +1192,8 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
-    const playerMode = urlParams.get('mode'); // Optional 'trailer' flag
+    const playerMode = urlParams.get('mode');
 
-    // ── OPENSUBTITLES.COM CONFIG (auto subtitles) ──────────────
-    // Free API key: https://www.opensubtitles.com/ → Apps & API.
-    // Paste your key below; online search stays disabled until set.
     const OPENSUBTITLES_API_KEY = '';
     let subtitleActive = false;
 
@@ -1302,12 +1256,6 @@
       }
     }
 
-    // ── SYNOPSIS / DESCRIPTION LOADER ─────────────────────────────
-    // Source order (first hit wins):
-    //   1. Hardcoded movie.description / movie.synopsis (most accurate when present)
-    //   2. TMDB overview (works once TMDB_API_KEY below is a valid key)
-    //   3. Wikipedia plot summary (free, no key) with year + film guards for accuracy
-    // Results are cached in localStorage so revisits are instant.
     const TMDB_API_KEY = '15d260044e350723365198253b23914f';
 
     function fetchWithTimeout(url, ms) {
@@ -1316,8 +1264,6 @@
       return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    // Release year is usually embedded in the stream URL (e.g. "The.Runner.2026.1080p...").
-    // Decode first: "%202026" in an encoded URL would otherwise read as "2020".
     function getMovieYear(movie) {
       let hay = ((movie.manualEmbed || '') + ' ' + (movie.trailerEmbed || ''));
       try { hay = decodeURIComponent(hay); } catch (e) {}
@@ -1356,9 +1302,6 @@
       }
     }
 
-    // Guards against grabbing the wrong page (an older film, the poem "The
-    // Odyssey", a TV series, etc.): the page must clearly be about a film and,
-    // when the release year is known, the page or its text must mention it.
     function wikipediaExtractPasses(summary, year, titleHasYear) {
       const hay = (summary.description || '') + ' ' + summary.extract;
       if (!/film|movie/i.test(hay)) return false;
@@ -1366,9 +1309,6 @@
       return true;
     }
 
-    // Search results must still look like OUR movie (e.g. "Almost Us" must not
-    // match "Toxic (2026 film)"). Requires a meaningful word of the movie title
-    // to appear in the candidate article's title.
     function wikipediaSearchMatches(resultTitle, movieTitle) {
       const stop = new Set(['the', 'a', 'an', 'and', 'of', 'in', 'on', 'to', 'for', 'with', 'vs', 'versus', 'live', 'action']);
       const tokens = movieTitle.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
@@ -1378,8 +1318,6 @@
       return tokens.some(t => lowerResult.indexOf(t) !== -1);
     }
 
-    // Keeps the last Wikipedia extract used for the synopsis so the genre
-    // detector can reuse it instead of fetching the page twice.
     let lastWikipediaExtract = '';
 
     async function loadWikipediaSynopsis(movie) {
@@ -1387,7 +1325,6 @@
       if (!title) return '';
       const year = getMovieYear(movie);
 
-      // 1) Direct article candidates, most specific first.
       const candidates = [];
       if (year) candidates.push(title + ' (' + year + ' film)');
       candidates.push(title + ' (film)');
@@ -1401,8 +1338,6 @@
         }
       }
 
-      // 2) Search fallback for titles whose article name differs
-      //    (e.g. "Moana: Live Action" -> "Moana (2026 film)").
       const q = (title + ' ' + (year || '') + ' film').trim();
       try {
         const res = await fetchWithTimeout(
@@ -1444,7 +1379,6 @@
         return;
       }
 
-      // Cached synopsis -> instant, no network.
       const cached = synopsisCacheGet(currentMovie.id);
       if (cached) {
         descElement.textContent = cached;
@@ -1454,7 +1388,6 @@
 
       let synopsis = '';
 
-      // TMDB overview (works once TMDB_API_KEY is a valid key).
       if (currentMovie.tmdbId && TMDB_API_KEY) {
         try {
           const tmdbRes = await fetchWithTimeout(
@@ -1486,10 +1419,6 @@
       checkSynopsisLength();
     }
 
-    // ── AUTO-DETECTED GENRE BADGE ────────────────────────────────
-    // Genres are parsed out of the synopsis text ("a 2026 American action
-    // thriller film" -> Action · Thriller). Works for hardcoded descriptions,
-    // TMDB overviews and Wikipedia extracts alike; results are cached.
     const GENRE_PATTERNS = [
       ['Sci-Fi', /\bsci-?fi\b|\bscience fiction\b/i],
       ['Action', /\baction\b/i],
@@ -1514,7 +1443,6 @@
 
     function detectGenres(text) {
       if (!text) return [];
-      // "live-action" would otherwise match "Action".
       const cleaned = text.replace(/live[- ]action/gi, ' ');
       const found = [];
       for (const [label, re] of GENRE_PATTERNS) {
@@ -1545,7 +1473,6 @@
         }
       };
 
-      // 1) Cached result.
       try {
         const cache = JSON.parse(localStorage.getItem('deymflix_genre_cache') || '{}');
         if (cache[currentMovie.id]) {
@@ -1554,15 +1481,12 @@
         }
       } catch (e) {}
 
-      // 2) Hardcoded description / synopsis.
       let genres = detectGenres(currentMovie.description || currentMovie.synopsis || '');
 
-      // 3) Wikipedia extract already fetched for the synopsis.
       if (genres.length === 0 && lastWikipediaExtract) {
         genres = detectGenres(lastWikipediaExtract);
       }
 
-      // 4) Dedicated Wikipedia lookup (e.g. description without genre words).
       if (genres.length === 0) {
         const extract = await loadWikipediaSynopsis(currentMovie);
         if (extract) genres = detectGenres(extract);
@@ -1773,8 +1697,6 @@
 
     playerContainer.addEventListener('mousemove', () => { showControls(); });
 
-    // Toggles the buffering UI: shows the spinner and hides the play/pause
-    // buttons while the video is loading, restores them when playback is ready.
     function setBufferingUI(on) {
       const spinner = document.getElementById('video-loading-spinner');
       const group = document.getElementById('center-controls');
@@ -1839,7 +1761,6 @@
     directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
 
     directPlayer.addEventListener('loadedmetadata', () => {
-      // Keep the buffering spinner up while a quality switch is in progress.
       if (!isQualitySwitch) hideLoadingSpinner();
       totalDurationText.textContent = formatTime(directPlayer.duration);
 
@@ -1894,7 +1815,6 @@
     });
 
     directPlayer.addEventListener('pause', () => {
-      // Keep the buffering UI intact while a quality switch is in progress.
       if (isQualitySwitch) return;
       hideLoadingSpinner();
       updatePlayStateUI(false);
@@ -1971,7 +1891,6 @@
       toggleFullscreen();
     };
 
-    // ── SETTINGS (QUALITY + CAPTIONS) CONTROL ────────────────────
     const settingsPanel = document.getElementById('settings-panel');
     const subtitleStatus = document.getElementById('subtitle-status');
     const subtitleResults = document.getElementById('subtitle-results');
@@ -2135,12 +2054,6 @@
       };
     }
 
-    // ── VIDEO QUALITY (HD/SD) CONTROL ────────────────────────────
-    // The quality button appears automatically for a movie once it has more
-    // than one source. Add optional fields to a movie in app.js to enable it:
-    //   manualEmbed:  ".../Movie.2026.1080p....mp4"  (default / best source)
-    //   manualEmbedHd: ".../Movie.2026.720p....mp4"  (optional, uses less data)
-    //   manualEmbedSd: ".../Movie.2026.480p....mp4"  (optional, best for slow internet)
     let qualityOptions = [];
     let activeQualityIndex = 0;
     let previousQualityIndex = 0;
@@ -2208,24 +2121,19 @@
     function setupQualityControl() {
       qualityOptions = buildQualityOptions();
 
-      // The settings button is always available (captions); only show the
-      // quality section when the movie actually has more than one source.
       const qualitySection = document.getElementById('settings-quality-section');
       if (qualitySection) {
         qualitySection.style.display = qualityOptions.length >= 2 ? 'flex' : 'none';
       }
       if (qualityOptions.length < 2) return;
 
-      // Restore the user's saved quality preference (e.g. "480p" for slow internet).
       const pref = localStorage.getItem('deymflix_quality_pref') || 'Auto';
       const prefIdx = qualityOptions.findIndex(o => o.label === pref);
 
-      // Initial selection is the movie's default source (Auto).
       activeQualityIndex = 0;
       applyQualitySelection();
       renderQualityMenu();
 
-      // If the saved preference is a lower quality, apply it right away.
       if (prefIdx > 0) {
         switchQuality(prefIdx);
       }
@@ -2278,7 +2186,6 @@
         applyQualitySelection();
         renderQualityMenu();
 
-        // Restore the previously working source so playback keeps going.
         const prevOpt = qualityOptions[previousQualityIndex];
         if (prevOpt) {
           directPlayer.src = prevOpt.url;
@@ -2400,7 +2307,6 @@
         showLoadingSpinner();
       } else {
         hideLoadingSpinner();
-        // Correct referrer policy helps YouTube authorize the embed request
         newIframe.setAttribute('referrerpolicy', 'origin');
       }
 
@@ -2416,15 +2322,11 @@
         hideLoadingSpinner();
       });
 
-      // Append first, then assign the source: the frame gets real layout
-      // dimensions (never 0x0) before YouTube initializes its player,
-      // which avoids invisible / audio-only playback.
       playerContainer.appendChild(newIframe);
       iframe = newIframe;
       newIframe.src = targetUrl;
     }
 
-    // Direct embed & trailer playback initialization
     function loadEmbed() {
       startSlowConnectionCheck();
 
@@ -2448,7 +2350,6 @@
 
       const lowerUrl = targetUrl.toLowerCase();
 
-      // Direct MP4 / MKV video stream -> Use Custom Player
       if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
         adShield.style.display = 'none';
         const oldIframe = document.getElementById('main-iframe');
@@ -2466,7 +2367,6 @@
         return;
       }
 
-      // --- TRAILER & YOUTUBE EMBED MODE ---
       let videoId = '';
 
       if (targetUrl.includes('youtube.com/watch?v=')) {
@@ -2480,8 +2380,6 @@
       const isYouTube = Boolean(videoId);
 
       if (isYouTube) {
-        // Build embed URL: playsinline + origin help YouTube initialize the
-        // visible video track reliably inside the frame (avoids audio-only playback)
         const ytOrigin = encodeURIComponent(window.location.origin || window.location.href);
         const finalEmbedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&enablejsapi=1&rel=0&modestbranding=1&playsinline=1&origin=${ytOrigin}`;
 
@@ -2494,14 +2392,11 @@
         adShield.style.setProperty('display', 'none', 'important');
         hideLoadingSpinner();
 
-        // Trailer mode hides the player overlay (which holds the back button),
-        // so add a dedicated floating back button for this mode
         ensureTrailerBackButton();
 
         const settingsTrailer = document.getElementById('btn-settings');
         if (settingsTrailer) settingsTrailer.style.display = 'none';
 
-        // Check if user click card exists
         let startCard = document.getElementById('trailer-start-overlay');
         if (!startCard) {
           startCard = document.createElement('div');
@@ -2526,7 +2421,6 @@
         return;
       }
 
-      // Default non-YouTube iframe fallback (manualEmbed)
       directPlayer.pause();
       directPlayer.removeAttribute('src');
       directPlayer.load();

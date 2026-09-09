@@ -71,7 +71,6 @@
 <body>
 
   <div class="offline-container">
-    <!-- Brand Logo -->
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" class="site-logo-svg">
       <defs>
         <linearGradient id="deymRed" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -102,13 +101,12 @@
     <div class="error-title">Connection Lost</div>
     <div class="error-desc">Please check your internet connection and try again.</div>
 
-    <!-- Reload Button -->
     <button class="reload-btn" onclick="retryConnection()">↻ Reload</button>
   </div>
 
+  <script src="security.js"></script>
   <script>
     function retryConnection() {
-      // Redirect back to main website URL
       window.location.href = "https://deymflix.eu.cc/index.html";
     }
   </script>

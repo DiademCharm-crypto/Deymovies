@@ -12,7 +12,7 @@ const aiReelsData = [
     id: "After-Divorce,-I-Ruined-My-Ex",
     title: "After Divorce, I Ruined My Ex",
     author: "@deymflix_official",
-    poster: "https://s1.dmcdn.net/v/eBBIQ1gdvg3yUnG7G/x240",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788788178_7HSdXSJ4KN.jpg?x-oss-process=image/resize,w_400,image/format,webp",
     videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/After+Divorce%2C+I+Ruined+My+Ex.mp4",
     likes: "12.4K"
   },
@@ -20,7 +20,7 @@ const aiReelsData = [
     id: "Chatty-Fated-Lover",
     title: "Chatty Fated Lover",
     author: "@deymflix_official",
-    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMVHwxTQ1lE-6DAPaFQI-mOJU7chnDYRXUAwpE2WAdvw&s",
+    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6b1lthOK6xe3fEAPjsPp8RKI3FSMlU3Ead2Emi2DUNg&s=10",
     videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/Chatty+Fated+Lover+Full+Movie.mp4",
     likes: "12.4K"
   },
@@ -36,7 +36,7 @@ const aiReelsData = [
     id: "My-Orphaned-beloved",
     title: "My Orphaned beloved",
     author: "@deymflix_official",
-    poster: "https://s1.dmcdn.net/v/e8Tmo1gdczMx4PJNY/x240",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788523346_RmyY57dWKi.jpg?x-oss-process=image/resize,w_400,image/format,webp",
     videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/My+orphaned+beloved+Full+Series+Short+Drama+English.mp4",
     likes: "12.4K"
   },
@@ -68,7 +68,7 @@ const aiReelsData = [
     id: "Two-Alphas-Wanted-Me,-But-I-Chose-the-Crown",
     title: "Two Alphas Wanted Me, But I Chose the Crown",
     author: "@deymflix_official",
-    poster: "https://s1.dmcdn.net/v/eBB3M1gdvvCayrdTH/x240",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788783897_pcM6JzYFjX.jpg?x-oss-process=image/resize,w_400,image/format,webp",
     videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/Two+Alphas+Wanted+Me%2C+But+I+Chose+the+Crown+-+Full+Drama+English+Sub+2026.mp4",
     likes: "12.4K"
   },

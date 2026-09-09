@@ -463,7 +463,7 @@
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
   <div class="reels-feed-container" id="reelsContainer"></div>
 
@@ -481,6 +481,7 @@
     </div>
   </div>
 
+  <script src="security.js"></script>
   <script src="reels-data.js?v=151.0"></script>
   <script>
     const firebaseConfig = {
@@ -493,8 +494,6 @@
       measurementId: "G-H8KMTM5YYH"
     };
 
-    // Firebase is optional: if the SDK fails to load or is blocked, the feed
-    // and video playback must still work — only likes/comments degrade.
     let db = null;
     let firebaseAvailable = false;
     try {
@@ -527,14 +526,11 @@
     let currentActiveReelId = null;
     let unsubscribeComments = null;
 
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-
     function goBackToHome(e) {
       if (e) e.stopPropagation();
       window.location.href = 'index.html';
     }
 
-    // ── REEL WATCH PROGRESS (Continue Watching history) ──────────
     function getReelHistory() {
       try { return JSON.parse(localStorage.getItem('deymflix_reel_history') || '{}'); } catch (e) { return {}; }
     }
@@ -549,7 +545,6 @@
       const progress = (currentTime / duration) * 100;
       const history = getReelHistory();
       if (progress >= 95) {
-        // Finished reels drop out of the "continue watching" history.
         if (history[reel.id]) {
           delete history[reel.id];
           saveReelHistory(history);
@@ -594,15 +589,12 @@
 
       let firstReel = list[0];
       if (targetId) {
-        // Opened from a specific card (e.g. Watch History): start that reel.
         const found = list.find(r => r.id === targetId);
         if (found) {
           firstReel = found;
           resumeReelId = found.id;
         }
       } else {
-        // No target: continue the most recently watched unfinished reel so
-        // users pick up exactly where they left off after leaving the site.
         const history = getReelHistory();
         const candidates = Object.values(history)
           .filter(h => h && h.progress < 95 && h.currentTime > 3)
@@ -766,7 +758,6 @@
           if (progressBar) progressBar.style.width = `${pct}%`;
           if (timeDisplay) timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
 
-          // Save watch progress (throttled) for "Continue Watching" history.
           const now = Date.now();
           if (now - lastHistorySave > 2000) {
             lastHistorySave = now;
@@ -781,8 +772,6 @@
         }
       });
 
-      // Resume the reel from its saved position (either opened via
-      // reels.html?id=... or auto-continued from watch history).
       if (resumeReelId && card.dataset.id === resumeReelId) {
         const saved = getReelHistory()[reel.id];
         if (saved && saved.currentTime > 3 && saved.progress < 95) {
@@ -840,9 +829,6 @@
       frame.addEventListener('mousemove', resetClearModeTimer);
       frame.addEventListener('touchstart', resetClearModeTimer, { passive: true });
 
-      // Comments & Share are wired with closures (no inline onclick with
-      // interpolated strings) so reel ids/titles containing apostrophes can
-      // never break the handlers.
       const commentsBtn = card.querySelector('[data-action="comments"]');
       if (commentsBtn) {
         commentsBtn.addEventListener('click', (e) => {
@@ -953,7 +939,6 @@
         localStorage.setItem(userLikedKey, "false");
       }
 
-      // Sync to Firestore only when available; local like state still works offline
       if (firebaseAvailable && db) {
         const reelRef = db.collection('reels').doc(reelId);
         db.runTransaction((transaction) => {

@@ -2,6 +2,20 @@
 // DEYMFLIX - Main Application Logic
 // ==========================================
 
+// Security Utility: Sanitize user inputs and dynamic text to prevent XSS
+function sanitizeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>"']/g, function (m) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m];
+  });
+}
+
 // Link Cleaner Utility
 function cleanDriveLink(url) {
   if (!url) return '';
@@ -11,9 +25,8 @@ function cleanDriveLink(url) {
   return url;
 }
 
-
 const featuredMovies = [
-    { 
+  { 
     id: "Moana:-Live-Action", 
     tmdbId: "1108427", 
     title: "Moana: Live Action",
@@ -21,8 +34,8 @@ const featuredMovies = [
     backdrop: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10",
     manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
     trailerEmbed: ""
-    },
-    { 
+  },
+  { 
     id: "Toy Story 5", 
     tmdbId: "1084244", 
     title: "Toy Story 5", 
@@ -43,15 +56,7 @@ const featuredMovies = [
   }
 ];
 
-
 const movies = [
-  // ── OPTIONAL QUALITY SOURCES ─────────────────────────────
-  // To enable the quality button on the player (for users with slow
-  // internet), add a lower-quality copy of the file to a movie:
-  //   manualEmbed:   ".../Movie.2026.1080p....mp4"  (default / best)
-  //   manualEmbedHd: ".../Movie.2026.720p....mp4"   (optional, less data)
-  //   manualEmbedSd: ".../Movie.2026.480p....mp4"   (optional, slow internet)
-  // The button only appears when a movie has more than one source.
   { 
     id: "The Runner", 
     tmdbId: "1510688",
@@ -103,7 +108,8 @@ const movies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uCUgMEGPbZrnGLDjDXRteffT9JM.jpg",
     manualEmbed: "https://video.nbanaapp.eu.cc/Maam.Chief.Shakedown.in.Seoul.2023-1080p(1).mkv",
     trailerEmbed: ""
-  },  { 
+  },
+  { 
     id: "The Odyssey", 
     tmdbId: "1368337", 
     title: "The Odyssey", 
@@ -810,22 +816,24 @@ function createMovieCard(movie, rankNumber = null) {
   };
 
   const fallbackUrl = 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=No+Poster';
-  const rankHTML = rankNumber ? `<div class="rank-badge-box">#${rankNumber}</div>` : '';
+  const rankHTML = rankNumber ? `<div class="rank-badge-box">#${sanitizeHTML(String(rankNumber))}</div>` : '';
 
-  // Checks if manualEmbed has a valid link -> HD, otherwise TRAILER
   const hasManualLink = movie.manualEmbed && movie.manualEmbed.trim() !== '';
   const qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
   const qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
 
+  const safeTitle = sanitizeHTML(movie.title);
+  const safePoster = sanitizeHTML(movie.poster);
+
   card.innerHTML = `
     ${rankHTML}
     <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
-    <img src="${movie.poster}" 
-         alt="${movie.title}" 
+    <img src="${safePoster}" 
+         alt="${safeTitle}" 
          loading="lazy" 
          onerror="this.onerror=null;this.src='${fallbackUrl}';">
     <div class="poster-card-overlay">
-      <div class="poster-card-title">${movie.title}</div>
+      <div class="poster-card-title">${safeTitle}</div>
     </div>
   `;
   return card;
@@ -858,10 +866,16 @@ function renderContinueWatching() {
   const container = document.getElementById('continue-watching-container');
   if (!section || !container) return;
 
-  const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  let savedData = {};
+  try {
+    savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  } catch (e) {
+    savedData = {};
+  }
+
   const items = Object.values(savedData)
-    .filter(item => item.progress < 95)
-    .sort((a, b) => b.updatedAt - a.updatedAt);
+    .filter(item => item && item.progress < 95)
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
   if (items.length === 0) {
     section.style.display = 'none';
@@ -880,19 +894,21 @@ function renderContinueWatching() {
       window.location.href = `player.html?id=${encodeURIComponent(item.id)}`;
     };
 
+    const safeTitle = sanitizeHTML(item.title);
+    const safePoster = sanitizeHTML(item.poster);
+    const safeProgress = Math.min(100, Math.max(0, Number(item.progress) || 0));
+
     card.innerHTML = `
       <button class="remove-continue-btn" title="Remove">&times;</button>
-      <img src="${item.poster}" alt="${item.title}" loading="lazy">
+      <img src="${safePoster}" alt="${safeTitle}" loading="lazy">
       <div class="poster-card-overlay">
-        <div class="poster-card-title">${item.title}</div>
+        <div class="poster-card-title">${safeTitle}</div>
       </div>
       <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.2); z-index: 10;">
-        <div style="width: ${item.progress}%; height: 100%; background: #e50914;"></div>
+        <div style="width: ${safeProgress}%; height: 100%; background: #e50914;"></div>
       </div>
     `;
 
-    // Remove button wired via closure so movie ids/titles containing
-    // apostrophes can never break the handler (inline onclick strings would).
     const removeBtn = card.querySelector('.remove-continue-btn');
     if (removeBtn) {
       removeBtn.addEventListener('click', (e) => {
@@ -906,10 +922,12 @@ function renderContinueWatching() {
 
 function removeContinueWatching(movieId, event) {
   event.stopPropagation();
+  let savedData = {};
+  try {
+    savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  } catch (e) {}
 
-  const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
   delete savedData[movieId];
-
   localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
   renderContinueWatching();
   showToast('Removed from Continue Watching');
@@ -923,10 +941,10 @@ function setupHeroBanner() {
     <div class="hero-carousel-track" id="hero-carousel-track">
       ${featuredMovies.map(item => `
         <div class="hero-slide-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
-          <img class="hero-backdrop-img" src="${item.backdrop || item.poster}" alt="${item.title}" loading="lazy">
+          <img class="hero-backdrop-img" src="${sanitizeHTML(item.backdrop || item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
           <div class="hero-fade-overlay"></div>
           <div class="hero-details-container">
-            <h1 class="hero-title-text">${item.title}</h1>
+            <h1 class="hero-title-text">${sanitizeHTML(item.title)}</h1>
             <button class="hero-action-btn">▶ Watch Now</button>
           </div>
         </div>
@@ -938,7 +956,6 @@ function setupHeroBanner() {
   if (!track) return;
 
   startAutoScroll(track);
-
   track.addEventListener('touchstart', () => clearInterval(heroCarouselTimer), { passive: true });
   track.addEventListener('mousedown', () => clearInterval(heroCarouselTimer));
   track.addEventListener('mouseleave', () => startAutoScroll(track));
@@ -986,11 +1003,14 @@ function renderAiReels() {
       window.location.href = `reels.html?id=${encodeURIComponent(reel.id)}`;
     };
 
+    const safeTitle = sanitizeHTML(reel.title);
+    const safePoster = sanitizeHTML(reel.poster || reel.thumbnail);
+
     card.innerHTML = `
-      <img src="${reel.poster || reel.thumbnail}" alt="${reel.title}" class="reel-thumb-img" loading="lazy">
+      <img src="${safePoster}" alt="${safeTitle}" class="reel-thumb-img" loading="lazy">
       <div class="reel-overlay-info">
         <span class="reel-badge-tag">AI REEL</span>
-        <span class="reel-thumb-title">${reel.title}</span>
+        <span class="reel-thumb-title">${safeTitle}</span>
       </div>
     `;
     container.appendChild(card);
@@ -1064,9 +1084,12 @@ function renderSuggestions(matches) {
   matches.forEach(movie => {
     const item = document.createElement('div');
     item.className = 'suggestion-item';
+    const safeTitle = sanitizeHTML(movie.title);
+    const safePoster = sanitizeHTML(movie.poster);
+
     item.innerHTML = `
-      <img src="${movie.poster}" alt="${movie.title}">
-      <span class="suggestion-title">${movie.title}</span>
+      <img src="${safePoster}" alt="${safeTitle}">
+      <span class="suggestion-title">${safeTitle}</span>
     `;
     item.onclick = () => {
       window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
@@ -1142,20 +1165,20 @@ async function submitMovieRequest() {
 
     const result = await res.json();
     if (result.success) {
-      showToast(`Request sent for: "${movieTitle}"`);
+      showToast(`Request sent for: "${sanitizeHTML(movieTitle)}"`);
       if (input) input.value = '';
       closeRequestModal();
     } else {
       showToast('Error submitting request. Check key.');
     }
   } catch (err) {
-    showToast(`Request saved locally for: "${movieTitle}"`);
+    showToast(`Request saved locally for: "${sanitizeHTML(movieTitle)}"`);
     if (input) input.value = '';
     closeRequestModal();
   }
 }
 
-// ── DEVELOPER INFO MODAL ──────────────────────────────────
+// DEVELOPER INFO MODAL
 function openDeveloperInfo() {
   const modal = document.getElementById('developer-modal');
   if (modal) modal.classList.add('open');
