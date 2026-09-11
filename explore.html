@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DEYMFLIX - Explore</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <link rel="stylesheet" href="style.css?v=153.0">
+  <style>
+    body { padding-top: 80px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important; }
+
+    .explore-search-wrapper {
+      padding: 0 16px 12px;
+    }
+
+    .explore-search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 16px;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .explore-search-bar:focus-within {
+      border-color: #e50914;
+    }
+    .explore-search-bar svg {
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+    .explore-search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+    .explore-search-bar input::placeholder {
+      color: rgba(255,255,255,0.35);
+    }
+    .explore-search-clear {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: none;
+      padding: 0 4px;
+    }
+    .explore-search-clear.visible { display: block; }
+
+    .explore-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: rgba(20, 20, 20, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+    }
+    .explore-tabs::-webkit-scrollbar { display: none; }
+
+    .explore-tab {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .explore-tab.active {
+      color: #e50914;
+      border-bottom-color: #e50914;
+    }
+    .explore-tab:hover { color: rgba(255,255,255,0.8); }
+    .explore-tab .tab-count {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-left: 4px;
+    }
+
+    .explore-content { padding: 16px; }
+    .explore-section { display: none; }
+    .explore-section.active { display: block; }
+
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (min-width: 768px) { .explore-grid { grid-template-columns: repeat(5, 1fr); } }
+    @media (min-width: 1024px) { .explore-grid { grid-template-columns: repeat(6, 1fr); } }
+
+    .explore-card {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 2/3;
+      background: #1a1a1a;
+      transition: transform 0.2s;
+    }
+    .explore-card:active { transform: scale(0.96); }
+    .explore-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .explore-card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    }
+    .explore-card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .explore-card-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #e50914;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .explore-card-badge.series { background: #1a73e8; }
+    .explore-card-badge.trailer { background: #ff9800; }
+    .explore-card-badge.reel { background: #9c27b0; }
+
+    .explore-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.4);
+    }
+    .explore-empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .explore-empty p { font-size: 0.9rem; line-height: 1.5; }
+
+    .section-header-title {
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-nav" style="padding-bottom: 0;">
+    <a href="index.html" class="brand-logo-link">
+      <img src="favicon.svg" alt="DEYMFLIX" class="brand-logo-img">
+      <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
+    </a>
+    <div class="nav-spacer"></div>
+  </header>
+
+  <!-- SEARCH BAR -->
+  <div class="explore-search-wrapper">
+    <div class="explore-search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="exploreSearchInput" placeholder="Search movies, series, reels..." oninput="handleExploreSearch(this.value)">
+      <button class="explore-search-clear" id="searchClearBtn" onclick="clearExploreSearch()">✕</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="explore-tabs" id="explore-tabs">
+    <button class="explore-tab active" data-tab="movies" onclick="switchExploreTab('movies')">🎬 Movies</button>
+    <button class="explore-tab" data-tab="tagalog" onclick="switchExploreTab('tagalog')">🇵🇭 Tagalog</button>
+    <button class="explore-tab" data-tab="reels" onclick="switchExploreTab('reels')">🎞️ Reels</button>
+  </div>
+
+  <!-- CONTENT -->
+  <main class="explore-content" id="explore-content"></main>
+
+  <!-- Coming Soon Tooltip -->
+  <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
+
+  <!-- Request Modal -->
+  <div id="request-modal" class="request-modal-backdrop" style="display: none;">
+    <div class="request-modal-content">
+      <span class="close-modal-btn" onclick="closeRequestModal()">&times;</span>
+      <h3>Request a Movie</h3>
+      <p>Can't find what you're looking for? Let us know!</p>
+      <div class="request-input-group">
+        <input type="text" id="modal-request-input" placeholder="Enter movie title...">
+        <button onclick="submitMovieRequest()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-items">
+      <li class="bottom-nav-item" data-page="home" onclick="window.location.href='index.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+        <span class="bottom-nav-label">Home</span>
+      </li>
+      <li class="bottom-nav-item" data-page="reels" onclick="window.location.href='reels.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span>
+        <span class="bottom-nav-label">Reels</span>
+      </li>
+      <li class="bottom-nav-item center-item active" data-page="explore">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <span class="bottom-nav-label">Explore</span>
+      </li>
+      <li class="bottom-nav-item" data-page="mylist" onclick="window.location.href='mylist.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
+        <span class="bottom-nav-label">My List</span>
+      </li>
+      <li class="bottom-nav-item" data-page="request" onclick="openRequestModal()">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
+        <span class="bottom-nav-label">Request</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div id="loading-toast" class="toast-notification">Loading...</div>
+
+  <script src="security.js"></script>
+  <script src="reels-data.js?v=151.0"></script>
+  <script src="app.js?v=153.0"></script>
+  <script>
+    let exploreActiveTab = 'movies';
+    let exploreSearchQuery = '';
+
+    // ── CATEGORIZE CONTENT ──
+    function getCategorizedContent() {
+      const movieList = typeof movies !== 'undefined' ? movies : [];
+      const reelsList = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
+
+      const allMovies = movieList.filter(m => !m.isSeries && !m.isFilipino);
+      const tagalogMovies = movieList.filter(m => m.isFilipino);
+      const reels = reelsList;
+
+      return { allMovies, tagalogMovies, reels };
+    }
+
+    // ── SEARCH ──
+    function filterBySearch(items, query) {
+      if (!query) return items;
+      const q = query.toLowerCase();
+      return items.filter(item => {
+        const title = (item.title || '').toLowerCase();
+        const author = (item.author || '').toLowerCase();
+        return title.includes(q) || author.includes(q);
+      });
+    }
+
+    function handleExploreSearch(value) {
+      exploreSearchQuery = value.trim();
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) clearBtn.classList.toggle('visible', exploreSearchQuery.length > 0);
+      renderExploreContent();
+    }
+
+    function clearExploreSearch() {
+      const input = document.getElementById('exploreSearchInput');
+      if (input) input.value = '';
+      exploreSearchQuery = '';
+      document.getElementById('searchClearBtn').classList.remove('visible');
+      renderExploreContent();
+    }
+
+    // ── TABS ──
+    function switchExploreTab(tab) {
+      exploreActiveTab = tab;
+      document.querySelectorAll('.explore-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      renderExploreContent();
+    }
+
+    // ── RENDER ──
+    function renderExploreContent() {
+      const container = document.getElementById('explore-content');
+      const { allMovies, tagalogMovies, reels } = getCategorizedContent();
+
+      // When searching, search across ALL categories and show combined results
+      if (exploreSearchQuery) {
+        const allItems = [
+          ...allMovies.map(m => ({ ...m, _type: 'movie' })),
+          ...tagalogMovies.map(m => ({ ...m, _type: 'tagalog' })),
+          ...reels.map(r => ({ ...r, _type: 'reel' }))
+        ];
+        const results = filterBySearch(allItems, exploreSearchQuery);
+
+        if (results.length === 0) {
+          container.innerHTML = `<div class="explore-empty"><div class="explore-empty-icon">🔍</div><p>No results for "${sanitizeHTML(exploreSearchQuery)}"<br>Try a different search term.</p></div>`;
+          return;
+        }
+
+        container.innerHTML = `<div class="explore-grid">${results.map(item => renderExploreCard(item, item._type)).join('')}</div>`;
+        return;
+      }
+
+      // Tab-based view
+      let items, badgeType, emptyIcon, emptyText;
+
+      switch (exploreActiveTab) {
+        case 'movies':
+          items = allMovies;
+          badgeType = '';
+          emptyIcon = '🎬';
+          emptyText = 'No movies yet.<br>Add movies to app.js to see them here.';
+          break;
+        case 'tagalog':
+          items = tagalogMovies;
+          badgeType = '🇵🇭';
+          emptyIcon = '🇵🇭';
+          emptyText = 'No Tagalog movies yet.<br>Add Filipino movies with isFilipino: true.';
+          break;
+        case 'reels':
+          items = reels;
+          badgeType = '';
+          emptyIcon = '🎞️';
+          emptyText = 'No reels yet.<br>Add reels to reels-data.js to see them here.';
+          break;
+      }
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="explore-empty"><div class="explore-empty-icon">${emptyIcon}</div><p>${emptyText}</p></div>`;
+        return;
+      }
+
+      const type = exploreActiveTab === 'reels' ? 'reel' : (exploreActiveTab === 'tagalog' ? 'tagalog' : 'movie');
+      container.innerHTML = `<div class="explore-grid">${items.map(item => renderExploreCard(item, type)).join('')}</div>`;
+    }
+
+    function renderExploreCard(item, type) {
+      const poster = item.poster || '';
+      const title = item.title || '';
+      const id = item.id || '';
+      const isSeries = item.isSeries === true;
+      const hasEmbed = !!(item.manualEmbed && item.manualEmbed.startsWith('http'));
+      const hasTrailer = !!(item.trailerEmbed && item.trailerEmbed.startsWith('http'));
+
+      let href, badge = '';
+
+      if (type === 'reel') {
+        href = `reels.html?id=${encodeURIComponent(id)}`;
+        badge = '<span class="explore-card-badge reel">Reel</span>';
+      } else if (isSeries) {
+        href = `player.html?id=${encodeURIComponent(id)}`;
+        badge = '<span class="explore-card-badge series">Series</span>';
+      } else if (hasEmbed) {
+        href = `player.html?id=${encodeURIComponent(id)}`;
+        badge = '<span class="explore-card-badge">HD</span>';
+      } else if (hasTrailer) {
+        href = `player.html?id=${encodeURIComponent(id)}`;
+        badge = '<span class="explore-card-badge trailer">Trailer</span>';
+      } else {
+        href = `player.html?id=${encodeURIComponent(id)}`;
+      }
+
+      return `
+        <div class="explore-card" onclick="window.location.href='${href}'">
+          <img src="${sanitizeHTML(poster)}" alt="${sanitizeHTML(title)}" loading="lazy">
+          ${badge}
+          <div class="explore-card-overlay">
+            <div class="explore-card-title">${sanitizeHTML(title)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ── UPDATE TAB COUNTS ──
+    function updateTabCounts() {
+      const { allMovies, tagalogMovies, reels } = getCategorizedContent();
+      const tabs = document.querySelectorAll('.explore-tab');
+      const counts = { movies: allMovies.length, tagalog: tagalogMovies.length, reels: reels.length };
+      tabs.forEach(tab => {
+        const key = tab.dataset.tab;
+        const count = counts[key] || 0;
+        const existing = tab.querySelector('.tab-count');
+        if (existing) existing.remove();
+        if (count > 0) {
+          tab.innerHTML += `<span class="tab-count">(${count})</span>`;
+        }
+      });
+    }
+
+    // ── INIT ──
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTabCounts();
+      renderExploreContent();
+    });
+  </script>
+</body>
+</html>

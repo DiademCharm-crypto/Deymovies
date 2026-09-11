@@ -466,7 +466,7 @@
   function addInvisibleWatermark() {
     const watermark = document.createElement('div');
     watermark.id = 'anti-recording-watermark';
-    watermark.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;opacity:0.01;font-size:10px;color:white;overflow:hidden;word-wrap:break-word;';
+    watermark.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;opacity:0;font-size:10px;color:transparent;overflow:hidden;word-wrap:break-word;';
     
     // Generate unique user watermark
     const userId = localStorage.getItem('deymflix_user_id') || 'anonymous';
