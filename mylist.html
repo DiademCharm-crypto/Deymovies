@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - My List</title>
@@ -125,6 +126,9 @@
       transition: opacity 0.2s;
     }
     .mylist-item:hover .mylist-remove-btn { opacity: 1; }
+    @media (hover: none) {
+      .mylist-remove-btn { opacity: 1 !important; background: rgba(0,0,0,0.7); }
+    }
 
     .mylist-progress {
       position: absolute;
@@ -318,12 +322,16 @@
     }
 
     // ── SERIES WATCH HISTORY ──
+    function seriesBaseId(id) { return id && id.includes('-ep') ? id.split('-ep')[0] : id; }
+
     function renderSeriesHistory(container) {
       const saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
       const movieList = typeof movies !== 'undefined' ? movies : [];
       const items = Object.values(saved)
         .filter(item => {
-          const movie = movieList.find(m => m.id === item.id);
+          // Episode entries use "seriesId-epN" — strip the suffix to find the series
+          const baseId = item.id.includes('-ep') ? item.id.split('-ep')[0] : item.id;
+          const movie = movieList.find(m => m.id === baseId);
           return movie && movie.isSeries;
         })
         .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));

@@ -272,6 +272,8 @@ function playEpisodeSource(episode) {
 
   if (typeof currentMovie !== 'undefined') {
     currentMovie.manualEmbed = episode.embedUrl;
+    currentMovie._episodeId = currentMovie.id + '-ep' + (episode.episodeNumber || '');
+    currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + episode.episodeNumber);
   }
 
   if (typeof loadEmbed === 'function') {

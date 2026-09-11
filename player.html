@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DEYMFLIX - Player</title>
@@ -1096,8 +1097,8 @@
       }
     }
   
-    /* ── MID-ROLL AD OVERLAY ── */
-    .midroll-ad-overlay {
+    /* ── VAST VIDEO AD OVERLAY ── */
+    .vast-ad-overlay {
       position: absolute;
       inset: 0;
       background: #000;
@@ -1107,58 +1108,50 @@
       align-items: center;
       justify-content: center;
     }
-    .midroll-ad-overlay.active {
+    .vast-ad-overlay.active {
       display: flex;
     }
-    .midroll-ad-content {
-      position: relative;
+    .vast-ad-video {
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      object-fit: contain;
+      background: #000;
     }
-    .midroll-ad-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .midroll-ad-skip {
+    .vast-ad-skip {
       position: absolute;
       bottom: 20px;
       right: 20px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #fff;
       font-size: 0.85rem;
       font-weight: 700;
-      padding: 8px 20px;
+      padding: 10px 24px;
       border-radius: 6px;
       cursor: pointer;
       display: none;
       transition: background 0.2s;
-      z-index: 510;
+      z-index: 520;
     }
-    .midroll-ad-skip.visible {
+    .vast-ad-skip.visible {
       display: block;
     }
-    .midroll-ad-skip:hover {
-      background: rgba(255, 255, 255, 0.15);
+    .vast-ad-skip:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
-    .midroll-ad-timer {
+    .vast-ad-timer {
       position: absolute;
       top: 12px;
       right: 12px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       color: #fff;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 6px 14px;
       border-radius: 4px;
-      z-index: 510;
+      z-index: 520;
     }
-    .midroll-ad-label {
+    .vast-ad-label {
       position: absolute;
       top: 12px;
       left: 12px;
@@ -1166,11 +1159,20 @@
       color: #fff;
       font-size: 0.65rem;
       font-weight: 800;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 3px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      z-index: 510;
+      z-index: 520;
+    }
+    .vast-ad-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #e50914;
+      z-index: 520;
+      transition: width 0.3s linear;
     }
 
   </style>
@@ -1241,14 +1243,13 @@
   <div class="video-container" id="playerContainer">
     <div id="player-poster-blur" class="player-poster-blur"></div>
 
-    <!-- MID-ROLL AD OVERLAY -->
-    <div id="midroll-ad-overlay" class="midroll-ad-overlay">
-      <div class="midroll-ad-content">
-        <span class="midroll-ad-label">Advertisement</span>
-        <span class="midroll-ad-timer" id="ad-timer">Ad ends in 5s</span>
-        <img class="midroll-ad-image" id="ad-image" src="" alt="Advertisement">
-        <button class="midroll-ad-skip" id="ad-skip-btn" onclick="skipMidrollAd()">Skip Ad ▶</button>
-      </div>
+    <!-- VAST VIDEO AD OVERLAY -->
+    <div id="vast-ad-overlay" class="vast-ad-overlay">
+      <span class="vast-ad-label">Advertisement</span>
+      <span class="vast-ad-timer" id="vast-ad-timer">Loading ad...</span>
+      <video id="vast-ad-video" class="vast-ad-video" playsinline></video>
+      <div class="vast-ad-progress" id="vast-ad-progress" style="width: 0%"></div>
+      <button class="vast-ad-skip" id="vast-ad-skip" onclick="skipVastAd()">Skip Ad ▶</button>
     </div>
 
     <video id="direct-video-player" playsinline style="display: none;"></video>
@@ -2055,11 +2056,14 @@
       totalDurationText.textContent = formatTime(directPlayer.duration);
 
       const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
-      const existingProgress = savedData[currentMovie.id];
+      const effId = currentMovie._episodeId || currentMovie.id;
+        const existingProgress = savedData[effId];
 
       if (existingProgress && existingProgress.progress < 95) {
         directPlayer.currentTime = existingProgress.currentTime;
       }
+      // Reset _episodeId when video loads so next episode starts fresh
+      delete currentMovie._episodeId;
     });
 
     directPlayer.addEventListener('playing', () => {
@@ -2083,9 +2087,10 @@
 
         if (currentTime > 5) {
           const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
-          savedData[currentMovie.id] = {
-            id: currentMovie.id,
-            title: currentMovie.title,
+          const saveId = currentMovie._episodeId || currentMovie.id;
+          savedData[saveId] = {
+            id: saveId,
+            title: currentMovie._episodeTitle || currentMovie.title,
             poster: currentMovie.poster,
             currentTime: currentTime,
             duration: directPlayer.duration,
@@ -2847,73 +2852,176 @@
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
   
-    // ── MID-ROLL AD SYSTEM ──
-    const midrollAdOverlay = document.getElementById('midroll-ad-overlay');
-    const adTimerEl = document.getElementById('ad-timer');
-    const adSkipBtn = document.getElementById('ad-skip-btn');
-    const adImageEl = document.getElementById('ad-image');
-    let adTriggered = false;
-    let adCountdown = null;
-    let adTimeLeft = 5;
+    // ── VAST VIDEO AD SYSTEM (HilltopAds) ──
+    const vastOverlay = document.getElementById('vast-ad-overlay');
+    const vastVideo = document.getElementById('vast-ad-video');
+    const vastTimer = document.getElementById('vast-ad-timer');
+    const vastSkipBtn = document.getElementById('vast-ad-skip');
+    const vastProgress = document.getElementById('vast-ad-progress');
+    let vastTriggered = false;
+    let vastAdPlaying = false;
+    let vastCountdown = null;
+    let vastTimeLeft = 5;
+    const VAST_TAG_URL = 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB';
 
-    // Ad images pool — add your ad image URLs here
-    const adImages = [
-      'https://media.themoviedb.org/t/p/w600_and_h900_face/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg',
-      'https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg'
-    ];
-
-    function getRandomAdImage() {
-      return adImages[Math.floor(Math.random() * adImages.length)];
+    // Parse VAST XML to extract video URL
+    function parseVastXml(xmlText) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlText, 'text/xml');
+        // Try to find MediaFile with video/mp4
+        const mediaFiles = doc.querySelectorAll('MediaFile');
+        for (const mf of mediaFiles) {
+          const type = mf.getAttribute('type') || '';
+          const url = mf.textContent.trim();
+          if (type.includes('video/mp4') && url) return url;
+        }
+        // Fallback: any MediaFile
+        for (const mf of mediaFiles) {
+          const url = mf.textContent.trim();
+          if (url) return url;
+        }
+        // Try Inline > Creatives > VideoClicks > ClickThrough (for click-through URL)
+        const clickThrough = doc.querySelector('ClickThrough');
+        if (clickThrough) return null; // No video, just click-through
+      } catch (e) {
+        console.warn('[VAST] Parse error:', e);
+      }
+      return null;
     }
 
-    function showMidrollAd() {
-      if (adTriggered) return;
-      adTriggered = true;
+    // Fetch VAST tag and extract video URL
+    async function fetchVastAd() {
+      try {
+        // First fetch the VAST tag URL (may redirect)
+        let resp;
+        try {
+          resp = await fetch(VAST_TAG_URL, { mode: 'cors' });
+        } catch (corsErr) {
+          console.warn('[VAST] CORS blocked, trying no-cors fallback');
+          return null; // Will trigger graceful skip — movie continues
+        }
+        const contentType = resp.headers.get('content-type') || '';
+        let xmlText;
 
-      // Pause the video
+        if (contentType.includes('xml') || contentType.includes('text')) {
+          xmlText = await resp.text();
+        } else {
+          // The URL might return a VAST wrapper or redirect
+          xmlText = await resp.text();
+        }
+
+        // Check if it's XML
+        if (xmlText.trim().startsWith('<?xml') || xmlText.trim().startsWith('<VAST')) {
+          return parseVastXml(xmlText);
+        }
+
+        // If it's a redirect URL to another VAST tag
+        if (xmlText.trim().startsWith('http')) {
+          const resp2 = await fetch(xmlText.trim(), { mode: 'cors' });
+          xmlText = await resp2.text();
+          return parseVastXml(xmlText);
+        }
+
+        return null;
+      } catch (e) {
+        console.warn('[VAST] Fetch error:', e);
+        return null;
+      }
+    }
+
+    // Show VAST ad overlay
+    async function showVastAd() {
+      if (vastTriggered || vastAdPlaying) return;
+      vastTriggered = true;
+
+      // Pause the movie
       directPlayer.pause();
 
-      // Set random ad image
-      adImageEl.src = getRandomAdImage();
+      // Show overlay with loading state
+      vastOverlay.classList.add('active');
+      vastTimer.textContent = 'Loading ad...';
+      vastSkipBtn.classList.remove('visible');
+      vastProgress.style.width = '0%';
 
-      // Show overlay
-      midrollAdOverlay.classList.add('active');
+      // Fetch the VAST ad video URL
+      const videoUrl = await fetchVastAd();
 
-      // Start countdown
-      adTimeLeft = 5;
-      adTimerEl.textContent = 'Ad ends in ' + adTimeLeft + 's';
-      adSkipBtn.classList.remove('visible');
+      if (!videoUrl) {
+        // Fallback: skip ad if no video found
+        console.warn('[VAST] No video URL found, skipping ad');
+        skipVastAd();
+        return;
+      }
 
-      adCountdown = setInterval(() => {
-        adTimeLeft--;
-        if (adTimeLeft <= 0) {
-          clearInterval(adCountdown);
-          adSkipBtn.classList.add('visible');
-          adTimerEl.textContent = 'You can skip now';
-        } else {
-          adTimerEl.textContent = 'Ad ends in ' + adTimeLeft + 's';
+      // Set video source and play
+      vastVideo.src = videoUrl;
+      vastVideo.load();
+
+      vastVideo.oncanplay = function() {
+        vastAdPlaying = true;
+        vastVideo.play().catch(() => {});
+
+        // Start skip countdown (5 seconds)
+        vastTimeLeft = 5;
+        vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
+
+        vastCountdown = setInterval(() => {
+          vastTimeLeft--;
+          if (vastTimeLeft <= 0) {
+            clearInterval(vastCountdown);
+            vastSkipBtn.classList.add('visible');
+            vastTimer.textContent = 'You can skip now';
+          } else {
+            vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
+          }
+        }, 1000);
+      };
+
+      // Update progress bar
+      vastVideo.addEventListener('timeupdate', function updateProgress() {
+        if (!isNaN(vastVideo.duration) && vastVideo.duration > 0) {
+          const pct = (vastVideo.currentTime / vastVideo.duration) * 100;
+          vastProgress.style.width = pct + '%';
         }
-      }, 1000);
+      });
+
+      // When ad ends naturally, resume movie
+      vastVideo.onended = function() {
+        skipVastAd();
+      };
     }
 
-    function skipMidrollAd() {
-      // Hide overlay
-      midrollAdOverlay.classList.remove('active');
-      clearInterval(adCountdown);
+    // Skip / close VAST ad
+    function skipVastAd() {
+      vastOverlay.classList.remove('active');
+      vastVideo.pause();
+      vastVideo.removeAttribute('src');
+      vastVideo.load();
+      clearInterval(vastCountdown);
+      vastAdPlaying = false;
 
-      // Resume playback
+      // Resume movie
       directPlayer.play().catch(() => {});
 
-      // Reset ad state so it can trigger again at next midpoint
-      setTimeout(() => { adTriggered = false; }, 10000);
+      // Reset trigger flag
+      setTimeout(() => { vastTriggered = false; }, 30000);
     }
 
-    // Hook into timeupdate to trigger ad at 50% of video
-    directPlayer.addEventListener('timeupdate', function checkMidrollAd() {
+    // Hook into timeupdate to trigger ads at 33% and 66% (1-2 ads per video)
+    let vastAdPhase = 0; // 0 = not triggered, 1 = first ad done, 2 = second ad done
+    directPlayer.addEventListener('timeupdate', function checkVastAd() {
       if (isNaN(directPlayer.duration) || directPlayer.duration < 30) return;
-      const midpoint = directPlayer.duration * 0.5;
-      if (directPlayer.currentTime >= midpoint && !adTriggered) {
-        showMidrollAd();
+      const pct = (directPlayer.currentTime / directPlayer.duration) * 100;
+      // First ad at 33%
+      if (vastAdPhase === 0 && pct >= 33) {
+        vastAdPhase = 1;
+        showVastAd();
+      }
+      // Second ad at 66% (only if video is long enough, >10 minutes)
+      else if (vastAdPhase === 1 && pct >= 66 && directPlayer.duration > 600) {
+        vastAdPhase = 2;
+        showVastAd();
       }
     });
 
