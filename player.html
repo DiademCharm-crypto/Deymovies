@@ -1160,6 +1160,7 @@
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
+    <div id="player-poster-blur" class="player-poster-blur"></div>
     <video id="direct-video-player" playsinline style="display: none;"></video>
 
     <!-- Animated Loading Buffer Overlay -->
@@ -1420,82 +1421,6 @@
     };
 
     updateBookmarkBtn();
-
-    // ============ DOWNLOAD FUNCTIONALITY ============
-    function initDownload() {
-      if (!currentMovie || !currentMovie.manualEmbed) {
-        showToast('No video available for download');
-        return;
-      }
-
-      // Already downloaded / in progress — no popup needed
-      const downloads = getDownloads();
-      const active = getActiveDownloads();
-      if (downloads.some(d => d.movieId === currentMovie.id)) {
-        showToast('Already in downloads');
-        return;
-      }
-      if (Object.values(active).some(d => d.movieId === currentMovie.id)) {
-        showToast('Download already in progress');
-        return;
-      }
-
-      openDownloadConfirm();
-    }
-    window.initDownload = initDownload;
-
-    function openDownloadConfirm() {
-      const backdrop = document.getElementById('dl-confirm-backdrop');
-      if (!backdrop) return;
-      document.getElementById('dl-confirm-movie').textContent = currentMovie.title;
-      backdrop.classList.add('show');
-    }
-
-    function closeDownloadConfirm() {
-      const backdrop = document.getElementById('dl-confirm-backdrop');
-      if (backdrop) backdrop.classList.remove('show');
-    }
-
-    function confirmDownload() {
-      closeDownloadConfirm();
-      window.startVideoDownload({
-        id: currentMovie.id,
-        title: currentMovie.title,
-        poster: currentMovie.poster,
-        url: currentMovie.manualEmbed
-      });
-      updateDownloadBtn();
-    }
-    window.confirmDownload = confirmDownload;
-    window.closeDownloadConfirm = closeDownloadConfirm;
-
-    // Update download button state
-    function updateDownloadBtn() {
-      const btn = document.getElementById('download-btn');
-      if (!btn) return;
-      const downloads = getDownloads();
-      const active = getActiveDownloads();
-      const isDownloaded = downloads.some(d => d.movieId === currentMovie.id);
-      const isDownloading = Object.values(active).some(d => d.movieId === currentMovie.id);
-      if (isDownloaded) {
-        btn.classList.add('bookmarked');
-        btn.classList.remove('downloading');
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-        btn.title = 'Downloaded';
-      } else if (isDownloading) {
-        btn.classList.add('downloading');
-        btn.classList.remove('bookmarked');
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-        btn.title = 'Downloading...';
-      } else {
-        btn.classList.remove('bookmarked', 'downloading');
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
-        btn.title = 'Download Video';
-      }
-    }
-    updateDownloadBtn();
-    // Periodically update button state
-    setInterval(updateDownloadBtn, 2000);
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
@@ -2602,6 +2527,28 @@
       newIframe.src = targetUrl;
     }
 
+    
+    // Player poster blur during buffering
+    const playerPosterBlur = document.getElementById('player-poster-blur');
+    
+    function showPlayerPosterBlur() {
+      if (playerPosterBlur && currentMovie.poster) {
+        playerPosterBlur.style.backgroundImage = 'url(' + currentMovie.poster + ')';
+        playerPosterBlur.classList.add('visible');
+      }
+    }
+    
+    function hidePlayerPosterBlur() {
+      if (playerPosterBlur) {
+        playerPosterBlur.classList.remove('visible');
+      }
+    }
+    
+    directPlayer.addEventListener('waiting', showPlayerPosterBlur);
+    directPlayer.addEventListener('playing', hidePlayerPosterBlur);
+    directPlayer.addEventListener('canplay', hidePlayerPosterBlur);
+    directPlayer.addEventListener('seeked', hidePlayerPosterBlur);
+
     function loadEmbed() {
       startSlowConnectionCheck();
 
@@ -2778,10 +2725,10 @@
         const genreText = movie.isFilipino ? 'Filipino' : (movieGenres.length > 0 ? movieGenres[0] : 'Movie');
         
         card.innerHTML = `
-          <img src="${movie.poster}" alt="${movie.title}">
+          <img src="${sanitizeHTML(movie.poster)}" alt="${sanitizeHTML(movie.title)}">
           <div class="rec-info">
-            <span class="rec-title">${movie.title}</span>
-            <span class="rec-genre">${genreText} • HD</span>
+            <span class="rec-title">${sanitizeHTML(movie.title)}</span>
+            <span class="rec-genre">${sanitizeHTML(genreText)} • HD</span>
           </div>
         `;
         grid.appendChild(card);

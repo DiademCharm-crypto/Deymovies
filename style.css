@@ -103,6 +103,18 @@ body {
   box-shadow: 0 0 15px rgba(229, 9, 20, 0.6);
 }
 
+/* Nav spacer for centering search on desktop */
+.nav-spacer {
+  flex: 1;
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .nav-spacer {
+    display: block;
+  }
+}
+
 .search-overlay-bar {
   position: relative;
   flex: 1;
@@ -706,9 +718,9 @@ body {
   }
 
   .search-overlay-bar {
-    flex: 1 !important;
-    margin: 0 40px !important;
-    max-width: 650px !important;
+    flex: 0 1 500px !important;
+    margin: 0 auto !important;
+    max-width: 500px !important;
   }
 
   .search-input-wrapper {

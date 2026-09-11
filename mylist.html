@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DEYMFLIX - My List</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <link rel="stylesheet" href="style.css?v=153.0">
+  <style>
+    body { padding-top: 80px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important; }
+
+    .mylist-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: rgba(20, 20, 20, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+    }
+    .mylist-tabs::-webkit-scrollbar { display: none; }
+
+    .mylist-tab {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .mylist-tab.active {
+      color: #e50914;
+      border-bottom-color: #e50914;
+    }
+    .mylist-tab:hover {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .mylist-content {
+      padding: 16px;
+    }
+
+    .mylist-section {
+      display: none;
+    }
+    .mylist-section.active {
+      display: block;
+    }
+
+    .mylist-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (min-width: 768px) {
+      .mylist-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .mylist-grid { grid-template-columns: repeat(6, 1fr); }
+    }
+
+    .mylist-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 2/3;
+      background: #1a1a1a;
+    }
+    .mylist-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .mylist-item-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    }
+    .mylist-item-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .mylist-remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .mylist-item:hover .mylist-remove-btn { opacity: 1; }
+
+    .mylist-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #e50914;
+      border-radius: 0 2px 0 0;
+    }
+
+    .mylist-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.4);
+    }
+    .mylist-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+    .mylist-empty p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .section-header-title {
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-nav" style="padding-bottom: 0;">
+    <a href="index.html" class="brand-logo-link">
+      <img src="favicon.svg" alt="DEYMFLIX" class="brand-logo-img">
+      <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
+    </a>
+  </header>
+
+  <div class="mylist-tabs" id="mylist-tabs">
+    <button class="mylist-tab active" data-tab="bookmarks" onclick="switchTab('bookmarks')">🔖 Bookmarks</button>
+    <button class="mylist-tab" data-tab="movies" onclick="switchTab('movies')">🎬 Movies</button>
+    <button class="mylist-tab" data-tab="series" onclick="switchTab('series')">📺 Series</button>
+    <button class="mylist-tab" data-tab="reels" onclick="switchTab('reels')">🎞️ Reels</button>
+  </div>
+
+  <main class="mylist-content" id="mylist-content">
+    <!-- Populated by JS -->
+  </main>
+
+  <!-- Coming Soon Tooltip -->
+  <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
+
+  <!-- Request Modal -->
+  <div id="request-modal" class="request-modal-backdrop" style="display: none;">
+    <div class="request-modal-content">
+      <span class="close-modal-btn" onclick="closeRequestModal()">&times;</span>
+      <h3>Request a Movie</h3>
+      <p>Can't find what you're looking for? Let us know!</p>
+      <div class="request-input-group">
+        <input type="text" id="modal-request-input" placeholder="Enter movie title...">
+        <button onclick="submitMovieRequest()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-items">
+      <li class="bottom-nav-item" data-page="home" onclick="window.location.href='index.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+        <span class="bottom-nav-label">Home</span>
+      </li>
+      <li class="bottom-nav-item" data-page="reels" onclick="window.location.href='reels.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span>
+        <span class="bottom-nav-label">Reels</span>
+      </li>
+      <li class="bottom-nav-item center-item" data-page="explore" onclick="showComingSoon(event)">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <span class="bottom-nav-label">Explore</span>
+      </li>
+      <li class="bottom-nav-item active" data-page="mylist">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
+        <span class="bottom-nav-label">My List</span>
+      </li>
+      <li class="bottom-nav-item" data-page="request" onclick="openRequestModal()">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
+        <span class="bottom-nav-label">Request</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div id="loading-toast" class="toast-notification">Loading...</div>
+
+  <script src="security.js"></script>
+  <script src="reels-data.js?v=151.0"></script>
+  <script src="app.js?v=153.0"></script>
+  <script>
+    let activeTab = 'bookmarks';
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.mylist-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      renderTabContent();
+    }
+
+    function renderTabContent() {
+      const container = document.getElementById('mylist-content');
+      switch (activeTab) {
+        case 'bookmarks': renderBookmarks(container); break;
+        case 'movies': renderMovieHistory(container); break;
+        case 'series': renderSeriesHistory(container); break;
+        case 'reels': renderReelsHistory(container); break;
+      }
+    }
+
+    // ── BOOKMARKS ──
+    function renderBookmarks(container) {
+      const list = getMyList();
+      if (list.length === 0) {
+        container.innerHTML = '<div class="mylist-empty"><div class="mylist-empty-icon">🔖</div><p>Your bookmarks list is empty.<br>Tap the bookmark icon on any movie to save it here.</p></div>';
+        return;
+      }
+      container.innerHTML = '<div class="mylist-grid">' + list.map(m => `
+        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(m.id)}'">
+          <img src="${sanitizeHTML(m.poster)}" alt="${sanitizeHTML(m.title)}" loading="lazy">
+          <div class="mylist-item-overlay">
+            <div class="mylist-item-title">${sanitizeHTML(m.title)}</div>
+          </div>
+          <button class="mylist-remove-btn" onclick="event.stopPropagation(); removeBookmark('${sanitizeHTML(m.id)}')">✕</button>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    function removeBookmark(id) {
+      const list = getMyList().filter(m => m.id !== id);
+      localStorage.setItem('deymflix_my_list', JSON.stringify(list));
+      renderTabContent();
+      showToast('Removed from Bookmarks');
+    }
+
+    // ── MOVIE WATCH HISTORY ──
+    function renderMovieHistory(container) {
+      const saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+      const movieList = typeof movies !== 'undefined' ? movies : [];
+      const items = Object.values(saved)
+        .filter(item => {
+          const movie = movieList.find(m => m.id === item.id);
+          return movie && !movie.isSeries;
+        })
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="mylist-empty"><div class="mylist-empty-icon">🎬</div><p>No movie watch history yet.<br>Start watching a movie and it will appear here.</p></div>';
+        return;
+      }
+      container.innerHTML = '<div class="mylist-grid">' + items.map(item => `
+        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
+          <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
+          <div class="mylist-progress" style="width: ${Math.min(100, item.progress || 0)}%"></div>
+          <div class="mylist-item-overlay">
+            <div class="mylist-item-title">${sanitizeHTML(item.title)}</div>
+          </div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    // ── SERIES WATCH HISTORY ──
+    function renderSeriesHistory(container) {
+      const saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+      const movieList = typeof movies !== 'undefined' ? movies : [];
+      const items = Object.values(saved)
+        .filter(item => {
+          const movie = movieList.find(m => m.id === item.id);
+          return movie && movie.isSeries;
+        })
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="mylist-empty"><div class="mylist-empty-icon">📺</div><p>No series watch history yet.<br>Start watching a series and it will appear here.</p></div>';
+        return;
+      }
+      container.innerHTML = '<div class="mylist-grid">' + items.map(item => `
+        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
+          <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
+          <div class="mylist-progress" style="width: ${Math.min(100, item.progress || 0)}%"></div>
+          <div class="mylist-item-overlay">
+            <div class="mylist-item-title">${sanitizeHTML(item.title)}</div>
+          </div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    // ── REELS WATCH HISTORY ──
+    function renderReelsHistory(container) {
+      const history = getReelHistory();
+      const items = Object.values(history)
+        .filter(h => h && h.currentTime > 3)
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="mylist-empty"><div class="mylist-empty-icon">🎞️</div><p>No reel watch history yet.<br>Watch some reels and they will appear here.</p></div>';
+        return;
+      }
+      container.innerHTML = '<div class="mylist-grid">' + items.map(item => `
+        <div class="mylist-item" onclick="window.location.href='reels.html?id=${encodeURIComponent(item.id)}'">
+          <img src="${sanitizeHTML(item.poster || '')}" alt="${sanitizeHTML(item.title || '')}" loading="lazy">
+          <div class="mylist-progress" style="width: ${Math.min(100, item.progress || 0)}%"></div>
+          <div class="mylist-item-overlay">
+            <div class="mylist-item-title">${sanitizeHTML(item.title || '')}</div>
+          </div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    function getReelHistory() {
+      try { return JSON.parse(localStorage.getItem('deymflix_reel_history') || '{}'); } catch (e) { return {}; }
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTabContent();
+    });
+  </script>
+</body>
+</html>

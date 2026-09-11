@@ -45,6 +45,59 @@ const seriesData = [
         ]
       }
     ]
+  },
+  {
+    id: "Crew-Girl",
+    title: "Crew Girl",
+    isFilipino: false,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tzf21i1ETZEu7i787ED3WThROH.jpg",
+    seasons: [
+      {
+        seasonNumber: 1,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E01.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E02.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E03.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E04.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E05.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E06.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E07.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E08.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+          }
+        ]
+      }
+    ]
   }
 ];
 

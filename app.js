@@ -27,7 +27,7 @@ function cleanDriveLink(url) {
 
 const featuredMovies = [
   { 
-    id: "Moana:-Live-Action", 
+    id: "Moana: Live Action", 
     tmdbId: "1108427", 
     title: "Moana: Live Action",
     poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10", 
@@ -79,6 +79,15 @@ const movies = [
     trailerEmbed: "",
     isSeries: false
   },
+    { 
+    id: "Crew-Girl", 
+    tmdbId: "300507",
+    title: "Crew Girl", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tzf21i1ETZEu7i787ED3WThROH.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E01.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv",
+    trailerEmbed: "",
+    isSeries: true
+  },
   { 
     id: "Love, Ngo", 
     tmdbId: "1700944",
@@ -86,6 +95,16 @@ const movies = [
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
+    id: "Us in the End (Tayo sa Wakas)", 
+    tmdbId: "1636593",
+    title: "Us in the End (Tayo sa Wakas)", 
+    isFilipino: true,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/jWK3fep9bswDb6EuarNgoIihDBa.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Us.In.The.End.2026.1080p.WEB-DLH264-TRICKFLIX+(1).mp4",
     trailerEmbed: "",
     isSeries: false
   },
@@ -621,7 +640,7 @@ const movies = [
     tmdbId: "1361969",
     title: "All Night Wrong", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/jFN9LcCG4a02wRWm2qfJ6nLY8BO.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/All%20Night%20Wrong%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/All.Night.Wrong.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.srt",
+    manualEmbed: "",
     trailerEmbed: "",
     isSeries: false
   },
@@ -657,7 +676,7 @@ const movies = [
     tmdbId: "1457515",
     title: "Air Force Elite: Thunderbirds", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hsJtBhMxNDGzW5KcQ9qz3EQGnEt.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Air%20Force%20Elite%20Thunderbirds%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.MX%5D/Air.Force.Elite.Thunderbirds.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.MX%5D.mp4.fdmdownload",
+    manualEmbed: "",
     trailerEmbed: "",
     isSeries: false
   },
@@ -828,7 +847,7 @@ const movies = [
     tmdbId: "964849",
     title: "Nightborn", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/e9ALgOANOJbcFpw84MbafK3xvD2.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Nightborn%202026%20720p%20AMZN%20WEB-DL%20DDP5%201%20H%20264-SCOPE/Nightborn%202026%20720p%20AMZN%20WEB-DL%20DDP5%201%20H%20264-SCOPE.mkv.fdmdownload",
+    manualEmbed: "",
     trailerEmbed: "",
     isSeries: false
   },
@@ -852,7 +871,7 @@ const movies = [
   },
   { 
     id: "The Devil's Mouth", 
-    tmdbId: "1409853",
+    tmdbId: "1481343",
     title: "The Devil's Mouth", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/dx2dblJL3GAKcXXXPjC2FSaMTWW.jpg",
     manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20The%20Devils%20Mouth%20(2026)%201080p%20BluRay%205.1-LAMA/The.Devils.Mouth.2026.1080p.BluRay.x264.AAC5.1-LAMA.mp4",
@@ -906,7 +925,7 @@ const movies = [
   },
   { 
     id: "Love-U-Lots", 
-    tmdbId: "1700944",
+    tmdbId: "329540",
     title: "Love U Lots", 
     synopsis: "Heartbroken Estong meets the mysterious Ysa and finds himself drawn to her. He soon learns that loving Ysa means accepting the many versions of her. A romantic comedy series about two ex-lovers who rekindle their feelings at a time when the two are already married.",
     isFilipino: true,
@@ -954,11 +973,19 @@ document.addEventListener('DOMContentLoaded', () => {
   setupHeroBanner();
   renderContinueWatching();
   renderTopPicks();
-  renderAiReels();
-  renderFilipinoMovies();
-  renderAllMoviesGrid();
   setupSearchHandlers();
   setupDragScroll();
+
+  // Stagger remaining sections for faster perceived load
+  requestIdleCallback(() => {
+    renderAiReels();
+    requestIdleCallback(() => {
+      renderFilipinoMovies();
+      requestIdleCallback(() => {
+        renderAllMoviesGrid();
+      });
+    });
+  }, { timeout: 500 });
 });
 
 function setupDragScroll() {
