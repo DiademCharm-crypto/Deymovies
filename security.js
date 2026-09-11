@@ -302,14 +302,11 @@
   meta.content = 'nosniff';
   document.head.appendChild(meta);
 
-  const metaFrame = document.createElement('meta');
-  metaFrame.httpEquiv = 'X-Frame-Options';
-  metaFrame.content = 'DENY';
-  document.head.appendChild(metaFrame);
+  // Note: X-Frame-Options only works as an HTTP header, not a meta tag — removed to avoid console warnings
 
   const metaReferrer = document.createElement('meta');
   metaReferrer.name = 'referrer';
-  metaReferrer.content = 'no-referrer';
+  metaReferrer.content = 'no-referrer-when-downgrade'; // keep ad referrer data (no-referrer would hurt ad revenue)
   document.head.appendChild(metaReferrer);
 
   // 21. Disable Preloading/Prefetching (privacy)
@@ -480,16 +477,23 @@
 
   // 41. Disable Remote Debugging Detection
   function detectRemoteDebugging() {
-    const element = document.createElement('div');
-    element.style.cssText = 'display:none;position:absolute;width:100px;height:100px;background:red;';
-    Object.defineProperty(element, 'id', {
-      get: function () {
-        // Remote debugging detected
-        document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px;">Access Denied - Remote debugging detected</h1>';
-      }
-    });
-    document.body.appendChild(element);
-    element.id = 'detect';
+    try {
+      const element = document.createElement('div');
+      element.style.cssText = 'display:none;position:absolute;width:100px;height:100px;background:red;';
+      Object.defineProperty(element, 'id', {
+        get: function () {
+          // Remote debugging detected
+          document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px;">Access Denied - Remote debugging detected</h1>';
+        },
+        set: function () {
+          // no-op setter to avoid TypeError when assigning id
+        }
+      });
+      document.body.appendChild(element);
+      element.id = 'detect';
+    } catch (e) {
+      // Silently fail — detection must never break the page
+    }
   }
   detectRemoteDebugging();
 
