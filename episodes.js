@@ -270,6 +270,17 @@ function renderEpisodesGrid(season) {
 function playEpisodeSource(episode) {
   if (!episode || !episode.embedUrl) return;
 
+  // Reset subtitles so auto-load fires for the new episode
+  try {
+    const dp = document.getElementById('direct-video-player');
+    if (dp) { const t = dp.querySelector('track'); if (t) t.remove(); }
+    if (typeof subtitleActive !== 'undefined') subtitleActive = false;
+    const offBtn = document.getElementById('btn-subtitle-off');
+    if (offBtn) offBtn.classList.remove('show');
+    const sBtn = document.getElementById('btn-settings');
+    if (sBtn) sBtn.classList.remove('subtitle-active-badge');
+  } catch(e) {}
+
   if (typeof currentMovie !== 'undefined') {
     currentMovie.manualEmbed = episode.embedUrl;
     currentMovie._episodeId = currentMovie.id + '-ep' + (episode.episodeNumber || '');

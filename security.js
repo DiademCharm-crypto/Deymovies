@@ -346,10 +346,25 @@
   // }
 
   // 26. Block Third-Party Scripts
+  const ALLOWED_SCRIPT_HOSTS = [
+    'cdn.jsdelivr.net',
+    'cdn.jsdelivr.net/npm',
+    'www.gstatic.com',
+    'firebaseapp.com',
+    'cloudflare.cloudflarecdn.com'
+  ];
+
+  function isAllowedScriptSrc(src) {
+    if (!src) return false;
+    if (src.includes(window.location.hostname)) return true;
+    const lower = src.toLowerCase();
+    return ALLOWED_SCRIPT_HOSTS.some(host => lower.includes(host));
+  }
+
   const observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       mutation.addedNodes.forEach(function (node) {
-        if (node.tagName === 'SCRIPT' && node.src && !node.src.includes(window.location.hostname)) {
+        if (node.tagName === 'SCRIPT' && node.src && !isAllowedScriptSrc(node.src)) {
           node.remove();
           console.warn('[DEYMFLIX Security] Third-party script blocked:', node.src);
         }

@@ -2,6 +2,17 @@
 // DEYMFLIX - Main Application Logic
 // ==========================================
 
+// Polyfill: requestIdleCallback is not supported in Safari/iOS
+if (!window.requestIdleCallback) {
+  window.requestIdleCallback = function (cb, opts) {
+    var delay = (opts && opts.timeout) || 0;
+    return setTimeout(function () {
+      cb({ didTimeout: false, timeRemaining: function () { return 50; } });
+    }, delay);
+  };
+  window.cancelIdleCallback = function (id) { clearTimeout(id); };
+}
+
 // Security Utility: Sanitize user inputs and dynamic text to prevent XSS
 function sanitizeHTML(str) {
   if (typeof str !== 'string') return '';
@@ -28,7 +39,7 @@ function cleanDriveLink(url) {
 const featuredMovies = [
   { 
     id: "Moana: Live Action", 
-    tmdbId: "1108427", 
+    tmdbId: "tt27419466", 
     title: "Moana: Live Action",
     poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10", 
     backdrop: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10",
@@ -71,7 +82,7 @@ const movies = [
 
   { 
     id: "Moana: Live Action", 
-    tmdbId: "1108427",
+    tmdbId: "tt27419466",
     title: "Moana: Live Action", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
     manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
@@ -1110,6 +1121,7 @@ function removeContinueWatching(movieId, event) {
   renderContinueWatching();
   showToast('Removed from Continue Watching');
 }
+
 
 function setupHeroBanner() {
   const heroWrapper = document.getElementById('hero-billboard-wrapper') || document.querySelector('.hero-wrapper');
