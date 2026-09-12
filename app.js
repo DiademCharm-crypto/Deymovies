@@ -40,7 +40,6 @@ const featuredMovies = [
     id: "Toy Story 5", 
     tmdbId: "1084244", 
     title: "Toy Story 5", 
-    synopsis: "Buzz, Woody, Jessie and the rest of the gang come face-to-face with Lilypad, a brand-new tablet device that arrives with her own disruptive ideas about what is best for Bonnie.",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
@@ -79,14 +78,23 @@ const movies = [
     trailerEmbed: "",
     isSeries: false
   },
-    { 
+  { 
     id: "Crew-Girl", 
     tmdbId: "300507",
     title: "Crew Girl", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tzf21i1ETZEu7i787ED3WThROH.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E01.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4",
     trailerEmbed: "",
     isSeries: true
+  },
+  { 
+    id: "Mayday", 
+    tmdbId: "1137844",
+    title: "Mayday", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/%5BSh4dy%5DMayday.2026.4K.atmos.mkv",
+    trailerEmbed: "",
+    isSeries: false
   },
   { 
     id: "Love, Ngo", 
@@ -181,7 +189,7 @@ const movies = [
     tmdbId: "1621552",
     title: "Facing El Chapo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Facing.El.Chapo.2026.1080p.NF.WEB-DL.Multi.AAC5.1.AV1-4kHdHub.Com.mkv",
     trailerEmbed: "",
     isSeries: false
   },
@@ -487,7 +495,7 @@ const movies = [
     tmdbId: "1185806",
     title: "PAW Patrol: The Dino Movie", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/qnin56Syy5rbG7KCaxWY7SPuy6p.jpg",
-    manualEmbed: "",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/PAW.Patrol.The.Dino.Movie.2026.1080p.AMZN.WEB-DL.DDP5.1.H.265-KyoGo.mkv",
     trailerEmbed: "",
     isSeries: false
   },

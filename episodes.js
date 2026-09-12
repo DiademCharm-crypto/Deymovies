@@ -58,42 +58,42 @@ const seriesData = [
           {
             episodeNumber: 1,
             title: "Episode 1 - The Catch",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E01.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 2,
             title: "Episode 2 - The Hateful Eight",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E02.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e02.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 3,
             title: "Episode 3 - Flight Crew",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E03.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e03.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 4,
             title: "Episode 4 - True Rowmance",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E04.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e04.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 5,
             title: "Episode 5 - Anatomy of a Fall Formal",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E05.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e05.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 6,
             title: "Episode 6 - Bad Break",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E06.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e06.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 7,
             title: "Episode 7 - Under Pressure",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E07.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e07.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 8,
             title: "Episode 8 - O Coxswain, My Coxswain",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Crew+Girl/Crew.Girl.S01E08.720p.HEVC.x265-MeGusta%5BEZTVx.to%5D.mkv"
+            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e08.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           }
         ]
       }
