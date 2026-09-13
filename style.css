@@ -467,7 +467,7 @@ body {
 .reel-overlay-info {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.95) 100%);
+  background: transparent;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -503,7 +503,12 @@ body {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 2px 4px rgba(0, 0, 0, 0.8);
   width: 100%;
 }
 

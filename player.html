@@ -45,6 +45,28 @@
       -webkit-touch-callout: none !important;
     }
 
+    /* PC MODE: Centered player with rounded corners and max-width */
+    @media (min-width: 769px) {
+      body {
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0e 50%, #0a0a0a 100%) !important;
+      }
+
+      .video-container {
+        max-width: 80% !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+        margin: 20px auto !important;
+      }
+
+      .video-container:fullscreen,
+      .video-container:-webkit-full-screen,
+      .video-container.fullscreen-active {
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+      }
+    }
+
     @supports not (aspect-ratio: 16 / 9) {
       .video-container {
         height: min(56.25vw, 90vh) !important;
@@ -457,7 +479,51 @@
     }
 
     .subtitle-active-badge {
-      color: #e50914 !important;
+      color: #ffffff !important;
+    }
+
+    /* Subtitle style: white text, no background, black outline */
+    video::cue {
+      color: #ffffff;
+      background: transparent;
+      text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: 600;
+    }
+    video::-webkit-media-text-track-container {
+      background: transparent !important;
+    }
+    video::-webkit-media-text-track-background {
+      background: transparent !important;
+    }
+
+    .pc-volume-control input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      outline: none;
+    }
+    .pc-volume-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #e50914;
+      cursor: pointer;
+    }
+    .pc-volume-control input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #e50914;
+      cursor: pointer;
+      border: none;
+    }
+
+    @media (max-width: 768px) {
+      .pc-volume-control { display: none !important; }
     }
 
     /* Download Modal */
@@ -565,6 +631,9 @@
     }
     .settings-panel.open {
       display: flex !important;
+    }
+    .speed-popup-panel {
+      z-index: 60 !important;
     }
     .settings-panel-header {
       display: flex !important;
@@ -727,6 +796,22 @@
       box-sizing: border-box !important;
     }
 
+    /* PC MODE: Center info box under the player */
+    @media (min-width: 769px) {
+      .video-info-box {
+        max-width: 80% !important;
+        margin: 0 auto !important;
+        padding: 16px 0 0 0 !important;
+      }
+
+      .content-section {
+        max-width: 80% !important;
+        margin: 20px auto 0 auto !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+    }
+
     .media-title {
       font-size: 1.35rem !important;
       font-weight: 800 !important;
@@ -875,6 +960,7 @@
     }
 
     .recommendation-card {
+      position: relative;
       background: #181818 !important;
       border: 1px solid #262626 !important;
       border-radius: 8px !important;
@@ -1012,6 +1098,9 @@
         overflow-x: auto !important;
         scrollbar-width: none;
         padding-bottom: 10px;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
       }
 
       .list-recommendations::-webkit-scrollbar {
@@ -1040,18 +1129,31 @@
         font-size: 0.78rem !important;
       }
 
+      /* Mobile: horizontal scroll row, card size matching index.html posters */
       .list-recommendations {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
+        display: flex !important;
+        gap: 14px !important;
+        overflow-x: auto !important;
+        scrollbar-width: none;
+        padding-bottom: 8px;
+        cursor: grab;
+      }
+
+      .list-recommendations:active {
+        cursor: grabbing;
+      }
+
+      .list-recommendations::-webkit-scrollbar {
+        display: none;
       }
 
       .recommendation-card {
-        width: 100% !important;
+        flex: 0 0 140px !important;
+        width: 140px !important;
       }
 
       .recommendation-card img {
-        height: 180px !important;
+        height: 210px !important;
       }
 
       .player-bottom-bar {
@@ -1243,6 +1345,25 @@
   <div class="video-container" id="playerContainer">
     <div id="player-poster-blur" class="player-poster-blur"></div>
 
+    <style>
+      .player-poster-blur {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+        z-index: 5;
+      }
+      .player-poster-blur.visible {
+        opacity: 0.4;
+      }
+    </style>
+
     <!-- VAST VIDEO AD OVERLAY -->
     <div id="vast-ad-overlay" class="vast-ad-overlay">
       <span class="vast-ad-label">Advertisement</span>
@@ -1337,6 +1458,21 @@
               </svg>
             </button>
 
+            <button id="btn-subtitle-toggle" class="ctrl-btn-small" title="Subtitles (C)" style="display:none;">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/>
+              </svg>
+            </button>
+
+            <div class="pc-volume-control" style="display:none;align-items:center;gap:6px;">
+              <button id="btn-pc-mute" class="ctrl-btn-small" title="Mute (M)" style="padding:0;">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path id="svg-pc-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+              </button>
+              <input type="range" id="pc-volume-slider" min="0" max="100" value="100" step="1" style="width:80px;height:4px;accent-color:#e50914;cursor:pointer;">
+            </div>
+
             <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -1346,48 +1482,92 @@
         </div>
       </div>
 
-      <!-- SETTINGS PANEL (VIDEO QUALITY + SUBTITLES) -->
+      <!-- SETTINGS PANEL (SUBTITLES + SPEED) -->
       <div id="settings-panel" class="settings-panel">
         <div class="settings-panel-header">
           <span>Settings</span>
           <button id="btn-settings-close" class="settings-panel-close" title="Close">&times;</button>
         </div>
 
-        <div id="settings-quality-section" class="settings-section">
-          <div class="settings-section-title">Video Quality</div>
-          <div id="quality-options" class="quality-options"></div>
+        <div class="settings-section">
+          <div class="settings-section-title">Subtitles</div>
+          <div id="settings-subtitle-toggle" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+            <span style="font-size:0.75rem;color:#ccc;">Subtitles</span>
+            <button id="btn-settings-sub-toggle" style="background:#333;border:none;border-radius:20px;width:44px;height:24px;position:relative;cursor:pointer;transition:background 0.2s;">
+              <span id="settings-sub-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left 0.2s;"></span>
+            </button>
+          </div>
+          <div id="settings-subtitle-options" style="display:none;margin-top:6px;">
+            <select id="subtitle-language">
+              <option value="en" selected>English</option>
+              <option value="es">Spanish</option>
+              <option value="fil">Filipino</option>
+              <option value="tl">Tagalog</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="pt">Portuguese</option>
+              <option value="hi">Hindi</option>
+              <option value="zh">Chinese</option>
+            </select>
+            <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
+            <div id="subtitle-status" class="subtitle-status"></div>
+            <div id="subtitle-results" class="subtitle-results"></div>
+            <button id="btn-subtitle-off" class="subtitle-off-btn" style="display:none;">Turn Off Subtitles</button>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:0.6rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button id="sub-offset-minus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">−1s</button>
+                <input type="range" id="sub-offset-slider" min="-5000" max="5000" step="100" value="0" style="flex:1;accent-color:#e50914;height:4px;">
+                <button id="sub-offset-plus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">+1s</button>
+              </div>
+              <div id="sub-offset-label" style="font-size:0.6rem;color:#aaa;text-align:center;">0 ms</div>
+            </div>
+          </div>
         </div>
 
         <div class="settings-section">
-          <div class="settings-section-title">Subtitles</div>
-          <select id="subtitle-language">
-            <option value="en" selected>English</option>
-            <option value="es">Spanish</option>
-            <option value="fil">Filipino</option>
-            <option value="tl">Tagalog</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="pt">Portuguese</option>
-            <option value="hi">Hindi</option>
-            <option value="zh">Chinese</option>
-          </select>
-          <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
-          <div id="subtitle-status" class="subtitle-status"></div>
-          <div id="subtitle-results" class="subtitle-results"></div>
-          <button id="btn-subtitle-off" class="subtitle-off-btn">Turn Off Subtitles</button>
-          <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
-            <label style="font-size:0.6rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <button id="sub-offset-minus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">−1s</button>
-              <input type="range" id="sub-offset-slider" min="-5000" max="5000" step="100" value="0" style="flex:1;accent-color:#e50914;height:4px;">
-              <button id="sub-offset-plus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">+1s</button>
-            </div>
-            <div id="sub-offset-label" style="font-size:0.6rem;color:#aaa;text-align:center;">0 ms</div>
+          <div class="settings-section-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" id="speed-section-header">
+            <span>Playback Speed</span>
+            <span id="speed-current-label" style="font-size:0.7rem;color:#e50914;">Normal (1x)</span>
           </div>
+        </div>
+    </div>
+
+    <!-- SPEED POPUP SUBMENU -->
+    <div id="speed-popup" class="settings-panel speed-popup-panel">
+      <div class="settings-panel-header">
+        <span id="speed-popup-back" style="cursor:pointer;display:flex;align-items:center;gap:6px;">‹ Speed</span>
+        <span id="speed-popup-value" style="font-size:0.7rem;color:#e50914;">1x</span>
+      </div>
+      <div class="quality-options" id="speed-popup-options">
+        <div class="quality-option" data-speed="0.5">
+          <div class="quality-option-info"><span class="quality-option-label">0.5x</span><span class="quality-option-hint">Slow</span></div>
+          <span class="quality-option-check"></span>
+        </div>
+        <div class="quality-option" data-speed="0.75">
+          <div class="quality-option-info"><span class="quality-option-label">0.75x</span><span class="quality-option-hint"></span></div>
+          <span class="quality-option-check"></span>
+        </div>
+        <div class="quality-option active" data-speed="1">
+          <div class="quality-option-info"><span class="quality-option-label">Normal</span><span class="quality-option-hint">1x</span></div>
+          <span class="quality-option-check">✓</span>
+        </div>
+        <div class="quality-option" data-speed="1.25">
+          <div class="quality-option-info"><span class="quality-option-label">1.25x</span><span class="quality-option-hint">Fast</span></div>
+          <span class="quality-option-check"></span>
+        </div>
+        <div class="quality-option" data-speed="1.5">
+          <div class="quality-option-info"><span class="quality-option-label">1.5x</span><span class="quality-option-hint">Faster</span></div>
+          <span class="quality-option-check"></span>
+        </div>
+        <div class="quality-option" data-speed="2">
+          <div class="quality-option-info"><span class="quality-option-label">2x</span><span class="quality-option-hint">Fastest</span></div>
+          <span class="quality-option-check"></span>
         </div>
       </div>
     </div>
   </div>
+</div>
 
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page.
@@ -1415,6 +1595,7 @@
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
   <!-- SCRIPT INCLUSIONS -->
+  <script src="config.js"></script>
   <script src="security.js"></script>
   <script src="app.js?v=153.0"></script>
   <script src="episodes.js?v=1.0"></script>
@@ -1475,7 +1656,7 @@
       playerMode = '';
     }
 
-    const OPENSUBTITLES_API_KEY = 'g0lXqsvA4zs8XdeLhj2eBf62PJnaLIr5';
+    // API keys are now server-side in proxy-server.js — never exposed to browser
     let subtitleActive = false;
     let subtitleOffsetMs = parseInt(localStorage.getItem('deymflix_sub_offset') || '0', 10) || 0;
 
@@ -1487,7 +1668,7 @@
                          { 
                            id: movieId || 'fallback', 
                            title: 'The Runner', 
-                           tmdbId: 634649, 
+                           imdbId: 'tt634649', 
                            synopsis: '', 
                            poster: 'https://via.placeholder.com/300x450?text=DEYMFLIX',
                            manualEmbed: '',
@@ -1567,7 +1748,7 @@
       }
     }
 
-    const TMDB_API_KEY = '15d260044e350723365198253b23914f';
+    // TMDB key is server-side in proxy-server.js
 
     function fetchWithTimeout(url, ms) {
       const ctrl = new AbortController();
@@ -1693,10 +1874,10 @@
 
       let synopsis = '';
 
-      if (currentMovie.tmdbId && TMDB_API_KEY) {
+      if (currentMovie.imdbId) {
         try {
           const tmdbRes = await fetchWithTimeout(
-            'https://api.themoviedb.org/3/movie/' + currentMovie.tmdbId + '?api_key=' + TMDB_API_KEY + '&language=en-US',
+            '/api/tmdb/movie/' + currentMovie.imdbId,
             5000
           );
           if (tmdbRes.ok) {
@@ -1866,6 +2047,8 @@
 
     function showControls() {
       playerOverlay.classList.add('active');
+      showPcVolumeControl();
+      updateSubtitleToggleUI();
       clearTimeout(autoHideTimer);
 
       autoHideTimer = setTimeout(() => {
@@ -1924,8 +2107,15 @@
       }
     }, { passive: true });
 
+    // Only enable brightness/volume swipe gestures in fullscreen mode
+    function isPlayerFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    }
+
     playerContainer.addEventListener('touchmove', (e) => {
       if (e.touches.length !== 1) return;
+      // Disable left/right swipe gestures when not in fullscreen
+      if (!isPlayerFullscreen()) return;
 
       const currentY = e.touches[0].clientY;
       const deltaY = touchStartY - currentY;
@@ -2002,6 +2192,24 @@
 
     playerContainer.addEventListener('mousemove', () => { showControls(); });
 
+    // Playback speed control
+    window.setPlaybackSpeed = function(speed, el) {
+      directPlayer.playbackRate = speed;
+      normalPlaybackRate = speed;
+      // Update active state in speed options
+      document.querySelectorAll('#speed-options .quality-option').forEach(opt => {
+        opt.classList.remove('active');
+        const check = opt.querySelector('.quality-option-check');
+        if (check) check.textContent = '';
+      });
+      if (el) {
+        el.classList.add('active');
+        const check = el.querySelector('.quality-option-check');
+        if (check) check.textContent = '\u2713';
+      }
+      showToast('Speed: ' + speed + 'x');
+    };
+
     function setBufferingUI(on) {
       const spinner = document.getElementById('video-loading-spinner');
       const group = document.getElementById('center-controls');
@@ -2068,16 +2276,16 @@
     // IMDB ID helper: returns IMDB ID (tt...) for a movie, fetching from TMDB if needed
     async function getImdbId(movie) {
       if (!movie) return '';
-      if (movie.tmdbId && String(movie.tmdbId).startsWith('tt')) return movie.tmdbId;
-      if (!movie.tmdbId || !TMDB_API_KEY) return '';
-      const cacheKey = 'deymflix_imdb_' + movie.tmdbId;
+      if (movie.imdbId && String(movie.imdbId).startsWith('tt')) return movie.imdbId;
+      if (!movie.imdbId) return '';
+      const cacheKey = 'deymflix_imdb_' + movie.imdbId;
       try {
         const cached = localStorage.getItem(cacheKey);
         if (cached) return cached;
       } catch (e) {}
       try {
         const res = await fetchWithTimeout(
-          'https://api.themoviedb.org/3/movie/' + movie.tmdbId + '?api_key=' + TMDB_API_KEY,
+          '/api/tmdb/movie/' + movie.imdbId,
           5000
         );
         if (!res.ok) return '';
@@ -2090,40 +2298,81 @@
       return '';
     }
 
+    // OpenSubtitles config
+    const OS_API_KEY = 'g0lXqsvA4zs8XdeLhj2eBf62PJnaLIr5';
+    const OS_USERNAME = 'deymflix';
+    const OS_PASSWORD = 'Chambe09';
+    const OS_API = 'https://api.opensubtitles.com/api/v1';
+    // CORS proxy for browser requests (required since OS API may block browser CORS)
+    const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+    async function osFetch(path, options = {}) {
+      const url = OS_API + path;
+      // Try direct first, fall back to CORS proxy
+      try {
+        const res = await fetch(url, options);
+        if (res.ok || res.status < 500) return res;
+      } catch (e) {
+        // CORS blocked — use proxy
+      }
+      return fetch(CORS_PROXY + encodeURIComponent(url), options);
+    }
+
     // Subtitle login helper — returns token or empty string
     async function openSubtitlesLogin() {
+      // Cache token in session to avoid repeated logins
+      const cached = sessionStorage.getItem('os_token');
+      const cachedTime = parseInt(sessionStorage.getItem('os_token_time') || '0', 10);
+      if (cached && Date.now() - cachedTime < 30 * 60 * 1000) return cached;
+
       try {
-        const res = await fetch('https://api.opensubtitles.com/api/v1/login', {
+        const res = await osFetch('/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Api-Key': OPENSUBTITLES_API_KEY },
-          body: JSON.stringify({ api_key: OPENSUBTITLES_API_KEY, username: 'deymflix', password: 'Chambe09' })
+          headers: {
+            'Content-Type': 'application/json',
+            'Api-Key': OS_API_KEY
+          },
+          body: JSON.stringify({ username: OS_USERNAME, password: OS_PASSWORD })
         });
-        if (!res.ok) return '';
         const data = await res.json();
-        return (data && data.token) || '';
-      } catch (e) { return ''; }
+        if (data.token) {
+          sessionStorage.setItem('os_token', data.token);
+          sessionStorage.setItem('os_token_time', String(Date.now()));
+          return data.token;
+        }
+        console.warn('[OpenSubtitles] Login failed:', res.status, JSON.stringify(data).substring(0, 200));
+        return '';
+      } catch (e) {
+        console.warn('[OpenSubtitles] Login error:', e.message);
+        return '';
+      }
+    }
+
+    // Search subtitles via OpenSubtitles API
+    async function osSearchSubtitles(token, imdbId, query, lang, limit) {
+      let url = '/subtitles?languages=' + encodeURIComponent(lang) + '&type=movie&limit=' + (limit || '5');
+      if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
+      else if (query) url += '&query=' + encodeURIComponent(query);
+
+      const res = await osFetch(url, {
+        method: 'GET',
+        headers: {
+          'Api-Key': OS_API_KEY,
+          'Authorization': 'Bearer ' + token
+        }
+      });
+      return res.json();
     }
 
     // Auto-load subtitles silently using IMDB ID for accuracy
     async function autoLoadSubtitles(title, lang) {
-      if (subtitleActive || !OPENSUBTITLES_API_KEY || !title) return;
+      if (subtitleActive || !title) return;
       try {
         const token = await openSubtitlesLogin();
         if (!token) return;
 
         const imdbId = await getImdbId(currentMovie);
-        let searchUrl = 'https://api.opensubtitles.com/api/v1/subtitles?languages=' + encodeURIComponent(lang) + '&type=movie&limit=5';
-        if (imdbId) {
-          searchUrl += '&imdb_id=' + encodeURIComponent(imdbId);
-        } else {
-          searchUrl += '&query=' + encodeURIComponent(title);
-        }
-
-        const searchRes = await fetch(searchUrl, {
-          headers: { 'Api-Key': OPENSUBTITLES_API_KEY, 'Authorization': 'Bearer ' + token }
-        });
-        if (!searchRes.ok) return;
-        const data = await searchRes.json();
+        const data = await osSearchSubtitles(token, imdbId, title, lang, '5');
         if (!data.data || data.data.length === 0) return;
 
         const first = data.data.find(item => item.attributes && item.attributes.files && item.attributes.files.length > 0);
@@ -2131,18 +2380,33 @@
         const fileId = first.attributes.files[0].file_id;
         const label = first.attributes.language || lang;
 
-        const dlRes = await fetch('https://api.opensubtitles.com/api/v1/download', {
+        // Download subtitle
+        const dlRes = await osFetch('/download', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Api-Key': OPENSUBTITLES_API_KEY },
+          headers: {
+            'Content-Type': 'application/json',
+            'Api-Key': OS_API_KEY,
+            'Authorization': 'Bearer ' + token
+          },
           body: JSON.stringify({ file_id: fileId })
         });
         if (!dlRes.ok) return;
         const dlData = await dlRes.json();
         if (!dlData.link) return;
 
-        const srtRes = await fetch(dlData.link);
-        if (!srtRes.ok) return;
-        const srtText = await srtRes.text();
+        // Fetch the subtitle file content (may need CORS proxy)
+        let srtText = '';
+        try {
+          const srtRes = await fetch(dlData.link);
+          if (srtRes.ok) srtText = await srtRes.text();
+        } catch (e) {
+          // CORS block — try through proxy
+          try {
+            const srtRes2 = await fetch('/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
+            if (srtRes2.ok) srtText = await srtRes2.text();
+          } catch (e2) {}
+        }
+        if (!srtText) return;
 
         enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, lang, srtText);
         showToast('Subtitles loaded: ' + label);
@@ -2291,6 +2555,158 @@
       toggleFullscreen();
     };
 
+    // ── PC Volume Control (horizontal slider) ──
+    const pcVolumeControl = document.querySelector('.pc-volume-control');
+    const pcVolumeSlider = document.getElementById('pc-volume-slider');
+    const btnPcMute = document.getElementById('btn-pc-mute');
+    const svgPcVolumePath = document.getElementById('svg-pc-volume-path');
+
+    function showPcVolumeControl() {
+      if (pcVolumeControl && window.innerWidth > 768) {
+        pcVolumeControl.style.display = 'flex';
+      }
+    }
+
+    // Update volume slider gradient fill (red up to value, gray after)
+    function updateVolumeSliderFill(slider) {
+      if (!slider) return;
+      const val = slider.value || 0;
+      slider.style.background = `linear-gradient(to right, #e50914 0%, #e50914 ${val}%, rgba(255,255,255,0.3) ${val}%, rgba(255,255,255,0.3) 100%)`;
+      slider.style.borderRadius = '4px';
+      slider.style.appearance = 'none';
+      slider.style.height = '4px';
+      slider.style.outline = 'none';
+    }
+
+    if (pcVolumeSlider) {
+      pcVolumeSlider.addEventListener('input', (e) => {
+        e.stopPropagation();
+        const vol = parseInt(e.target.value) / 100;
+        directPlayer.volume = vol;
+        directPlayer.muted = vol === 0;
+        if (svgPcVolumePath) {
+          svgPcVolumePath.setAttribute('d', vol === 0 ? volOffData : volOnData);
+        }
+        updateVolumeSliderFill(pcVolumeSlider);
+      });
+      // Initialize fill on load
+      updateVolumeSliderFill(pcVolumeSlider);
+    }
+
+    if (btnPcMute) {
+      btnPcMute.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMute();
+        if (pcVolumeSlider) {
+          pcVolumeSlider.value = directPlayer.muted ? 0 : directPlayer.volume * 100;
+          updateVolumeSliderFill(pcVolumeSlider);
+        }
+        if (svgPcVolumePath) {
+          svgPcVolumePath.setAttribute('d', directPlayer.muted ? volOffData : volOnData);
+        }
+      });
+    }
+
+    // ── Subtitle Toggle Button (CC icon) ──
+    const btnSubtitleToggle = document.getElementById('btn-subtitle-toggle');
+    if (btnSubtitleToggle) {
+      btnSubtitleToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (subtitleActive) {
+          turnOffSubtitles();
+        } else {
+          const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
+          autoLoadSubtitles(currentMovie.title, lang);
+          showToast('Loading subtitles…');
+        }
+        updateSubtitleToggleUI();
+      });
+    }
+
+    function updateSubtitleToggleUI() {
+      if (btnSubtitleToggle) {
+        btnSubtitleToggle.style.color = subtitleActive ? '#e50914' : '#ffffff';
+        btnSubtitleToggle.title = subtitleActive ? 'Subtitles ON — Click to disable (C)' : 'Subtitles OFF — Click to enable (C)';
+      }
+      // Keep the settings-panel switch in sync
+      const subToggleBtn = document.getElementById('btn-settings-sub-toggle');
+      const subKnob = document.getElementById('settings-sub-knob');
+      if (subToggleBtn && subKnob) {
+        subToggleBtn.style.background = subtitleActive ? '#e50914' : '#333';
+        subKnob.style.left = subtitleActive ? '23px' : '3px';
+      }
+    }
+
+    // Show CC button on desktop
+    if (btnSubtitleToggle && window.innerWidth > 768) {
+      btnSubtitleToggle.style.display = 'flex';
+    }
+
+    // ── Keyboard Shortcuts (PC Mode) ──
+    document.addEventListener('keydown', (e) => {
+      // Don't capture if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+
+      switch (e.key.toLowerCase()) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          togglePlayPause();
+          showControls();
+          break;
+        case 'f':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'm':
+          e.preventDefault();
+          toggleMute();
+          showControls();
+          break;
+        case 'arrowleft':
+          e.preventDefault();
+          directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
+          showControls();
+          break;
+        case 'arrowright':
+          e.preventDefault();
+          directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
+          showControls();
+          break;
+        case 'arrowup':
+          e.preventDefault();
+          directPlayer.volume = Math.min(1, directPlayer.volume + 0.1);
+          directPlayer.muted = false;
+          showControls();
+          break;
+        case 'arrowdown':
+          e.preventDefault();
+          directPlayer.volume = Math.max(0, directPlayer.volume - 0.1);
+          showControls();
+          break;
+        case 'c':
+          e.preventDefault();
+          if (subtitleActive) {
+            turnOffSubtitles();
+          } else {
+            const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
+            autoLoadSubtitles(currentMovie.title, lang);
+            showToast('Loading subtitles…');
+          }
+          updateSubtitleToggleUI();
+          break;
+        case '0':
+        case 'home':
+          e.preventDefault();
+          directPlayer.currentTime = 0;
+          break;
+        case 'end':
+          e.preventDefault();
+          directPlayer.currentTime = directPlayer.duration || 0;
+          break;
+      }
+    });
+
     const settingsPanel = document.getElementById('settings-panel');
     const subtitleStatus = document.getElementById('subtitle-status');
     const subtitleResults = document.getElementById('subtitle-results');
@@ -2387,7 +2803,7 @@
         vttBlocks.push(startVtt + ' --> ' + endVtt + '\n' + textLines.join('\n'));
       }
 
-      return 'WEBVTT\n\n' + vttBlocks.join('\n\n') + '\n';
+      return 'WEBVTT\n\nSTYLE\n::cue {\n  color: #ffffff;\n  background: transparent;\n  text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 2px 4px rgba(0,0,0,0.9);\n  font-weight: 600;\n}\n\n' + vttBlocks.join('\n\n') + '\n';
     }
 
     function srtTimeToMs(ts) {
@@ -2448,6 +2864,7 @@
       if (btnSubtitleOff) btnSubtitleOff.classList.add('show');
       const settingsBtn = document.getElementById('btn-settings');
       if (settingsBtn) settingsBtn.classList.add('subtitle-active-badge');
+      updateSubtitleToggleUI();
     }
 
     function turnOffSubtitles() {
@@ -2457,19 +2874,13 @@
       if (btnSubtitleOff) btnSubtitleOff.classList.remove('show');
       const settingsBtn = document.getElementById('btn-settings');
       if (settingsBtn) settingsBtn.classList.remove('subtitle-active-badge');
+      updateSubtitleToggleUI();
       showToast('Subtitles off');
     }
 
     async function searchOnlineSubtitles() {
       if (subtitleStatus) subtitleStatus.textContent = '';
       if (subtitleResults) subtitleResults.innerHTML = '';
-
-      if (!OPENSUBTITLES_API_KEY) {
-        if (subtitleStatus) {
-          subtitleStatus.textContent = 'No API key set. Paste your opensubtitles.com key in OPENSUBTITLES_API_KEY (player.html).';
-        }
-        return;
-      }
 
       const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
       const query = currentMovie.title;
@@ -2478,24 +2889,12 @@
         if (subtitleStatus) subtitleStatus.textContent = 'Searching "' + query + '" (' + lang + ')…';
 
         const token = await openSubtitlesLogin();
-        if (!token) throw new Error('OpenSubtitles login failed. Check your account status.');
+        if (!token) throw new Error('Login failed — check your internet connection.');
 
-        // Use IMDB ID for precise matching, fall back to title query
         const imdbId = await getImdbId(currentMovie);
-        let searchUrl = 'https://api.opensubtitles.com/api/v1/subtitles?languages=' + encodeURIComponent(lang) + '&type=movie&limit=15';
-        if (imdbId) {
-          searchUrl += '&imdb_id=' + encodeURIComponent(imdbId);
-        } else {
-          searchUrl += '&query=' + encodeURIComponent(query);
-        }
+        const data = await osSearchSubtitles(token, imdbId, query, lang, '15');
 
-        const searchRes = await fetch(searchUrl, {
-          headers: { 'Api-Key': OPENSUBTITLES_API_KEY, 'Authorization': 'Bearer ' + token }
-        });
-        if (!searchRes.ok) throw new Error('OpenSubtitles search failed (' + searchRes.status + ')');
-        const data = await searchRes.json();
-
-        if (!data.data || data.data.length === 0) {
+        if (!data || !data.data || data.data.length === 0) {
           if (subtitleStatus) subtitleStatus.textContent = 'No subtitles found for "' + query + '" in ' + lang + '.';
           return;
         }
@@ -2525,18 +2924,34 @@
     async function downloadAndEnableSubtitle(fileId, label) {
       try {
         if (subtitleStatus) subtitleStatus.textContent = 'Downloading subtitle…';
-        const dlRes = await fetch('https://api.opensubtitles.com/api/v1/download', {
+        const token = await openSubtitlesLogin();
+        if (!token) throw new Error('Login failed — cannot download subtitle.');
+
+        const dlRes = await osFetch('/download', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Api-Key': OPENSUBTITLES_API_KEY },
+          headers: {
+            'Content-Type': 'application/json',
+            'Api-Key': OS_API_KEY,
+            'Authorization': 'Bearer ' + token
+          },
           body: JSON.stringify({ file_id: fileId })
         });
         if (!dlRes.ok) throw new Error('Download failed (' + dlRes.status + ')');
         const dlData = await dlRes.json();
         if (!dlData.link) throw new Error('No subtitle link returned');
 
-        const srtRes = await fetch(dlData.link);
-        if (!srtRes.ok) throw new Error('Subtitle fetch failed (' + srtRes.status + ')');
-        const srtText = await srtRes.text();
+        // Fetch subtitle file content
+        let srtText = '';
+        try {
+          const srtRes = await fetch(dlData.link);
+          if (srtRes.ok) srtText = await srtRes.text();
+        } catch (e) {
+          try {
+            const srtRes2 = await fetch('/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
+            if (srtRes2.ok) srtText = await srtRes2.text();
+          } catch (e2) {}
+        }
+        if (!srtText) throw new Error('Could not fetch subtitle file');
 
         enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, label, srtText);
         if (subtitleStatus) subtitleStatus.textContent = 'Subtitles enabled (' + label + ').';
@@ -2613,17 +3028,10 @@
 
     function buildQualityOptions() {
       const opts = [];
-      const seen = new Set();
-      const push = (label, url, hint) => {
-        if (!url || typeof url !== 'string' || url.trim() === '') return;
-        if (seen.has(url)) return;
-        seen.add(url);
-        opts.push({ label: label, url: url, hint: hint });
-      };
-      push('Auto', currentMovie.manualEmbed, 'Best available quality');
-      push('1080p', currentMovie.manualEmbed, 'Full HD');
-      push('720p', currentMovie.manualEmbedHd, 'Uses less data');
-      push('480p', currentMovie.manualEmbedSd, 'Best for slow internet');
+      const url = currentMovie.manualEmbed || currentMovie.trailerEmbed;
+      if (url && typeof url === 'string' && url.trim() !== '') {
+        opts.push({ label: 'Auto (Best)', url: url, hint: 'Best available quality' });
+      }
       return opts;
     }
 
@@ -2675,7 +3083,7 @@
 
       const qualitySection = document.getElementById('settings-quality-section');
       if (qualitySection) {
-        qualitySection.style.display = qualityOptions.length >= 2 ? 'flex' : 'none';
+        qualitySection.style.display = qualityOptions.length > 0 ? 'flex' : 'none';
       }
       if (qualityOptions.length < 2) return;
 
@@ -2775,9 +3183,109 @@
     if (btnSettingsClose) {
       btnSettingsClose.onclick = (e) => {
         e.stopPropagation();
+        if (speedPopup) speedPopup.classList.remove('open');
         closeSettingsPanel();
       };
     }
+
+    // --- Speed popup submenu ---
+    const speedSectionHeader = document.getElementById('speed-section-header');
+    const speedPopup = document.getElementById('speed-popup');
+    const speedCurrentLabel = document.getElementById('speed-current-label');
+    const speedPopupValue = document.getElementById('speed-popup-value');
+    const speedPopupBack = document.getElementById('speed-popup-back');
+
+    function showSpeedPopup() {
+      if (!speedPopup) return;
+      settingsPanel.classList.remove('open');
+      speedPopup.classList.add('open');
+    }
+    function hideSpeedPopup() {
+      if (!speedPopup) return;
+      speedPopup.classList.remove('open');
+      settingsPanel.classList.add('open');
+    }
+    if (speedSectionHeader) {
+      speedSectionHeader.onclick = (e) => {
+        e.stopPropagation();
+        showSpeedPopup();
+      };
+    }
+    if (speedPopupBack) {
+      speedPopupBack.onclick = (e) => {
+        e.stopPropagation();
+        hideSpeedPopup();
+      };
+    }
+    // Speed option clicks inside the popup
+    if (speedPopup) {
+      speedPopup.querySelectorAll('.quality-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const speed = parseFloat(opt.getAttribute('data-speed'));
+          // Clear checkmark from all popup options, then apply
+          speedPopup.querySelectorAll('.quality-option').forEach(o => {
+            o.classList.remove('active');
+            const c = o.querySelector('.quality-option-check');
+            if (c) c.textContent = '';
+          });
+          setPlaybackSpeed(speed, opt);
+          if (speedPopupValue) speedPopupValue.textContent = speed + 'x';
+          // Return to main settings after selection
+          setTimeout(hideSpeedPopup, 250);
+        });
+      });
+    }
+    // Close popup when settings close button pressed while popup open
+    const btnSettingsClose2 = document.getElementById('btn-settings-close');
+
+    // Update speed label when speed changes
+    const _origSetSpeed = window.setPlaybackSpeed;
+    window.setPlaybackSpeed = function(speed, el) {
+      _origSetSpeed(speed, el);
+      if (speedCurrentLabel) {
+        const names = {'0.5':'Slow','0.75':'','1':'Normal','1.25':'Fast','1.5':'Faster','2':'Fastest'};
+        speedCurrentLabel.textContent = (names[String(speed)] || '') + ' (' + speed + 'x)';
+      }
+    };
+
+    // --- Subtitle toggle switch in settings ---
+    const btnSettingsSubToggle = document.getElementById('btn-settings-sub-toggle');
+    const settingsSubKnob = document.getElementById('settings-sub-knob');
+    const settingsSubtitleOptions = document.getElementById('settings-subtitle-options');
+    function updateSettingsSubToggleUI() {
+      if (!btnSettingsSubToggle || !settingsSubKnob) return;
+      if (subtitleActive) {
+        btnSettingsSubToggle.style.background = '#e50914';
+        settingsSubKnob.style.left = '23px';
+      } else {
+        btnSettingsSubToggle.style.background = '#333';
+        settingsSubKnob.style.left = '3px';
+      }
+    }
+    if (btnSettingsSubToggle) {
+      btnSettingsSubToggle.onclick = (e) => {
+        e.stopPropagation();
+        if (subtitleActive) {
+          turnOffSubtitles();
+        } else {
+          const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
+          autoLoadSubtitles(currentMovie.title, lang);
+          showToast('Loading subtitles…');
+        }
+        updateSettingsSubToggleUI();
+        updateSubtitleToggleUI();
+      };
+    }
+    // Sync toggle when settings panel opens
+    const _origToggle = toggleSettingsPanel;
+    toggleSettingsPanel = function() {
+      _origToggle();
+      updateSettingsSubToggleUI();
+      if (settingsSubtitleOptions) {
+        settingsSubtitleOptions.style.display = subtitleActive ? 'block' : 'none';
+      }
+    };
 
     function toggleFullscreen() {
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
@@ -2882,22 +3390,44 @@
     
     // Player poster blur during buffering
     const playerPosterBlur = document.getElementById('player-poster-blur');
-    
+    let posterShown = false; // Track if poster has been shown (first buffer only)
+    let stallTimer = null;
+    let isShowingBlur = false;
+
     function showPlayerPosterBlur() {
-      if (playerPosterBlur && currentMovie.poster) {
-        playerPosterBlur.style.backgroundImage = 'url(' + currentMovie.poster + ')';
-        playerPosterBlur.classList.add('visible');
-      }
+      if (posterShown || isShowingBlur || !playerPosterBlur || !currentMovie.poster) return;
+      posterShown = true; // Mark as shown — only show once per session
+      isShowingBlur = true;
+      playerPosterBlur.style.backgroundImage = 'url(' + currentMovie.poster + ')';
+      playerPosterBlur.classList.add('visible');
     }
-    
+
     function hidePlayerPosterBlur() {
-      if (playerPosterBlur) {
-        playerPosterBlur.classList.remove('visible');
-      }
+      if (!isShowingBlur || !playerPosterBlur) return;
+      isShowingBlur = false;
+      playerPosterBlur.classList.remove('visible');
+      if (stallTimer) { clearTimeout(stallTimer); stallTimer = null; }
     }
-    
-    directPlayer.addEventListener('waiting', showPlayerPosterBlur);
-    directPlayer.addEventListener('playing', hidePlayerPosterBlur);
+
+    // Only show poster on the FIRST buffer event, not subsequent ones
+    directPlayer.addEventListener('waiting', () => {
+      if (posterShown || directPlayer.paused || stallTimer) return;
+      stallTimer = setTimeout(() => {
+        stallTimer = null;
+        showPlayerPosterBlur();
+      }, 800);
+    });
+    directPlayer.addEventListener('playing', () => {
+      if (stallTimer) { clearTimeout(stallTimer); stallTimer = null; }
+      hidePlayerPosterBlur();
+    });
+    directPlayer.addEventListener('stalled', () => {
+      if (posterShown || stallTimer) return;
+      stallTimer = setTimeout(() => {
+        stallTimer = null;
+        showPlayerPosterBlur();
+      }, 300);
+    });
     directPlayer.addEventListener('canplay', hidePlayerPosterBlur);
     directPlayer.addEventListener('seeked', hidePlayerPosterBlur);
 
@@ -3085,11 +3615,17 @@
         const movieGenres = detectGenres(movie.synopsis || movie.description || '');
         const genreText = movie.isFilipino ? 'Filipino' : (movieGenres.length > 0 ? movieGenres[0] : 'Movie');
         
+        // Badge: HD if has playable video, TRAILER otherwise (matches index.html logic)
+        const hasManualLink = movie.manualEmbed && movie.manualEmbed.trim() !== '';
+        const qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
+        const qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
+        
         card.innerHTML = `
           <img src="${sanitizeHTML(movie.poster)}" alt="${sanitizeHTML(movie.title)}">
+          <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
           <div class="rec-info">
             <span class="rec-title">${sanitizeHTML(movie.title)}</span>
-            <span class="rec-genre">${sanitizeHTML(genreText)} • HD</span>
+            <span class="rec-genre">${sanitizeHTML(genreText)} • ${qualityLabel}</span>
           </div>
         `;
         grid.appendChild(card);
@@ -3101,6 +3637,36 @@
     loadEmbed();
 
     loadRecommendations();
+
+    // ── More Like This: horizontal scroll (wheel + drag) ──
+    (function setupRecsScroll() {
+      const row = document.getElementById('random-grid');
+      if (!row) return;
+
+      // Vertical wheel → horizontal scroll
+      row.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          row.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+
+      // Mouse drag to scroll (PC)
+      let isDown = false, startX = 0, startScroll = 0;
+      row.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - row.offsetLeft;
+        startScroll = row.scrollLeft;
+        row.style.cursor = 'grabbing';
+      });
+      row.addEventListener('mouseleave', () => { isDown = false; row.style.cursor = 'grab'; });
+      row.addEventListener('mouseup', () => { isDown = false; row.style.cursor = 'grab'; });
+      row.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        row.scrollLeft = startScroll - ((e.pageX - row.offsetLeft) - startX) * 1.5;
+      });
+    })();
 
     function handleFullscreenChange() {
       const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
@@ -3131,8 +3697,8 @@
     let vastTriggered = false;
     let vastAdPlaying = false;
     let vastCountdown = null;
-    let vastTimeLeft = 5;
-    const VAST_TAG_URL = 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB';
+    let vastTimeLeft = 7;
+    // VAST URL is server-side in proxy-server.js
 
     // Parse VAST XML to extract video URL
     function parseVastXml(xmlText) {
@@ -3163,13 +3729,13 @@
     // Fetch VAST tag and extract video URL
     async function fetchVastAd() {
       try {
-        // First fetch the VAST tag URL (may redirect)
+        // Fetch VAST tag through our server-side proxy (avoids CORS)
         let resp;
         try {
-          resp = await fetch(VAST_TAG_URL, { mode: 'cors' });
-        } catch (corsErr) {
-          console.warn('[VAST] CORS blocked, trying no-cors fallback');
-          return null; // Will trigger graceful skip — movie continues
+          resp = await fetch('/api/vast');
+        } catch (err) {
+          console.warn('[VAST] Proxy fetch failed:', err);
+          return null;
         }
         const contentType = resp.headers.get('content-type') || '';
         let xmlText;
@@ -3177,7 +3743,6 @@
         if (contentType.includes('xml') || contentType.includes('text')) {
           xmlText = await resp.text();
         } else {
-          // The URL might return a VAST wrapper or redirect
           xmlText = await resp.text();
         }
 
@@ -3230,23 +3795,51 @@
 
       vastVideo.oncanplay = function() {
         vastAdPlaying = true;
-        vastVideo.play().catch(() => {});
 
-        // Start skip countdown (5 seconds)
-        vastTimeLeft = 5;
-        vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
-
-        vastCountdown = setInterval(() => {
-          vastTimeLeft--;
-          if (vastTimeLeft <= 0) {
-            clearInterval(vastCountdown);
-            vastSkipBtn.classList.add('visible');
-            vastTimer.textContent = 'You can skip now';
-          } else {
+        // iOS Safari and other autoplay-blocked browsers require a user gesture
+        // to play the ad video. The 'waiting' -> 'canplay' event sequence is
+        // our best shot — users already tapped to load the ad.
+        const playPromise = vastVideo.play();
+        if (playPromise) {
+          playPromise.then(() => {
+            // Playback started successfully
+            vastCountdown = setInterval(() => {
+              vastTimeLeft--;
+              if (vastTimeLeft <= 0) {
+                clearInterval(vastCountdown);
+                vastSkipBtn.classList.add('visible');
+                vastTimer.textContent = 'You can skip now';
+              } else {
+                vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
+              }
+            }, 1000);
             vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
-          }
-        }, 1000);
+            vastSkipBtn.classList.remove('visible');
+          }).catch((err) => {
+            // Autoplay blocked — show a play button overlay so user can tap to
+            // start the ad manually. This is the most common iOS scenario.
+            console.warn('[VAST] Autoplay blocked:', err.message);
+            vastTimer.textContent = 'Tap to play ad';
+            vastSkipBtn.classList.remove('visible');
+
+            // Show play button on the ad video
+            vastVideo.controls = true;
+            vastVideo.style.cursor = 'pointer';
+            vastVideo.style.outline = 'none';
+          });
+        }
       };
+
+      // Also try to play on the first interaction with the ad container
+      const vastContainerTap = function() {
+        if (!vastAdPlaying) {
+          vastVideo.play().catch(() => {});
+        }
+        vastContainerTap = null;
+      };
+      vastVideo.addEventListener('click', vastContainerTap);
+
+      // Update progress bar
 
       // Update progress bar
       vastVideo.addEventListener('timeupdate', function updateProgress() {
@@ -3271,8 +3864,11 @@
       clearInterval(vastCountdown);
       vastAdPlaying = false;
 
-      // Resume movie
+      // Resume movie (auto-play) and ensure subtitles are still active
       directPlayer.play().catch(() => {});
+      if (!subtitleActive && currentMovie && currentMovie.title) {
+        autoLoadSubtitles(currentMovie.title, 'en');
+      }
 
       // Reset trigger flag
       setTimeout(() => { vastTriggered = false; }, 30000);

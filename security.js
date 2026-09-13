@@ -151,7 +151,6 @@
     if (endTime - startTime > 100) {
       if (!devToolsOpen) {
         devToolsOpen = true;
-        console.clear();
         console.warn('%c[DEYMFLIX SECURITY] DevTools detected! This is a protected application.', 'color: red; font-size: 20px; font-weight: bold;');
         // Optional: Redirect or show warning
         // document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px;">Access Denied</h1>';
@@ -208,12 +207,6 @@
     debug: console.debug
   };
 
-  // Periodically clear console
-  setInterval(function () {
-    try {
-      console.clear();
-    } catch (e) {}
-  }, 2000);
 
   // 8. Disable Image/Video Saving
   document.addEventListener('mousedown', function (e) {

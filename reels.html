@@ -488,6 +488,97 @@
       font-weight: 800;
       cursor: pointer;
     }
+
+    .reel-poster-blur {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      filter: blur(20px);
+      transform: scale(1.1);
+    }
+    .reel-poster-blur.visible {
+      opacity: 0.6;
+    }
+
+    .reel-vast-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .reel-vast-overlay.active {
+      display: flex;
+    }
+    .reel-vast-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+    .reel-vast-skip {
+      position: absolute;
+      bottom: 30px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+      z-index: 520;
+    }
+    .reel-vast-skip.visible {
+      display: block;
+    }
+    .reel-vast-timer {
+      position: absolute;
+      top: 20px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 4px;
+      z-index: 520;
+    }
+    .reel-vast-label {
+      position: absolute;
+      top: 20px;
+      left: 16px;
+      background: #e50914;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      z-index: 520;
+    }
+    .reel-vast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #e50914;
+      z-index: 520;
+      transition: width 0.3s linear;
+    }
   </style>
 </head>
 <body>
@@ -552,6 +643,7 @@
   <!-- Coming Soon Tooltip -->
   <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
 
+  <script src="config.js"></script>
   <script src="security.js"></script>
   <script src="reels-data.js?v=151.0"></script>
   <script src="app.js?v=153.0"></script>
@@ -563,15 +655,7 @@
       });
     }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCSejdiwh4Y6N6Pwl6QyLXPNYdUqz8vc1M",
-      authDomain: "deymflix.firebaseapp.com",
-      projectId: "deymflix",
-      storageBucket: "deymflix.firebasestorage.app",
-      messagingSenderId: "333198075783",
-      appId: "1:333198075783:web:91765cf2f3c09e3c119522",
-      measurementId: "G-H8KMTM5YYH"
-    };
+    const firebaseConfig = window.__DEYMFLIX_CONFIG__?.FIREBASE_CONFIG || {};
 
     let db = null;
     let firebaseAvailable = false;
@@ -742,6 +826,14 @@
         <div class="reel-frame" id="frame-${index}">
           <div class="reel-poster-blur" id="poster-blur-${index}" style="background-image: url('${reel.poster || reel.thumbnail || ""}')"></div>
           <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline preload="none"></video>
+
+          <div class="reel-vast-overlay" id="reel-vast-${index}">
+            <span class="reel-vast-label">Ad</span>
+            <span class="reel-vast-timer" id="reel-vast-timer-${index}">Loading ad...</span>
+            <video class="reel-vast-video" id="reel-vast-video-${index}" playsinline></video>
+            <div class="reel-vast-progress" id="reel-vast-progress-${index}" style="width:0%"></div>
+            <button class="reel-vast-skip" id="reel-vast-skip-${index}" onclick="skipReelAd(${index})">Skip ▶</button>
+          </div>
 
           <div class="speed-badge-overlay" id="speed-badge-${index}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
@@ -954,15 +1046,6 @@
             if (Date.now() - lastTap >= 300 && !isLongPressing) {
               if (video.paused) {
                 video.play().catch(() => {});
-            // Show blurred poster during buffering
-            const posterBlur = document.getElementById('poster-blur-' + index);
-            if (posterBlur) {
-              const showBlur = () => posterBlur.classList.add('visible');
-              const hideBlur = () => posterBlur.classList.remove('visible');
-              video.addEventListener('waiting', showBlur);
-              video.addEventListener('playing', hideBlur);
-              video.addEventListener('canplay', hideBlur);
-            }
                 showIndicator(indicator, false);
               } else {
                 video.pause();
@@ -1180,6 +1263,101 @@
 
     let observer = null;
 
+    // ── Reel VAST Ad System (portrait mode) ──
+    let reelAdPlayed = new Set(); // Track which reels already showed an ad
+    const REEL_VAST_URL = '/api/vast';
+
+    async function parseVastXml(xmlText) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlText, 'text/xml');
+        const mediaFiles = doc.querySelectorAll('MediaFile');
+        for (const mf of mediaFiles) {
+          const type = mf.getAttribute('type') || '';
+          const url = mf.textContent.trim();
+          if (type.includes('video/mp4') && url) return url;
+        }
+        for (const mf of mediaFiles) {
+          const url = mf.textContent.trim();
+          if (url) return url;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    async function showReelAd(index) {
+      if (reelAdPlayed.has(index)) return;
+      reelAdPlayed.add(index);
+
+      const video = document.getElementById('video-' + index);
+      const overlay = document.getElementById('reel-vast-' + index);
+      const adVideo = document.getElementById('reel-vast-video-' + index);
+      const timer = document.getElementById('reel-vast-timer-' + index);
+      const skipBtn = document.getElementById('reel-vast-skip-' + index);
+      const progress = document.getElementById('reel-vast-progress-' + index);
+      if (!overlay || !adVideo) return;
+
+      if (video) video.pause();
+      overlay.classList.add('active');
+      timer.textContent = 'Loading ad...';
+      skipBtn.classList.remove('visible');
+      progress.style.width = '0%';
+
+      try {
+        const resp = await fetch(REEL_VAST_URL);
+        const xmlText = await resp.text();
+        const videoUrl = await parseVastXml(xmlText);
+        if (!videoUrl) { skipReelAd(index); return; }
+
+        adVideo.src = videoUrl;
+        adVideo.load();
+
+        adVideo.oncanplay = function() {
+          const playPromise = adVideo.play();
+          if (playPromise) {
+            playPromise.then(() => {
+              let timeLeft = 5;
+              timer.textContent = 'Skip in ' + timeLeft + 's';
+              const countdown = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                  clearInterval(countdown);
+                  skipBtn.classList.add('visible');
+                  timer.textContent = 'You can skip now';
+                } else {
+                  timer.textContent = 'Skip in ' + timeLeft + 's';
+                }
+              }, 1000);
+              skipBtn.classList.add('visible');
+            }).catch(() => {
+              timer.textContent = 'Tap to play ad';
+              adVideo.controls = true;
+              adVideo.style.cursor = 'pointer';
+            });
+          }
+        };
+
+        adVideo.addEventListener('timeupdate', function() {
+          if (!isNaN(adVideo.duration) && adVideo.duration > 0) {
+            progress.style.width = ((adVideo.currentTime / adVideo.duration) * 100) + '%';
+          }
+        });
+
+        adVideo.onended = function() { skipReelAd(index); };
+      } catch (e) {
+        skipReelAd(index);
+      }
+    }
+
+    function skipReelAd(index) {
+      const overlay = document.getElementById('reel-vast-' + index);
+      const adVideo = document.getElementById('reel-vast-video-' + index);
+      const video = document.getElementById('video-' + index);
+      if (overlay) overlay.classList.remove('active');
+      if (adVideo) { adVideo.pause(); adVideo.removeAttribute('src'); adVideo.load(); }
+      if (video) video.play().catch(() => {});
+    }
+
     function observeReelCards() {
       if (observer) observer.disconnect();
 
@@ -1194,6 +1372,36 @@
               video.currentTime = 0;
               video.muted = reelMuted;
               video.play().catch(() => {});
+
+              // Set up blur on first buffer only (once per reel)
+              if (!video._blurSetup) {
+                video._blurSetup = true;
+                let reelPosterShown = false;
+                const posterBlur = document.getElementById('poster-blur-' + index);
+                if (posterBlur) {
+                  let reelStallTimer = null;
+                  video.addEventListener('waiting', () => {
+                    if (reelPosterShown || video.paused || reelStallTimer) return;
+                    reelStallTimer = setTimeout(() => {
+                      reelStallTimer = null;
+                      reelPosterShown = true;
+                      posterBlur.classList.add('visible');
+                    }, 600);
+                  });
+                  video.addEventListener('playing', () => {
+                    if (reelStallTimer) { clearTimeout(reelStallTimer); reelStallTimer = null; }
+                    posterBlur.classList.remove('visible');
+                  });
+                  video.addEventListener('canplay', () => {
+                    if (reelStallTimer) { clearTimeout(reelStallTimer); reelStallTimer = null; }
+                    posterBlur.classList.remove('visible');
+                  });
+                }
+              }
+            }
+            // Show ad on every 3rd reel (index 2, 5, 8, ...)
+            if (index > 0 && index % 3 === 2 && !reelAdPlayed.has(index)) {
+              setTimeout(() => showReelAd(index), 1500);
             }
             resetClearModeTimer();
 
