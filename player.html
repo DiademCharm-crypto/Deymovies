@@ -15,7 +15,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=153.0">
+  <link rel="stylesheet" href="style.css?v=157.0">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -49,6 +49,7 @@
     @media (min-width: 769px) {
       body {
         background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0e 50%, #0a0a0a 100%) !important;
+        background-attachment: fixed !important;
       }
 
       .video-container {
@@ -482,6 +483,11 @@
       color: #ffffff !important;
     }
 
+    /* Subtitles ON indicator — red CC button (class beats the !important white) */
+    .ctrl-btn-small.subtitle-on {
+      color: #e50914 !important;
+    }
+
     /* Subtitle style: white text, no background, black outline */
     video::cue {
       color: #ffffff;
@@ -817,13 +823,13 @@
       font-weight: 800 !important;
       margin-bottom: 6px !important;
       color: #ffffff !important;
+      padding-right: 48px !important;
     }
 
+    /* Title stacked: title on top, genre chips on their own line under it */
     .title-row {
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      flex-wrap: wrap !important;
+      display: block !important;
+      position: relative !important;
     }
 
     .genre-badge {
@@ -831,18 +837,19 @@
       align-items: center !important;
       gap: 6px !important;
       flex-wrap: wrap !important;
-      margin-bottom: 6px !important;
+      margin-top: 4px !important;
+      margin-bottom: 10px !important;
     }
 
     .genre-chip {
-      font-size: 0.62rem !important;
+      font-size: 0.6rem !important;
       font-weight: 800 !important;
-      letter-spacing: 0.6px !important;
+      letter-spacing: 0.4px !important;
       text-transform: uppercase !important;
       color: #e50914 !important;
       border: 1px solid rgba(229, 9, 20, 0.5) !important;
       background: rgba(229, 9, 20, 0.1) !important;
-      padding: 2px 9px !important;
+      padding: 1px 7px !important;
       border-radius: 20px !important;
       white-space: nowrap !important;
     }
@@ -850,7 +857,9 @@
     .title-actions {
       display: flex !important;
       gap: 8px !important;
-      margin-left: auto !important;
+      position: absolute !important;
+      top: 0 !important;
+      right: 0 !important;
       flex-shrink: 0 !important;
     }
 
@@ -1074,10 +1083,6 @@
 
       .media-title {
         font-size: 1.8rem !important;
-      }
-
-      .genre-chip {
-        font-size: 0.72rem !important;
       }
 
       .synopsis-text {
@@ -1362,6 +1367,59 @@
       .player-poster-blur.visible {
         opacity: 0.4;
       }
+
+      /* ── Codec unsupported screen ── */
+      .codec-unsupported-screen {
+        position: absolute;
+        inset: 0;
+        z-index: 600;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: #101010;
+        padding: 24px;
+        gap: 14px;
+      }
+      @media (min-width: 769px) {
+        .codec-unsupported-screen {
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0e 50%, #0a0a0a 100%);
+        }
+      }
+      .codec-unsupported-screen h3 {
+        color: #fff;
+        font-size: 1.3rem;
+        margin: 0;
+        font-weight: 800;
+      }
+      .codec-unsupported-screen p {
+        color: rgba(255,255,255,0.75);
+        max-width: 520px;
+        line-height: 1.5;
+        margin: 0;
+        font-size: 0.95rem;
+      }
+      .codec-unsupported-screen .codec-btns {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 8px;
+      }
+      .codec-unsupported-screen button {
+        background: #e50914;
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+      .codec-unsupported-screen button.secondary {
+        background: rgba(255,255,255,0.12);
+      }
     </style>
 
     <!-- VAST VIDEO AD OVERLAY -->
@@ -1512,7 +1570,6 @@
             <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
             <div id="subtitle-status" class="subtitle-status"></div>
             <div id="subtitle-results" class="subtitle-results"></div>
-            <button id="btn-subtitle-off" class="subtitle-off-btn" style="display:none;">Turn Off Subtitles</button>
             <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
               <label style="font-size:0.6rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
               <div style="display:flex;align-items:center;gap:6px;">
@@ -2349,12 +2406,23 @@
     }
 
     // Search subtitles via OpenSubtitles API
+    // Episode-aware: series episodes search by episode metadata (type=episode)
     async function osSearchSubtitles(token, imdbId, query, lang, limit) {
-      let url = '/subtitles?languages=' + encodeURIComponent(lang) + '&type=movie&limit=' + (limit || '5');
-      if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
-      else if (query) url += '&query=' + encodeURIComponent(query);
+      const isEpisode = !!(currentMovie && currentMovie._episodeNum);
+      let url = '/subtitles?languages=' + encodeURIComponent(lang) +
+        '&type=' + (isEpisode ? 'episode' : 'movie') +
+        '&limit=' + (limit || '5');
+      if (isEpisode) {
+        url += '&query=' + encodeURIComponent(currentMovie.title || query || '') +
+               '&season_number=' + encodeURIComponent(currentMovie._episodeSeason || 1) +
+               '&episode_number=' + encodeURIComponent(currentMovie._episodeNum);
+        if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
+      } else {
+        if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
+        else if (query) url += '&query=' + encodeURIComponent(query);
+      }
 
-      const res = await osFetch(url, {
+      const res = await osSearchSubtitlesFetch(url, {
         method: 'GET',
         headers: {
           'Api-Key': OS_API_KEY,
@@ -2364,6 +2432,10 @@
       return res.json();
     }
 
+    function osSearchSubtitlesFetch(url, options) {
+      return osFetch(url, options);
+    }
+
     // Auto-load subtitles silently using IMDB ID for accuracy
     async function autoLoadSubtitles(title, lang) {
       if (subtitleActive || !title) return;
@@ -2371,9 +2443,26 @@
         const token = await openSubtitlesLogin();
         if (!token) return;
 
-        const imdbId = await getImdbId(currentMovie);
+        // Episodes: skip IMDB lookup (series-level IMDB would mismatch the episode)
+        const imdbId = (currentMovie && currentMovie._episodeNum) ? '' : await getImdbId(currentMovie);
         const data = await osSearchSubtitles(token, imdbId, title, lang, '5');
         if (!data.data || data.data.length === 0) return;
+
+        // Episodes: verify results actually belong to THIS series — the search
+        // can return other shows' episodes with the same S/E numbers.
+        if (currentMovie && currentMovie._episodeNum) {
+          const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+          const seriesWords = norm(currentMovie.title).split(/\s+/).filter(w => w.length > 1);
+          data.data = data.data.filter(item => {
+            const fd = item.attributes && item.attributes.feature_details;
+            if (!fd) return false;
+            const featTitle = norm(fd.title || fd.movie_title || '');
+            if (!featTitle) return false;
+            const hitCount = seriesWords.filter(w => featTitle.indexOf(w) !== -1).length;
+            return seriesWords.length === 0 || (hitCount / seriesWords.length) >= 0.5;
+          });
+          if (data.data.length === 0) return; // only wrong-show results — don't attach
+        }
 
         const first = data.data.find(item => item.attributes && item.attributes.files && item.attributes.files.length > 0);
         if (!first) return;
@@ -2625,7 +2714,7 @@
 
     function updateSubtitleToggleUI() {
       if (btnSubtitleToggle) {
-        btnSubtitleToggle.style.color = subtitleActive ? '#e50914' : '#ffffff';
+        btnSubtitleToggle.classList.toggle('subtitle-on', !!subtitleActive);
         btnSubtitleToggle.title = subtitleActive ? 'Subtitles ON — Click to disable (C)' : 'Subtitles OFF — Click to enable (C)';
       }
       // Keep the settings-panel switch in sync
@@ -2800,7 +2889,7 @@
         const startVtt = msToVtt(startMs);
         const endVtt = msToVtt(endMs);
 
-        vttBlocks.push(startVtt + ' --> ' + endVtt + '\n' + textLines.join('\n'));
+        vttBlocks.push(startVtt + ' --> ' + endVtt + ' line:88%\n' + textLines.join('\n'));
       }
 
       return 'WEBVTT\n\nSTYLE\n::cue {\n  color: #ffffff;\n  background: transparent;\n  text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 2px 4px rgba(0,0,0,0.9);\n  font-weight: 600;\n}\n\n' + vttBlocks.join('\n\n') + '\n';
@@ -2904,9 +2993,10 @@
           const attrs = item.attributes || {};
           const fileId = attrs.files && attrs.files.length > 0 ? attrs.files[0].file_id : null;
           const release = attrs.release_name || attrs.file_name || ('Subtitle #' + item.id);
+          const featTitle = attrs.feature_details && attrs.feature_details.title ? ' — ' + attrs.feature_details.title : '';
           const div = document.createElement('div');
           div.className = 'subtitle-result-item';
-          div.textContent = release + ' · ' + (attrs.language || lang);
+          div.textContent = release + featTitle + ' · ' + (attrs.language || lang);
           div.onclick = () => {
             if (!fileId) {
               if (subtitleStatus) subtitleStatus.textContent = 'No downloadable file for this result.';
@@ -2967,12 +3057,7 @@
         searchOnlineSubtitles();
       };
     }
-    if (btnSubtitleOff) {
-      btnSubtitleOff.onclick = (e) => {
-        e.stopPropagation();
-        turnOffSubtitles();
-      };
-    }
+    // (Turn Off Subtitles button removed — the Subtitles switch above handles it)
 
     // Subtitle timing offset controls
     const subOffsetSlider = document.getElementById('sub-offset-slider');
@@ -3431,6 +3516,130 @@
     directPlayer.addEventListener('canplay', hidePlayerPosterBlur);
     directPlayer.addEventListener('seeked', hidePlayerPosterBlur);
 
+    // ── Codec support preflight ──
+    // Desktop Chrome/Edge cannot decode HEVC (H.265/x265) or AV1 without OS codec
+    // packs. The video then plays audio with a BLACK SCREEN. iOS Safari supports
+    // HEVC natively, so we probe canPlayType instead of blocking by name.
+    function detectUnsupportedCodec(url) {
+      const lower = (url || '').toLowerCase();
+      const probe = document.createElement('video');
+      if (/x265|h\.?265|hevc|hvc1/.test(lower)) {
+        const ok = probe.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') ||
+                   probe.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"');
+        if (!ok) return 'HEVC (H.265)';
+      }
+      if (/\bav1\b|av01/.test(lower)) {
+        const ok = probe.canPlayType('video/mp4; codecs="av01.0.05M.08"');
+        if (!ok) return 'AV1';
+      }
+      return '';
+    }
+
+    function showUnsupportedCodecScreen(codecName, url) {
+      hideLoadingSpinner();
+      try {
+        directPlayer.pause();
+        directPlayer.removeAttribute('src');
+        directPlayer.load();
+      } catch (e) {}
+
+      let screen = document.getElementById('codec-unsupported-screen');
+      if (!screen) {
+        screen = document.createElement('div');
+        screen.id = 'codec-unsupported-screen';
+        screen.className = 'codec-unsupported-screen';
+        playerContainer.appendChild(screen);
+      }
+
+      const hasTrailer = currentMovie && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '';
+      screen.innerHTML = `
+        <h3>Can't play this video on this browser</h3>
+        <p><strong>${sanitizeHTML(currentMovie ? currentMovie.title : 'This title')}</strong> is encoded in
+        <strong>${codecName}</strong>, which this browser can't decode (that's why the screen stays black
+        while audio plays).</p>
+        <p>iPhone / iPad (Safari) can play it. On PC, use a browser with the codec installed
+        (e.g. Edge + HEVC Video Extensions), or watch the trailer.</p>
+        <div class="codec-btns">
+          <button id="codec-play-anyway">Play Anyway</button>
+          ${hasTrailer ? '<button id="codec-watch-trailer" class="secondary">Watch Trailer</button>' : ''}
+          <button id="codec-go-back" class="secondary">Go Back</button>
+        </div>
+      `;
+      screen.style.display = 'flex';
+
+      document.getElementById('codec-play-anyway').onclick = function() {
+        try { sessionStorage.setItem('dfx_force_play_' + (currentMovie && currentMovie.id || ''), '1'); } catch (e) {}
+        screen.style.display = 'none';
+        stopBlackScreenWatch();
+        directPlayer.src = url;
+        directPlayer.play().catch(function() {});
+      };
+      const tBtn = document.getElementById('codec-watch-trailer');
+      if (tBtn) tBtn.onclick = function() {
+        screen.style.display = 'none';
+        playerMode = 'trailer';
+        loadEmbed();
+      };
+      document.getElementById('codec-go-back').onclick = function() {
+        screen.style.display = 'none';
+        if (window.history.length > 1) { window.history.back(); }
+        else { window.location.href = 'index.html'; }
+      };
+    }
+
+    // Friendly message if the video file itself fails to load
+    directPlayer.addEventListener('error', function() {
+      if (directPlayer.src && directPlayer.style.display !== 'none') {
+        hideLoadingSpinner();
+        showToast('Video failed to load. The file may be unavailable or in an unsupported format.');
+      }
+    });
+
+    // ── Runtime black-screen detector ──
+    // canPlayType() lies on some PCs (says "probably" for HEVC but the actual
+    // decode fails, e.g. 10-bit without hardware support). If the video claims
+    // to be playing but NO frames ever render, surface the codec screen.
+    let blackScreenWatch = null;
+    function startBlackScreenWatch(url) {
+      stopBlackScreenWatch();
+      const state = { done: false };
+      const onTimeUpdate = function() {
+        if (state.done) return;
+        if (directPlayer.readyState < 2 || directPlayer.currentTime <= 2 || directPlayer.paused) return;
+        let zeroFrames = false;
+        // Preferred: real decode counters (Chromium)
+        if (typeof directPlayer.getVideoPlaybackQuality === 'function') {
+          const q = directPlayer.getVideoPlaybackQuality();
+          zeroFrames = (q.totalVideoFrames === 0);
+        } else if (directPlayer.webkitDecodedFrameCount !== undefined) {
+          zeroFrames = (directPlayer.webkitDecodedFrameCount === 0);
+        }
+        if (zeroFrames) {
+          // Respect explicit "Play Anyway" choice for this movie
+          let forced = false;
+          try { forced = !!sessionStorage.getItem('dfx_force_play_' + (currentMovie && currentMovie.id || '')); } catch (e) {}
+          if (forced) { state.done = true; stopBlackScreenWatch(); return; }
+          state.done = true;
+          stopBlackScreenWatch();
+          showUnsupportedCodecScreen('a codec this browser cannot decode (HEVC/AV1)', url);
+        }
+      };
+      directPlayer.addEventListener('timeupdate', onTimeUpdate);
+      blackScreenWatch = {
+        state: state,
+        cleanup: function() {
+          directPlayer.removeEventListener('timeupdate', onTimeUpdate);
+        }
+      };
+    }
+    function stopBlackScreenWatch() {
+      if (blackScreenWatch) {
+        blackScreenWatch.state.done = true;
+        blackScreenWatch.cleanup();
+        blackScreenWatch = null;
+      }
+    }
+
     function loadEmbed() {
       startSlowConnectionCheck();
 
@@ -3472,8 +3681,19 @@
 
         directPlayer.style.display = 'block';
         playerOverlay.style.display = 'flex';
+
+        // Codec preflight: avoid silent black screens for HEVC/AV1 files
+        const unsupportedCodec = detectUnsupportedCodec(targetUrl);
+        let forcePlay = false;
+        try { forcePlay = !!sessionStorage.getItem('dfx_force_play_' + (currentMovie && currentMovie.id || '')); } catch (e) {}
+        if (unsupportedCodec && !forcePlay) {
+          showUnsupportedCodecScreen(unsupportedCodec, targetUrl);
+          return;
+        }
+
         directPlayer.src = targetUrl;
-        
+        startBlackScreenWatch(targetUrl);
+
         attemptAutoUnmute();
         showControls();
         const settingsBtn = document.getElementById('btn-settings');

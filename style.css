@@ -30,6 +30,13 @@ body {
   overflow-x: hidden;
 }
 
+/* PC MODE ONLY: subtle dark red tint across the site (mobile stays neutral dark) */
+@media (min-width: 769px) {
+  body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0e 50%, #0a0a0a 100%) fixed;
+  }
+}
+
 /* TOP NAVIGATION HEADER BASE */
 .top-nav {
   position: absolute;
@@ -759,15 +766,15 @@ body {
   .top-picks-scroll .poster-card,
   .horizontal-scroll .poster-card,
   .poster-card {
-    flex: 0 0 230px !important;
-    width: 230px !important;
-    height: 345px !important;
+    flex: 0 0 190px !important;
+    width: 190px !important;
+    height: 285px !important;
   }
 
   .reels-horizontal-scroll .reel-thumb-card {
-    flex: 0 0 210px !important;
-    width: 210px !important;
-    height: 345px !important;
+    flex: 0 0 175px !important;
+    width: 175px !important;
+    height: 285px !important;
   }
 
   .top-picks-scroll,
@@ -796,25 +803,25 @@ body {
 
   .poster-card-title,
   .reel-thumb-title {
-    font-size: 1rem;
-    line-height: 1.3;
+    font-size: 0.85rem;
+    line-height: 1.25;
   }
 
   .category-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-    gap: 28px !important;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)) !important;
+    gap: 24px !important;
   }
 
   .category-grid .poster-card {
-    height: 360px !important;
+    height: 300px !important;
   }
 
   .category-grid.reels-grid-mode {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
   }
 
   .category-grid.reels-grid-mode .reel-thumb-card {
-    height: 360px !important;
+    height: 300px !important;
   }
 
   .page-num-btn,

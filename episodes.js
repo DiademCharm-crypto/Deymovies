@@ -139,6 +139,18 @@ function injectEpisodesUI(series) {
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
     }
+    /* PC MODE: align with the 80% centered band above + dark red theme */
+    @media (min-width: 769px) {
+      .episodes-container-section {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0e 50%, #0a0a0a 100%);
+        border: 1px solid rgba(229, 9, 20, 0.25);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+    }
     .episodes-header-flex {
       display: flex;
       align-items: center;
@@ -255,19 +267,17 @@ function renderEpisodesGrid(season) {
     btn.className = `episode-square-btn ${idx === 0 ? 'active' : ''}`;
     btn.type = 'button';
     btn.textContent = ep.episodeNumber || (idx + 1);
-    btn.title = ep.title || `Episode ${ep.episodeNumber || (idx + 1)}`;
-
-    btn.onclick = () => {
-      document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
-      playEpisodeSource(ep);
-    };
+    btn.title = ep.title || `Episode ${ep.episodeNumber || (idx + 1)}`;            btn.onclick = () => {
+            document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            playEpisodeSource(ep, season);
+          };
 
     episodesList.appendChild(btn);
   });
 }
 
-function playEpisodeSource(episode) {
+function playEpisodeSource(episode, season) {
   if (!episode || !episode.embedUrl) return;
 
   // Reset subtitles so auto-load fires for the new episode
@@ -285,6 +295,25 @@ function playEpisodeSource(episode) {
     currentMovie.manualEmbed = episode.embedUrl;
     currentMovie._episodeId = currentMovie.id + '-ep' + (episode.episodeNumber || '');
     currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + episode.episodeNumber);
+    // Episode metadata for episode-aware subtitle search (OpenSubtitles)
+    currentMovie._episodeSeason = (season && season.seasonNumber) || 1;
+    currentMovie._episodeNum = episode.episodeNumber || 1;
+    currentMovie._episodeName = episode.title || '';
+    currentMovie._subtitleUrl = episode.subtitleUrl || '';
+  }
+
+  // Load a manually assigned subtitle file for this episode, if provided
+  // Usage: add  subtitleUrl: "https://.../S01E03.srt"  next to embedUrl in episodes.js
+  if (episode.subtitleUrl && typeof enableSubtitleTrack === 'function' && typeof srtToVtt === 'function') {
+    fetch(episode.subtitleUrl)
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(srt => {
+        enableSubtitleTrack(srtToVtt(srt, 0), 'Episode Subtitle', 'en', srt);
+        if (typeof showToast === 'function') showToast('Subtitle loaded for Episode ' + (episode.episodeNumber || ''));
+      })
+      .catch(() => {
+        if (typeof showToast === 'function') showToast('Could not load the episode subtitle file.');
+      });
   }
 
   if (typeof loadEmbed === 'function') {
