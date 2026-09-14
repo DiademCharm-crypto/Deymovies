@@ -328,7 +328,7 @@ const movies = [
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
     manualEmbed: "https://video.deymflix.eu.cc/Yellow%20Mirror%202026%20NORDiC%201080p%20WEB-DL%20H%20264%20DDP5%201-ADDICTION.mkv",
     trailerEmbed: "",
-    isSeries: true
+    isSeries: false
   },
   { 
     id: "The Dog Stars", 
@@ -383,15 +383,6 @@ const movies = [
     manualEmbed: "",
     trailerEmbed: "",
     isSeries: false
-  },
-  { 
-    id: "Untold Raygun: Breaking Badly", 
-    imdbId: "tt43700441",
-    title: "Untold Raygun: Breaking Badly", 
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3pnlJjsGtrUp3cPEOLzkR0sPQAK.jpg",
-    manualEmbed: "",
-    trailerEmbed: "",
-    isSeries: true
   },
   { 
     id: "Just Play Dead", 

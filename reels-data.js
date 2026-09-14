@@ -1,6 +1,54 @@
 // AI Reels & Shorts Data Source
 const aiReelsData = [
   {
+    id: "He-Takes-the-Credit,-I-Foot-the-Bill",
+    title: "He Takes the Credit, I Foot the Bill",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788441976_kYDpCFacfe.jpg",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/ai2/(Exclusive)+The+Broken+Vow+of+the+Sea+God+S+Son+FULL+Drama+2026.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Slum-Family-Saved-by-Divine-Lamp",
+    title: "Slum Family Saved by Divine Lamp",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788443095_YWKF8tj2Yy.jpg",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+MOVIES/AI+002/Slum+Family+Saved+by+Divine+Lamp+(FULL).mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Highway-to-Justice",
+    title: "Highway to Justice",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788440962_Kym3WCPG2H.jpg",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+MOVIES/AI+002/Highway+to+Justice.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "Killed-Me-9-Times",
+    title: "Killed Me 9 Times",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788441703_KPyD5t6ixd.jpg",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+MOVIES/AI+002/Killed+Me+9+TimesNow+I.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "You-Can't-Stop-My-Super-X-Ray-Vision",
+    title: "You Can't Stop My Super X-Ray Vision",
+    author: "@deymflix_official",
+    poster: "https://s1.dmcdn.net/v/eCAPM1ge2_3ZYSVsi/x240",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+MOVIES/AI+002/%5BNEW%5D+%5BCompleted%5D+You+Can.mp4",
+    likes: "12.4K"
+  },
+  {
+    id: "A-Fatal-Delayed-Plea",
+    title: "A Fatal Delayed Plea",
+    author: "@deymflix_official",
+    poster: "https://zshipubcf.farsunpteltd.com/playlet/1788434571_C3PDxaB7Ss.jpg?x-oss-process=image/resize,w_400,image/format,webp",
+    videoUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/AI+001/The+Billionaire.mp4",
+    likes: "12.4K"
+  },
+  {
     id: "The-Broken-Vow-of-the Sea-God's-Son",
     title: "The Broken Vow of the Sea God's Son",
     author: "@deymflix_official",
