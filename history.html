@@ -5,7 +5,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DEYMFLIX - My List</title>
+  <title>DEYMFLIX - History</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="stylesheet" href="style.css?v=158.0">
@@ -63,14 +63,14 @@
 
     .mylist-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px;
     }
     @media (min-width: 768px) {
-      .mylist-grid { grid-template-columns: repeat(5, 1fr); }
+      .mylist-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
     }
     @media (min-width: 1024px) {
-      .mylist-grid { grid-template-columns: repeat(6, 1fr); }
+      .mylist-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 22px; }
     }
 
     .mylist-item {
@@ -168,10 +168,10 @@
   </header>
 
   <div class="mylist-tabs" id="mylist-tabs">
-    <button class="mylist-tab active" data-tab="bookmarks" onclick="switchTab('bookmarks')">🔖 Bookmarks</button>
-    <button class="mylist-tab" data-tab="movies" onclick="switchTab('movies')">🎬 Movies</button>
+    <button class="mylist-tab active" data-tab="movies" onclick="switchTab('movies')">🎬 Movies</button>
     <button class="mylist-tab" data-tab="series" onclick="switchTab('series')">📺 Series</button>
     <button class="mylist-tab" data-tab="reels" onclick="switchTab('reels')">🎞️ Reels</button>
+    <button class="mylist-tab" data-tab="bookmarks" onclick="switchTab('bookmarks')">🔖 Bookmarks</button>
   </div>
 
   <main class="mylist-content" id="mylist-content">
@@ -209,9 +209,9 @@
         <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <span class="bottom-nav-label">Explore</span>
       </li>
-      <li class="bottom-nav-item active" data-page="mylist">
-        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
-        <span class="bottom-nav-label">My List</span>
+      <li class="bottom-nav-item active" data-page="history">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+        <span class="bottom-nav-label">History</span>
       </li>
       <li class="bottom-nav-item" data-page="request" onclick="openRequestModal()">
         <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
@@ -227,7 +227,7 @@
   <script src="reels-data.js?v=151.0"></script>
   <script src="app.js?v=153.0"></script>
   <script>
-    let activeTab = 'bookmarks';
+    let activeTab = 'movies';
 
     function switchTab(tab) {
       activeTab = tab;

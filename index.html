@@ -12,7 +12,11 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=157.0">
+  <link rel="stylesheet" href="style.css?v=158.0">
+
+  <!-- Firebase for online counter -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -24,8 +28,13 @@
       <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
 
-    <!-- 2. RIGHT: Search Overlay Bar -->
-    <div class="nav-spacer"></div>
+    <!-- 2. RIGHT: Online Badge (same row as logo on mobile, beside search on PC) -->
+    <div id="online-count-badge" class="online-count-badge">
+      <span class="online-dot"></span>
+      <span id="online-count-text">0 online</span>
+    </div>
+
+    <!-- 3. SEARCH BAR: full width on mobile, inline on PC -->
     <div class="search-overlay-bar">
       <form id="search-form" onsubmit="event.preventDefault();">
         <div class="search-input-wrapper">
@@ -147,9 +156,9 @@
         <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <span class="bottom-nav-label">Explore</span>
       </li>
-      <li class="bottom-nav-item" data-page="mylist" onclick="window.location.href='mylist.html'">
-        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
-        <span class="bottom-nav-label">My List</span>
+      <li class="bottom-nav-item" data-page="history" onclick="window.location.href='history.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+        <span class="bottom-nav-label">History</span>
       </li>
       <li class="bottom-nav-item" data-page="request" onclick="openRequestModal()">
         <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
@@ -161,7 +170,7 @@
   <!-- Coming Soon Tooltip -->
   <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
 
-  <!-- My List Modal -->
+  <!-- Bookmarks Modal -->
   <div class="mylist-modal-backdrop" id="mylist-modal">
     <div class="mylist-modal">
       <div class="mylist-modal-header">
@@ -180,5 +189,54 @@
   <script src="security.js"></script>
   <script src="reels-data.js?v=151.0"></script>
   <script src="app.js?v=153.0"></script>
+
+  <!-- Live Online Counter -->
+  <script>
+  (function() {
+    // Initialize Firebase for online tracking
+    const config = window.__DEYMFLIX_CONFIG__ && window.__DEYMFLIX_CONFIG__.FIREBASE_CONFIG;
+    if (!config) return;
+    
+    if (!firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    const db = firebase.database();
+    const onlineRef = db.ref('online');
+    const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const myRef = onlineRef.child(myId);
+
+    // When connected, register this user
+    const connRef = db.ref('.info/connected');
+    connRef.on('value', function(snap) {
+      if (snap.val() === true) {
+        // Add self to online list
+        myRef.set({ joined: firebase.database.ServerValue.TIMESTAMP });
+        // When disconnected, remove self
+        myRef.onDisconnect().remove();
+      }
+    });
+
+    // Listen for online count changes and update UI
+    onlineRef.on('value', function(snap) {
+      const count = snap.numChildren();
+      const badge = document.getElementById('online-count-badge');
+      const countText = document.getElementById('online-count-text');
+      if (badge) {
+        badge.style.display = count > 0 ? 'flex' : 'none';
+      }
+      if (countText) {
+        countText.textContent = count + ' online';
+      }
+    });
+
+    // Clean up stale entries (older than 2 minutes without heartbeat)
+    setInterval(function() {
+      const cutoff = Date.now() - 120000;
+      onlineRef.orderByChild('joined').endAt(cutoff).once('child_added', function(snap) {
+        snap.ref.remove();
+      });
+    }, 60000);
+  })();
+  </script>
 </body>
 </html>

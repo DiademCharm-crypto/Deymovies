@@ -1,5 +1,6 @@
 :root {
   --bg-dark: #0f0f0f;
+  --vh: 1vh; /* Updated dynamically via JS for iOS */
   --card-bg: #181818;
   --primary-red: #e50914;
   --primary-red-hover: #ff0f1b;
@@ -26,7 +27,7 @@
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
-  padding-bottom: 40px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
   overflow-x: hidden;
 }
 
@@ -43,7 +44,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 16px 32px;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 32px 16px 32px;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -635,7 +636,7 @@ body {
     justify-content: space-between !important;
   }
 
-  /* 1. LOGO AND SITE TITLE -> ABSOLUTE LEFT */
+  /* 1. LOGO AND SITE TITLE -> LEFT */
   .brand-logo-link {
     order: 1 !important;
     margin-right: auto !important;
@@ -652,13 +653,11 @@ body {
     font-size: 1.45rem;
   }
 
-  /* 2. REQUEST MOVIE BUTTON -> ABSOLUTE RIGHT */
-  .header-request-btn {
+  /* 2. ONLINE BADGE -> RIGHT (same row as logo) */
+  .online-count-badge {
     order: 2 !important;
-    margin-left: 0 !important;
-    padding: 6px 12px !important;
-    font-size: 0.75rem !important;
-    border-radius: 20px !important;
+    margin-left: auto !important;
+    margin-right: 10px !important;
   }
 
   /* 3. SEARCH BAR -> FULL WIDTH BELOW */
@@ -667,6 +666,11 @@ body {
     flex: 0 0 100% !important;
     margin-top: 8px !important;
     max-width: 100% !important;
+  }
+
+  /* Hide nav-spacer on mobile */
+  .nav-spacer {
+    display: none !important;
   }
 
   .content-section {
@@ -1295,7 +1299,7 @@ header, .navbar, .top-nav {
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* My List Modal */
+/* Bookmarks Modal */
 .mylist-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1439,9 +1443,68 @@ header, .navbar, .top-nav {
   background: #e50914;
 }
 
+/* iOS 100dvh support - fallback for browsers without dvh */
+@supports (height: 100dvh) {
+  .hero-wrapper {
+    height: 58dvh;
+  }
+}
+
+/* Online Users Badge - inline in header */
+.online-count-badge {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Mobile: badge on right side of same row as logo */
+@media (max-width: 768px) {
+  .online-count-badge {
+    order: 2;
+    margin-left: auto;
+  }
+}
+
+/* PC: badge sits between spacer and search bar */
+@media (min-width: 769px) {
+  .online-count-badge {
+    order: 2;
+    margin-right: 12px;
+  }
+  .search-overlay-bar {
+    order: 3;
+  }
+  .nav-spacer {
+    order: 1;
+  }
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  background: #00e676;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(0, 230, 118, 0); }
+}
+
 /* Body padding for bottom nav */
 body.has-bottom-nav {
-  padding-bottom: 90px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Hide nav bar */

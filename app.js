@@ -1255,6 +1255,16 @@ function setupSearchHandlers() {
 
   searchInput.addEventListener('input', handleTyping);
 
+  // Prevent Enter when empty, clear on Escape
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchInput.value = '';
+      hideSuggestions();
+      resetHomeState();
+      searchInput.blur();
+    }
+  });
+
   if (searchForm) {
     searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -1306,6 +1316,12 @@ function executeSearch() {
 
   if (!searchInput || !allMoviesGrid) return;
   const query = searchInput.value.toLowerCase().trim();
+
+  // If query is empty, reset to normal home state instead of hiding everything
+  if (!query) {
+    resetHomeState();
+    return;
+  }
 
   if (homeSectionsWrapper) homeSectionsWrapper.classList.add('hide-for-search');
 
@@ -1427,7 +1443,7 @@ function addToMyList(movie) {
   if (!list.find(m => m.id === movie.id)) {
     list.unshift({ id: movie.id, title: movie.title, poster: movie.poster });
     localStorage.setItem('deymflix_my_list', JSON.stringify(list));
-    showToast(`Added "${movie.title}" to My List`);
+    showToast(`Added to Bookmarks`);
   }
 }
 

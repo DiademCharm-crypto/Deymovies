@@ -82,8 +82,10 @@
     .video-container.fullscreen-active {
       width: 100vw !important;
       height: 100vh !important;
+      height: 100dvh !important;
       max-width: 100vw !important;
       max-height: 100vh !important;
+      max-height: 100dvh !important;
       aspect-ratio: auto !important;
       margin: 0 !important;
       padding: 0 !important;
@@ -1635,7 +1637,7 @@
       <h1 id="current-title" class="media-title">Loading...</h1>
       <div id="genre-label" class="genre-badge" style="display: none;"></div>
       <div class="title-actions">
-        <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to My List">
+        <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to Bookmarks">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
         </button>
       </div>
@@ -1742,7 +1744,7 @@
       if (!btn) return;
       const isBookmarked = list.some(m => m.id === currentMovie.id);
       btn.classList.toggle('bookmarked', isBookmarked);
-      btn.title = isBookmarked ? 'Remove from My List' : 'Add to My List';
+      btn.title = isBookmarked ? 'Remove from Bookmarks' : 'Add to Bookmarks';
     }
 
     function getMyList() {
@@ -1754,10 +1756,10 @@
       const idx = list.findIndex(m => m.id === currentMovie.id);
       if (idx >= 0) {
         list.splice(idx, 1);
-        showToast('Removed from My List');
+        showToast('Removed from Bookmarks');
       } else {
         list.unshift({ id: currentMovie.id, title: currentMovie.title, poster: currentMovie.poster });
-        showToast('Added to My List');
+        showToast('Added to Bookmarks');
       }
       localStorage.setItem('deymflix_my_list', JSON.stringify(list));
       updateBookmarkBtn();
