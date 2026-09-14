@@ -2357,24 +2357,13 @@
       return '';
     }
 
-    // OpenSubtitles config
-    const OS_API_KEY = 'g0lXqsvA4zs8XdeLhj2eBf62PJnaLIr5';
-    const OS_USERNAME = 'deymflix';
-    const OS_PASSWORD = 'Chambe09';
-    const OS_API = 'https://api.opensubtitles.com/api/v1';
-    // CORS proxy for browser requests (required since OS API may block browser CORS)
-    const CORS_PROXY = 'https://corsproxy.io/?url=';
+    // OpenSubtitles credentials stay server-side in proxy-server.js.
+    // The browser talks only to our proxy — the API key, username and
+    // password never reach the client.
+    const OS_API = '/api/opensubtitles';
 
     async function osFetch(path, options = {}) {
-      const url = OS_API + path;
-      // Try direct first, fall back to CORS proxy
-      try {
-        const res = await fetch(url, options);
-        if (res.ok || res.status < 500) return res;
-      } catch (e) {
-        // CORS blocked — use proxy
-      }
-      return fetch(CORS_PROXY + encodeURIComponent(url), options);
+      return fetch(OS_API + path, options);
     }
 
     // Subtitle login helper — returns token or empty string
@@ -2388,10 +2377,9 @@
         const res = await osFetch('/login', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Api-Key': OS_API_KEY
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ username: OS_USERNAME, password: OS_PASSWORD })
+          body: JSON.stringify({})
         });
         const data = await res.json();
         if (data.token) {
@@ -2424,11 +2412,10 @@
         else if (query) url += '&query=' + encodeURIComponent(query);
       }
 
-      const res = await osSearchSubtitlesFetch(url, {
+      const res = await osSearchSubtitlesFetch('/search?' + new URLSearchParams(url.split('?')[1]).toString() + '&token=' + encodeURIComponent(token), {
         method: 'GET',
         headers: {
-          'Api-Key': OS_API_KEY,
-          'Authorization': 'Bearer ' + token
+          'Content-Type': 'application/json'
         }
       });
       return res.json();
@@ -2475,11 +2462,9 @@
         const dlRes = await osFetch('/download', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Api-Key': OS_API_KEY,
-            'Authorization': 'Bearer ' + token
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ file_id: fileId })
+          body: JSON.stringify({ file_id: fileId, token: token })
         });
         if (!dlRes.ok) return;
         const dlData = await dlRes.json();
@@ -3022,11 +3007,9 @@
         const dlRes = await osFetch('/download', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Api-Key': OS_API_KEY,
-            'Authorization': 'Bearer ' + token
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ file_id: fileId })
+          body: JSON.stringify({ file_id: fileId, token: token })
         });
         if (!dlRes.ok) throw new Error('Download failed (' + dlRes.status + ')');
         const dlData = await dlRes.json();
@@ -3922,11 +3905,29 @@
     let vastTimeLeft = 7;
     // VAST URL is server-side in proxy-server.js
 
-    // Parse VAST XML to extract video URL
+    // ── VAST tracking pixels ──
+    // HilltopAds (like every VAST network) counts an impression ONLY when the
+    // viewer's browser requests these pixel URLs. Without firing them, ads
+    // play but the network records nothing — stats stay empty, no earnings.
+    let vastTracking = { impressions: [], start: [], fired: new Set() };
+
+    function fireVastPixels(list) {
+      (list || []).forEach(function (url) {
+        if (!url || vastTracking.fired.has(url)) return;
+        vastTracking.fired.add(url);
+        try { new Image().src = url; } catch (e) {}
+        try { fetch(url, { mode: 'no-cors' }).catch(function () {}); } catch (e) {}
+      });
+    }
+
+    // Parse VAST XML to extract video URL + tracking pixels
     function parseVastXml(xmlText) {
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(xmlText, 'text/xml');
+        // Collect impression + start pixels so we can fire them when the ad actually plays
+        vastTracking.impressions = Array.from(doc.querySelectorAll('Impression')).map(function (n) { return n.textContent.trim(); }).filter(Boolean);
+        vastTracking.start = Array.from(doc.querySelectorAll('Tracking[event="start"]')).map(function (n) { return n.textContent.trim(); }).filter(Boolean);
         // Try to find MediaFile with video/mp4
         const mediaFiles = doc.querySelectorAll('MediaFile');
         for (const mf of mediaFiles) {
@@ -4014,6 +4015,14 @@
       // Set video source and play
       vastVideo.src = videoUrl;
       vastVideo.load();
+
+      // Fire impression pixels the moment the ad truly starts rendering
+      vastVideo.addEventListener('playing', function onVastPlaying() {
+        vastVideo.removeEventListener('playing', onVastPlaying);
+        fireVastPixels(vastTracking.impressions);
+        fireVastPixels(vastTracking.start);
+        console.log('[VAST] Ad impression fired to ad network');
+      });
 
       vastVideo.oncanplay = function() {
         vastAdPlaying = true;

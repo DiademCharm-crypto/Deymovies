@@ -175,6 +175,8 @@ async function handleProxyRoutes(req, res, parsedUrl) {
     let type = query.type || 'movie';
     let limit = query.limit || '15';
     let token = query.token || '';
+    let season = query.season_number || '';
+    let episode = query.episode_number || '';
 
     // If POST, override with body params (more reliable for token passing)
     if (req.method === 'POST') {
@@ -186,6 +188,8 @@ async function handleProxyRoutes(req, res, parsedUrl) {
         if (body.type) type = body.type;
         if (body.limit) limit = body.limit;
         if (body.token) token = body.token;
+        if (body.season_number) season = body.season_number;
+        if (body.episode_number) episode = body.episode_number;
       } catch (e) {}
     }
 
@@ -195,6 +199,8 @@ async function handleProxyRoutes(req, res, parsedUrl) {
     } else if (queryStr) {
       searchUrl += '&query=' + encodeURIComponent(queryStr);
     }
+    if (season) searchUrl += '&season_number=' + encodeURIComponent(season);
+    if (episode) searchUrl += '&episode_number=' + encodeURIComponent(episode);
 
     try {
       const searchResp = await fetchUrl(searchUrl, {
@@ -229,11 +235,11 @@ async function handleProxyRoutes(req, res, parsedUrl) {
       });
       if (dlResp.status !== 200) console.warn('[DOWNLOAD] Status:', dlResp.status);
       // Handle non-JSON responses (503 error pages)
-      let parsedBody;
-      try { parsedBody = JSON.parse(dlResp.body); } catch (e) {
-        parsedBody = { status: dlResp.status, message: 'Download limit reached or service unavailable (503). Free tier allows 20 downloads/day.' };
+      let dlResult;
+      try { dlResult = JSON.parse(dlResp.body); } catch (e) {
+        dlResult = { status: dlResp.status, message: 'Download limit reached or service unavailable (503). Free tier allows 20 downloads/day.' };
       }
-      jsonResponse(res, dlResp.status, parsedBody);
+      jsonResponse(res, dlResp.status, dlResult);
     } catch (e) {
 
       sendError(res, 502, 'OpenSubtitles download failed: ' + e.message);

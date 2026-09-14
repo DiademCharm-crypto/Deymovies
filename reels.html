@@ -1271,6 +1271,9 @@
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(xmlText, 'text/xml');
+        // Collect impression + start pixels (network counts views ONLY when these fire)
+        reelTracking.impressions = Array.from(doc.querySelectorAll('Impression')).map(function (n) { return n.textContent.trim(); }).filter(Boolean);
+        reelTracking.start = Array.from(doc.querySelectorAll('Tracking[event="start"]')).map(function (n) { return n.textContent.trim(); }).filter(Boolean);
         const mediaFiles = doc.querySelectorAll('MediaFile');
         for (const mf of mediaFiles) {
           const type = mf.getAttribute('type') || '';
@@ -1283,6 +1286,17 @@
         }
       } catch (e) {}
       return null;
+    }
+
+    // Fire tracking pixels (impression counting)
+    let reelTracking = { impressions: [], start: [], fired: new Set() };
+    function fireReelPixels(list) {
+      (list || []).forEach(function (url) {
+        if (!url || reelTracking.fired.has(url)) return;
+        reelTracking.fired.add(url);
+        try { new Image().src = url; } catch (e) {}
+        try { fetch(url, { mode: 'no-cors' }).catch(function () {}); } catch (e) {}
+      });
     }
 
     async function showReelAd(index) {
@@ -1303,32 +1317,48 @@
       skipBtn.classList.remove('visible');
       progress.style.width = '0%';
 
+      // Safety net: if the ad request stalls, clear the overlay after 10s
+      const stallGuard = setTimeout(() => { if (overlay.classList.contains('active') && !adVideo.src) skipReelAd(index); }, 10000);
+
       try {
         const resp = await fetch(REEL_VAST_URL);
         const xmlText = await resp.text();
         const videoUrl = await parseVastXml(xmlText);
-        if (!videoUrl) { skipReelAd(index); return; }
+        if (!videoUrl) { clearTimeout(stallGuard); skipReelAd(index); return; }
 
         adVideo.src = videoUrl;
         adVideo.load();
+
+        // Fire impression pixels the moment the ad truly starts rendering
+        adVideo.addEventListener('playing', function onReelAdPlaying() {
+          adVideo.removeEventListener('playing', onReelAdPlaying);
+          fireReelPixels(reelTracking.impressions);
+          fireReelPixels(reelTracking.start);
+          console.log('[VAST] Reel ad impression fired to ad network');
+        });
 
         adVideo.oncanplay = function() {
           const playPromise = adVideo.play();
           if (playPromise) {
             playPromise.then(() => {
-              let timeLeft = 5;
-              timer.textContent = 'Skip in ' + timeLeft + 's';
-              const countdown = setInterval(() => {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                  clearInterval(countdown);
+              // 7-second skip timer driven by the ad's own currentTime —
+              // stays accurate even if the browser throttles background timers
+              let lastCount = 7;
+              timer.textContent = 'Skip in 7s';
+              const tick = () => {
+                const remain = Math.ceil(7 - adVideo.currentTime);
+                if (remain > 0) {
+                  if (remain !== lastCount) { lastCount = remain; timer.textContent = 'Skip in ' + remain + 's'; }
+                } else if (!skipBtn.classList.contains('visible')) {
+                  clearInterval(adVideo._reelAdTimer);
                   skipBtn.classList.add('visible');
                   timer.textContent = 'You can skip now';
-                } else {
-                  timer.textContent = 'Skip in ' + timeLeft + 's';
                 }
-              }, 1000);
-              skipBtn.classList.add('visible');
+              };
+              clearInterval(adVideo._reelAdTimer);
+              adVideo._reelAdTimer = setInterval(tick, 250);
+              adVideo.addEventListener('timeupdate', tick);
+              tick();
             }).catch(() => {
               timer.textContent = 'Tap to play ad';
               adVideo.controls = true;
@@ -1354,7 +1384,7 @@
       const adVideo = document.getElementById('reel-vast-video-' + index);
       const video = document.getElementById('video-' + index);
       if (overlay) overlay.classList.remove('active');
-      if (adVideo) { adVideo.pause(); adVideo.removeAttribute('src'); adVideo.load(); }
+      if (adVideo) { clearInterval(adVideo._reelAdTimer); adVideo.pause(); adVideo.removeAttribute('src'); adVideo.load(); }
       if (video) video.play().catch(() => {});
     }
 
