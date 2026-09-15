@@ -154,7 +154,7 @@ const movies = [
     title: "Ma'am Chief: Shakedown in Seoul", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uCUgMEGPbZrnGLDjDXRteffT9JM.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Maam.Chief.Shakedown.in.Seoul.2023-1080p(1).mkv",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Maam.Chief.Shakedown.in.Seoul.2023-1080p(1).mp4",
     trailerEmbed: "",
     isSeries: false
   },
