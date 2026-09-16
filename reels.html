@@ -644,6 +644,14 @@
   <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
 
   <script src="config.js"></script>
+  <script>
+    // Backend base: '' = same origin; or full URL of the host running proxy-server.js
+    // (set window.__DEYMFLIX_CONFIG__.API_BASE in config.js for static hosting).
+    window.__API_BASE__ = (function () {
+      try { return (window.__DEYMFLIX_CONFIG__ && window.__DEYMFLIX_CONFIG__.API_BASE) || ''; }
+      catch (e) { return ''; }
+    })();
+  </script>
   <script src="security.js"></script>
   <script src="reels-data.js?v=151.0"></script>
   <script src="app.js?v=153.0"></script>
@@ -1265,7 +1273,7 @@
 
     // ── Reel VAST Ad System (portrait mode) ──
     let reelAdPlayed = new Set(); // Track which reels already showed an ad
-    const REEL_VAST_URL = '/api/vast';
+    const REEL_VAST_URL = (window.__API_BASE__ || '') + '/api/vast';
 
     async function parseVastXml(xmlText) {
       try {

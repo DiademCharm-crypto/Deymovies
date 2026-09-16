@@ -1436,6 +1436,194 @@
       display: none !important;
     }
 
+    /* ══════════════════════════════════════════════════════════════════
+       MOBILE (below 1024px): the same details as PC but WITHOUT the
+       poster — release date + runtime, rating and the Info / Cast tabs.
+       Each piece only appears once its data has arrived, so when the
+       lookup fails the classic mobile info box is untouched.
+       ══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1023.98px) {
+      /* the plain synopsis + Read More are replaced by the Info panel */
+      .video-info-box.pc-details-ready > #current-description,
+      .video-info-box.pc-details-ready > #toggle-synopsis-btn {
+        display: none !important;
+      }
+
+      .pc-meta-row.is-ready {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        margin: 2px 0 10px 0 !important;
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.82rem !important;
+        font-weight: 500 !important;
+      }
+
+      .pc-meta-row.is-ready > span:not(:first-child)::before {
+        content: '';
+        display: inline-block;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      .pc-meta-row.is-ready > span[style*="display: none"]::before { display: none; }
+
+      .pc-rating-row.is-ready {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 0 0 12px 0 !important;
+      }
+
+      .pc-score {
+        min-width: 40px;
+        text-align: center;
+        background: #17181d !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        font-size: 0.92rem !important;
+        padding: 6px 10px !important;
+        border-radius: 8px !important;
+      }
+
+      .pc-stars { font-size: 0.9rem !important; letter-spacing: 2px !important; }
+      .pc-star { color: rgba(255, 255, 255, 0.22) !important; }
+      .pc-star.on { color: #e50914 !important; }
+      .pc-votes { font-size: 0.75rem !important; color: rgba(255, 255, 255, 0.5) !important; }
+
+      .pc-tabs.is-ready {
+        display: flex !important;
+        gap: 2px !important;
+        margin: 12px 0 0 0 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+      }
+
+      .pc-tab {
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 2px solid transparent !important;
+        font-family: inherit !important;
+        color: rgba(255, 255, 255, 0.65) !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        padding: 11px 18px !important;
+        cursor: pointer !important;
+        transition: color 0.15s ease, background 0.15s ease !important;
+      }
+
+      .pc-tab:hover { color: #ffffff !important; }
+
+      .pc-tab.is-active {
+        background: #e50914 !important;
+        color: #ffffff !important;
+        border-bottom-color: #e50914 !important;
+        border-radius: 4px 4px 0 0 !important;
+      }
+
+      .pc-panel.is-active { display: block !important; padding: 16px 0 6px 0 !important; }
+
+      .pc-panel-title {
+        font-size: 0.96rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        margin: 0 0 10px 0 !important;
+      }
+
+      .pc-panel-text {
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+        margin: 0 0 16px 0 !important;
+      }
+
+      .pc-stills {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+      }
+
+      .pc-stills:empty { display: none !important; }
+
+      .pc-stills img {
+        width: 100% !important;
+        aspect-ratio: 16 / 9 !important;
+        object-fit: cover !important;
+        display: block !important;
+        border-radius: 7px !important;
+        background: #14090b !important;
+      }
+
+      .pc-people-group.is-ready { display: block !important; margin-bottom: 20px !important; }
+
+      .pc-people-grid,
+      .pc-cast-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0 14px !important;
+      }
+
+      .pc-person {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 8px 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        min-width: 0 !important;
+      }
+
+      .pc-person-photo {
+        width: 44px !important;
+        height: 44px !important;
+        flex: 0 0 44px !important;
+        border-radius: 7px !important;
+        object-fit: cover !important;
+        object-position: center top !important;
+        background: #221012 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+
+      .pc-person-initials {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: rgba(255, 255, 255, 0.55) !important;
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+      }
+
+      .pc-person-name {
+        color: #ffffff !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .pc-person-role {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+    }
+
+    /* very narrow phones: single-column cast list */
+    @media (max-width: 419.98px) {
+      .pc-people-grid,
+      .pc-cast-grid { grid-template-columns: 1fr !important; }
+    }
+
     @media (min-width: 1024px) {
       /* poster column + info column */
       .pc-main .video-info-box {
@@ -2085,6 +2273,14 @@
 
   <!-- SCRIPT INCLUSIONS -->
   <script src="config.js"></script>
+  <script>
+    // Backend base: '' = same origin; or full URL of the host running proxy-server.js
+    // (set window.__DEYMFLIX_CONFIG__.API_BASE in config.js for static hosting).
+    window.__API_BASE__ = (function () {
+      try { return (window.__DEYMFLIX_CONFIG__ && window.__DEYMFLIX_CONFIG__.API_BASE) || ''; }
+      catch (e) { return ''; }
+    })();
+  </script>
   <script src="security.js"></script>
   <script src="app.js?v=153.0"></script>
   <script src="episodes.js?v=1.0"></script>
@@ -2219,12 +2415,18 @@
 
     function checkSynopsisLength() {
       setTimeout(() => {
-        if (descElement.scrollHeight > descElement.clientHeight || descElement.textContent.length > 150) {
-          readMoreBtn.style.display = 'inline-block';
-        } else {
-          readMoreBtn.style.display = 'none';
-        }
+        // Show the toggle ONLY when the text actually overflows the 3-line
+        // clamp — short synopses that fit within 3 lines get no button.
+        // (2px tolerance for browser rounding.)
+        const overflows = descElement.scrollHeight - descElement.clientHeight > 2;
+        readMoreBtn.style.display = overflows ? 'inline-block' : 'none';
       }, 50);
+    }
+
+    // Web fonts can change line wrapping after the first check — re-check
+    // once fonts are ready so the button never appears/disappears wrongly.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { checkSynopsisLength(); }).catch(function () {});
     }
 
     function toggleSynopsis() {
@@ -2366,7 +2568,7 @@
       if (currentMovie.imdbId) {
         try {
           const tmdbRes = await fetchWithTimeout(
-            '/api/tmdb/movie/' + currentMovie.imdbId,
+            (window.__API_BASE__ || '') + '/api/tmdb/movie/' + currentMovie.imdbId,
             5000
           );
           if (tmdbRes.ok) {
@@ -2680,8 +2882,206 @@
       if (box) box.classList.add('pc-details-ready');
     }
 
+    /* ── Backend-free fallback: query Wikidata straight from the browser ──
+       GitHub Pages, Live Server and file:// have no proxy-server.js behind
+       them, so the /api/tmdb/details call can never answer there. Wikidata's
+       API is CORS-open (origin=*), so we replicate the server's lookup in
+       the browser: same payload shape, same title/year guards. This makes
+       cast, rating and release date work on ANY hosting, even static. */
+    const WD_API_URL = 'https://www.wikidata.org/w/api.php';
+
+    async function wdDirectJson(url) {
+      const r = await fetch(url + (url.indexOf('?') === -1 ? '?' : '&') + 'origin=*');
+      if (!r.ok) throw new Error('Wikidata HTTP ' + r.status);
+      return r.json();
+    }
+
+    function wdNormalizeTitle(s) {
+      return String(s || '').toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    function titlesMatchClient(hint, got) {
+      const h = wdNormalizeTitle(hint), g = wdNormalizeTitle(got);
+      if (!h || !g) return true;
+      if (h === g) return true;
+      if (g.indexOf(h) !== -1 || h.indexOf(g) !== -1) return true;
+      const hs = new Set(h.split(' ')), gs = new Set(g.split(' '));
+      let shared = 0;
+      hs.forEach(function (t) { if (gs.has(t)) shared++; });
+      const smaller = Math.min(hs.size, gs.size) || 1;
+      return (shared / smaller) > 0.5;
+    }
+
+    function wdIds(entity, prop) {
+      const out = [];
+      (((entity.claims || {})[prop]) || []).forEach(function (c) {
+        const v = c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+        if (v && v.id) out.push(v.id);
+      });
+      return out;
+    }
+    function wdStr(entity, prop) {
+      const cl = ((entity.claims || {})[prop]) || [];
+      for (let i = 0; i < cl.length; i++) {
+        const v = cl[i].mainsnak && cl[i].mainsnak.datavalue && cl[i].mainsnak.datavalue.value;
+        if (typeof v === 'string' && v) return v;
+      }
+      return '';
+    }
+    function wdAmt(entity, prop) {
+      const cl = ((entity.claims || {})[prop]) || [];
+      for (let i = 0; i < cl.length; i++) {
+        const v = cl[i].mainsnak && cl[i].mainsnak.datavalue && cl[i].mainsnak.datavalue.value;
+        if (v && typeof v.amount !== 'undefined') return Math.round(parseFloat(v.amount)) || 0;
+      }
+      return 0;
+    }
+    function wdTime(entity, prop) {
+      const cl = ((entity.claims || {})[prop]) || [];
+      for (let i = 0; i < cl.length; i++) {
+        const v = cl[i].mainsnak && cl[i].mainsnak.datavalue && cl[i].mainsnak.datavalue.value;
+        if (v && v.time) {
+          const m = String(v.time).match(/(\d{4})-(\d{2})-(\d{2})/);
+          if (m) return (m[2] === '00' || m[3] === '00') ? m[1] + '-01-01' : m[1] + '-' + m[2] + '-' + m[3];
+        }
+      }
+      return '';
+    }
+    function wdScoreOf(entity) {
+      const cl = ((entity.claims || {})['P444']) || [];
+      for (let i = 0; i < cl.length; i++) {
+        const v = cl[i].mainsnak && cl[i].mainsnak.datavalue && cl[i].mainsnak.datavalue.value;
+        if (typeof v !== 'string') continue;
+        const m = v.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+)/);
+        if (!m) continue;
+        const num = parseFloat(m[1]), den = parseFloat(m[2]);
+        if (den === 10) return num;
+        if (den === 100) return Math.round((num / 10) * 10) / 10;
+      }
+      return 0;
+    }
+    function wdCastOf(entity) {
+      const out = [];
+      (((entity.claims || {})['P161']) || []).forEach(function (c) {
+        const v = c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+        if (!v || !v.id) return;
+        const q = c.qualifiers || {};
+        let character = '';
+        const rt = q.P4633 && q.P4633[0] && q.P4633[0].datavalue && q.P4633[0].datavalue.value;
+        const ri = q.P453 && q.P453[0] && q.P453[0].datavalue && q.P453[0].datavalue.value;
+        if (typeof rt === 'string') character = rt;
+        else if (ri && ri.id) character = '§' + ri.id;
+        out.push({ person: v.id, character: character });
+      });
+      return out;
+    }
+
+    async function fetchWikidataDirect(movie, imdbId) {
+      try {
+        const wantTitle = (movie.title || '').trim();
+        const year = parseInt(getMovieYear(movie), 10) || 0;
+
+        // 1) entity by IMDB id, 2) search by title (film, then TV)
+        let candidates = [];
+        if (/^tt\d{5,}$/.test(imdbId)) {
+          try {
+            const s = await wdDirectJson(WD_API_URL + '?action=query&list=search&format=json&srlimit=1&srsearch=' +
+              encodeURIComponent('haswbstatement:P345=' + imdbId));
+            candidates = (((s.query || {}).search) || []).slice();
+          } catch (e) {}
+        }
+        if (!candidates.length && wantTitle) {
+          const s = await wdDirectJson(WD_API_URL + '?action=query&list=search&format=json&srlimit=8&srsearch=' +
+            encodeURIComponent(wantTitle + ' haswbstatement:P31=Q11424'));
+          candidates = (((s.query || {}).search) || []).slice();
+          if (!candidates.length) {
+            const tv = await wdDirectJson(WD_API_URL + '?action=query&list=search&format=json&srlimit=8&srsearch=' +
+              encodeURIComponent(wantTitle + ' haswbstatement:P31=Q5398426'));
+            candidates = (((tv.query || {}).search) || []).slice();
+          }
+        }
+        if (!candidates.length) return null;
+
+        const ids = candidates.slice(0, 8).map(function (c) { return c.title; }).join('|');
+        const ents = await wdDirectJson(WD_API_URL + '?action=wbgetentities&format=json&props=claims|labels&languages=en&ids=' + encodeURIComponent(ids));
+        const pool = ents.entities || {};
+
+        let chosen = null;
+        for (let i = 0; i < candidates.length && i < 8; i++) {
+          const e = pool[candidates[i].title];
+          if (!e) continue;
+          const label = (e.labels && e.labels.en && e.labels.en.value) || '';
+          if (wantTitle && !titlesMatchClient(wantTitle, label)) continue;
+          if (year) {
+            const py = parseInt(wdTime(e, 'P577').slice(0, 4), 10) || 0;
+            if (py && Math.abs(py - year) > 2) continue;
+          }
+          chosen = e;
+          break;
+        }
+        if (!chosen) return null;
+
+        const dirIds = wdIds(chosen, 'P57');
+        const genreIds = wdIds(chosen, 'P136');
+        const castRaw = wdCastOf(chosen);
+
+        // batch-fetch labels (+ P18 photos) for everyone referenced
+        const labelIds = dirIds.concat(genreIds);
+        castRaw.forEach(function (c) {
+          labelIds.push(c.person);
+          if (c.character.charAt(0) === '§') labelIds.push(c.character.slice(1));
+        });
+        const uniq = Array.from(new Set(labelIds.filter(Boolean))).slice(0, 40);
+        const labels = {}, photos = {};
+        if (uniq.length) {
+          const pj = await wdDirectJson(WD_API_URL + '?action=wbgetentities&format=json&props=labels|claims&languages=en&ids=' + encodeURIComponent(uniq.join('|')));
+          Object.keys(pj.entities || {}).forEach(function (id) {
+            const pe = pj.entities[id];
+            labels[id] = (pe.labels && pe.labels.en && pe.labels.en.value) || '';
+            const img = wdStr(pe, 'P18');
+            if (img) {
+              photos[id] = 'https://commons.wikimedia.org/wiki/Special:FilePath/' +
+                encodeURIComponent(String(img).replace(/ /g, '_')) + '?width=200';
+            }
+          });
+        }
+
+        const tidyGenre = function (s) {
+          const t = String(s || '').trim().replace(/\s+(film|movie|television series|series)$/i, '');
+          return t.replace(/\b[a-z]/g, function (ch) { return ch.toUpperCase(); });
+        };
+        const castOut = [];
+        castRaw.forEach(function (c) {
+          const name = labels[c.person] || '';
+          if (!name) return;
+          const role = c.character.charAt(0) === '§' ? (labels[c.character.slice(1)] || '') : c.character;
+          castOut.push({ name: name, character: role, photo: photos[c.person] || '' });
+        });
+
+        return {
+          found: true,
+          source: 'wikidata-direct',
+          tmdbId: null,
+          imdbId: imdbId,
+          title: (chosen.labels && chosen.labels.en && chosen.labels.en.value) || wantTitle,
+          releaseDate: wdTime(chosen, 'P577'),
+          runtime: wdAmt(chosen, 'P2047'),
+          score: wdScoreOf(chosen),
+          votes: 0,
+          genres: Array.from(new Set(genreIds.map(function (g) { return tidyGenre(labels[g]); }).filter(Boolean))).slice(0, 4),
+          overview: '',
+          poster: '',
+          backdrop: '',
+          director: dirIds.map(function (d) { return labels[d]; }).filter(Boolean),
+          cast: castOut.slice(0, 12),
+          stills: []
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function loadPcDetails() {
-      if (pcDetailsLoaded || !pcIsDesktop()) return;
+      if (pcDetailsLoaded) return;
       const movie = currentMovie;
       if (!movie || movie._episodeNum) return; // episodes keep the series layout
       const imdbId = movie.imdbId ? String(movie.imdbId) : '';
@@ -2701,8 +3101,13 @@
 
       if (!data) {
         try {
-          const titleHint = movie.title ? ('?title=' + encodeURIComponent(movie.title)) : '';
-          const resp = await fetch('/api/tmdb/details/' + encodeURIComponent(imdbId) + titleHint);
+          const params = new URLSearchParams();
+          if (movie.title) params.set('title', movie.title);
+          // year disambiguates same-title films (remakes, different movies)
+          const yHint = getMovieYear(movie);
+          if (yHint) params.set('year', yHint);
+          const qs = params.toString();
+          const resp = await fetch((window.__API_BASE__ || '') + '/api/tmdb/details/' + encodeURIComponent(imdbId) + (qs ? '?' + qs : ''));
           if (resp.ok) {
             data = await resp.json();
             if (data && data.found) {
@@ -2711,6 +3116,15 @@
           }
         } catch (e) {
           data = null;
+        }
+      }
+
+      if (!data || !data.found) {
+        // No backend behind this page (GitHub Pages / Live Server / file://)?
+        // Ask Wikidata directly from the browser — same data, key-free.
+        try { data = await fetchWikidataDirect(movie, imdbId); } catch (e) { data = null; }
+        if (data && data.found) {
+          try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data: data })); } catch (e) {}
         }
       }
 
@@ -3028,7 +3442,7 @@
       } catch (e) {}
       try {
         const res = await fetchWithTimeout(
-          '/api/tmdb/movie/' + movie.imdbId,
+          (window.__API_BASE__ || '') + '/api/tmdb/movie/' + movie.imdbId,
           5000
         );
         if (!res.ok) return '';
@@ -3044,7 +3458,7 @@
     // OpenSubtitles credentials stay server-side in proxy-server.js.
     // The browser talks only to our proxy — the API key, username and
     // password never reach the client.
-    const OS_API = '/api/opensubtitles';
+    const OS_API = (window.__API_BASE__ || '') + '/api/opensubtitles';
 
     async function osFetch(path, options = {}) {
       return fetch(OS_API + path, options);
@@ -3162,7 +3576,7 @@
         } catch (e) {
           // CORS block — try through proxy
           try {
-            const srtRes2 = await fetch('/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
+            const srtRes2 = await fetch((window.__API_BASE__ || '') + '/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
             if (srtRes2.ok) srtText = await srtRes2.text();
           } catch (e2) {}
         }
@@ -3706,7 +4120,7 @@
           if (srtRes.ok) srtText = await srtRes.text();
         } catch (e) {
           try {
-            const srtRes2 = await fetch('/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
+            const srtRes2 = await fetch((window.__API_BASE__ || '') + '/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
             if (srtRes2.ok) srtText = await srtRes2.text();
           } catch (e2) {}
         }
@@ -4646,7 +5060,7 @@
         // Fetch VAST tag through our server-side proxy (avoids CORS)
         let resp;
         try {
-          resp = await fetch('/api/vast');
+          resp = await fetch((window.__API_BASE__ || '') + '/api/vast');
         } catch (err) {
           console.warn('[VAST] Proxy fetch failed:', err);
           return null;

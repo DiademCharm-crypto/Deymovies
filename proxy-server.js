@@ -270,27 +270,41 @@ async function buildWdPayload(entity, qid, imdbId) {
 
 // Key-free fallback: find a film/TV entity by title when the IMDB id is unknown.
 // Wikidata's `haswbstatement` filter keeps the search to actual films/series.
-async function wikidataDetailsForTitle(title) {
+// Search ranking is unreliable ("The Runner" surfaces "Blade Runner 2049" first),
+// so we walk the candidates and return the first whose title (and, when known,
+// release year) actually matches — never the first raw hit.
+async function wikidataDetailsForTitle(title, yearHint) {
   try {
-    let hit = null;
-    const film = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=3&srsearch=' +
+    let candidates = [];
+    // srlimit=8: brand-new films rank below classics ("The Odyssey" search
+    // surfaces the 1997 TV film before Nolan's 2026 one), so fetch a wider
+    // pool and disambiguate by title/year ourselves.
+    const film = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=8&srsearch=' +
       encodeURIComponent(title + ' haswbstatement:P31=Q11424'));
-    hit = ((film.query && film.query.search) || [])[0];
-    if (!hit) {
-      const tv = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=3&srsearch=' +
+    candidates = ((film.query && film.query.search) || []).slice();
+    if (!candidates.length) {
+      const tv = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=8&srsearch=' +
         encodeURIComponent(title + ' haswbstatement:P31=Q5398426'));
-      hit = ((tv.query && tv.query.search) || [])[0];
+      candidates = ((tv.query && tv.query.search) || []).slice();
     }
-    if (!hit) return null;
 
-    const qid = hit.title;
-    const ent = await wdJson(WD_API + '?action=wbgetentities&format=json&props=claims|labels&languages=en&ids=' + qid);
-    const entity = (ent.entities || {})[qid];
-    if (!entity) return null;
-    const payload = await buildWdPayload(entity, qid, '');
-    // Text search can surface a similar-but-different film — verify the title
-    if (!titlesMatch(title, payload.title)) return null;
-    return payload;
+    for (let i = 0; i < candidates.length && i < 8; i++) {
+      const qid = candidates[i].title;
+      const ent = await wdJson(WD_API + '?action=wbgetentities&format=json&props=claims|labels&languages=en&ids=' + qid);
+      const entity = (ent.entities || {})[qid];
+      if (!entity) continue;
+      const payload = await buildWdPayload(entity, qid, '');
+      // Text search can surface a similar-but-different film — verify the title
+      if (!titlesMatch(title, payload.title)) continue;
+      // Same title but a different film (e.g. 2015 "The Runner" vs 2026's)?
+      // Reject when the client-provided year clearly disagrees.
+      if (yearHint) {
+        const py = parseInt(String(payload.releaseDate || '').slice(0, 4), 10) || 0;
+        if (py && Math.abs(py - yearHint) > 2) continue;
+      }
+      return payload;
+    }
+    return null;
   } catch (e) {
     return null;
   }
@@ -578,6 +592,8 @@ async function handleProxyRoutes(req, res, parsedUrl) {
     if (!/^tt\d{5,}$/.test(rawId)) return sendError(res, 400, 'Invalid IMDB ID');
     // Optional title hint (?title=...) helps find movies whose id is unknown/invalid
     const titleHint = String((parsedUrl.query && parsedUrl.query.title) || '').trim();
+    // Optional year hint (?year=2026) rejects same-title-different-film matches
+    const yearHint = parseInt(String((parsedUrl.query && parsedUrl.query.year) || ''), 10) || 0;
 
     try {
       const cached = tmdbCacheGet(rawId);
@@ -615,12 +631,13 @@ async function handleProxyRoutes(req, res, parsedUrl) {
         } catch (e) {}
       }
 
-      // 3) TMDB search by title
+      // 3) TMDB search by title (year narrows same-title remakes)
       if (!tmdbId && keyWorks && titleHint) {
         try {
           const s = await fetchUrl(
             'https://api.themoviedb.org/3/search/movie?api_key=' + SECRETS.TMDB_API_KEY +
-            '&language=en-US&query=' + encodeURIComponent(titleHint)
+            '&language=en-US&query=' + encodeURIComponent(titleHint) +
+            (yearHint ? '&year=' + yearHint : '')
           );
           if (s.status === 200) {
             const sj = JSON.parse(s.body);
@@ -679,10 +696,10 @@ async function handleProxyRoutes(req, res, parsedUrl) {
 
       // 4) Key-free fallbacks: Wikidata by IMDB id, then by title
       let alt = null;
-      try { alt = await wikidataDetailsForImdb(rawId); } catch (e) {}
+      try { alt = await wikidataDetailsForImdb(rawId); } catch (e) { console.warn('[WD] id lookup failed:', e.message); }
       if (alt && titleHint && !titlesMatch(titleHint, alt.title)) alt = null;
       if (!alt && titleHint) {
-        try { alt = await wikidataDetailsForTitle(titleHint); } catch (e) {}
+        try { alt = await wikidataDetailsForTitle(titleHint, yearHint); } catch (e) { console.warn('[WD] title lookup failed:', e.message); }
       }
       const out = alt || { found: false };
       // Cache only positive results — a failed lookup should retry later
