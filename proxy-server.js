@@ -16,7 +16,8 @@ const SECRETS = {
   OPENSUBTITLES_API_KEY: 'g0lXqsvA4zs8XdeLhj2eBf62PJnaLIr5',
   OPENSUBTITLES_USERNAME: 'deymflix',
   OPENSUBTITLES_PASSWORD: 'Chambe09',
-  TMDB_API_KEY: '15d260044e350723365198253b23914f',
+  // Optional: set TMDB_API_KEY in the environment to override the key below.
+  TMDB_API_KEY: process.env.TMDB_API_KEY || '15d260044e350723365198253b23914f',
   VAST_TAG_URL: 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB',
   FIREBASE_CONFIG: {
     apiKey: 'AIzaSyCSejdiwh4Y6N6Pwl6QyLXPNYdUqz8vc1M',
@@ -28,6 +29,273 @@ const SECRETS = {
     measurementId: 'G-H8KMTM5YYH'
   }
 };
+
+// ============ SIMPLE IN-MEMORY CACHE ============
+// Movie metadata barely changes, so cache it instead of hammering TMDB
+// (and to keep the player responsive on repeat visits).
+const TMDB_DETAILS_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const tmdbDetailsCache = new Map();
+
+function tmdbCacheGet(key) {
+  const hit = tmdbDetailsCache.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.at > TMDB_DETAILS_TTL_MS) {
+    tmdbDetailsCache.delete(key);
+    return null;
+  }
+  return hit.value;
+}
+
+function tmdbCacheSet(key, value) {
+  tmdbDetailsCache.set(key, { at: Date.now(), value: value });
+  if (tmdbDetailsCache.size > 500) {
+    let oldestKey = null, oldestAt = Infinity;
+    tmdbDetailsCache.forEach(function (v, k) { if (v.at < oldestAt) { oldestAt = v.at; oldestKey = k; } });
+    if (oldestKey) tmdbDetailsCache.delete(oldestKey);
+  }
+}
+
+// ============ MOVIE DETAILS HELPERS ============
+// Two sources, best first:
+//   1) TMDB     — rating + votes, cast with photos/roles, stills (needs a valid key)
+//   2) Wikidata — key-free fallback: release date, runtime, genres, director,
+//                 cast + roles, and cast portraits from Wikimedia Commons
+// Both produce the SAME payload shape, so the player never needs to know which
+// source answered. When the TMDB key is missing/expired we simply fall through.
+
+const WD_API = 'https://www.wikidata.org/w/api.php';
+const WD_UA = 'Deymflix/1.0 (movie metadata lookup)';
+
+async function wdJson(targetUrl) {
+  const r = await fetchUrl(targetUrl, {
+    headers: { 'User-Agent': WD_UA, 'Accept': 'application/json' }
+  });
+  if (r.status !== 200) throw new Error('Wikidata HTTP ' + r.status);
+  return JSON.parse(r.body);
+}
+
+// Entity-valued claims (e.g. director → Q-id)
+function wdEntityIds(entity, prop) {
+  const ids = [];
+  const claims = (entity.claims && entity.claims[prop]) || [];
+  claims.forEach(function (c) {
+    const v = c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+    if (v && v['entity-type'] && v.id) ids.push(v.id);
+  });
+  return ids;
+}
+
+// String-valued claims (e.g. Commons image filename → P18)
+function wdStringValue(entity, prop) {
+  const claims = (entity.claims && entity.claims[prop]) || [];
+  for (let i = 0; i < claims.length; i++) {
+    const v = claims[i].mainsnak && claims[i].mainsnak.datavalue && claims[i].mainsnak.datavalue.value;
+    if (typeof v === 'string' && v) return v;
+  }
+  return '';
+}
+
+function wdQuantity(entity, prop) {
+  const claims = (entity.claims && entity.claims[prop]) || [];
+  for (let i = 0; i < claims.length; i++) {
+    const v = claims[i].mainsnak && claims[i].mainsnak.datavalue && claims[i].mainsnak.datavalue.value;
+    if (v && typeof v.amount !== 'undefined') return Math.round(parseFloat(v.amount)) || 0;
+  }
+  return 0;
+}
+
+function wdDate(entity, prop) {
+  const claims = (entity.claims && entity.claims[prop]) || [];
+  for (let i = 0; i < claims.length; i++) {
+    const v = claims[i].mainsnak && claims[i].mainsnak.datavalue && claims[i].mainsnak.datavalue.value;
+    if (v && v.time) {
+      const m = String(v.time).match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) continue;
+      if (m[2] === '00' || m[3] === '00') return m[1] + '-01-01';
+      return m[1] + '-' + m[2] + '-' + m[3];
+    }
+  }
+  return '';
+}
+
+// Wikidata review scores are strings like "8/10" or "78/100"
+function wdScore(entity) {
+  const claims = (entity.claims && entity.claims['P444']) || [];
+  for (let i = 0; i < claims.length; i++) {
+    const v = claims[i].mainsnak && claims[i].mainsnak.datavalue && claims[i].mainsnak.datavalue.value;
+    if (typeof v !== 'string') continue;
+    const m = v.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+)/);
+    if (!m) continue;
+    const num = parseFloat(m[1]);
+    const den = parseFloat(m[2]);
+    if (den === 10) return num;
+    if (den === 100) return Math.round((num / 10) * 10) / 10;
+  }
+  return 0;
+}
+
+// Cast members plus the character they played, where Wikidata records it.
+// Characters are either a plain string (P4633) or another item (§-prefixed).
+function wdCast(entity) {
+  const claims = (entity.claims && entity.claims['P161']) || [];
+  const out = [];
+  claims.forEach(function (c) {
+    const v = c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+    if (!v || !v.id) return;
+    const q = c.qualifiers || {};
+    let character = '';
+    const roleText = q.P4633 && q.P4633[0] && q.P4633[0].datavalue && q.P4633[0].datavalue.value;
+    const roleItem = q.P453 && q.P453[0] && q.P453[0].datavalue && q.P453[0].datavalue.value;
+    if (typeof roleText === 'string') character = roleText;
+    else if (roleItem && roleItem.id) character = '§' + roleItem.id;
+    out.push({ person: v.id, character: character });
+  });
+  return out;
+}
+
+// Wikidata genre labels are slugs like "action film"/"thriller film" — tidy
+// them so the chips read like normal genre names.
+function tidyWdGenre(label) {
+  let s = String(label || '').trim();
+  if (!s) return '';
+  s = s.replace(/\s+(film|movie|television series|series)$/i, '');
+  return s.replace(/\b[a-z]/g, function (ch) { return ch.toUpperCase(); });
+}
+
+// Free portrait served straight from Wikimedia Commons
+function commonsPhoto(fileName) {
+  if (!fileName) return '';
+  return 'https://commons.wikimedia.org/wiki/Special:FilePath/' +
+    encodeURIComponent(String(fileName).replace(/ /g, '_')) + '?width=200';
+}
+
+// Loose title comparison so a wrong-movie match (a DIFFERENT film with a similar
+// or unrelated title) is rejected, while sequels/subtitles still pass.
+function normalizeTitle(s) {
+  return String(s || '').toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function titlesMatch(hint, got) {
+  const h = normalizeTitle(hint);
+  const g = normalizeTitle(got);
+  if (!h || !g) return true; // no gate when we lack a title
+  if (h === g) return true;
+  if (g.indexOf(h) !== -1 || h.indexOf(g) !== -1) return true;
+  const hs = new Set(h.split(' '));
+  const gs = new Set(g.split(' '));
+  let shared = 0;
+  hs.forEach(function (t) { if (gs.has(t)) shared++; });
+  const smaller = Math.min(hs.size, gs.size) || 1;
+  return (shared / smaller) > 0.5;
+}
+
+async function wikidataDetailsForImdb(imdbId) {
+  const search = await wdJson(WD_API + '?action=query&list=search&format=json&srsearch=' +
+    encodeURIComponent('haswbstatement:P345=' + imdbId));
+  const hit = ((search.query && search.query.search) || [])[0];
+  if (!hit) return null;
+
+  const qid = hit.title;
+  const ent = await wdJson(WD_API + '?action=wbgetentities&format=json&props=claims|labels&languages=en&ids=' + qid);
+  const entity = (ent.entities || {})[qid];
+  if (!entity) return null;
+  return buildWdPayload(entity, qid, imdbId);
+}
+
+// Shared: turn a Wikidata film/series entity into the details payload
+async function buildWdPayload(entity, qid, imdbId) {
+  const directors = wdEntityIds(entity, 'P57');
+  const genres = wdEntityIds(entity, 'P136');
+  const cast = wdCast(entity);
+  const peopleIds = Array.from(new Set(directors.concat(cast.map(function (c) { return c.person; })))).slice(0, 20);
+  const labelIds = Array.from(new Set(genres.concat(cast.map(function (c) {
+    return c.character.charAt(0) === '§' ? c.character.slice(1) : '';
+  })))).filter(Boolean).slice(0, 40);
+
+  const labels = {};
+  const photos = {};
+
+  if (labelIds.length) {
+    const lj = await wdJson(WD_API + '?action=wbgetentities&format=json&props=labels&languages=en&ids=' +
+      encodeURIComponent(labelIds.join('|')));
+    Object.keys(lj.entities || {}).forEach(function (id) {
+      const e = lj.entities[id];
+      labels[id] = (e.labels && e.labels.en && e.labels.en.value) || '';
+    });
+  }
+
+  if (peopleIds.length) {
+    const pj = await wdJson(WD_API + '?action=wbgetentities&format=json&props=labels|claims&languages=en&ids=' +
+      encodeURIComponent(peopleIds.join('|')));
+    Object.keys(pj.entities || {}).forEach(function (id) {
+      const e = pj.entities[id];
+      labels[id] = (e.labels && e.labels.en && e.labels.en.value) || '';
+      const img = wdStringValue(e, 'P18');
+      if (img) photos[id] = commonsPhoto(img);
+    });
+  }
+
+  const castOut = [];
+  cast.forEach(function (c) {
+    const name = labels[c.person] || '';
+    if (!name) return;
+    const role = c.character.charAt(0) === '§'
+      ? (labels[c.character.slice(1)] || '')
+      : c.character;
+    castOut.push({ name: name, character: role, photo: photos[c.person] || '' });
+  });
+
+  return {
+    found: true,
+    source: 'wikidata',
+    tmdbId: null,
+    imdbId: imdbId,
+    title: (entity.labels && entity.labels.en && entity.labels.en.value) || '',
+    releaseDate: wdDate(entity, 'P577'),
+    runtime: wdQuantity(entity, 'P2047'),
+    score: wdScore(entity),
+    votes: 0,
+    genres: Array.from(new Set(genres.map(function (g) { return tidyWdGenre(labels[g]); })
+      .filter(Boolean))).slice(0, 4),
+    overview: '',
+    poster: '',
+    backdrop: '',
+    director: directors.map(function (d) { return labels[d]; }).filter(Boolean),
+    cast: castOut.slice(0, 12),
+    stills: []
+  };
+}
+
+// Key-free fallback: find a film/TV entity by title when the IMDB id is unknown.
+// Wikidata's `haswbstatement` filter keeps the search to actual films/series.
+async function wikidataDetailsForTitle(title) {
+  try {
+    let hit = null;
+    const film = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=3&srsearch=' +
+      encodeURIComponent(title + ' haswbstatement:P31=Q11424'));
+    hit = ((film.query && film.query.search) || [])[0];
+    if (!hit) {
+      const tv = await wdJson(WD_API + '?action=query&list=search&format=json&srlimit=3&srsearch=' +
+        encodeURIComponent(title + ' haswbstatement:P31=Q5398426'));
+      hit = ((tv.query && tv.query.search) || [])[0];
+    }
+    if (!hit) return null;
+
+    const qid = hit.title;
+    const ent = await wdJson(WD_API + '?action=wbgetentities&format=json&props=claims|labels&languages=en&ids=' + qid);
+    const entity = (ent.entities || {})[qid];
+    if (!entity) return null;
+    const payload = await buildWdPayload(entity, qid, '');
+    // Text search can surface a similar-but-different film — verify the title
+    if (!titlesMatch(title, payload.title)) return null;
+    return payload;
+  } catch (e) {
+    return null;
+  }
+}
+
 
 // ============ STATIC FILE MIME TYPES ============
 const MIME = {
@@ -109,10 +377,14 @@ function jsonResponse(res, status, data) {
     'Cache-Control': 'no-cache'
   });
   res.end(JSON.stringify(data));
+  // Return true so callers can `return jsonResponse(...)` to stop the request
+  // from falling through to static-file serving (which would try to write
+  // headers again and crash the process with ERR_HTTP_HEADERS_SENT).
+  return true;
 }
 
 function sendError(res, status, message) {
-  jsonResponse(res, status, { error: message });
+  return jsonResponse(res, status, { error: message });
 }
 
 // ============ PROXY ROUTES ============
@@ -295,6 +567,129 @@ async function handleProxyRoutes(req, res, parsedUrl) {
       jsonResponse(res, tmdbResp.status, JSON.parse(tmdbResp.body));
     } catch (e) {
       sendError(res, 502, 'TMDB external IDs failed: ' + e.message);
+    }
+    return true;
+  }
+
+  // ---- TMDB Full Details (IMDB id → TMDB details + credits + images) ----
+  // /movie/<id> does NOT accept IMDB ids, so resolve it through /find first.
+  if (pathname.startsWith('/api/tmdb/details/')) {
+    const rawId = decodeURIComponent(pathname.split('/api/tmdb/details/')[1] || '').trim().replace(/\/.*$/, '');
+    if (!/^tt\d{5,}$/.test(rawId)) return sendError(res, 400, 'Invalid IMDB ID');
+    // Optional title hint (?title=...) helps find movies whose id is unknown/invalid
+    const titleHint = String((parsedUrl.query && parsedUrl.query.title) || '').trim();
+
+    try {
+      const cached = tmdbCacheGet(rawId);
+      if (cached) return jsonResponse(res, 200, cached);
+
+      // 1) TMDB find by IMDB id (needs a valid key)
+      let tmdbId = null;
+      let keyWorks = false;
+      try {
+        const found = await fetchUrl(
+          'https://api.themoviedb.org/3/find/' + rawId +
+          '?api_key=' + SECRETS.TMDB_API_KEY + '&external_source=imdb_id&language=en-US'
+        );
+        if (found.status === 200) {
+          keyWorks = true;
+          const fj = JSON.parse(found.body);
+          const hit = (fj.movie_results || [])[0] || (fj.tv_results || [])[0];
+          if (hit) tmdbId = hit.id;
+        } else {
+          console.warn('[TMDB] find', rawId, 'status', found.status);
+        }
+      } catch (e) {}
+
+      // 2) This library stores TMDB ids with a "tt" prefix — try /movie/<digits> directly
+      if (!tmdbId && keyWorks) {
+        try {
+          const direct = await fetchUrl(
+            'https://api.themoviedb.org/3/movie/' + rawId.slice(2) +
+            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US'
+          );
+          if (direct.status === 200) {
+            const dj = JSON.parse(direct.body);
+            if (dj && dj.id) tmdbId = dj.id;
+          }
+        } catch (e) {}
+      }
+
+      // 3) TMDB search by title
+      if (!tmdbId && keyWorks && titleHint) {
+        try {
+          const s = await fetchUrl(
+            'https://api.themoviedb.org/3/search/movie?api_key=' + SECRETS.TMDB_API_KEY +
+            '&language=en-US&query=' + encodeURIComponent(titleHint)
+          );
+          if (s.status === 200) {
+            const sj = JSON.parse(s.body);
+            const first = (sj.results || [])[0];
+            if (first) tmdbId = first.id;
+          }
+        } catch (e) {}
+      }
+
+      if (tmdbId) {
+        try {
+          const det = await fetchUrl(
+            'https://api.themoviedb.org/3/movie/' + tmdbId +
+            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US&append_to_response=credits,images'
+          );
+          if (det.status === 200) {
+            const j = JSON.parse(det.body);
+            const credits = j.credits || {};
+            const crew = credits.crew || [];
+            const castRaw = credits.cast || [];
+            const backdrops = (j.images && j.images.backdrops) || [];
+
+            const payload = {
+              found: true,
+              source: 'tmdb',
+              tmdbId: tmdbId,
+              imdbId: rawId,
+              title: j.title || '',
+              releaseDate: j.release_date || '',
+              runtime: j.runtime || 0,
+              score: typeof j.vote_average === 'number' ? j.vote_average : 0,
+              votes: j.vote_count || 0,
+              genres: (j.genres || []).map(function (g) { return g.name; }),
+              overview: j.overview || '',
+              poster: j.poster_path || '',
+              backdrop: j.backdrop_path || '',
+              director: crew.filter(function (c) { return c.job === 'Director'; })
+                           .map(function (c) { return c.name; }),
+              cast: castRaw.slice(0, 12).map(function (c) {
+                return { name: c.name || '', character: c.character || '', photo: c.profile_path || '' };
+              }),
+              stills: backdrops.slice()
+                .sort(function (a, b) { return (b.vote_average || 0) - (a.vote_average || 0); })
+                .slice(0, 6)
+                .map(function (b) { return b.file_path; })
+            };
+
+            // Reject a wrong-movie match (e.g. a different film with a similar title)
+            if (!titleHint || titlesMatch(titleHint, payload.title)) {
+              tmdbCacheSet(rawId, payload);
+              return jsonResponse(res, 200, payload);
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 4) Key-free fallbacks: Wikidata by IMDB id, then by title
+      let alt = null;
+      try { alt = await wikidataDetailsForImdb(rawId); } catch (e) {}
+      if (alt && titleHint && !titlesMatch(titleHint, alt.title)) alt = null;
+      if (!alt && titleHint) {
+        try { alt = await wikidataDetailsForTitle(titleHint); } catch (e) {}
+      }
+      const out = alt || { found: false };
+      // Cache only positive results — a failed lookup should retry later
+      if (out && out.found) tmdbCacheSet(rawId, out);
+      return jsonResponse(res, 200, out);
+    } catch (e) {
+      sendError(res, 502, 'TMDB details failed: ' + e.message);
     }
     return true;
   }

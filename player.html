@@ -1284,6 +1284,383 @@
       transition: width 0.3s linear;
     }
 
+    /* ══════════════════════════════════════════════════════════════════
+       PC (desktop) LAYOUT — two columns:
+         left  : video player + movie info
+         right : "More Like This" rail of wide (landscape) cards
+       Below 1024px the markup collapses back to the existing stacked
+       layout, so mobile/tablet behaviour is untouched.
+       Theme colours are unchanged (dark red base).
+       ══════════════════════════════════════════════════════════════════ */
+    @media (min-width: 1024px) {
+      .pc-layout {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 340px !important;
+        gap: 22px !important;
+        align-items: start !important;
+        max-width: 1560px !important;
+        margin: 0 auto !important;
+        padding: 18px 22px 44px !important;
+        box-sizing: border-box !important;
+      }
+
+      .pc-main {
+        min-width: 0 !important;
+      }
+
+      /* Player fills its column instead of being centred at 80%. */
+      .pc-main .video-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+      }
+
+      /* Keep real fullscreen edge-to-edge (these rules come after the
+         earlier fullscreen block, so re-assert what matters here). */
+      .pc-main .video-container:fullscreen,
+      .pc-main .video-container:-webkit-full-screen,
+      .pc-main .video-container.fullscreen-active {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Movie info sits directly beneath the player. */
+      .pc-main .video-info-box {
+        margin-top: 20px !important;
+      }
+
+      /* ── right rail ── */
+      .pc-aside {
+        position: sticky !important;
+        top: 18px !important;
+        max-height: calc(100vh - 36px) !important;
+        max-height: calc(100dvh - 36px) !important;
+        overflow-y: auto !important;
+        scrollbar-width: none;
+        padding-right: 2px !important;
+        box-sizing: border-box !important;
+      }
+
+      .pc-aside::-webkit-scrollbar {
+        display: none;
+      }
+
+      .pc-aside .content-section {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Slim section label — the rail is mostly artwork. */
+      .pc-aside .section-header-title {
+        font-size: 1rem !important;
+        margin-bottom: 12px !important;
+      }
+
+      /* Vertical rail of wide cards. */
+      .pc-aside .list-recommendations {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        cursor: default !important;
+      }
+
+      .pc-aside .recommendation-card {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        aspect-ratio: 16 / 9 !important;
+        border-radius: 9px !important;
+      }
+
+      .pc-aside .recommendation-card:hover {
+        transform: none !important;
+        border-color: #e50914 !important;
+      }
+
+      .pc-aside .recommendation-card img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+      }
+
+      /* Title overlaid on the artwork, bottom-left. */
+      .pc-aside .rec-info {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 28px 12px 10px !important;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.82) 100%) !important;
+        gap: 1px !important;
+      }
+
+      /* Wrap to at most two lines instead of cutting the title with "…". */
+      .pc-aside .rec-title {
+        font-size: 0.92rem !important;
+        line-height: 1.25 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+        white-space: normal !important;
+        text-overflow: clip !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .pc-aside .rec-genre {
+        font-size: 0.74rem !important;
+        opacity: 0.85 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       PC ONLY movie detail block — poster beside the title, release date,
+       runtime, rating, genres and the Info / Cast tabs.
+       Everything here is hidden on mobile/tablet: the stacked info box is
+       used there exactly as before. The ≥1024px block below reveals each
+       piece only after its data has arrived (classes .is-ready/.is-active).
+       ══════════════════════════════════════════════════════════════════ */
+    .pc-hero-poster,
+    .pc-meta-row,
+    .pc-rating-row,
+    .pc-tabs,
+    .pc-panel,
+    .pc-people-group {
+      display: none !important;
+    }
+
+    @media (min-width: 1024px) {
+      /* poster column + info column */
+      .pc-main .video-info-box {
+        display: grid !important;
+        grid-template-columns: 178px minmax(0, 1fr) !important;
+        column-gap: 22px !important;
+        row-gap: 0 !important;
+        align-items: start !important;
+        max-width: 100% !important;
+        margin: 20px 0 0 0 !important;
+        padding: 16px 0 0 0 !important;
+      }
+
+      .pc-main .video-info-box > .pc-hero-poster { grid-column: 1; grid-row: 1 / span 5; }
+      .pc-main .video-info-box > .title-row { grid-column: 2; }
+      .pc-main .video-info-box > .pc-meta-row,
+      .pc-main .video-info-box > .pc-rating-row,
+      .pc-main .video-info-box > #genre-label { grid-column: 2; }
+      .pc-main .video-info-box > .pc-tabs,
+      .pc-main .video-info-box > .pc-panel { grid-column: 1 / -1; }
+
+      /* the plain synopsis + Read More are replaced by the Info panel */
+      .pc-main .video-info-box.pc-details-ready > #current-description,
+      .pc-main .video-info-box.pc-details-ready > #toggle-synopsis-btn {
+        display: none !important;
+      }
+
+      .pc-hero-poster.is-ready { display: block !important; }
+
+      .pc-hero-poster img {
+        width: 100% !important;
+        aspect-ratio: 2 / 3 !important;
+        object-fit: cover !important;
+        display: block !important;
+        border-radius: 10px !important;
+        background: #14090b !important;
+        border: 1px solid rgba(229, 9, 20, 0.28) !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55) !important;
+      }
+
+      .pc-meta-row.is-ready {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 2px 0 12px 0 !important;
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.86rem !important;
+        font-weight: 500 !important;
+      }
+
+      .pc-meta-row.is-ready > span:not(:first-child)::before {
+        content: '';
+        display: inline-block;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      .pc-meta-row.is-ready > span[style*="display: none"]::before { display: none; }
+
+      .pc-rating-row.is-ready {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        margin: 0 0 12px 0 !important;
+      }
+
+      .pc-score {
+        min-width: 44px;
+        text-align: center;
+        background: #17181d !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        padding: 7px 11px !important;
+        border-radius: 8px !important;
+      }
+
+      .pc-stars { font-size: 0.95rem !important; letter-spacing: 2px !important; }
+      .pc-star { color: rgba(255, 255, 255, 0.22) !important; }
+      .pc-star.on { color: #e50914 !important; }
+      .pc-votes { font-size: 0.78rem !important; color: rgba(255, 255, 255, 0.5) !important; }
+
+      /* genres under the rating, a touch bigger than the mobile chips */
+      .pc-main .video-info-box > #genre-label {
+        margin-top: 0 !important;
+        margin-bottom: 4px !important;
+      }
+
+      .pc-main .video-info-box > #genre-label .genre-chip {
+        font-size: 0.74rem !important;
+        padding: 4px 12px !important;
+      }
+
+      .pc-tabs.is-ready {
+        display: flex !important;
+        gap: 4px !important;
+        margin: 14px 0 0 0 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+      }
+
+      .pc-tab {
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 2px solid transparent !important;
+        font-family: inherit !important;
+        color: rgba(255, 255, 255, 0.65) !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        padding: 14px 26px !important;
+        cursor: pointer !important;
+        transition: color 0.15s ease, background 0.15s ease !important;
+      }
+
+      .pc-tab:hover { color: #ffffff !important; }
+
+      .pc-tab.is-active {
+        background: #e50914 !important;
+        color: #ffffff !important;
+        border-bottom-color: #e50914 !important;
+        border-radius: 4px 4px 0 0 !important;
+      }
+
+      .pc-panel.is-active { display: block !important; padding: 22px 0 6px 0 !important; }
+
+      .pc-panel-title {
+        font-size: 1.02rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        margin: 0 0 12px 0 !important;
+      }
+
+      .pc-panel-text {
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-size: 0.95rem !important;
+        line-height: 1.65 !important;
+        margin: 0 0 20px 0 !important;
+      }
+
+      .pc-stills {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 14px !important;
+      }
+
+      .pc-stills:empty { display: none !important; }
+
+      .pc-stills img {
+        width: 100% !important;
+        aspect-ratio: 16 / 9 !important;
+        object-fit: cover !important;
+        display: block !important;
+        border-radius: 7px !important;
+        background: #14090b !important;
+      }
+
+      .pc-people-group.is-ready { display: block !important; margin-bottom: 26px !important; }
+
+      .pc-people-grid,
+      .pc-cast-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 2px 18px !important;
+      }
+
+      .pc-person {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 10px 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        min-width: 0 !important;
+      }
+
+      .pc-person-photo {
+        width: 54px !important;
+        height: 54px !important;
+        flex: 0 0 54px !important;
+        border-radius: 8px !important;
+        object-fit: cover !important;
+        object-position: center top !important;
+        background: #221012 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+
+      .pc-person-initials {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: rgba(255, 255, 255, 0.55) !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+      }
+
+      .pc-person-text { min-width: 0 !important; }
+
+      .pc-person-name {
+        color: #ffffff !important;
+        font-size: 0.92rem !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .pc-person-role {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.76rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      /* the sidebar rail should use the full column width */
+      .pc-aside .content-section { max-width: 100% !important; }
+    }
+
   </style>
 
   <!-- ANTI-POPUP & REDIRECT SHIELD -->
@@ -1347,6 +1724,10 @@
   </script>
 </head>
 <body>
+
+  <!-- PC: two-column shell — player + movie info on the left, recommendations on the right -->
+  <div class="pc-layout">
+  <main class="pc-main">
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
@@ -1632,24 +2013,73 @@
     ⚠️ Slow connection? Reload the page.
   </div>
 
-  <div class="video-info-box">
+  <div class="video-info-box" id="video-info-box">
+
+    <!-- PC ONLY: poster shown beside the title (hidden below 1024px) -->
+    <div class="pc-hero-poster" id="pc-hero-poster">
+      <img id="pc-poster" alt="" loading="lazy">
+    </div>
+
     <div class="title-row">
       <h1 id="current-title" class="media-title">Loading...</h1>
-      <div id="genre-label" class="genre-badge" style="display: none;"></div>
       <div class="title-actions">
         <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to Bookmarks">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
         </button>
       </div>
     </div>
+
+    <!-- PC ONLY: release date + runtime -->
+    <div class="pc-meta-row" id="pc-meta-row">
+      <span id="pc-release"></span>
+      <span id="pc-runtime"></span>
+    </div>
+
+    <!-- PC ONLY: rating score + stars + votes -->
+    <div class="pc-rating-row" id="pc-rating-row">
+      <span class="pc-score" id="pc-score">0</span>
+      <span class="pc-stars" id="pc-stars"></span>
+      <span class="pc-votes" id="pc-votes"></span>
+    </div>
+
+    <div id="genre-label" class="genre-badge" style="display: none;"></div>
+
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
+
+    <!-- PC ONLY: Info / Cast tabs -->
+    <div class="pc-tabs" id="pc-tabs" role="tablist">
+      <button type="button" class="pc-tab is-active" data-pc-tab="info">Info</button>
+      <button type="button" class="pc-tab" data-pc-tab="cast" id="pc-tab-cast">Cast</button>
+    </div>
+
+    <div class="pc-panel" id="pc-panel-info">
+      <h4 class="pc-panel-title">Synopsis</h4>
+      <p class="pc-panel-text" id="pc-synopsis"></p>
+      <div class="pc-stills" id="pc-stills"></div>
+    </div>
+
+    <div class="pc-panel" id="pc-panel-cast">
+      <div class="pc-people-group" id="pc-director-group">
+        <h4 class="pc-panel-title">Director</h4>
+        <div class="pc-people-grid" id="pc-director"></div>
+      </div>
+      <div class="pc-people-group" id="pc-cast-group">
+        <h4 class="pc-panel-title">Cast</h4>
+        <div class="pc-cast-grid" id="pc-cast-grid"></div>
+      </div>
+    </div>
   </div>
 
-  <section class="content-section" style="padding-bottom: 30px; margin-top: 20px;">
-    <h3 class="section-header-title" style="margin-bottom: 12px; color: #ffffff;">More Like This</h3>
-    <div class="list-recommendations" id="random-grid"></div>
-  </section>
+  </main>
+
+  <aside class="pc-aside">
+    <section class="content-section" style="padding-bottom: 30px; margin-top: 20px;">
+      <h3 class="section-header-title" style="margin-bottom: 12px; color: #ffffff;">More Like This</h3>
+      <div class="list-recommendations" id="random-grid"></div>
+    </section>
+  </aside>
+  </div>
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
@@ -1999,23 +2429,31 @@
       return [...new Set(labels)].slice(0, 3);
     }
 
-    async function loadMovieGenre() {
+    // Renders the genre chips into the badge. Shared by the keyword guesser
+    // below and the PC details loader, which prefers the real genres.
+    function renderGenreChips(genres) {
       const badge = document.getElementById('genre-label');
       if (!badge) return;
+      if (genres && genres.length > 0) {
+        badge.innerHTML = '';
+        genres.forEach((g) => {
+          const chip = document.createElement('span');
+          chip.className = 'genre-chip';
+          chip.textContent = g;
+          badge.appendChild(chip);
+        });
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    async function loadMovieGenre() {
+      if (window.__pcGenresFromDetails) return; // real genres already on screen
 
       const setGenre = (genres) => {
-        if (genres && genres.length > 0) {
-          badge.innerHTML = '';
-          genres.forEach((g) => {
-            const chip = document.createElement('span');
-            chip.className = 'genre-chip';
-            chip.textContent = g;
-            badge.appendChild(chip);
-          });
-          badge.style.display = 'flex';
-        } else {
-          badge.style.display = 'none';
-        }
+        if (window.__pcGenresFromDetails) return;
+        renderGenreChips(genres);
       };
 
       try {
@@ -2047,8 +2485,254 @@
       setGenre(genres);
     }
 
+    /* ══════════════════════════════════════════════════════════════════
+       PC-ONLY movie details: poster beside the title, release date, runtime,
+       rating, genres and the Info / Cast tabs.
+       Data comes from this site's own endpoint /api/tmdb/details/<imdbId>,
+       which keeps the API key server-side (TMDB when a valid key is present,
+       Wikidata as the key-free fallback). Player, ads and subtitles are not
+       touched, and none of this shows below 1024px.
+       ══════════════════════════════════════════════════════════════════ */
+    let pcDetailsLoaded = false;
+
+    function pcIsDesktop() {
+      return window.matchMedia('(min-width: 1024px)').matches;
+    }
+
+    function pcEscape(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function pcRuntimeLabel(minutes) {
+      const total = Math.round(Number(minutes) || 0);
+      if (!total) return '';
+      const h = Math.floor(total / 60);
+      const m = total % 60;
+      return h ? h + 'H ' + m + ' Min.' : m + ' Min.';
+    }
+
+    function pcDateLabel(iso) {
+      if (!iso) return '';
+      const d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function pcStars(score) {
+      const filled = Math.round((Number(score) || 0) / 2); // 10-point score → 5 stars
+      let out = '';
+      for (let i = 1; i <= 5; i++) {
+        out += '<span class="pc-star' + (i <= filled ? ' on' : '') + '">★</span>';
+      }
+      return out;
+    }
+
+    function pcPersonCard(name, role, photo) {
+      const initials = String(name || '?')
+        .trim().split(/\s+/).slice(0, 2)
+        .map(function (w) { return w.charAt(0); })
+        .join('').toUpperCase();
+      const avatar = photo
+        ? '<img class="pc-person-photo" loading="lazy" src="' + pcEscape(photo) + '" alt="">'
+        : '<span class="pc-person-photo pc-person-initials">' + pcEscape(initials) + '</span>';
+      return '<div class="pc-person">' + avatar +
+        '<div class="pc-person-text">' +
+          '<div class="pc-person-name">' + pcEscape(name) + '</div>' +
+          '<div class="pc-person-role">' + pcEscape(role || '') + '</div>' +
+        '</div></div>';
+    }
+
+    function pcSwitchTab(name) {
+      const tabs = document.getElementById('pc-tabs');
+      if (tabs) {
+        tabs.querySelectorAll('.pc-tab').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-pc-tab') === name);
+        });
+      }
+      document.querySelectorAll('.pc-panel').forEach(function (p) {
+        p.classList.toggle('is-active', p.id === 'pc-panel-' + name);
+      });
+    }
+
+    (function initPcTabs() {
+      const tabs = document.getElementById('pc-tabs');
+      if (!tabs) return;
+      tabs.addEventListener('click', function (ev) {
+        const btn = ev.target.closest ? ev.target.closest('.pc-tab') : null;
+        if (!btn) return;
+        pcSwitchTab(btn.getAttribute('data-pc-tab'));
+      });
+    })();
+
+    function pcApplyDetails(d) {
+      const box = document.getElementById('video-info-box');
+
+      // poster, shown beside the title
+      const posterBox = document.getElementById('pc-hero-poster');
+      const posterImg = document.getElementById('pc-poster');
+      const posterUrl = (currentMovie && currentMovie.poster) ||
+        (d.poster ? 'https://image.tmdb.org/t/p/w500' + d.poster : '');
+      if (posterBox && posterImg && posterUrl) {
+        posterImg.onerror = function () { posterBox.classList.remove('is-ready'); };
+        posterImg.src = posterUrl;
+        posterBox.classList.add('is-ready');
+      }
+
+      // release date + runtime
+      const metaRow = document.getElementById('pc-meta-row');
+      const releaseEl = document.getElementById('pc-release');
+      const runtimeEl = document.getElementById('pc-runtime');
+      const releaseText = pcDateLabel(d.releaseDate) ||
+        pcDateLabel(currentMovie && currentMovie.releaseDate);
+      const runtimeMinutes = d.runtime ||
+        (typeof cachedDuration === 'number' && cachedDuration ? Math.round(cachedDuration / 60) : 0);
+      const runtimeText = pcRuntimeLabel(runtimeMinutes);
+      if (releaseEl) {
+        releaseEl.textContent = releaseText;
+        if (!releaseText) releaseEl.style.display = 'none';
+      }
+      if (runtimeEl) {
+        runtimeEl.textContent = runtimeText;
+        if (!runtimeText) runtimeEl.style.display = 'none';
+      }
+      if (metaRow && (releaseText || runtimeText)) metaRow.classList.add('is-ready');
+
+      // rating (only shown when a source actually provides a score)
+      const ratingRow = document.getElementById('pc-rating-row');
+      if (ratingRow && Number(d.score) > 0) {
+        const scoreEl = document.getElementById('pc-score');
+        const starsEl = document.getElementById('pc-stars');
+        const votesEl = document.getElementById('pc-votes');
+        if (scoreEl) scoreEl.textContent = String(Math.round(Number(d.score) * 10) / 10);
+        if (starsEl) starsEl.innerHTML = pcStars(d.score);
+        if (votesEl) {
+          votesEl.textContent = Number(d.votes) > 0
+            ? Number(d.votes).toLocaleString() + (Number(d.votes) === 1 ? ' vote' : ' votes')
+            : '';
+        }
+        ratingRow.classList.add('is-ready');
+      }
+
+      // genres, preferring the real ones over the keyword guess
+      if (d.genres && d.genres.length) {
+        window.__pcGenresFromDetails = true;
+        renderGenreChips(d.genres);
+        try {
+          const cache = JSON.parse(localStorage.getItem('deymflix_genre_cache') || '{}');
+          cache[currentMovie.id] = d.genres;
+          localStorage.setItem('deymflix_genre_cache', JSON.stringify(cache));
+        } catch (e) {}
+      }
+
+      // Info tab: synopsis + stills
+      const synEl = document.getElementById('pc-synopsis');
+      // no synopsis from the metadata source? reuse the one already fetched
+      // from Wikipedia for the plain info box, then the bundled text.
+      const descEl = document.getElementById('current-description');
+      const descText = descEl && !/^Loading synopsis/i.test(descEl.textContent.trim())
+        ? descEl.textContent.trim() : '';
+      const synText = (d.overview && d.overview.trim()) || descText ||
+        (currentMovie && currentMovie.synopsis) || '';
+      if (synEl) synEl.textContent = synText || 'No synopsis available yet.';
+
+      const stillsEl = document.getElementById('pc-stills');
+      if (stillsEl && d.stills && d.stills.length) {
+        stillsEl.innerHTML = d.stills.slice(0, 6).map(function (f) {
+          return '<img loading="lazy" src="https://image.tmdb.org/t/p/w780' + pcEscape(f) + '" alt="">';
+        }).join('');
+      }
+
+      // Cast tab: director + cast
+      const directorGroup = document.getElementById('pc-director-group');
+      const directorGrid = document.getElementById('pc-director');
+      if (directorGroup && directorGrid && d.director && d.director.length) {
+        directorGrid.innerHTML = d.director.map(function (n) {
+          return pcPersonCard(n, 'Director', '');
+        }).join('');
+        directorGroup.classList.add('is-ready');
+      }
+
+      const castGroup = document.getElementById('pc-cast-group');
+      const castGrid = document.getElementById('pc-cast-grid');
+      const cast = (d.cast || []).filter(function (c) { return c && c.name; }).slice(0, 9);
+      if (castGrid && cast.length) {
+        castGrid.innerHTML = cast.map(function (c) {
+          return pcPersonCard(c.name, c.character || 'Cast', c.photo || '');
+        }).join('');
+        if (castGroup) castGroup.classList.add('is-ready');
+      }
+
+      if (!((d.director && d.director.length) || cast.length)) {
+        const castTabBtn = document.getElementById('pc-tab-cast');
+        if (castTabBtn) castTabBtn.style.display = 'none';
+      }
+
+      pcSwitchTab('info');
+
+      const tabs = document.getElementById('pc-tabs');
+      if (tabs) tabs.classList.add('is-ready');
+      // the plain synopsis + Read More are replaced by the Info panel
+      if (box) box.classList.add('pc-details-ready');
+    }
+
+    async function loadPcDetails() {
+      if (pcDetailsLoaded || !pcIsDesktop()) return;
+      const movie = currentMovie;
+      if (!movie || movie._episodeNum) return; // episodes keep the series layout
+      const imdbId = movie.imdbId ? String(movie.imdbId) : '';
+      if (!/^tt\d{5,}$/.test(imdbId)) return;
+      pcDetailsLoaded = true;
+
+      const cacheKey = 'deymflix_pcdetails_' + imdbId;
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      let data = null;
+
+      try {
+        const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+        if (cached && cached.data && cached.data.found && (Date.now() - cached.savedAt) < ONE_DAY) {
+          data = cached.data;
+        }
+      } catch (e) {}
+
+      if (!data) {
+        try {
+          const titleHint = movie.title ? ('?title=' + encodeURIComponent(movie.title)) : '';
+          const resp = await fetch('/api/tmdb/details/' + encodeURIComponent(imdbId) + titleHint);
+          if (resp.ok) {
+            data = await resp.json();
+            if (data && data.found) {
+              try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data: data })); } catch (e) {}
+            }
+          }
+        } catch (e) {
+          data = null;
+        }
+      }
+
+      if (!data || !data.found) {
+        pcDetailsLoaded = false; // let a later attempt retry
+        return;
+      }
+
+      pcApplyDetails(data);
+    }
+
+    let pcResizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(pcResizeTimer);
+      pcResizeTimer = setTimeout(function () {
+        if (pcIsDesktop()) loadPcDetails();
+      }, 400);
+    });
+
     loadBroadSynopsis().then(() => {
       loadMovieGenre();
+      loadPcDetails();
     });
 
     let iframe = null;
@@ -3848,8 +4532,14 @@
       const row = document.getElementById('random-grid');
       if (!row) return;
 
+      // True only while the row is laid out horizontally (mobile / tablet).
+      // On PC the cards are stacked vertically in the sidebar, so the wheel
+      // must scroll the page/sidebar normally instead of being hijacked.
+      const isHorizontal = () => (row.scrollWidth - row.clientWidth) > 4;
+
       // Vertical wheel → horizontal scroll
       row.addEventListener('wheel', (e) => {
+        if (!isHorizontal()) return;
         if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
           e.preventDefault();
           row.scrollLeft += e.deltaY;
@@ -3859,6 +4549,7 @@
       // Mouse drag to scroll (PC)
       let isDown = false, startX = 0, startScroll = 0;
       row.addEventListener('mousedown', (e) => {
+        if (!isHorizontal()) return;
         isDown = true;
         startX = e.pageX - row.offsetLeft;
         startScroll = row.scrollLeft;

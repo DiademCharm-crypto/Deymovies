@@ -205,16 +205,52 @@
     const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     const myRef = onlineRef.child(myId);
 
-    // When connected, register this user
+    // Use SERVER time so a wrong device clock can never expire live users
+    let serverOffset = 0;
+    db.ref('.info/serverTimeOffset').on('value', function(s) { serverOffset = s.val() || 0; });
+    function serverNow() { return Date.now() + serverOffset; }
+
+    // Presence is refreshed on a heartbeat, so a visitor stays "online" for as
+    // long as their tab is open instead of expiring shortly after page load.
+    const HEARTBEAT_MS = 25000; // refresh presence every 25s
+    // Browsers throttle background tabs to roughly one timer per minute, so the
+    // tolerance must be comfortably above that or open tabs flicker offline.
+    const STALE_MS = 150000;    // only treat as offline after 2.5 min of silence
+    let beat = null;
+
+    function heartbeat() {
+      // Only refresh lastSeen. We deliberately do NOT remove on disconnect: a
+      // brief socket drop (backgrounded tab, phone locked, wifi blip) must not
+      // mark a visitor offline while their tab is still open. Anyone who really
+      // left is cleaned up by the stale sweep below.
+      myRef.set({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
+    }
+    function startHeartbeat() {
+      if (beat) return;
+      heartbeat();
+      beat = setInterval(heartbeat, HEARTBEAT_MS);
+    }
+    function wakePresence() {
+      heartbeat();
+      startHeartbeat();
+    }
+
     const connRef = db.ref('.info/connected');
     connRef.on('value', function(snap) {
       if (snap.val() === true) {
-        // Add self to online list
-        myRef.set({ joined: firebase.database.ServerValue.TIMESTAMP });
-        // When disconnected, remove self
-        myRef.onDisconnect().remove();
+        startHeartbeat();
+      } else if (beat) {
+        clearInterval(beat);
+        beat = null;
       }
     });
+
+    // Mobile browsers freeze timers in background tabs, so re-register whenever
+    // the tab returns to the foreground or the network comes back.
+    document.addEventListener('visibilitychange', function() { if (!document.hidden) wakePresence(); });
+    window.addEventListener('focus', wakePresence);
+    window.addEventListener('pageshow', wakePresence);
+    window.addEventListener('online', wakePresence);
 
     // Listen for online count changes and update UI
     onlineRef.on('value', function(snap) {
@@ -229,13 +265,26 @@
       }
     });
 
-    // Clean up stale entries (older than 2 minutes without heartbeat)
-    setInterval(function() {
-      const cutoff = Date.now() - 120000;
-      onlineRef.orderByChild('joined').endAt(cutoff).once('child_added', function(snap) {
-        snap.ref.remove();
+    // Sweep users who stopped heartbeating (crashed tabs, closed browsers).
+    // We read the node and check each entry ourselves: orderByChild/endAt would
+    // also match entries that simply lack the ordered field, which would delete
+    // live users. Entries with no usable timestamp are leftovers from the old
+    // script and get cleared out too.
+    function sweep() {
+      onlineRef.once('value', function(snap) {
+        const cutoff = serverNow() - STALE_MS;
+        snap.forEach(function(child) {
+          const v = child.val() || {};
+          const stamp = typeof v.lastSeen === 'number' ? v.lastSeen
+                      : typeof v.joined === 'number' ? v.joined
+                      : null;
+          if (stamp === null || stamp < cutoff) {
+            child.ref.remove();
+          }
+        });
       });
-    }, 60000);
+    }
+    setInterval(sweep, 30000);
   })();
   </script>
 </body>

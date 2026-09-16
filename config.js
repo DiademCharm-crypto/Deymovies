@@ -14,6 +14,7 @@
     FIREBASE_CONFIG: {
       apiKey: 'AIzaSyCSejdiwh4Y6N6Pwl6QyLXPNYdUqz8vc1M',
       authDomain: 'deymflix.firebaseapp.com',
+      databaseURL: 'https://deymflix-default-rtdb.firebaseio.com',
       projectId: 'deymflix',
       storageBucket: 'deymflix.firebasestorage.app',
       messagingSenderId: '333198075783',
