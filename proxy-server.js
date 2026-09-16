@@ -55,6 +55,16 @@ function tmdbCacheSet(key, value) {
   }
 }
 
+// Circuit breaker: when the TMDB key is dead (401/403), every lookup burns
+// doomed HTTP round-trips (~5s each) before the Wikidata fallback answers —
+// with 12 lookups per player page that froze first paint for ~15s. After the
+// first rejection we skip TMDB entirely for a while. A key change clears it
+// on the next server restart (or automatically after the cooldown expires).
+const TMDB_KEY_COOLDOWN_MS = 10 * 60 * 1000;
+let tmdbKeyDeadUntil = 0;
+function tmdbKeyIsDead() { return Date.now() < tmdbKeyDeadUntil; }
+function markTmdbKeyDead() { tmdbKeyDeadUntil = Date.now() + TMDB_KEY_COOLDOWN_MS; }
+
 // ============ MOVIE DETAILS HELPERS ============
 // Two sources, best first:
 //   1) TMDB     — rating + votes, cast with photos/roles, stills (needs a valid key)
@@ -599,23 +609,30 @@ async function handleProxyRoutes(req, res, parsedUrl) {
       const cached = tmdbCacheGet(rawId);
       if (cached) return jsonResponse(res, 200, cached);
 
-      // 1) TMDB find by IMDB id (needs a valid key)
+      // 1) TMDB find by IMDB id (needs a valid key). Skipped entirely while
+      //    the circuit breaker is open — no point re-failing for 10 minutes.
       let tmdbId = null;
       let keyWorks = false;
-      try {
-        const found = await fetchUrl(
-          'https://api.themoviedb.org/3/find/' + rawId +
-          '?api_key=' + SECRETS.TMDB_API_KEY + '&external_source=imdb_id&language=en-US'
-        );
-        if (found.status === 200) {
-          keyWorks = true;
-          const fj = JSON.parse(found.body);
-          const hit = (fj.movie_results || [])[0] || (fj.tv_results || [])[0];
-          if (hit) tmdbId = hit.id;
-        } else {
-          console.warn('[TMDB] find', rawId, 'status', found.status);
-        }
-      } catch (e) {}
+      if (!tmdbKeyIsDead()) {
+        try {
+          const found = await fetchUrl(
+            'https://api.themoviedb.org/3/find/' + rawId +
+            '?api_key=' + SECRETS.TMDB_API_KEY + '&external_source=imdb_id&language=en-US'
+          );
+          if (found.status === 200) {
+            keyWorks = true;
+            const fj = JSON.parse(found.body);
+            const hit = (fj.movie_results || [])[0] || (fj.tv_results || [])[0];
+            if (hit) tmdbId = hit.id;
+          } else {
+            console.warn('[TMDB] find', rawId, 'status', found.status);
+            if (found.status === 401 || found.status === 403) {
+              markTmdbKeyDead();
+              console.warn('[TMDB] key rejected — skipping TMDB for 10 minutes');
+            }
+          }
+        } catch (e) {}
+      }
 
       // 2) This library stores TMDB ids with a "tt" prefix — try /movie/<digits> directly
       if (!tmdbId && keyWorks) {

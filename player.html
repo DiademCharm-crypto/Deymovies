@@ -2256,6 +2256,21 @@
 
     .pc-aside .recommendation-card img.is-loaded { opacity: 1; }
 
+    /* broken poster → show the title's first letter instead of an empty box */
+    .pc-aside .rec-side::before {
+      content: attr(data-letter);
+      position: absolute !important;
+      inset: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 2rem !important;
+      font-weight: 800 !important;
+      color: rgba(255, 255, 255, 0.22) !important;
+    }
+
+    .pc-aside .rec-side:not(.img-failed)::before { content: none !important; }
+
     /* quality badge (HD / TRAILER) top-right, like the YouTube reference */
     .pc-aside .rec-side .tag-badge-top-right {
       top: 7px !important;
@@ -5156,9 +5171,10 @@
         })(movie);
 
         card.innerHTML = `
-          <div class="rec-side">
+          <div class="rec-side" data-letter="${sanitizeHTML((movie.title || '?').trim().charAt(0).toUpperCase())}">
             <img src="${sanitizeHTML(movie.poster)}" alt="${sanitizeHTML(movie.title)}"
-                 onload="this.classList.add('is-loaded')">
+                 onload="this.classList.add('is-loaded')"
+                 onerror="this.parentElement.classList.add('img-failed')">
             <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
           </div>
           <div class="rec-info">
