@@ -1498,6 +1498,12 @@
       .pc-star.on { color: #e50914 !important; }
       .pc-votes { font-size: 0.75rem !important; color: rgba(255, 255, 255, 0.5) !important; }
 
+      /* See More button under the clamped Info-tab synopsis (mobile) */
+      #pcSynopsisSeeMore {
+        font-size: 0.8rem !important;
+        margin: -6px 0 14px 0 !important;
+      }
+
       .pc-tabs.is-ready {
         display: flex !important;
         gap: 2px !important;
@@ -2197,6 +2203,142 @@
   </div>
 </div>
 
+  <style>
+  /* ════════════════════════════════════════════════════════════════
+     PC RAIL (≥1024px): YouTube-style list — thumbnail LEFT, text RIGHT.
+     Card: [poster thumb] [Title / Date / 4.5/5 IMDB]. The text column is
+     always reserved, so nothing shifts while the poster image loads.
+     Below 1024px these rules never apply (mobile keeps the poster grid).
+     ════════════════════════════════════════════════════════════════ */
+  @media (min-width: 1024px) {
+    .pc-aside .recommendation-card {
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+      width: 100% !important;
+      aspect-ratio: auto !important;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 10px !important;
+      padding: 4px !important;
+      box-sizing: border-box !important;
+    }
+
+    .pc-aside .recommendation-card:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* thumbnail column: LANDSCAPE 16:9 (poster centre-cropped), fixed width
+       so the text never reflows while the image loads. Sized to fit the
+       title block: title (2 lines) + date + rating. */
+    .pc-aside .rec-side {
+      position: relative !important;
+      flex: 0 0 176px !important;
+      width: 176px !important;
+      aspect-ratio: 16 / 9 !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+      background: #1a1a1a !important;
+      border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    }
+
+    .pc-aside .recommendation-card img {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center 28% !important;
+      display: block !important;
+      opacity: 0;
+      transition: opacity 0.35s ease !important;
+    }
+
+    .pc-aside .recommendation-card img.is-loaded { opacity: 1; }
+
+    /* quality badge (HD / TRAILER) top-right, like the YouTube reference */
+    .pc-aside .rec-side .tag-badge-top-right {
+      top: 7px !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: 7px !important;
+    }
+
+    /* text column: title → date → rating, always visible */
+    .pc-aside .rec-info {
+      position: static !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      background: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 3px !important;
+    }
+
+    .pc-aside .rec-title {
+      font-size: 0.95rem !important;
+      font-weight: 600 !important;
+      line-height: 1.3 !important;
+      color: #fff !important;
+      text-shadow: none !important;
+      white-space: normal !important;
+      text-overflow: clip !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pc-aside .rec-date {
+      font-size: 0.76rem !important;
+      color: rgba(255, 255, 255, 0.55) !important;
+      text-shadow: none !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .pc-aside .rec-rating {
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      text-shadow: none !important;
+    }
+
+    .pc-aside .rec-rating b { color: #e50914 !important; }
+
+    .pc-aside .rec-genre { display: none !important; }
+  }
+
+  /* 3-line clamp + See More for the Info-tab synopsis (PC and mobile) */
+  #pc-synopsis {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #pc-synopsis.expanded {
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  #pcSynopsisSeeMore {
+    display: none;
+    background: transparent;
+    border: 0;
+    color: #e50914;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0;
+    margin: -10px 0 16px 0;
+    cursor: pointer;
+  }
+  </style>
+
   <div id="network-note" class="network-warning-note" style="display: none;">
     ⚠️ Slow connection? Reload the page.
   </div>
@@ -2244,6 +2386,7 @@
     <div class="pc-panel" id="pc-panel-info">
       <h4 class="pc-panel-title">Synopsis</h4>
       <p class="pc-panel-text" id="pc-synopsis"></p>
+      <button type="button" id="pcSynopsisSeeMore" onclick="pcToggleSynopsis()">See More</button>
       <div class="pc-stills" id="pc-stills"></div>
     </div>
 
@@ -2774,7 +2917,7 @@
     function pcApplyDetails(d) {
       const box = document.getElementById('video-info-box');
 
-      // poster, shown beside the title
+      // poster, shown beside the title (PC only)
       const posterBox = document.getElementById('pc-hero-poster');
       const posterImg = document.getElementById('pc-poster');
       const posterUrl = (currentMovie && currentMovie.poster) ||
@@ -2804,7 +2947,9 @@
       }
       if (metaRow && (releaseText || runtimeText)) metaRow.classList.add('is-ready');
 
-      // rating (only shown when a source actually provides a score)
+      // rating — shown on PC ONLY when the side rail has no score for this
+      // movie (otherwise it would appear twice); always shown on mobile.
+      const railScore = pcGetRailScore();
       const ratingRow = document.getElementById('pc-rating-row');
       if (ratingRow && Number(d.score) > 0) {
         const scoreEl = document.getElementById('pc-score');
@@ -2817,7 +2962,11 @@
             ? Number(d.votes).toLocaleString() + (Number(d.votes) === 1 ? ' vote' : ' votes')
             : '';
         }
-        ratingRow.classList.add('is-ready');
+        if (railScore > 0 && pcIsDesktop()) {
+          ratingRow.classList.remove('is-ready'); // PC only: rail already shows X.X/5 IMDB
+        } else {
+          ratingRow.classList.add('is-ready'); // mobile always keeps the rating row
+        }
       }
 
       // genres, preferring the real ones over the keyword guess
@@ -2831,7 +2980,7 @@
         } catch (e) {}
       }
 
-      // Info tab: synopsis + stills
+      // Info tab: synopsis (3-line clamp + See More) + stills
       const synEl = document.getElementById('pc-synopsis');
       // no synopsis from the metadata source? reuse the one already fetched
       // from Wikipedia for the plain info box, then the bundled text.
@@ -2840,7 +2989,11 @@
         ? descEl.textContent.trim() : '';
       const synText = (d.overview && d.overview.trim()) || descText ||
         (currentMovie && currentMovie.synopsis) || '';
-      if (synEl) synEl.textContent = synText || 'No synopsis available yet.';
+      if (synEl) {
+        synEl.classList.remove('expanded');
+        synEl.textContent = synText || 'No synopsis available yet.';
+        if (typeof pcCheckSynopsisClamp === 'function') pcCheckSynopsisClamp();
+      }
 
       const stillsEl = document.getElementById('pc-stills');
       if (stillsEl && d.stills && d.stills.length) {
@@ -3080,6 +3233,53 @@
       }
     }
 
+    /* ── Info-tab synopsis: 3-line clamp with a See More toggle (PC + mobile)
+       — same behaviour as the classic Read More under the title ── */
+    function pcCheckSynopsisClamp() {
+      const syn = document.getElementById('pc-synopsis');
+      const btn = document.getElementById('pcSynopsisSeeMore');
+      if (!syn || !btn) return;
+      setTimeout(function () {
+        btn.style.display = (syn.scrollHeight - syn.clientHeight > 2) ? 'inline-block' : 'none';
+      }, 50);
+    }
+
+    window.pcToggleSynopsis = function () {
+      const syn = document.getElementById('pc-synopsis');
+      const btn = document.getElementById('pcSynopsisSeeMore');
+      if (!syn || !btn) return;
+      if (syn.classList.contains('expanded')) {
+        syn.classList.remove('expanded');
+        btn.textContent = 'See More';
+        if (typeof pcCheckSynopsisClamp === 'function') pcCheckSynopsisClamp();
+      } else {
+        syn.classList.add('expanded');
+        btn.textContent = 'See Less';
+      }
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { pcCheckSynopsisClamp(); }).catch(function () {});
+    }
+
+    /* ── side-rail score: the same X.X/5 IMDB shown next to each rail card ──
+       Ratings live in the server cache (data.score) or in the localStorage
+       details cache for that movie's imdb id, so the hero area can skip the
+       rating row when the rail beside it already shows the score. */
+    function pcGetRailScore() {
+      if (!(currentMovie && currentMovie.imdbId)) return 0;
+      try {
+        const key = 'deymflix_pcdetails_' + currentMovie.imdbId;
+        const c = JSON.parse(localStorage.getItem(key) || 'null');
+        if (c && c.data && c.data.found) return Math.max(0, Number(c.data.score) || 0);
+      } catch (e) {}
+      try {
+        const raw = sessionStorage.getItem('deymflix_details_' + currentMovie.imdbId);
+        if (raw) return Math.max(0, (JSON.parse(raw).score) || 0);
+      } catch (e) {}
+      return 0;
+    }
+
     async function loadPcDetails() {
       if (pcDetailsLoaded) return;
       const movie = currentMovie;
@@ -3132,6 +3332,9 @@
         pcDetailsLoaded = false; // let a later attempt retry
         return;
       }
+
+      // remember the score so the rail and the hero agree
+      try { sessionStorage.setItem('deymflix_details_' + imdbId, JSON.stringify({ score: data.score || 0 })); } catch (e) {}
 
       pcApplyDetails(data);
     }
@@ -4923,16 +5126,120 @@
         const qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
         const qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
         
+        // release date for the rail line (poster side info comes first on PC)
+        const railDate = (function getRailDate(mv) {
+          try {
+            if (mv.imdbId) {
+              const key = 'deymflix_pcdetails_' + mv.imdbId;
+              const c = JSON.parse(localStorage.getItem(key) || 'null');
+              if (c && c.data && c.data.found && c.data.releaseDate) {
+                const dt = new Date(String(c.data.releaseDate).slice(0, 10) + 'T00:00:00');
+                if (!isNaN(dt.getTime())) {
+                  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+              }
+            }
+          } catch (e) {}
+          return '';
+        })(movie);
+        const railScore = (function getRailCardScore(mv) {
+          try {
+            if (mv.imdbId) {
+              const key = 'deymflix_pcdetails_' + mv.imdbId;
+              const c = JSON.parse(localStorage.getItem(key) || 'null');
+              if (c && c.data && c.data.found && Number(c.data.score) > 0) {
+                return String(Math.round(Number(c.data.score) * 10) / 10);
+              }
+            }
+          } catch (e) {}
+          return '';
+        })(movie);
+
         card.innerHTML = `
-          <img src="${sanitizeHTML(movie.poster)}" alt="${sanitizeHTML(movie.title)}">
-          <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
+          <div class="rec-side">
+            <img src="${sanitizeHTML(movie.poster)}" alt="${sanitizeHTML(movie.title)}"
+                 onload="this.classList.add('is-loaded')">
+            <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
+          </div>
           <div class="rec-info">
             <span class="rec-title">${sanitizeHTML(movie.title)}</span>
+            ${railDate ? `<span class="rec-date">${sanitizeHTML(railDate)}</span>` : ''}
+            ${railScore ? `<span class="rec-rating"><b>${sanitizeHTML(railScore)}</b>/5 IMDB</span>` : ''}
             <span class="rec-genre">${sanitizeHTML(genreText)} • ${qualityLabel}</span>
           </div>
         `;
         grid.appendChild(card);
       });
+
+      // Fill in date + rating on the rail cards as their details arrive
+      // (desktop only — mobile keeps the simple poster grid).
+      if (typeof pcIsDesktop === 'function' && pcIsDesktop()) {
+        enrichRailCards(recommendations, grid);
+      }
+    }
+
+    /* ── Rail enrichment: fetch date + score for each recommended movie ──
+       Uses the same sources as the hero details (server endpoint when
+       available, browser-direct Wikidata otherwise) and writes into the
+       localStorage cache, so repeat visits render instantly. Sequential
+       with a small gap so Wikidata is never hammered. */
+    let railEnrichStarted = false;
+    function railCacheGet(imdbId) {
+      try {
+        const c = JSON.parse(localStorage.getItem('deymflix_pcdetails_' + imdbId) || 'null');
+        if (c && c.data && c.data.found && (Date.now() - c.savedAt) < 24 * 60 * 60 * 1000) return c.data;
+      } catch (e) {}
+      return null;
+    }
+    async function enrichRailCards(movies, grid) {
+      if (railEnrichStarted) return;
+      railEnrichStarted = true;
+      const cards = grid.querySelectorAll('.recommendation-card');
+      for (let i = 0; i < movies.length && i < cards.length && i < 12; i++) {
+        const mv = movies[i], card = cards[i];
+        const imdbId = mv.imdbId ? String(mv.imdbId) : '';
+        if (!/^tt\d{5,}$/.test(imdbId)) continue;
+
+        let data = railCacheGet(imdbId);
+        if (!data) {
+          try {
+            const params = new URLSearchParams();
+            if (mv.title) params.set('title', mv.title);
+            const yHint = getMovieYear(mv);
+            if (yHint) params.set('year', yHint);
+            const qs = params.toString();
+            const resp = await fetch((window.__API_BASE__ || '') + '/api/tmdb/details/' + encodeURIComponent(imdbId) + (qs ? '?' + qs : ''));
+            if (resp.ok) data = await resp.json();
+          } catch (e) { data = null; }
+          if (!data || !data.found) {
+            try { data = await fetchWikidataDirect(mv, imdbId); } catch (e) { data = null; }
+          }
+          if (data && data.found) {
+            try { localStorage.setItem('deymflix_pcdetails_' + imdbId, JSON.stringify({ savedAt: Date.now(), data: data })); } catch (e) {}
+          }
+        }
+
+        if (data && data.found) {
+          const info = card.querySelector('.rec-info');
+          if (info) {
+            const dateTxt = pcDateLabel(data.releaseDate);
+            const score = Math.round(Number(data.score) * 10) / 10;
+            if (dateTxt && !info.querySelector('.rec-date')) {
+              const s = document.createElement('span');
+              s.className = 'rec-date';
+              s.textContent = dateTxt;
+              info.insertBefore(s, info.querySelector('.rec-genre'));
+            }
+            if (score > 0 && !info.querySelector('.rec-rating')) {
+              const s = document.createElement('span');
+              s.className = 'rec-rating';
+              s.innerHTML = '<b>' + pcEscape(score) + '</b>/5 IMDB';
+              info.insertBefore(s, info.querySelector('.rec-genre'));
+            }
+          }
+        }
+        await new Promise(function (r) { setTimeout(r, 250); });
+      }
     }
 
     // Start the video loader regardless of ?mode value.
