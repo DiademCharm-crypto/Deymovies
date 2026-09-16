@@ -118,12 +118,62 @@ const movies = [
     isSeries: false
   },
   { 
+    id: "Filipiñana", 
+    imdbId: "tt29512008",
+    title: "Filipiñana", 
+    isFilipino: true,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/paJZyL5uwTJZLlWbEcN6MbFLGYA.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Filipi%C3%B1ana+%E2%80%93+DLPAPS.mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
+    id: "Ganito, Ganyan, Ganoon", 
+    imdbId: "tt39741670",
+    title: "Ganito, Ganyan, Ganoon", 
+    isFilipino: true,
+    poster: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/This%2C+That+and+Everything+in+Between.mp4",
+    manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
     id: "Us in the End (Tayo sa Wakas)", 
     imdbId: "tt39554253",
     title: "Us in the End (Tayo sa Wakas)", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/jWK3fep9bswDb6EuarNgoIihDBa.jpg",
     manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Us.In.The.End.2026.1080p.WEB-DLH264-TRICKFLIX+(1).mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
+    id: "Wonderful Nightmare", 
+    imdbId: "tt39602729",
+    title: "Wonderful Nightmare", 
+    isFilipino: true,
+    poster: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Wonderful+Nightmare.mp4",
+    manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
+    id: "A Special Memory", 
+    imdbId: "tt40269077",
+    title: "A Special Memory", 
+    isFilipino: true,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1ucCvNfCUlhacBZseLik4IWg797.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/A+Special+Memory.mp4",
+    trailerEmbed: "",
+    isSeries: false
+  },
+  { 
+    id: "Until She Remembers", 
+    imdbId: "tt39310310",
+    title: "Until She Remembers", 
+    isFilipino: true,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/xLjqaHCbdX8Rh3vRvR9XQbgGk85.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Until+She+Remembers+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "",
     isSeries: false
   },
