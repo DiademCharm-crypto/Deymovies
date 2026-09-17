@@ -579,6 +579,29 @@
       z-index: 520;
       transition: width 0.3s linear;
     }
+    .reel-vast-mute {
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 520;
+    }
+    .reel-vast-overlay.active .reel-vast-mute {
+      display: flex;
+    }
+    .reel-vast-mute.muted {
+      color: #e50914;
+      border-color: #e50914;
+    }
   </style>
 </head>
 <body>
@@ -654,6 +677,7 @@
   </script>
   <script src="security.js"></script>
   <script src="reels-data.js?v=151.0"></script>
+    <script src="filipino-movies.js?v=1.0"></script>
   <script src="app.js?v=153.0"></script>
   <script>
     function sanitizeHTML(str) {
@@ -839,6 +863,9 @@
             <span class="reel-vast-label">Ad</span>
             <span class="reel-vast-timer" id="reel-vast-timer-${index}">Loading ad...</span>
             <video class="reel-vast-video" id="reel-vast-video-${index}" playsinline></video>
+            <button class="reel-vast-mute" id="reel-vast-mute-${index}" title="Mute ad" onclick="event.stopPropagation(); toggleReelAdMute(${index})">
+              <svg id="reel-vast-mute-icon-${index}" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
             <div class="reel-vast-progress" id="reel-vast-progress-${index}" style="width:0%"></div>
             <button class="reel-vast-skip" id="reel-vast-skip-${index}" onclick="skipReelAd(${index})">Skip ▶</button>
           </div>
@@ -1275,6 +1302,31 @@
     let reelAdPlayed = new Set(); // Track which reels already showed an ad
     const REEL_VAST_URL = (window.__API_BASE__ || '') + '/api/vast';
 
+    // ── Ad mute (shared preference with the player page via localStorage) ──
+    let reelAdMuted = localStorage.getItem('deymflix_ad_muted') === '1';
+    function persistAdMute() { localStorage.setItem('deymflix_ad_muted', reelAdMuted ? '1' : '0'); }
+
+    function setReelAdMuteUI(index) {
+      const btn = document.getElementById('reel-vast-mute-' + index);
+      const icon = document.getElementById('reel-vast-mute-icon-' + index);
+      if (btn) btn.classList.toggle('muted', reelAdMuted);
+      if (icon) {
+        icon.innerHTML = reelAdMuted
+          ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
+          : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+      }
+    }
+
+    function toggleReelAdMute(index) {
+      reelAdMuted = !reelAdMuted;
+      persistAdMute();
+      // Apply to every reel ad video (mute state follows the user across cards)
+      document.querySelectorAll('.reel-vast-video').forEach(v => { v.muted = reelAdMuted; });
+      // Sync all visible mute buttons
+      document.querySelectorAll('[id^="reel-vast-mute-"]').forEach((b, i) => setReelAdMuteUI(i));
+      if (typeof window !== 'undefined' && typeof adMuted !== 'undefined') { /* player-page hook, if present */ }
+    }
+
     async function parseVastXml(xmlText) {
       try {
         const parser = new DOMParser();
@@ -1332,10 +1384,10 @@
         const resp = await fetch(REEL_VAST_URL);
         const xmlText = await resp.text();
         const videoUrl = await parseVastXml(xmlText);
-        if (!videoUrl) { clearTimeout(stallGuard); skipReelAd(index); return; }
-
-        adVideo.src = videoUrl;
-        adVideo.load();
+        if (!videoUrl) { clearTimeout(stallGuard); skipReelAd(index); return; }        adVideo.src = videoUrl;
+          adVideo.load();
+          adVideo.muted = reelAdMuted; // honor the ad-mute preference
+          setReelAdMuteUI(index);
 
         // Fire impression pixels the moment the ad truly starts rendering
         adVideo.addEventListener('playing', function onReelAdPlaying() {

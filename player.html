@@ -717,6 +717,11 @@
       border-color: #e50914 !important;
     }
 
+    .subtitle-result-item.local-sub-match {
+      border-color: rgba(229, 9, 20, 0.55) !important;
+      background: rgba(229, 9, 20, 0.10) !important;
+    }
+
     .subtitle-status {
       font-size: 0.75rem !important;
       color: #cccccc !important;
@@ -1282,6 +1287,84 @@
       background: #e50914;
       z-index: 520;
       transition: width 0.3s linear;
+    }
+    .vast-ad-mute {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      margin-top: 34px; /* below the timer */
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 520;
+      transition: background 0.2s;
+    }
+    .vast-ad-overlay.active .vast-ad-mute {
+      display: flex;
+    }
+    .vast-ad-mute:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .vast-ad-mute.muted {
+      color: #e50914;
+      border-color: #e50914;
+    }
+
+    /* ── Netflix-style Next Episode ── */
+    .next-episode-box {
+      position: absolute;
+      right: 24px;
+      bottom: 90px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      z-index: 480;
+      animation: nextEpIn 0.3s ease;
+    }
+    .next-episode-box.visible {
+      display: flex;
+    }
+    @keyframes nextEpIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .next-ep-label {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    .next-ep-btn {
+      background: rgba(20, 20, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .next-ep-btn:hover {
+      background: rgba(229, 9, 20, 0.9);
+      border-color: #e50914;
+    }
+    .next-ep-count {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.75);
+      font-weight: 600;
+      min-width: 20px;
+      text-align: left;
     }
 
     /* ══════════════════════════════════════════════════════════════════
@@ -2003,12 +2086,24 @@
     <div id="vast-ad-overlay" class="vast-ad-overlay">
       <span class="vast-ad-label">Advertisement</span>
       <span class="vast-ad-timer" id="vast-ad-timer">Loading ad...</span>
-      <video id="vast-ad-video" class="vast-ad-video" playsinline></video>
+      <video id="vast-ad-video" class="vast-ad-video" playsinline preload="auto"></video>
+      <button class="vast-ad-mute" id="vast-ad-mute" title="Mute ad (M)" onclick="toggleAdMute()">
+        <svg id="vast-ad-mute-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
       <div class="vast-ad-progress" id="vast-ad-progress" style="width: 0%"></div>
       <button class="vast-ad-skip" id="vast-ad-skip" onclick="skipVastAd()">Skip Ad ▶</button>
     </div>
 
-    <video id="direct-video-player" playsinline style="display: none;"></video>
+    <!-- NETFLIX-STYLE NEXT EPISODE BUTTON -->
+    <div id="next-episode-box" class="next-episode-box">
+      <span class="next-ep-label">Next episode</span>
+      <button id="btn-next-episode" class="next-ep-btn" onclick="playNextEpisode()">
+        <span id="next-ep-text">Next Episode</span>
+        <span id="next-ep-count" class="next-ep-count"></span>
+      </button>
+    </div>
+
+    <video id="direct-video-player" playsinline preload="auto" style="display: none;"></video>
 
     <!-- Animated Loading Buffer Overlay -->
     <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: none;">
@@ -2145,6 +2240,7 @@
               <option value="zh">Chinese</option>
             </select>
             <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
+            <button id="btn-subtitle-local" class="subtitle-search-btn" style="margin-top:5px;">📁 My Subtitles</button>
             <div id="subtitle-status" class="subtitle-status"></div>
             <div id="subtitle-results" class="subtitle-results"></div>
             <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
@@ -2206,7 +2302,7 @@
   <style>
   /* ════════════════════════════════════════════════════════════════
      PC RAIL (≥1024px): YouTube-style list — thumbnail LEFT, text RIGHT.
-     Card: [poster thumb] [Title / Date / 4.5/5 IMDB]. The text column is
+     Card: [poster thumb] [Title / Date / 8.7/10 IMDB]. The text column is
      always reserved, so nothing shifts while the poster image loads.
      Below 1024px these rules never apply (mobile keeps the poster grid).
      ════════════════════════════════════════════════════════════════ */
@@ -2440,6 +2536,7 @@
     })();
   </script>
   <script src="security.js"></script>
+    <script src="filipino-movies.js?v=1.0"></script>
   <script src="app.js?v=153.0"></script>
   <script src="episodes.js?v=1.0"></script>
   <script>
@@ -2978,7 +3075,7 @@
             : '';
         }
         if (railScore > 0 && pcIsDesktop()) {
-          ratingRow.classList.remove('is-ready'); // PC only: rail already shows X.X/5 IMDB
+          ratingRow.classList.remove('is-ready'); // PC only: rail already shows X.X/10 IMDB
         } else {
           ratingRow.classList.add('is-ready'); // mobile always keeps the rating row
         }
@@ -3277,7 +3374,7 @@
       document.fonts.ready.then(function () { pcCheckSynopsisClamp(); }).catch(function () {});
     }
 
-    /* ── side-rail score: the same X.X/5 IMDB shown next to each rail card ──
+    /* ── side-rail score: the same X.X/10 IMDB shown next to each rail card ──
        Ratings live in the server cache (data.score) or in the localStorage
        details cache for that movie's imdb id, so the hero area can skip the
        rating row when the rail beside it already shows the score. */
@@ -3821,9 +3918,9 @@
       // Reset _episodeId when video loads so next episode starts fresh
       delete currentMovie._episodeId;
 
-      // Auto-load English subtitles if not already active
+      // Auto-load English subtitles if not already active (local folder first, then online)
       if (!subtitleActive && currentMovie.title) {
-        autoLoadSubtitles(currentMovie.title, 'en');
+        autoLoadSubtitlesWithLocal(currentMovie.title, 'en');
       }
     });
 
@@ -4008,7 +4105,7 @@
           turnOffSubtitles();
         } else {
           const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-          autoLoadSubtitles(currentMovie.title, lang);
+          autoLoadSubtitlesWithLocal(currentMovie.title, lang);
           showToast('Loading subtitles…');
         }
         updateSubtitleToggleUI();
@@ -4082,7 +4179,7 @@
             turnOffSubtitles();
           } else {
             const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-            autoLoadSubtitles(currentMovie.title, lang);
+            autoLoadSubtitlesWithLocal(currentMovie.title, lang);
             showToast('Loading subtitles…');
           }
           updateSubtitleToggleUI();
@@ -4359,6 +4456,213 @@
       };
     }
     // (Turn Off Subtitles button removed — the Subtitles switch above handles it)
+
+    // ============ LOCAL SUBTITLES (the /subtitles folder) ============
+    const btnSubtitleLocal = document.getElementById('btn-subtitle-local');
+    const localSubCache = { at: 0, files: [] };
+
+    function localSubBase() {
+      return (window.__API_BASE__ || '');
+    }
+
+    function normalizeSubName(s) {
+      return String(s || '').toLowerCase()
+        .replace(/\.(srt|vtt|ass|ssa)$/i, '')
+        .replace(/[._\-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function movieSubCandidates() {
+      const m = currentMovie || {};
+      const list = [];
+      const push = v => { if (v && list.indexOf(v) === -1) list.push(v); };
+      if (m._episodeNum) {
+        // Episodes: "Title-ep2" first, then episode-name patterns
+        push(m.title + '-ep' + m._episodeNum);
+        push(m.title + ' episode ' + m._episodeNum);
+        push(m.title + ' s' + String(m._episodeSeason || 1).padStart(2, '0') + 'e' + String(m._episodeNum).padStart(2, '0'));
+        if (m._episodeName) push(m.title + ' ' + m._episodeName);
+      } else {
+        push(m.title);
+        if (m.imdbId) push(m.imdbId);
+      }
+      return list;
+    }
+
+    function fileMatchesMovie(fileName) {
+      // fileName may include subfolders: "Crew Girl/ep1.srt"
+      const parts = String(fileName).split('/');
+      const dir = parts.slice(0, -1).join(' ');   // "Crew Girl"
+      const base = parts[parts.length - 1] || '';
+      const f = normalizeSubName(base);
+      const d = normalizeSubName(dir);
+      if (!f) return false;
+      const m = currentMovie || {};
+      // Reject files for other episodes: "... ep3" must not match "...-ep2"
+      if (m._episodeNum) {
+        const epRe = /\b(?:ep?\.?\s*)(\d{1,2})\b|\bs(\d{1,2})\s*e(\d{1,2})\b/g;
+        let mm;
+        while ((mm = epRe.exec(f)) !== null) {
+          const n1 = mm[2] ? parseInt(mm[2], 10) : null;
+          const n2 = mm[3] ? parseInt(mm[3], 10) : null;
+          const n = (n1 !== null && !isNaN(n1)) ? n1 : (n2 !== null ? n2 : null);
+          if (n !== null && n !== m._episodeNum) return false;
+        }
+      }
+      const cands = movieSubCandidates().map(normalizeSubName).filter(Boolean);
+      // The file (or its subfolder name) must reference this movie/series
+      const hay = d ? d + ' ' + f : f;
+      return cands.some(c => c === f || hay.indexOf(c) !== -1 || c.indexOf(f) !== -1);
+    }
+
+    function subtitleUploadUrl(fileName) {
+      return localSubBase() + '/api/local-subtitles/' + encodeURIComponent(fileName);
+    }
+
+    // Returns the raw subtitle text, converting .ass/.ssa to SRT if needed
+    function loadLocalSubText(fileName) {
+      return fetch(subtitleUploadUrl(fileName))
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .then(txt => {
+          if (/^\s*\[Script Info\]/i.test(txt)) return assToSrt(txt);
+          return txt;
+        });
+    }
+
+    function applyLocalSubtitle(fileName, silent) {
+      return loadLocalSubText(fileName).then(srtText => {
+        const label = fileName.replace(/\.(srt|vtt|ass|ssa)$/i, '');
+        enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, 'en', srtText);
+        if (!silent) showToast('Subtitles loaded: ' + label);
+        if (subtitleStatus) subtitleStatus.textContent = 'Loaded from your subtitles folder: ' + fileName;
+      });
+    }
+
+    function fetchLocalSubList(force) {
+      const now = Date.now();
+      if (!force && localSubCache.files.length && (now - localSubCache.at) < 30000) {
+        return Promise.resolve(localSubCache.files);
+      }
+      return fetch(localSubBase() + '/api/local-subtitles')
+        .then(r => r.ok ? r.json() : { files: [] })
+        .then(j => {
+          localSubCache.files = j.files || [];
+          localSubCache.at = now;
+          return localSubCache.files;
+        })
+        .catch(() => []);
+    }
+
+    // Priority loader: local folder first, then OpenSubtitles online search
+    async function autoLoadSubtitlesWithLocal(title, lang) {
+      try {
+        const files = await fetchLocalSubList();
+        const match = files.find(fileMatchesMovie);
+        if (match) {
+          await applyLocalSubtitle(match, true);
+          showToast('Subtitles loaded: ' + match.replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
+          return; // local match wins — skip online search
+        }
+      } catch (e) { /* fall through */ }
+      // No-backend hosting (GitHub Pages, Live Server, file://): try conventional paths.
+      // Covers both layouts: top-level files AND series subfolders (subtitles/Crew Girl/ep1.srt)
+      try {
+        const m = currentMovie || {};
+        const enc = s => encodeURIComponent(s);
+        const guesses = [];
+        if (m._episodeNum) {
+          const n = m._episodeNum;
+          guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
+        } else {
+          guesses.push('subtitles/' + enc(m.title) + '.srt');
+        }
+        for (const g of guesses) {
+          try {
+            const resp = await fetch(g);
+            if (resp.ok) {
+              const txt = await resp.text();
+              if (txt && txt.indexOf('-->') !== -1) { // sanity: it's really a subtitle, not a 404 page
+                const label = m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title;
+                enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, 'en', txt);
+                showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
+                return;
+              }
+            }
+          } catch (e) {}
+        }
+      } catch (e) { /* fall through to online */ }
+      return autoLoadSubtitles(title, lang);
+      }
+
+    function renderLocalSubList() {
+      if (!subtitleResults) return;
+      subtitleResults.innerHTML = '';
+      fetchLocalSubList(true).then(files => {
+        if (!files.length) {
+          if (subtitleStatus) subtitleStatus.textContent = 'No files in your subtitles folder yet. Drop .srt files in /subtitles on the server.';
+          return;
+        }
+        if (subtitleStatus) subtitleStatus.textContent = files.length + ' file(s) in your subtitles folder — tap one to load:';
+        files.forEach(fn => {
+          const div = document.createElement('div');
+          div.className = 'subtitle-result-item' + (fileMatchesMovie(fn) ? ' local-sub-match' : '');
+          div.textContent = fn + (fileMatchesMovie(fn) ? '  ★ match' : ''); // subfolder paths shown as-is: "Crew Girl/ep1.srt"
+          div.onclick = () => {
+            applyLocalSubtitle(fn).catch(() => {
+              if (subtitleStatus) subtitleStatus.textContent = 'Could not load ' + fn;
+            });
+          };
+          subtitleResults.appendChild(div);
+        });
+      });
+    }
+
+    if (btnSubtitleLocal) {
+      btnSubtitleLocal.onclick = (e) => {
+        e.stopPropagation();
+        renderLocalSubList();
+      };
+    }
+
+    // Minimal .ass/.ssa → .srt converter (dialogue lines + timing)
+    function assToSrt(assText) {
+      const lines = String(assText).replace(/\r/g, '').split('\n');
+      const out = [];
+      let idx = 1;
+      const toSrtTime = t => {
+        const m = String(t).trim().match(/(\d+):(\d+):(\d+)[.,](\d{1,3})/);
+        if (!m) return null;
+        return m[1].padStart(2, '0') + ':' + m[2].padStart(2, '0') + ':' + m[3].padStart(2, '0') + ',' + m[4].padEnd(3, '0').slice(0, 3);
+      };
+      let fmt = null;
+      for (const ln of lines) {
+        if (/^\s*Format:\s*(.*)$/i.test(ln) && /text/i.test(ln)) {
+          fmt = ln.replace(/^\s*Format:\s*/i, '').split(',').map(s => s.trim().toLowerCase());
+          continue;
+        }
+        const dm = ln.match(/^\s*Dialogue:\s*(.*)$/i);
+        if (!dm) continue;
+        const parts = dm[1].split(',');
+        if (parts.length < 10) continue;
+        const start = toSrtTime(parts[1]);
+        const end = toSrtTime(parts[2]);
+        if (!start || !end) continue;
+        let textIdx = fmt ? fmt.indexOf('text') : 9;
+        if (textIdx < 0) textIdx = 9;
+        const text = parts.slice(textIdx).join(',')
+          .replace(/\{[^}]*\}/g, '')              // strip override tags
+          .replace(/\\N/gi, '\n')                 // soft line breaks
+          .replace(/\s+$/, '');
+        if (!text) continue;
+        out.push(idx + '\n' + start + ' --> ' + end + '\n' + text);
+        idx++;
+      }
+      return out.join('\n\n') + (out.length ? '\n' : '');
+    }
 
     // Subtitle timing offset controls
     const subOffsetSlider = document.getElementById('sub-offset-slider');
@@ -4656,7 +4960,7 @@
           turnOffSubtitles();
         } else {
           const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-          autoLoadSubtitles(currentMovie.title, lang);
+          autoLoadSubtitlesWithLocal(currentMovie.title, lang);
           showToast('Loading subtitles…');
         }
         updateSettingsSubToggleUI();
@@ -5180,7 +5484,7 @@
           <div class="rec-info">
             <span class="rec-title">${sanitizeHTML(movie.title)}</span>
             ${railDate ? `<span class="rec-date">${sanitizeHTML(railDate)}</span>` : ''}
-            ${railScore ? `<span class="rec-rating"><b>${sanitizeHTML(railScore)}</b>/5 IMDB</span>` : ''}
+            ${railScore ? `<span class="rec-rating"><b>${sanitizeHTML(railScore)}</b>/10 IMDB</span>` : ''}
             <span class="rec-genre">${sanitizeHTML(genreText)} • ${qualityLabel}</span>
           </div>
         `;
@@ -5249,7 +5553,7 @@
             if (score > 0 && !info.querySelector('.rec-rating')) {
               const s = document.createElement('span');
               s.className = 'rec-rating';
-              s.innerHTML = '<b>' + pcEscape(score) + '</b>/5 IMDB';
+              s.innerHTML = '<b>' + pcEscape(score) + '</b>/10 IMDB';
               info.insertBefore(s, info.querySelector('.rec-genre'));
             }
           }
@@ -5329,6 +5633,8 @@
     const vastProgress = document.getElementById('vast-ad-progress');
     let vastTriggered = false;
     let vastAdPlaying = false;
+    let movieMutedBeforeAd = false;
+    let vastLoadGuard = null;
     let vastCountdown = null;
     let vastTimeLeft = 7;
     // VAST URL is server-side in proxy-server.js
@@ -5421,8 +5727,18 @@
       if (vastTriggered || vastAdPlaying) return;
       vastTriggered = true;
 
-      // Pause the movie
-      directPlayer.pause();
+      // KEEP the movie playing (muted) while the ad loads — a paused video
+      // stops buffering, so pausing here meant re-buffering after every ad.
+      // It keeps buffering behind the overlay and is paused the instant the
+      // ad is actually ready (vastVideo.oncanplay below).
+      movieMutedBeforeAd = directPlayer.muted;
+      directPlayer.muted = true;
+
+      // Safety net: if the ad fetch/load hangs, bail out and resume the movie
+      if (vastLoadGuard) clearTimeout(vastLoadGuard);
+      vastLoadGuard = setTimeout(function () {
+        if (!vastAdPlaying) { console.warn('[VAST] Ad load timeout — skipping'); skipVastAd(); }
+      }, 15000);
 
       // Show overlay with loading state
       vastOverlay.classList.add('active');
@@ -5441,6 +5757,10 @@
       }
 
       // Set video source and play
+      vastVideo.onerror = function () {
+        console.warn('[VAST] Ad video failed to load — skipping');
+        if (!vastAdPlaying) skipVastAd();
+      };
       vastVideo.src = videoUrl;
       vastVideo.load();
 
@@ -5450,11 +5770,13 @@
         fireVastPixels(vastTracking.impressions);
         fireVastPixels(vastTracking.start);
         console.log('[VAST] Ad impression fired to ad network');
-      });
+      });      vastVideo.oncanplay = function() {
 
-      vastVideo.oncanplay = function() {
+        // Ad is ready NOW — pause the movie (it buffered all through the fetch)
+        directPlayer.pause();
+        if (vastLoadGuard) { clearTimeout(vastLoadGuard); vastLoadGuard = null; }
         vastAdPlaying = true;
-
+        vastVideo.muted = adMuted; // honor the ad-mute preference each ad
         // iOS Safari and other autoplay-blocked browsers require a user gesture
         // to play the ad video. The 'waiting' -> 'canplay' event sequence is
         // our best shot — users already tapped to load the ad.
@@ -5478,6 +5800,7 @@
             // Autoplay blocked — show a play button overlay so user can tap to
             // start the ad manually. This is the most common iOS scenario.
             console.warn('[VAST] Autoplay blocked:', err.message);
+            directPlayer.pause(); // ad couldn't start — stop the movie behind the overlay
             vastTimer.textContent = 'Tap to play ad';
             vastSkipBtn.classList.remove('visible');
 
@@ -5514,6 +5837,45 @@
       };
     }
 
+    // ── Ad mute toggle (also used by reels) ──
+    let adMuted = localStorage.getItem('deymflix_ad_muted') === '1';
+    function toggleAdMute() {
+      adMuted = !adMuted;
+      localStorage.setItem('deymflix_ad_muted', adMuted ? '1' : '0');
+      const btn = document.getElementById('vast-ad-mute');
+      const icon = document.getElementById('vast-ad-mute-icon');
+      if (btn) btn.classList.toggle('muted', adMuted);
+      if (icon) {
+        // Swap between speaker and speaker-x icons
+        icon.innerHTML = adMuted
+          ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
+          : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+      }
+      // Apply to every ad video on the page (player + any reel ads)
+      document.querySelectorAll('.vast-ad-video, .reel-vast-video').forEach(v => { v.muted = adMuted; });
+    }
+
+    // ── Enter / OK (TV remote) skips the ad once the skip button is visible ──
+    document.addEventListener('keydown', function adSkipKeyHandler(e) {
+      if (e.key === 'Enter') {
+        // Player ad: visible skip button means we're past the 7s timer
+        const skipBtn = document.getElementById('vast-ad-skip');
+        if (skipBtn && skipBtn.classList.contains('visible') &&
+            document.getElementById('vast-ad-overlay').classList.contains('active')) {
+          e.preventDefault();
+          skipVastAd();
+          return;
+        }
+        // Reel ads
+        const reelSkip = document.querySelector('.reel-vast-skip.visible');
+        if (reelSkip) {
+          e.preventDefault();
+          const m = reelSkip.getAttribute('onclick').match(/skipReelAd\((\d+)\)/);
+          if (m && typeof skipReelAd === 'function') skipReelAd(parseInt(m[1], 10));
+        }
+      }
+    });
+
     // Skip / close VAST ad
     function skipVastAd() {
       vastOverlay.classList.remove('active');
@@ -5521,12 +5883,19 @@
       vastVideo.removeAttribute('src');
       vastVideo.load();
       clearInterval(vastCountdown);
+      if (vastLoadGuard) { clearTimeout(vastLoadGuard); vastLoadGuard = null; }
       vastAdPlaying = false;
+
+      // Restore the sound state the movie had before the ad muted it
+      directPlayer.muted = movieMutedBeforeAd;
+      const volPath = document.getElementById('svg-volume-path');
+      if (volPath && !directPlayer.muted) volPath.setAttribute('d', volOnData);
+      movieMutedBeforeAd = false;
 
       // Resume movie (auto-play) and ensure subtitles are still active
       directPlayer.play().catch(() => {});
       if (!subtitleActive && currentMovie && currentMovie.title) {
-        autoLoadSubtitles(currentMovie.title, 'en');
+        autoLoadSubtitlesWithLocal(currentMovie.title, 'en');
       }
 
       // Reset trigger flag
@@ -5547,6 +5916,96 @@
       else if (vastAdPhase === 1 && pct >= 66 && directPlayer.duration > 600) {
         vastAdPhase = 2;
         showVastAd();
+      }
+    });    // ════════════════════════════════════════════════════════════════
+    // NETFLIX-STYLE NEXT EPISODE — appears at 92% of an episode,
+    // counts down 10s, auto-advances, disappears if ignored.
+    // ════════════════════════════════════════════════════════════════
+    const nextEpBox = document.getElementById('next-episode-box');
+    const nextEpCount = document.getElementById('next-ep-count');
+    let nextEpTimer = null;
+    let nextEpShown = false;
+
+    function getNextEpisodeInfo() {
+      if (typeof seriesData === 'undefined' || !currentMovie || !currentMovie._episodeNum) return null;
+      const series = seriesData.find(s => s.id === currentMovie.id);
+      if (!series || !series.seasons) return null;
+      const curSeasonIdx = series.seasons.findIndex(s => s.seasonNumber === (currentMovie._episodeSeason || 1));
+      if (curSeasonIdx === -1) return null;
+      const curSeason = series.seasons[curSeasonIdx];
+      const epIdx = curSeason.episodes.findIndex(e => e.episodeNumber === currentMovie._episodeNum);
+      if (epIdx === -1) return null;
+      if (epIdx + 1 < curSeason.episodes.length) {
+        return { episode: curSeason.episodes[epIdx + 1], season: curSeason,
+                 label: 'Episode ' + curSeason.episodes[epIdx + 1].episodeNumber };
+      }
+      // End of season → next season's first episode
+      if (curSeasonIdx + 1 < series.seasons.length) {
+        const ns = series.seasons[curSeasonIdx + 1];
+        if (ns.episodes && ns.episodes.length) {
+          return { episode: ns.episodes[0], season: ns,
+                   label: 'S' + ns.seasonNumber + ' Episode ' + ns.episodes[0].episodeNumber };
+        }
+      }
+      return null; // series finished
+    }
+
+    function playNextEpisode() {
+      const nxt = getNextEpisodeInfo();
+      hideNextEpisodeButton();
+      if (!nxt) return;
+      // Reset ad phase so the new episode gets its own ads
+      vastAdPhase = 0;
+      // Mark the correct button active in the episodes grid
+      document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
+      const btns = document.querySelectorAll('.episode-square-btn');
+      btns.forEach(b => {
+        if (b.textContent.trim() === String(nxt.episode.episodeNumber)) b.classList.add('active');
+      });
+      if (typeof playEpisodeSource === 'function') playEpisodeSource(nxt.episode, nxt.season);
+    }
+
+    function hideNextEpisodeButton() {
+      nextEpBox.classList.remove('visible');
+      if (nextEpTimer) { clearInterval(nextEpTimer); nextEpTimer = null; }
+    }
+
+    function maybeShowNextEpisode() {
+      if (!currentMovie || !currentMovie._episodeNum) return;      // movies: never
+      if (typeof seriesData === 'undefined') return;
+      if (!getNextEpisodeInfo()) return;                            // no next episode
+      if (isNaN(directPlayer.duration) || directPlayer.duration < 60) return;
+      const remain = directPlayer.duration - directPlayer.currentTime;
+      if (remain <= (directPlayer.duration * 0.08) && remain > 0.5) {
+        if (!nextEpShown) {
+          nextEpShown = true;
+          const nxt = getNextEpisodeInfo();
+          document.getElementById('next-ep-text').textContent = nxt.label;
+          nextEpBox.classList.add('visible');
+          let count = 10;
+          nextEpCount.textContent = count + 's';
+          nextEpTimer = setInterval(() => {
+            count--;
+            if (count <= 0) {
+              hideNextEpisodeButton(); // Netflix behaviour: ignored → hide
+            } else {
+              nextEpCount.textContent = count + 's';
+            }
+          }, 1000);
+        }
+      }
+    }
+
+    directPlayer.addEventListener('timeupdate', maybeShowNextEpisode);
+    directPlayer.addEventListener('seeked', () => { if (directPlayer.currentTime < directPlayer.duration * 0.85) { nextEpShown = false; hideNextEpisodeButton(); } });
+    directPlayer.addEventListener('ended', () => { // ended with button visible → advance immediately
+      if (nextEpBox.classList.contains('visible')) playNextEpisode();
+    });
+    // Re-allow the button on new episode load
+    document.addEventListener('click', (e) => {
+      if (e.target.closest && e.target.closest('.episode-square-btn')) {
+        nextEpShown = false;
+        hideNextEpisodeButton();
       }
     });
 

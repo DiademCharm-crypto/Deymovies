@@ -17,7 +17,7 @@ const SECRETS = {
   OPENSUBTITLES_USERNAME: 'deymflix',
   OPENSUBTITLES_PASSWORD: 'Chambe09',
   // Optional: set TMDB_API_KEY in the environment to override the key below.
-  TMDB_API_KEY: process.env.TMDB_API_KEY || '15d260044e350723365198253b23914f',
+  TMDB_API_KEY: process.env.TMDB_API_KEY || '4c9f9c43d92c258b1176ac1bf3f9cc8f',
   VAST_TAG_URL: 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB',
   FIREBASE_CONFIG: {
     apiKey: 'AIzaSyCSejdiwh4Y6N6Pwl6QyLXPNYdUqz8vc1M',
@@ -561,6 +561,63 @@ async function handleProxyRoutes(req, res, parsedUrl) {
     return true;
   }
 
+  // ---- Local Subtitles: list files in the /subtitles folder (incl. subfolders) ----
+  if (pathname === '/api/local-subtitles') {
+    const subsDir = path.join(__dirname, 'subtitles');
+    const found = [];
+    const walk = (dir, rel, depth) => {
+      if (depth > 3) return; // sanity cap: subtitles/Crew Girl/Season 1/ is deep enough
+      let items = [];
+      try { items = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
+      for (const it of items) {
+        if (it.name.startsWith('.')) continue;
+        const relPath = rel ? rel + '/' + it.name : it.name;
+        if (it.isDirectory()) {
+          walk(path.join(dir, it.name), relPath, depth + 1);
+        } else if (/\.(srt|vtt|ass|ssa)$/i.test(it.name)) {
+          let mtime = 0;
+          try { mtime = fs.statSync(path.join(dir, it.name)).mtimeMs; } catch (e) {}
+          found.push({ p: relPath, mtime: mtime });
+        }
+      }
+    };
+    walk(subsDir, '', 0);
+    found.sort((a, b) => b.mtime - a.mtime); // newest first
+    jsonResponse(res, 200, { files: found.map(f => f.p) });
+    return true;
+  }
+
+  // ---- Local Subtitles: serve one file (subfolder-safe, no traversal) ----
+  if (pathname.startsWith('/api/local-subtitles/')) {
+    let requested = '';
+    try { requested = decodeURIComponent(pathname.split('/api/local-subtitles/')[1] || ''); } catch (e) {
+      return sendError(res, 400, 'Invalid path');
+    }
+    if (!requested || requested.includes('..') || requested.includes('\\') || /^[a-zA-Z]:/.test(requested)) {
+      return sendError(res, 400, 'Invalid path');
+    }
+    const subsRoot = path.resolve(__dirname, 'subtitles');
+    const full = path.resolve(subsRoot, requested);
+    if (full !== subsRoot && !full.startsWith(subsRoot + path.sep)) {
+      return sendError(res, 403, 'Forbidden');
+    }
+    if (!/\.(srt|vtt|ass|ssa)$/i.test(full)) {
+      return sendError(res, 400, 'Only .srt/.vtt/.ass/.ssa files are served');
+    }
+    try {
+      const data = fs.readFileSync(full);
+      res.writeHead(200, {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache'
+      });
+      res.end(data);
+    } catch (e) {
+      sendError(res, 404, 'Subtitle file not found');
+    }
+    return true;
+  }
+
   // ---- TMDB Movie Lookup ----
   if (pathname.startsWith('/api/tmdb/movie/')) {
     const movieId = pathname.split('/api/tmdb/movie/')[1];
@@ -634,21 +691,9 @@ async function handleProxyRoutes(req, res, parsedUrl) {
         } catch (e) {}
       }
 
-      // 2) This library stores TMDB ids with a "tt" prefix — try /movie/<digits> directly
-      if (!tmdbId && keyWorks) {
-        try {
-          const direct = await fetchUrl(
-            'https://api.themoviedb.org/3/movie/' + rawId.slice(2) +
-            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US'
-          );
-          if (direct.status === 200) {
-            const dj = JSON.parse(direct.body);
-            if (dj && dj.id) tmdbId = dj.id;
-          }
-        } catch (e) {}
-      }
-
-      // 3) TMDB search by title (year narrows same-title remakes)
+      // 2) TMDB search by title (year narrows same-title remakes).
+      //    Preferred over the numeric probe: our ids are IMDB ids, so probing
+      //    /movie/<digits> can resolve a completely different film.
       if (!tmdbId && keyWorks && titleHint) {
         try {
           const s = await fetchUrl(
@@ -660,6 +705,22 @@ async function handleProxyRoutes(req, res, parsedUrl) {
             const sj = JSON.parse(s.body);
             const first = (sj.results || [])[0];
             if (first) tmdbId = first.id;
+          }
+        } catch (e) {}
+      }
+
+      // 3) Legacy fallback: some entries may still carry numeric TMDB ids with a
+      //    "tt" prefix — try /movie/<digits> directly (title gate below catches
+      //    any wrong-film hits this produces).
+      if (!tmdbId && keyWorks) {
+        try {
+          const direct = await fetchUrl(
+            'https://api.themoviedb.org/3/movie/' + rawId.slice(2) +
+            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US'
+          );
+          if (direct.status === 200) {
+            const dj = JSON.parse(direct.body);
+            if (dj && dj.id) tmdbId = dj.id;
           }
         } catch (e) {}
       }
