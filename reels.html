@@ -1377,8 +1377,8 @@
       skipBtn.classList.remove('visible');
       progress.style.width = '0%';
 
-      // Safety net: if the ad request stalls, clear the overlay after 10s
-      const stallGuard = setTimeout(() => { if (overlay.classList.contains('active') && !adVideo.src) skipReelAd(index); }, 10000);
+      // NOTE: no stall-guard auto-skip — if the ad request stalls the overlay
+      // stays on "Loading ad..." until it loads or the user skips (after 7s).
 
       try {
         const resp = await fetch(REEL_VAST_URL);
@@ -1392,10 +1392,33 @@
           const resp2 = await fetch(REEL_VAST_URL);
           videoUrl = await parseVastXml(await resp2.text());
         }
-        if (!videoUrl) { clearTimeout(stallGuard); skipReelAd(index); return; }        adVideo.src = videoUrl;
+        if (!videoUrl) {
+          // No fill — let the USER decide (no auto-skip). Skip unlocks after 7s;
+          // the reel stays paused behind the overlay and resumes on skip.
+          console.warn('[VAST] No video URL found — waiting for user skip');
+          let n = 7;
+          timer.textContent = 'No ad available — skip in 7s';
+          const iv = setInterval(() => {
+            n--;
+            if (n <= 0) { clearInterval(iv); timer.textContent = 'No ad available'; skipBtn.classList.add('visible'); }
+            else { timer.textContent = 'No ad available — skip in ' + n + 's'; }
+          }, 1000);
+          return;
+        }
+        adVideo.src = videoUrl;
           adVideo.load();
           adVideo.muted = reelAdMuted; // honor the ad-mute preference
           setReelAdMuteUI(index);
+
+        // Dead ad URL — no auto-skip: keep the overlay up with a message;
+        // the user can Skip (after 7s). The reel resumes when they do.
+        adVideo.onerror = function () {
+          console.warn('[VAST] Reel ad video failed to load');
+          if (!adVideo.duration || isNaN(adVideo.duration)) {
+            timer.textContent = 'Ad unavailable — you can skip';
+            skipBtn.classList.add('visible');
+          }
+        };
 
         // Fire impression pixels the moment the ad truly starts rendering
         adVideo.addEventListener('playing', function onReelAdPlaying() {
@@ -1443,7 +1466,10 @@
 
         adVideo.onended = function() { skipReelAd(index); };
       } catch (e) {
-        skipReelAd(index);
+        // Fetch threw (network down etc.) — surface it, no auto-skip
+        console.warn('[VAST] Reel ad fetch failed:', e && e.message);
+        timer.textContent = 'Ad unavailable — you can skip';
+        skipBtn.classList.add('visible');
       }
     }
 

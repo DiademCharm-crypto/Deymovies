@@ -568,6 +568,67 @@
       .pc-volume-control { display: none !important; }
     }
 
+    /* ── MOBILE (Android) fullscreen volume control ──
+       Red speaker icon in the bottom bar; tapping it opens an
+       adjustable vertical volume slider (no mute/unmute).
+       Shown ONLY in fullscreen on mobile widths; hidden entirely
+       on iOS (Safari forbids setting HTML5 video volume from JS). */
+    .mobile-volume-control {
+      display: none;
+      position: relative;
+      align-items: center;
+    }
+    #btn-mobile-volume {
+      background: none;
+      border: none;
+      color: #e50914;               /* red icon per request */
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .mobile-volume-slider {
+      position: absolute;
+      bottom: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 110px;
+      background: transparent;        /* no background box — just the slider */
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 65;
+    }
+    .mobile-volume-control.open .mobile-volume-slider { display: flex; }
+    .mobile-volume-slider input[type="range"] {
+      width: 84px;
+      transform: rotate(-90deg);    /* bulletproof vertical slider — min at bottom */
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: linear-gradient(to right, #e50914 var(--fill, 100%), rgba(255,255,255,0.45) var(--fill, 100%));
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    .mobile-volume-slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e50914;
+      border: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      body.is-ios .mobile-volume-control { display: none !important; }
+      .video-container.fullscreen-active .mobile-volume-control { display: flex; }
+    }
+
     /* Download Modal */
     .download-modal {
       position: fixed !important;
@@ -2233,6 +2294,18 @@
                 <input type="range" id="pc-volume-slider" min="0" max="100" value="100" step="1">
               </div>
             </div>
+
+            <!-- Android fullscreen volume: icon opens adjustable slider (no mute) -->
+            <div class="mobile-volume-control" id="mobile-volume-control">
+              <button id="btn-mobile-volume" class="ctrl-btn-small" title="Volume" style="padding:0;">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+              </button>
+              <div class="mobile-volume-slider">
+                <input type="range" id="mobile-volume-slider" min="0" max="100" value="100" step="1">
+              </div>
+            </div>
           </div>
           <div class="right-utility-btns">
             <button id="btn-settings" class="ctrl-btn-small settings-btn" title="Settings">
@@ -3030,6 +3103,11 @@
     }
 
     function pcPersonCard(name, role, photo) {
+      // TMDB returns bare paths like '/abc.jpg' — add the image base so the
+      // browser doesn't request it against our own origin (404).
+      if (photo && photo.charAt(0) === '/' && !/^https?:\/\//i.test(photo)) {
+        photo = 'https://image.tmdb.org/t/p/w185' + photo;
+      }
       const initials = String(name || '?')
         .trim().split(/\s+/).slice(0, 2)
         .map(function (w) { return w.charAt(0); })
@@ -3571,6 +3649,9 @@
       const settingsPanelEl = document.getElementById('settings-panel');
       if (settingsPanelEl && settingsPanelEl.classList.contains('open')) return;
       playerOverlay.classList.remove('active');
+      // Close the mobile volume popup with the rest of the controls
+      const mvc = document.getElementById('mobile-volume-control');
+      if (mvc) mvc.classList.remove('open');
     }
 
     function toggleOverlayControls(e) {
@@ -4235,6 +4316,53 @@
         }
       });
     }
+
+    // ── Mobile (Android) fullscreen volume: tap = adjustable slider, NOT mute ──
+    // iOS/Safari doesn't allow JS to set HTML5 video volume, so this control is
+    // Android-only (body.is-ios hides it via CSS even in fullscreen).
+    const mobileVolumeControl = document.getElementById('mobile-volume-control');
+    const btnMobileVolume = document.getElementById('btn-mobile-volume');
+    const mobileVolumeSlider = document.getElementById('mobile-volume-slider');
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIOSDevice && document.body) document.body.classList.add('is-ios');
+    let mvCloseTimer = null;
+    function mvScheduleClose() {
+      clearTimeout(mvCloseTimer);
+      mvCloseTimer = setTimeout(() => {
+        if (mobileVolumeControl) mobileVolumeControl.classList.remove('open');
+      }, 6000);
+    }
+    function updateMobileVolumeFill() {
+      if (!mobileVolumeSlider) return;
+      mobileVolumeSlider.style.setProperty('--fill', (mobileVolumeSlider.value || 0) + '%');
+    }
+    if (btnMobileVolume && mobileVolumeSlider && !isIOSDevice) {
+      btnMobileVolume.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Open/close the adjustable slider — never mute/unmute
+        mobileVolumeControl.classList.toggle('open');
+        mobileVolumeSlider.value = Math.round((directPlayer.muted ? 0 : directPlayer.volume) * 100);
+        updateMobileVolumeFill();
+        if (mobileVolumeControl.classList.contains('open')) mvScheduleClose();
+      });
+      mobileVolumeSlider.addEventListener('input', (e) => {
+        e.stopPropagation();
+        const vol = parseInt(e.target.value, 10) / 100;
+        try { directPlayer.volume = vol; directPlayer.muted = false; } catch (err) {}
+        if (svgPcVolumePath) svgPcVolumePath.setAttribute('d', vol === 0 ? volOffData : volOnData);
+        updateMobileVolumeFill();
+        mvScheduleClose();   // stay open while adjusting
+      });
+      updateMobileVolumeFill();
+    }
+    // Popup closes automatically when leaving fullscreen
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach((evName) => {
+      document.addEventListener(evName, () => {
+        const fs = document.fullscreenElement || document.webkitFullscreenElement;
+        if (!fs && mobileVolumeControl) mobileVolumeControl.classList.remove('open');
+      });
+    });
 
     // ── Subtitle Toggle Button (CC icon) ──
     const btnSubtitleToggle = document.getElementById('btn-subtitle-toggle');
@@ -5943,13 +6071,8 @@
           vastVideo.controls = true;
           vastVideo.style.cursor = 'pointer';
           vastVideo.style.outline = 'none';
-
-          // If the user never taps, don't leave the movie stuck behind the
-          // overlay forever — skip the ad and resume the movie after 12s.
-          if (vastLoadGuard) clearTimeout(vastLoadGuard);
-          vastLoadGuard = setTimeout(function () {
-            if (vastVideo.paused) { console.warn('[VAST] Ad never played — skipping'); skipVastAd(); }
-          }, 12000);
+          // NO auto-skip: the ad stays until the user taps it to play or taps
+          // Skip once the 7s countdown has elapsed.
         });
       }
     }
@@ -5967,11 +6090,8 @@
       directPlayer.muted = true;
       syncPcVolumeUI(); // ad mutes the movie — reflect it on the speaker icon
 
-      // Safety net: if the ad fetch/load hangs, bail out and resume the movie
-      if (vastLoadGuard) clearTimeout(vastLoadGuard);
-      vastLoadGuard = setTimeout(function () {
-        if (!vastAdPlaying) { console.warn('[VAST] Ad load timeout — skipping'); skipVastAd(); }
-      }, 15000);
+      // NOTE: no fetch/load timeout auto-skip — if the ad is slow to load the
+      // overlay stays on "Loading ad..." until it's ready or the user skips.
 
       // Show overlay with loading state
       vastOverlay.classList.add('active');
@@ -5983,16 +6103,34 @@
       const videoUrl = await fetchVastAd();
 
       if (!videoUrl) {
-        // Fallback: skip ad if no video found
-        console.warn('[VAST] No video URL found, skipping ad');
-        skipVastAd();
+        // No fill — show a clear message and let the USER decide (no auto-skip).
+        // Skip becomes available after the 7s countdown so this state can't be
+        // spammed instantly; the movie stays paused and resumes on skip.
+        console.warn('[VAST] No video URL found — waiting for user skip');
+        vastTimer.textContent = 'No ad available — you can skip';
+        directPlayer.pause();
+        (function noFillCountdown() {
+          let n = 7;
+          vastSkipBtn.classList.remove('visible');
+          const iv = setInterval(() => {
+            n--;
+            if (n <= 0) { clearInterval(iv); vastTimer.textContent = 'No ad available'; vastSkipBtn.classList.add('visible'); }
+            else { vastTimer.textContent = 'No ad available — skip in ' + n + 's'; }
+          }, 1000);
+        })();
         return;
       }
 
       // Set video source and play
       vastVideo.onerror = function () {
-        console.warn('[VAST] Ad video failed to load — skipping');
-        if (!vastAdPlaying) skipVastAd();
+        // Dead ad URL — no auto-skip: keep the overlay up with a clear message
+        // and let the user Skip (after 7s) or reload. The movie is paused and
+        // resumes the moment the user skips.
+        console.warn('[VAST] Ad video failed to load');
+        if (!vastAdPlaying) {
+          vastTimer.textContent = 'Ad unavailable — you can skip';
+          directPlayer.pause();
+        }
       };
       // Attach canplay BEFORE src — a cached ad can fire canplay within
       // milliseconds of load(), before an after-src assignment would run.
