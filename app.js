@@ -41,8 +41,8 @@ const featuredMovies = [
     id: "Moana: Live Action", 
     imdbId: "tt27419466", 
     title: "Moana: Live Action",
-    poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10", 
-    backdrop: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw2lirBoqlyONQUwGu0YZFqav1ipY_NEB6beqN14VMzg&s=10",
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
+    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
     manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
     trailerEmbed: "",
     isSeries: false
@@ -95,7 +95,7 @@ const movies = [
     title: "Crew Girl", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tzf21i1ETZEu7i787ED3WThROH.jpg",
     manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=Xs5qsfqp-tA",
     isSeries: true
   },
   { 
@@ -538,7 +538,7 @@ const movies = [
     title: "Narcissist's Playbook", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/nuI0XoN1p92MpVlSNtkxFzM3u6p.jpg",
     manualEmbed: "",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=0scEwiYwYds",
     isSeries: false
   },
   { 
@@ -745,7 +745,7 @@ const movies = [
     title: "Jailhouse to Milhouse", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/9QR5hejamYx2nMtxUHNO96bFsoK.jpg",
     manualEmbed: "",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=LoDuEWrrPI0",
     isSeries: false
   },
   { 
@@ -772,7 +772,7 @@ const movies = [
     title: "The Christmas Spirit", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6a8nocaDfYOehQzeqZMvni9WqVq.jpg",
     manualEmbed: "",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=TzS1uOOL_-M",
     isSeries: false
   },
   { 
@@ -853,7 +853,7 @@ const movies = [
     title: "Oracle of the Dragon", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/lxVFFVIdXDnQCAFAllCrNfPDHFv.jpg",
     manualEmbed: "",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=m22-nh9DiXw",
     isSeries: false
   },
   { 
@@ -914,10 +914,484 @@ function createMovieCard(movie, rankNumber = null) {
       <div class="poster-card-title">${safeTitle}</div>
     </div>
   `;
+  // PC hover trailer preview (index.html only, no-op elsewhere)
+  if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.isEnabled && HOVER_PREVIEW.isEnabled()) {
+    HOVER_PREVIEW.attach(card, movie);
+  }
   return card;
 }
 
 let heroCarouselTimer = null;
+
+// ============================================
+// NETFLIX-STYLE HOVER TRAILER PREVIEW (PC only)
+// Hovering a poster for ~600ms starts a muted
+// trailer preview ON the card (scaled up, absolutely
+// positioned — the grid/poster sizes never change).
+// index.html + category.html.
+// ============================================
+const HOVER_PREVIEW = (function () {
+  // index.html + category.html (category pages use the same .poster-card grid).
+  // Path+search are tested together so /category.html?type=tagalog matches.
+  const isIndexPage = /(^|\/)index\.html($|\?|#)/.test(window.location.pathname + window.location.search) ||
+                      /(^|\/)category\.html($|\?|#)/.test(window.location.pathname + window.location.search) ||
+                      window.location.pathname === '/' || window.location.pathname === '';
+  // Re-evaluated on every use. The old one-shot (hover: hover) and (pointer: fine)
+  // check broke on Windows touchscreen laptops — the touchscreen is the PRIMARY
+  // pointer there, so (pointer: fine) failed even with a mouse attached.
+  // any-* variants are true whenever a mouse/trackpad is present at all.
+  // MOBILE: long-press on a poster opens the same preview (touch-enabled
+  // devices with small screens skip the width/pointer gates via isTouchDevice).
+  let touchDevice = null;
+  function isTouchDevice() {
+    if (touchDevice === null) {
+      touchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    }
+    return touchDevice;
+  }
+  function isEnabled() {
+    if (!isIndexPage) return false;
+    if (isTouchDevice()) return true;           // long-press path — any screen size
+    // Any real desktop window. The any-hover/any-pointer checks below already
+    // exclude touch-only devices; the old 900px floor made the feature dead in
+    // narrow windows and embedded preview panes.
+    if (window.innerWidth < 560) return false;
+    return window.matchMedia('(any-hover: hover)').matches &&
+           window.matchMedia('(any-pointer: fine)').matches;
+  }
+
+  const state = {
+    timer: null,
+    activeCard: null,
+    activeMovieId: null,
+    activeMovie: null,  // movie object for the panel buttons
+    trailerCache: {},   // movieId -> youtube key ('' = none found)
+    detailsCache: {},   // movieId -> details payload (reuses player's endpoint)
+    inflight: {}        // movieId -> Promise<string>
+  };
+  function apiBase() {
+    try { return (window.__DEYMFLIX_CONFIG__ && window.__DEYMFLIX_CONFIG__.API_BASE) || ''; }
+    catch (e) { return ''; }
+  }
+
+  function pageName() {
+    const p = window.location.pathname.split('/').pop();
+    return p || 'index.html';
+  }
+
+  // Resolve a YouTube trailer key for a movie: local trailerEmbed first,
+  // then TMDB via the shared server endpoint (cached server-side too).
+  function resolveTrailerKey(movie) {
+    const id = movie && movie.id;
+    if (!id) return Promise.resolve('');
+    if (state.trailerCache[id] !== undefined) return Promise.resolve(state.trailerCache[id]);
+    if (state.inflight[id]) return state.inflight[id];
+
+    // 1) Manual YouTube trailer from app data
+    const manual = (movie.trailerEmbed || '').trim();
+    if (manual) {
+      const m = manual.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+      if (m) {
+        state.trailerCache[id] = m[1];
+        return Promise.resolve(m[1]);
+      }
+    }
+
+    // 2) TMDB videos through the server (needs imdb id)
+    const imdb = movie.imdbId || movie.tmdbId || '';
+    if (/^tt\d{5,}$/.test(imdb)) {
+      const qs = new URLSearchParams({ title: movie.title || '' });
+      const yr = (movie.releaseDate || movie.year || '').toString().match(/\d{4}/);
+      if (yr) qs.set('year', yr[0]);
+      state.inflight[id] = fetch(apiBase() + '/api/tmdb/details/' + encodeURIComponent(imdb) + '?' + qs.toString())
+        .then(r => r.ok ? r.json() : { found: false })
+        .then(j => {
+          const key = (j && j.trailerKey) || '';
+          state.trailerCache[id] = key;
+          return key;
+        })
+        .catch(() => { state.trailerCache[id] = ''; return ''; })
+        .finally(() => { delete state.inflight[id]; });
+      return state.inflight[id];
+    }
+
+    state.trailerCache[id] = '';
+    return Promise.resolve('');
+  }
+
+  // One global floating panel (NOT inside the card) — Netflix-style landscape
+  // preview that hovers OVER the grid, anchored to the hovered card.
+  // Layout: video / title / Play+Bookmark buttons / match% · year / genres
+  function getPanel() {
+    let pv = document.getElementById('hover-preview-panel');
+    let backdrop = document.getElementById('hover-preview-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'hover-preview-backdrop';
+      backdrop.className = 'hp-backdrop';
+      document.body.appendChild(backdrop);
+      backdrop.addEventListener('touchstart', function () { clearPreview(); }, { passive: true });
+      backdrop.addEventListener('mousedown', function () { clearPreview(); });
+    }
+    if (!pv) {
+      pv = document.createElement('div');
+      pv.id = 'hover-preview-panel';
+      pv.className = 'hover-preview';
+      pv.innerHTML =
+        '<div class="hp-video"><div class="hp-loading">Loading</div></div>' +
+        '<div class="hp-info">' +
+          '<div class="hp-title"></div>' +
+          '<div class="hp-actions">' +
+            '<button class="hp-btn hp-play" title="Play" aria-label="Play">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
+            '</button>' +
+            '<button class="hp-btn hp-bookmark" title="Add to Bookmarks" aria-label="Add to Bookmarks">' +
+              '<svg class="hp-bm-plus" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>' +
+              '<svg class="hp-bm-check" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="hp-meta"><span class="hp-match"></span><span class="hp-year"></span></div>' +
+          '<div class="hp-genres"></div>' +
+        '</div>';
+      document.body.appendChild(pv);
+      wirePanelButtons(pv);
+      // Leaving the panel closes it (unless moving back onto the card — the
+      // card's mouseenter restarts the preview in that case)
+      pv.addEventListener('mouseleave', function (e) {
+        if (state.activeCard && e.relatedTarget && state.activeCard.contains(e.relatedTarget)) return;
+        clearPreview();
+      });
+    }
+    return pv;
+  }
+
+  // Play + bookmark buttons on the panel (delegated — panel is recreated often)
+  function wirePanelButtons(pv) {
+    pv.addEventListener('click', function (e) { e.stopPropagation(); });
+    const play = pv.querySelector('.hp-play');
+    if (play) play.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const m = state.activeMovie || currentMovieForPanel();
+      if (!m) return;
+      window.location.href = 'player.html?id=' + encodeURIComponent(m.id);
+    });
+    const bm = pv.querySelector('.hp-bookmark');
+    if (bm) bm.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const m = state.activeMovie || currentMovieForPanel();
+      if (!m) return;
+      if (typeof addToMyList === 'function' && typeof getMyList === 'function') {
+        const inList = getMyList().some(function (x) { return x.id === m.id; });
+        if (!inList) {
+          addToMyList(m);
+          updateBookmarkBtnState(pv, m);
+        }
+      }
+    });
+  }
+
+  function currentMovieForPanel() {
+    const id = state.activeMovieId;
+    const pool = (typeof movies !== 'undefined' && Array.isArray(movies) ? movies : [])
+      .concat(typeof featuredMovies !== 'undefined' ? featuredMovies : []);
+    return pool.find(function (x) { return x && x.id === id; }) || null;
+  }
+
+  function updateBookmarkBtnState(pv, movie) {
+    const bm = pv.querySelector('.hp-bookmark');
+    if (!bm) return;
+    const inList = (typeof getMyList === 'function') && getMyList().some(function (x) { return x.id === movie.id; });
+    bm.classList.toggle('in-list', inList);
+    bm.title = inList ? 'In Bookmarks' : 'Add to Bookmarks';
+  }
+
+  // Fill match% / year / genres from the TMDB details endpoint (cached)
+  function fetchDetailsForPanel(movie) {
+    const id = movie && movie.id;
+    if (!id) return Promise.resolve(null);
+    if (state.detailsCache[id]) return Promise.resolve(state.detailsCache[id]);
+    const imdb = movie.imdbId || movie.tmdbId || '';
+    if (!/^tt\d{5,}$/.test(imdb)) return Promise.resolve(null);
+    const qs = new URLSearchParams({ title: movie.title || '' });
+    const yr = (movie.releaseDate || movie.year || '').toString().match(/\d{4}/);
+    if (yr) qs.set('year', yr[0]);
+    return fetch(apiBase() + '/api/tmdb/details/' + encodeURIComponent(imdb) + '?' + qs.toString())
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.found) { state.detailsCache[id] = j; } return j || null; })
+      .catch(function () { return null; });
+  }
+
+  function fillInfoRows(movie) {
+    const pv = document.getElementById('hover-preview-panel');
+    if (!pv) return;
+    const matchEl = pv.querySelector('.hp-match');
+    const yearEl = pv.querySelector('.hp-year');
+    const genresEl = pv.querySelector('.hp-genres');
+    // Graceful fallbacks from local data while/instead of TMDB
+    const localYear = (movie.releaseDate || movie.year || '').toString().match(/\d{4}/);
+    if (yearEl) yearEl.textContent = localYear ? localYear[0] : '';
+    if (genresEl) genresEl.textContent = (movie.genres && movie.genres.length) ? movie.genres.join(' · ') : '';
+    fetchDetailsForPanel(movie).then(function (d) {
+      // user may have un-hovered during the fetch
+      if (document.getElementById('hover-preview-panel') !== pv) return;
+      if (!d) return;
+      if (matchEl) {
+        const pct = Math.round((d.score || 0) * 10);
+        matchEl.textContent = pct > 0 ? pct + '% Match' : '';
+      }
+      if (yearEl) {
+        const y = (d.releaseDate || '').match(/\d{4}/);
+        if (y) yearEl.textContent = y[0];
+      }
+      if (genresEl && d.genres && d.genres.length) {
+        genresEl.textContent = d.genres.slice(0, 3).join(' · ');
+      }
+    });
+  }
+
+  function mountPreview(card, movie) {
+    const pv = getPanel();
+    pv.classList.remove('visible');
+    // Panel grows taller (video + info block) — recompute height from the real box
+    const rect = card.getBoundingClientRect();
+    const W = 340;
+    const H = W * 9 / 16 + 150;          // 16:9 video + title/buttons/meta/genres
+    let left = rect.left + rect.width / 2 - W / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - W - 12));
+    let top = rect.top + rect.height / 2 - H / 2;
+    top = Math.max(80, Math.min(top, window.innerHeight - H - 90));
+    pv.style.left = Math.round(left) + 'px';
+    pv.style.top = Math.round(top) + 'px';
+    // Title + rows; buttons reflect current bookmark state
+    const t = pv.querySelector('.hp-title');
+    if (t) t.textContent = movie.title || '';
+    updateBookmarkBtnState(pv, movie);
+    fillInfoRows(movie);
+    state.activeMovie = movie;
+    // Show the poster in the video area right away (no blank box while the
+    // trailer lookup runs); playYouTube swaps in the iframe when a key exists.
+    const vid0 = pv.querySelector('.hp-video');
+    if (vid0 && !vid0.querySelector('iframe')) {
+      vid0.innerHTML = '<img class="hp-fallback" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
+    }
+    // Reveal on the next frame so the transition plays
+    requestAnimationFrame(function () { pv.classList.add('visible'); });
+  }
+
+  // Mobile: open the same panel as a centered modal-ish overlay
+  function mountPreviewMobile(card, movie) {
+    const pv = getPanel();
+    const bd = document.getElementById('hover-preview-backdrop');
+    if (bd) bd.classList.add('visible');
+    pv.classList.remove('visible');
+    // Width: 88% of screen, max 340px; vertically centered in the viewport
+    const W = Math.min(340, Math.round(window.innerWidth * 0.88));
+    const H = W * 9 / 16 + 150;
+    const left = Math.max(10, Math.round((window.innerWidth - W) / 2));
+    const top = Math.max(70, Math.round((window.innerHeight - H) / 2));
+    pv.style.left = left + 'px';
+    pv.style.top = top + 'px';
+    pv.style.width = W + 'px';
+    const t = pv.querySelector('.hp-title');
+    if (t) t.textContent = movie.title || '';
+    updateBookmarkBtnState(pv, movie);
+    fillInfoRows(movie);
+    state.activeMovie = movie;
+    const vid0 = pv.querySelector('.hp-video');
+    if (vid0 && !vid0.querySelector('iframe')) {
+      vid0.innerHTML = '<img class="hp-fallback" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
+    }
+    requestAnimationFrame(function () { pv.classList.add('visible'); });
+  }
+
+  function playYouTube(card, movie, key) {
+    const pv = document.getElementById('hover-preview-panel');
+    if (!pv) return;
+    const vid = pv.querySelector('.hp-video');
+    if (!vid) return;
+    if (key) {
+      vid.innerHTML =
+        '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(key) +
+        '?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=' +
+        encodeURIComponent(key) + '&rel=0&enablejsapi=1" allow="autoplay; encrypted-media" ' +
+        'title="trailer" tabindex="-1"></iframe>' +
+        '<button class="hp-mute-toggle" title="Sound on/off" aria-label="Toggle sound">🔇</button>';
+      const iframe = vid.querySelector('iframe');
+      const cmd = function (func, args) {
+        try { iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*'); } catch (e) {}
+      };
+      // WHY MUTED AT FIRST: browsers block audible autoplay until the user has
+      // clicked somewhere on the page (hover doesn't count). We start muted —
+      // always allowed — then auto-try to unmute once playback begins. If the
+      // user has clicked anything since loading, sound comes on; the speaker
+      // button is the manual fallback (same pattern as Netflix previews).
+      setTimeout(function () {
+        if (!document.body.contains(iframe)) return;
+        cmd('unMute');
+        cmd('setVolume', [100]);
+        const btn = vid.querySelector('.hp-mute-toggle');
+        if (btn) btn.textContent = '🔊';
+      }, 900);
+      // Bulletproof loop: the loop=1 param is flaky in some embeds, so restart
+      // explicitly when the player reports the video ended.
+      cmd('addEventListener', ['onStateChange']);
+      const onMsg = function (ev) {
+        if (!iframe.isConnected || ev.source !== iframe.contentWindow) return;
+        try {
+          const d = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
+          const ended = (d && d.event === 'onStateChange' && d.info === 0) ||
+                        (d && d.event === 'infoDelivery' && d.info && d.info.playerState === 0);
+          if (ended) { cmd('seekTo', [0]); cmd('playVideo'); }
+        } catch (e) {}
+      };
+      window.addEventListener('message', onMsg);
+      state.panelMsgCleanup = function () { window.removeEventListener('message', onMsg); };
+      // Speaker toggle
+      const muteBtn = vid.querySelector('.hp-mute-toggle');
+      if (muteBtn) {
+        muteBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const muted = muteBtn.textContent === '🔇';
+          if (muted) { cmd('unMute'); cmd('setVolume', [100]); muteBtn.textContent = '🔊'; }
+          else { cmd('mute'); muteBtn.textContent = '🔇'; }
+        });
+      }
+    } else {
+      // No trailer: Netflix-style static fallback — the poster fills the video area
+      vid.innerHTML = '<img class="hp-fallback" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
+    }
+  }
+
+  function clearPreview() {
+    if (state.timer) { clearTimeout(state.timer); state.timer = null; }
+    if (state.panelMsgCleanup) { state.panelMsgCleanup(); state.panelMsgCleanup = null; }
+    const pv = document.getElementById('hover-preview-panel');
+    if (pv) pv.remove(); // iframe removed = playback + network stop instantly
+    const bd = document.getElementById('hover-preview-backdrop');
+    if (bd) bd.classList.remove('visible');
+    state.activeCard = null;
+    state.activeMovieId = null;
+    state.activeMovie = null;
+  }
+
+  // The panel is fixed-position — close it when the page moves under it
+  window.addEventListener('scroll', function () { if (state.activeCard) clearPreview(); }, { passive: true });
+  window.addEventListener('resize', function () { if (state.activeCard) clearPreview(); }, { passive: true });
+
+  function attach(card, movie) {
+    if (!isEnabled() || !card || card.dataset.hpBound === '1') return;
+    card.dataset.hpBound = '1';
+
+    // ---- MOBILE: long-press opens the preview ----
+    // 500ms hold → preview opens centered; move/cancel/early-lift aborts.
+    // The tap-to-open-player click is suppressed only when a preview opened.
+    let lpTimer = null;
+    let lpOpened = false;
+    let lpStartX = 0, lpStartY = 0;
+    function lpCancel() {
+      if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; }
+    }
+    card.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { lpCancel(); return; } // pinch/2-finger → cancel
+      const t = e.touches[0];
+      lpStartX = t.clientX; lpStartY = t.clientY;
+      lpOpened = false;
+      lpTimer = setTimeout(function () {
+        lpTimer = null;
+        lpOpened = true;
+        clearPreview();
+        state.activeCard = card;
+        state.activeMovieId = movie.id;
+        mountPreviewMobile(card, movie);
+        resolveTrailerKey(movie).then(function (key) {
+          if (state.activeCard !== card) return;
+          playYouTube(card, movie, key);
+        });
+      }, 500);
+    }, { passive: true });
+    card.addEventListener('touchmove', function (e) {
+      // finger drifted >12px → user is scrolling, not pressing
+      if (lpTimer && e.touches[0] &&
+          (Math.abs(e.touches[0].clientX - lpStartX) > 12 ||
+           Math.abs(e.touches[0].clientY - lpStartY) > 12)) lpCancel();
+    }, { passive: true });
+    card.addEventListener('touchcancel', function () {
+      lpCancel();
+      if (lpOpened) clearPreview();
+    }, { passive: true });
+    card.addEventListener('touchend', function () {
+      lpCancel();
+      if (lpOpened) { clearPreview(); lpOpened = false; } // lift closes it
+    }, { passive: true });
+    // Suppress the navigation click that fires right after a long-press lift
+    card.addEventListener('click', function (e) {
+      if (lpOpened) { e.preventDefault(); e.stopPropagation(); lpOpened = false; }
+    }, true);
+
+    card.addEventListener('mouseenter', function () {
+      if (!isEnabled()) return;
+      clearPreview();
+      state.activeCard = card;
+      state.activeMovieId = movie.id;
+      state.timer = setTimeout(async function () {
+        if (state.activeCard !== card) return; // hover moved on
+        // Mount the panel IMMEDIATELY with the poster in the video area —
+        // the old code waited for the TMDB trailer lookup and showed nothing
+        // at all when a movie had no trailer (most 2026 titles don't yet).
+        mountPreview(card, movie);
+        const key = await resolveTrailerKey(movie);
+        if (state.activeCard !== card) return; // hover left during fetch
+        playYouTube(card, movie, key);          // key='' → poster fallback stays
+      }, 600);
+    });
+
+    // If the pointer moves onto the panel itself (the panel covers the card),
+    // the card would fire mouseleave and kill the preview. Keep it alive when
+    // the pointer is moving INTO the panel — close only when leaving both.
+    card.addEventListener('mouseleave', function (e) {
+      const pv = document.getElementById('hover-preview-panel');
+      if (pv && e.relatedTarget && pv.contains(e.relatedTarget)) return;
+      clearPreview();
+    });
+  }
+
+  // Bind to every poster card on index.html — including dynamically rendered ones
+  function bindAll() {
+    if (!isEnabled()) return;
+    document.querySelectorAll('.poster-card:not([data-hp-bound])').forEach(function (card) {
+      const movie = movieByIdForCard(card);
+      if (movie) attach(card, movie);
+    });
+  }
+
+  // Cards don't carry the movie object — recover it from the click target URL
+  function movieByIdForCard(card) {
+    const img = card.querySelector('img[loading="lazy"]');
+    if (!img) return null;
+    const onclick = card.getAttribute('onclick') || '';
+    const m = onclick.match(/player\.html\?id=([^"']+)/);
+    if (m) {
+      const id = decodeURIComponent(m[1]);
+      const pool = (typeof movies !== 'undefined' && Array.isArray(movies) ? movies : [])
+        .concat(typeof featuredMovies !== 'undefined' ? featuredMovies : [])
+        .concat(typeof continueWatchingPool !== 'undefined' ? continueWatchingPool : []);
+      const found = pool.find(function (x) { return x && x.id === id; });
+      if (found) return found;
+    }
+    // Continue-watching cards build hrefs in JS (no onclick attr) — match by title
+    const titleEl = card.querySelector('.poster-card-title');
+    if (titleEl) {
+      const pool = (typeof movies !== 'undefined' && Array.isArray(movies) ? movies : []);
+      return pool.find(function (x) { return x && x.title === titleEl.textContent; }) || null;
+    }
+    return null;
+  }
+
+  // Public: called after each render pass
+  function refresh() { if (isEnabled()) setTimeout(bindAll, 50); }
+
+  return { attach: attach, refresh: refresh, isEnabled: isEnabled };
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
   setupHeroBanner();
@@ -936,6 +1410,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }, { timeout: 500 });
+
+  // Continue-watching cards are built inline (not via createMovieCard) —
+  // bind hover previews to them after the DOM settles.
+  if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.isEnabled && HOVER_PREVIEW.isEnabled()) {
+    setTimeout(() => HOVER_PREVIEW.refresh(), 300);
+  }
 });
 
 function setupDragScroll() {
@@ -993,8 +1473,10 @@ function renderContinueWatching() {
     savedData = {};
   }
 
+  // Continue Watching = unfinished only. Finished movies (user completed them
+  // or progress hit 95%+) are removed here; they still appear on the History page.
   const items = Object.values(savedData)
-    .filter(item => item && item.progress < 95)
+    .filter(item => item && !item.finished && Number(item.progress) < 95)
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
   if (items.length === 0) {
@@ -1018,9 +1500,15 @@ function renderContinueWatching() {
     const safePoster = sanitizeHTML(item.poster);
     const safeProgress = Math.min(100, Math.max(0, Number(item.progress) || 0));
 
+    // Netflix-style badge: 'Finished' at 95%+, otherwise the % watched
+    const badgeHTML = safeProgress >= 95
+      ? '<div class="mylist-progress-badge">Finished</div>'
+      : (safeProgress > 0 ? `<div class="mylist-progress-badge">${Math.round(safeProgress)}% watched</div>` : '');
+
     card.innerHTML = `
       <button class="remove-continue-btn" title="Remove">&times;</button>
       <img src="${safePoster}" alt="${safeTitle}" loading="lazy">
+      ${badgeHTML}
       <div class="poster-card-overlay">
         <div class="poster-card-title">${safeTitle}</div>
       </div>

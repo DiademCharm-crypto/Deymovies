@@ -12,7 +12,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=158.0">
+  <link rel="stylesheet" href="style.css?v=159.5">
 </head>
 <body>
 
@@ -120,11 +120,11 @@
 
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
-  <script src="config.js"></script>
-  <script src="security.js"></script>
+  <script src="config.js?v=2.0"></script>
+  <script src="security.js?v=2.1"></script>
   <script src="reels-data.js?v=151.0"></script>
-    <script src="filipino-movies.js?v=1.0"></script>
-  <script src="app.js?v=153.0"></script>
+    <script src="filipino-movies.js?v=1.1"></script>
+  <script src="app.js?v=158.2"></script>
   <script>
     let currentPage = 1;
     const itemsPerPage = 18;
@@ -204,6 +204,8 @@
 
       renderPaginationControls(totalPages, paginationWrapper);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Re-bind hover/long-press previews to the freshly rendered cards
+      if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.refresh) HOVER_PREVIEW.refresh();
     }
 
     function handleCategorySearch() {
@@ -251,6 +253,8 @@
       }
 
       renderPaginationControls(totalPages, paginationWrapper);
+      // Re-bind hover/long-press previews to the freshly rendered cards
+      if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.refresh) HOVER_PREVIEW.refresh();
     }
 
     // ── REEL WATCH HISTORY (AI Reels mode only) ──────────────────

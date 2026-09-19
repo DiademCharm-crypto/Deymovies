@@ -35,7 +35,7 @@ const filipinoMovieData = [
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/voT1x4FdnBieu1en3CeKhf7N0n8.jpg",
     manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/This%2C+That+and+Everything+in+Between.mp4",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=ueGNj0fC8rU",
     isSeries: false
   },
   { 
@@ -216,7 +216,7 @@ const filipinoMovieData = [
     isFilipino: true,
     poster: "https://m.media-amazon.com/images/M/MV5BNzRhZDIyYzItYjAxYi00MjUwLTk0MjAtMDcwODMzNWIzYjUzXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/The+Ride.mp4",
-    trailerEmbed: "",
+    trailerEmbed: "https://www.youtube.com/watch?v=P-dnzj_iILY",
     isSeries: true
   },
 ];

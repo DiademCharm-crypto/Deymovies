@@ -1,5 +1,5 @@
 // ==========================================
-// DEYMFLIX - Ultimate Security System v2.0
+// DEYMFLIX - Ultimate Security System v2.1
 // ==========================================
 (function () {
   'use strict';
@@ -139,13 +139,16 @@
     }
   }, true);
 
-  // 3. DevTools Anti-Tamper Loop (Enhanced)
+  // 3. DevTools Anti-Tamper Loop —Timing detection only, NO debugger statement.
+  // The old version executed 'debugger' every 500ms; any user with DevTools open
+  // had the whole page freeze on every loop tick. Timing heuristics below keep
+  // detection without hijacking the main thread.
   let devToolsOpen = false;
   const devToolsDetector = setInterval(function () {
     const startTime = performance.now();
-    try {
-      (function () {}.constructor('debugger')());
-    } catch (e) {}
+    // busy-wait ~0ms baseline; a paused main thread (debugger) skews timing
+    let x = 0;
+    for (let i = 0; i < 1e4; i++) x += i;
     const endTime = performance.now();
     
     if (endTime - startTime > 100) {
@@ -415,17 +418,8 @@
   //   };
   // }
 
-  // 34. Screen Recording Detection (Visibility API) - pause videos when tab hidden
-  let isRecordingDetected = false;
-  
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-      const videos = document.querySelectorAll('video');
-      videos.forEach(function (video) {
-        video.pause();
-      });
-    }
-  });
+  // 34. Visibility change: keep videos playing when tab is hidden (multitasking allowed)
+  // (Removed the old 'pause videos when tab hidden' handler — it broke background playback.)
 
   // 35. Allow MediaRecorder API (for future recording features)
   // if ('MediaRecorder' in window) {
@@ -505,31 +499,12 @@
   }
   detectRemoteDebugging();
 
-  // 42. Monitor for DevTools via debugger statement timing
-  let debugMode = false;
-  setInterval(function () {
-    const start = performance.now();
-    debugger;
-    const end = performance.now();
-    
-    if (end - start > 50) {
-      if (!debugMode) {
-        debugMode = true;
-        // Pause all videos
-        document.querySelectorAll('video').forEach(function (v) {
-          v.pause();
-          v.style.filter = 'blur(20px)';
-        });
-      }
-    } else {
-      if (debugMode) {
-        debugMode = false;
-        document.querySelectorAll('video').forEach(function (v) {
-          v.style.filter = 'none';
-        });
-      }
-    }
-  }, 1000);
+  // 42. DevTools via debugger timing — DISABLED.
+  // The old version paused and blurred ALL videos whenever one timing sample
+  // exceeded 50ms. GC pauses / background-tab throttling / slow phones routinely
+  // exceed that, so real users lost playback for no reason. DevTools itself is
+  // still detected by the detector above without punishing viewers.
+  // (code removed 2026-09 — was: setInterval(function(){ debugger; ...pause videos }))
 
   // 43. Disable WindowSharing (Screen share detection)
   if (navigator.mediaDevices) {

@@ -729,7 +729,7 @@ async function handleProxyRoutes(req, res, parsedUrl) {
         try {
           const det = await fetchUrl(
             'https://api.themoviedb.org/3/movie/' + tmdbId +
-            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US&append_to_response=credits,images'
+            '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US&append_to_response=credits,images,videos'
           );
           if (det.status === 200) {
             const j = JSON.parse(det.body);
@@ -760,7 +760,16 @@ async function handleProxyRoutes(req, res, parsedUrl) {
               stills: backdrops.slice()
                 .sort(function (a, b) { return (b.vote_average || 0) - (a.vote_average || 0); })
                 .slice(0, 6)
-                .map(function (b) { return b.file_path; })
+                .map(function (b) { return b.file_path; }),
+              // Official YouTube trailer key (for hover previews / embeds)
+              trailerKey: (function () {
+                const vids = (j.videos && j.videos.results) || [];
+                const yt = vids.filter(function (v) { return v.site === 'YouTube'; });
+                const t = yt.find(function (v) { return v.type === 'Trailer' && v.official; })
+                        || yt.find(function (v) { return v.type === 'Trailer'; })
+                        || yt.find(function (v) { return v.type === 'Teaser'; });
+                return t ? (t.key || '') : '';
+              })()
             };
 
             // Reject a wrong-movie match (e.g. a different film with a similar title)
@@ -843,19 +852,72 @@ const server = http.createServer(async (req, res) => {
   const ext = path.extname(fullPath).toLowerCase();
   const ct = MIME[ext] || 'application/octet-stream';
 
-  fs.readFile(fullPath, (err, data) => {
+  const statCb = (err, stat) => {
     if (err) {
       res.writeHead(404);
       res.end('Not found: ' + filePath);
       return;
     }
-    res.writeHead(200, {
+
+    // ---- HTTP Range support (essential for smooth video seeking) ----
+    // Video elements issue Range requests when the user scrubs; without 206
+    // responses the browser must re-download the file from byte 0 to seek.
+    const rangeHeader = req.headers.range;
+    const isStreamable = /\.(mp4|m4v|webm|mkv|mov|m4a|mp3|ogg|wav)$/i.test(fullPath);
+
+    if (rangeHeader && isStreamable && stat.size > 0) {
+      const m = /bytes=(\d*)-(\d*)/.exec(rangeHeader);
+      if (m) {
+        let start = m[1] === '' ? NaN : parseInt(m[1], 10);
+        let end = m[2] === '' ? NaN : parseInt(m[2], 10);
+        if (isNaN(start)) { start = 0; }
+        if (isNaN(end) || end >= stat.size) { end = stat.size - 1; }
+        if (start >= 0 && start <= end && start < stat.size) {
+          const stream = fs.createReadStream(fullPath, { start, end });
+          res.writeHead(206, {
+            'Content-Type': ct,
+            'Content-Range': 'bytes ' + start + '-' + end + '/' + stat.size,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': (end - start + 1),
+            'Cache-Control': 'no-cache',
+            'Access-Control-Allow-Origin': '*'
+          });
+          stream.on('error', () => { try { res.destroy(); } catch (e) {} });
+          stream.pipe(res);
+          return;
+        }
+      }
+      // Malformed/unsatisfiable range
+      res.writeHead(416, { 'Content-Range': 'bytes */' + stat.size });
+      res.end();
+      return;
+    }
+
+    const headers = {
       'Content-Type': ct,
       'Cache-Control': 'no-cache',
       'Access-Control-Allow-Origin': '*'
-    });
-    res.end(data);
-  });
+    };
+    if (isStreamable && stat.size > 0) {
+      headers['Accept-Ranges'] = 'bytes';
+      headers['Content-Length'] = stat.size;
+    }
+    res.writeHead(200, headers);
+
+    if (req.method === 'HEAD' || !isStreamable) {
+      fs.readFile(fullPath, (err2, data) => {
+        if (err2) { try { res.end(); } catch (e) {} return; }
+        if (req.method !== 'HEAD') res.end(data); else res.end();
+      });
+      return;
+    }
+    // Stream media files instead of buffering them fully into memory
+    fs.createReadStream(fullPath)
+      .on('error', () => { try { res.end(); } catch (e) {} })
+      .pipe(res);
+  };
+
+  fs.stat(fullPath, statCb);
 });
 
 const PORT = 3000;

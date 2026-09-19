@@ -15,7 +15,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=157.0">
+  <link rel="stylesheet" href="style.css?v=159.5">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -504,13 +504,40 @@
       background: transparent !important;
     }
 
+    /* Volume slider hidden by default — slides out on hover over the speaker (YouTube-style) */
+    .pc-volume-control {
+      align-items: center;
+      gap: 0;
+    }
+    .pc-volume-slider-wrap {
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      transition: width 0.25s ease, opacity 0.25s ease, margin-left 0.25s ease;
+      margin-left: 0;
+    }
+    .pc-volume-control:hover .pc-volume-slider-wrap,
+    .pc-volume-control.slider-open .pc-volume-slider-wrap {
+      width: 80px;
+      opacity: 1;
+      margin-left: 6px;
+      /* generous invisible hit area so the slider is easy to grab */
+      padding: 10px 0;
+      margin-top: -10px;
+      margin-bottom: -10px;
+    }
     .pc-volume-control input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
+      width: 80px;
       height: 4px;
       background: rgba(255,255,255,0.3);
       border-radius: 2px;
       outline: none;
+      cursor: pointer;
+      accent-color: #e50914;
     }
     .pc-volume-control input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -518,16 +545,23 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #e50914;
+      background: #e50914;            /* red thumb, YouTube-style */
+      border: none;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.7);  /* keeps it visible on the red fill */
       cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .pc-volume-control input[type="range"]:hover::-webkit-slider-thumb {
+      transform: scale(1.25);
     }
     .pc-volume-control input[type="range"]::-moz-range-thumb {
       width: 14px;
       height: 14px;
       border-radius: 50%;
       background: #e50914;
-      cursor: pointer;
       border: none;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.7);
+      cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -791,16 +825,25 @@
     }
 
     .network-warning-note {
+      /* Overlaid INSIDE the video player, just above the control bar */
+      position: absolute !important;
+      bottom: 68px !important;
+      left: 0 !important;
+      right: 0 !important;
       width: calc(100% - 40px) !important;
-      margin: 14px auto 0 auto !important;
+      margin: 0 auto !important;
       padding: 10px 16px !important;
-      background: rgba(229, 9, 20, 0.12) !important;
+      background: rgba(229, 9, 20, 0.35) !important;
       border: 1px solid rgba(229, 9, 20, 0.4) !important;
       border-radius: 8px !important;
       color: #ffffff !important;
       font-size: 0.82rem !important;
       font-weight: 600 !important;
       box-sizing: border-box !important;
+      text-align: center !important;
+      z-index: 45 !important;
+      pointer-events: none !important;
+      backdrop-filter: blur(4px);
     }
 
     .video-info-box {
@@ -2008,6 +2051,11 @@
 
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
+
+    <!-- Slow-connection warning: overlaid inside the player, above the controls -->
+    <div id="network-note" class="network-warning-note" style="display: none;">
+      ⚠️ Slow connection? Reload the page.
+    </div>
     <div id="player-poster-blur" class="player-poster-blur"></div>
 
     <style>
@@ -2174,14 +2222,19 @@
             <div class="time-display" style="font-size: 0.8rem; font-weight: 600; color: #ffffff;">
               <span id="current-time-text">00:00:00</span> / <span id="total-duration-text">00:00:00</span>
             </div>
+
+            <div class="pc-volume-control" style="display:none;">
+              <button id="btn-pc-mute" class="ctrl-btn-small" title="Mute (M)" style="padding:0;">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path id="svg-pc-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+              </button>
+              <div class="pc-volume-slider-wrap">
+                <input type="range" id="pc-volume-slider" min="0" max="100" value="100" step="1">
+              </div>
+            </div>
           </div>
           <div class="right-utility-btns">
-            <button id="btn-unmute" class="ctrl-btn-small" title="Mute/Unmute (M)">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path id="svg-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-              </svg>
-            </button>
-
             <button id="btn-settings" class="ctrl-btn-small settings-btn" title="Settings">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
@@ -2193,15 +2246,6 @@
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/>
               </svg>
             </button>
-
-            <div class="pc-volume-control" style="display:none;align-items:center;gap:6px;">
-              <button id="btn-pc-mute" class="ctrl-btn-small" title="Mute (M)" style="padding:0;">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                  <path id="svg-pc-volume-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                </svg>
-              </button>
-              <input type="range" id="pc-volume-slider" min="0" max="100" value="100" step="1" style="width:80px;height:4px;accent-color:#e50914;cursor:pointer;">
-            </div>
 
             <button id="btn-fullscreen" class="ctrl-btn-small" title="Fullscreen (F)">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2229,20 +2273,19 @@
           </div>
           <div id="settings-subtitle-options" style="display:none;margin-top:6px;">
             <select id="subtitle-language">
-              <option value="en" selected>English</option>
-              <option value="es">Spanish</option>
-              <option value="fil">Filipino</option>
-              <option value="tl">Tagalog</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="pt">Portuguese</option>
-              <option value="hi">Hindi</option>
-              <option value="zh">Chinese</option>
+              <optgroup label="OpenSubtitles.org — auto search">
+                <option value="en" selected>English</option>
+                <option value="tl">Tagalog</option>
+                <option value="es">Spanish</option>
+                <option value="ko">Korean</option>
+                <option value="ja">Japanese</option>
+              </optgroup>
+              <optgroup label="My Subtitles — manual">
+                <option value="local-en">English (Engsub)</option>
+                <option value="local-tl">Tagalog (PHsub)</option>
+              </optgroup>
             </select>
-            <button id="btn-subtitle-search" class="subtitle-search-btn">🔎 Search Online</button>
-            <button id="btn-subtitle-local" class="subtitle-search-btn" style="margin-top:5px;">📁 My Subtitles</button>
             <div id="subtitle-status" class="subtitle-status"></div>
-            <div id="subtitle-results" class="subtitle-results"></div>
             <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
               <label style="font-size:0.6rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
               <div style="display:flex;align-items:center;gap:6px;">
@@ -2450,10 +2493,6 @@
   }
   </style>
 
-  <div id="network-note" class="network-warning-note" style="display: none;">
-    ⚠️ Slow connection? Reload the page.
-  </div>
-
   <div class="video-info-box" id="video-info-box">
 
     <!-- PC ONLY: poster shown beside the title (hidden below 1024px) -->
@@ -2526,7 +2565,7 @@
   <div id="loading-toast" class="toast-notification">Loading...</div>
 
   <!-- SCRIPT INCLUSIONS -->
-  <script src="config.js"></script>
+  <script src="config.js?v=2.0"></script>
   <script>
     // Backend base: '' = same origin; or full URL of the host running proxy-server.js
     // (set window.__DEYMFLIX_CONFIG__.API_BASE in config.js for static hosting).
@@ -2535,9 +2574,9 @@
       catch (e) { return ''; }
     })();
   </script>
-  <script src="security.js"></script>
-    <script src="filipino-movies.js?v=1.0"></script>
-  <script src="app.js?v=153.0"></script>
+  <script src="security.js?v=2.1"></script>
+    <script src="filipino-movies.js?v=1.1"></script>
+  <script src="app.js?v=158.2"></script>
   <script src="episodes.js?v=1.0"></script>
   <script>
     function destroyAllPlayers() {
@@ -2598,6 +2637,7 @@
 
     // API keys are now server-side in proxy-server.js — never exposed to browser
     let subtitleActive = false;
+    let subtitleAttempted = false; // one automatic subtitle attempt per movie load
     let subtitleOffsetMs = parseInt(localStorage.getItem('deymflix_sub_offset') || '0', 10) || 0;
 
     const safeMoviesList = (typeof movies !== 'undefined' && Array.isArray(movies)) ? movies : [];
@@ -3474,7 +3514,6 @@
 
     const btnRewind = document.getElementById('btn-rewind-center');
     const btnForward = document.getElementById('btn-forward-center');
-    const btnUnmute = document.getElementById('btn-unmute');
     const btnFullscreen = document.getElementById('btn-fullscreen');
 
     const seekbar = document.getElementById('video-seekbar');
@@ -3641,25 +3680,77 @@
       }, 1000);
     });
 
-    playerContainer.addEventListener('mousedown', (e) => {
-      isLongPressing = false;
-      clearTimeout(longPressTimer);
-      longPressTimer = setTimeout(() => {
+    // ── Keyboard long-press speed hold (PC): hold → / → = 2x forward, hold ← = 2x backward ──
+    // Touch long-press was removed on PC per user request; arrows now hold-scan instead of tap-seek.
+    let keyHoldTimer = null;
+    let keyHoldDir = 0; // 1 = forward, -1 = backward, 0 = none
+    let keyHoldRaf = null;
+    let keyHoldLastTs = 0;
+
+    function startArrowHold(direction) {
+      // Guard: ignore OS key auto-repeat — a hold is already active if timer pending OR direction set
+      if (keyHoldTimer || keyHoldDir !== 0) return;
+      keyHoldDir = direction;
+      keyHoldTimer = setTimeout(() => {
+        keyHoldTimer = null;
         if (directPlayer.style.display !== 'none') {
           isLongPressing = true;
-          directPlayer.playbackRate = 2.0;
+          speedBadge.textContent = direction === 1 ? '2.0x Forward »' : '« 2.0x Rewind';
           speedBadge.classList.add('show');
+          if (direction === 1) {
+            // Forward: real 2x playback
+            directPlayer.playbackRate = 2.0;
+          } else {
+            // Backward: HTML5 video can't play negative rates — simulate by seeking back.
+            // Seek back (normalRate + 2)s per real second while playing forward at normalRate → net 2x rewind.
+            keyHoldLastTs = performance.now();
+            let lastSeekTs = 0;
+            const stepBack = (ts) => {
+              // Throttle to ~9 seeks/sec: continuous rAF seeking pins the video in
+              // 'seeking' state, which suppresses subtitle cue rendering — the
+              // throttle leaves the browser render windows so subs follow the rewind.
+              if (ts - lastSeekTs >= 110) {
+                // Clamp dt: if the tab is hidden/backgrounded rAF pauses — a huge dt on the
+                // next frame would slam the position to 0 instead of rewinding smoothly.
+                const dt = Math.min(0.2, (ts - keyHoldLastTs) / 1000);
+                keyHoldLastTs = ts;
+                lastSeekTs = ts;
+                directPlayer.currentTime = Math.max(0, directPlayer.currentTime - (normalPlaybackRate + 2) * dt);
+              }
+              keyHoldRaf = requestAnimationFrame(stepBack);
+            };
+            keyHoldRaf = requestAnimationFrame(stepBack);
+          }
         }
-      }, 600);
+      }, 450);
+    }
+
+    function endArrowHold() {
+      clearTimeout(keyHoldTimer);
+      keyHoldTimer = null;
+      if (keyHoldRaf) { cancelAnimationFrame(keyHoldRaf); keyHoldRaf = null; }
+      if (keyHoldDir !== 0) {
+        keyHoldDir = 0;
+        if (isLongPressing) {
+          isLongPressing = false;
+          directPlayer.playbackRate = normalPlaybackRate;
+          speedBadge.textContent = '2.0x Speed';
+          speedBadge.classList.remove('show');
+        }
+      }
+    }
+
+    document.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      if (key === 'arrowleft' || key === 'arrowright') {
+        endArrowHold();
+        showControls();
+      }
     });
 
-    playerContainer.addEventListener('mouseup', () => {
-      clearTimeout(longPressTimer);
-      if (isLongPressing) {
-        isLongPressing = false;
-        directPlayer.playbackRate = normalPlaybackRate;
-        speedBadge.classList.remove('show');
-      }
+    // Release the hold if the window loses focus while a key is down
+    window.addEventListener('blur', () => {
+      endArrowHold();
     });
 
     playerContainer.addEventListener('mousemove', () => { showControls(); });
@@ -3908,18 +3999,23 @@
       if (!isQualitySwitch) hideLoadingSpinner();
       totalDurationText.textContent = formatTime(directPlayer.duration);
 
-      const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+      const savedData = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
       const effId = currentMovie._episodeId || currentMovie.id;
         const existingProgress = savedData[effId];
 
-      if (existingProgress && existingProgress.progress < 95) {
+      // Watch Again: ?restart=1 skips the resume position and starts fresh
+      const isRestart = new URLSearchParams(window.location.search).get('restart') === '1';
+      if (!isRestart && existingProgress && existingProgress.progress < 95) {
         directPlayer.currentTime = existingProgress.currentTime;
       }
       // Reset _episodeId when video loads so next episode starts fresh
       delete currentMovie._episodeId;
 
-      // Auto-load English subtitles if not already active (local folder first, then online)
+      // Auto-load subtitles (OpenSubtitles first, local Engsub/PHsub fallback)
+      // One automatic attempt per movie/episode load — ad recovery must not re-run it
+      subtitleAttempted = false;
       if (!subtitleActive && currentMovie.title) {
+        subtitleAttempted = true;
         autoLoadSubtitlesWithLocal(currentMovie.title, 'en');
       }
     });
@@ -3936,6 +4032,7 @@
     });
 
     directPlayer.addEventListener('timeupdate', () => {
+      if (isSeekDragging) return; // user is scrubbing — don't yank the thumb back
       if (!isNaN(directPlayer.duration)) {
         const currentTime = directPlayer.currentTime;
         const pct = (currentTime / directPlayer.duration) * 100;
@@ -3944,28 +4041,70 @@
         currentTimeText.textContent = formatTime(currentTime);
 
         if (currentTime > 5) {
-          const savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
-          const saveId = currentMovie._episodeId || currentMovie.id;
-          savedData[saveId] = {
-            id: saveId,
-            title: currentMovie._episodeTitle || currentMovie.title,
-            poster: currentMovie.poster,
-            currentTime: currentTime,
-            duration: directPlayer.duration,
-            progress: pct,
-            updatedAt: Date.now()
-          };
-          localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
+          // Throttle: writing on every timeupdate (~4x/sec) hammers localStorage;
+          // once per 3 seconds of playback is plenty for resume accuracy
+          const now = Date.now();
+          if (!directPlayer._lastCWWrite || now - directPlayer._lastCWWrite > 3000) {
+            directPlayer._lastCWWrite = now;
+            const savedData = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+            const saveId = currentMovie._episodeId || currentMovie.id;
+            if (pct < 95) {
+              // Still watching — record progress
+              savedData[saveId] = {
+                id: saveId,
+                title: currentMovie._episodeTitle || currentMovie.title,
+                poster: currentMovie.poster,
+                currentTime: currentTime,
+                duration: directPlayer.duration,
+                progress: pct,
+                updatedAt: now
+              };
+            } else {
+              // Finished (≥95%) — remove from Continue Watching entirely.
+              // History page keeps its own entry? No: history reads the same key,
+              // so record a 'finished' marker instead of a resume position.
+              savedData[saveId] = {
+                id: saveId,
+                title: currentMovie._episodeTitle || currentMovie.title,
+                poster: currentMovie.poster,
+                finished: true,
+                progress: 100,
+                updatedAt: now
+              };
+            }
+            try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData)); } catch (e) {}
+          }
         }
       }
     });
 
+    let isSeekDragging = false; // true while the user is dragging the seekbar (visual-only updates)
+
+    function setSeekDragging(on) {
+      isSeekDragging = on;
+      if (!on) updateSeekbarBackground(seekbar.value);
+    }
+    seekbar.addEventListener('mousedown', () => setSeekDragging(true));
+    seekbar.addEventListener('touchstart', () => setSeekDragging(true), { passive: true });
+    window.addEventListener('mouseup', () => { if (isSeekDragging) setSeekDragging(false); });
+    window.addEventListener('touchend', () => { if (isSeekDragging) setSeekDragging(false); });
+
     seekbar.addEventListener('input', () => {
+      // While dragging: update visuals ONLY — no currentTime writes.
+      // Every write fires a network range-request + rebuffer; seeking once on release is smooth.
+      updateSeekbarBackground(seekbar.value);
       if (!isNaN(directPlayer.duration)) {
-        directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
-        updateSeekbarBackground(seekbar.value);
+        currentTimeText.textContent = formatTime((seekbar.value / 100) * directPlayer.duration);
       }
     });
+
+    function applySeekbarSeek() {
+      if (isNaN(directPlayer.duration) || !directPlayer.duration) return;
+      directPlayer.currentTime = (seekbar.value / 100) * directPlayer.duration;
+    }
+
+    // 'change' fires once on release (mouse OR touch OR keyboard) — one clean seek
+    seekbar.addEventListener('change', applySeekbarSeek);
 
     directPlayer.addEventListener('pause', () => {
       if (isQualitySwitch) return;
@@ -3985,27 +4124,33 @@
 
     function toggleMute() {
       directPlayer.muted = !directPlayer.muted;
-      const volPath = document.getElementById('svg-volume-path');
-      if (volPath) {
-        volPath.setAttribute('d', directPlayer.muted ? volOffData : volOnData);
+      syncPcVolumeUI();
+    }
+
+    // Keep the LEFT volume control (icon + slider) in sync with mute state —
+    // called by toggleMute (M key / speaker click), auto-unmute and ad restore.
+    function syncPcVolumeUI() {
+      const pcPath = document.getElementById('svg-pc-volume-path');
+      if (pcPath) pcPath.setAttribute('d', directPlayer.muted ? volOffData : volOnData);
+      const slider = document.getElementById('pc-volume-slider');
+      if (slider) {
+        slider.value = directPlayer.muted ? 0 : directPlayer.volume * 100;
+        updateVolumeSliderFill(slider);
       }
     }
 
     function attemptAutoUnmute() {
       directPlayer.muted = false;
       directPlayer.play().then(() => {
-        const volPath = document.getElementById('svg-volume-path');
-        if (volPath) volPath.setAttribute('d', volOnData);
+        syncPcVolumeUI();
       }).catch(() => {
         directPlayer.muted = true;
-        const volPath = document.getElementById('svg-volume-path');
-        if (volPath) volPath.setAttribute('d', volOffData);
+        syncPcVolumeUI();
         directPlayer.play();
 
         const unlockAudio = () => {
           directPlayer.muted = false;
-          const volPath = document.getElementById('svg-volume-path');
-          if (volPath) volPath.setAttribute('d', volOnData);
+          syncPcVolumeUI();
           document.removeEventListener('click', unlockAudio);
           document.removeEventListener('touchstart', unlockAudio);
         };
@@ -4032,11 +4177,6 @@
     btnForward.onclick = (e) => {
       e.stopPropagation();
       triggerForward();
-    };
-
-    btnUnmute.onclick = (e) => {
-      e.stopPropagation();
-      toggleMute();
     };
 
     btnFullscreen.onclick = (e) => {
@@ -4104,8 +4244,7 @@
         if (subtitleActive) {
           turnOffSubtitles();
         } else {
-          const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-          autoLoadSubtitlesWithLocal(currentMovie.title, lang);
+          loadSubtitleForCurrentSelection();
           showToast('Loading subtitles…');
         }
         updateSubtitleToggleUI();
@@ -4154,12 +4293,16 @@
           break;
         case 'arrowleft':
           e.preventDefault();
-          directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
+          // Tap = -10s jump; hold = 2x rewind (keyup restores normal speed)
+          if (!e.repeat) directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
+          startArrowHold(-1);
           showControls();
           break;
         case 'arrowright':
           e.preventDefault();
-          directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
+          // Tap = +10s jump; hold = 2x forward (keyup restores normal speed)
+          if (!e.repeat) directPlayer.currentTime = Math.min(directPlayer.duration || 0, directPlayer.currentTime + 10);
+          startArrowHold(1);
           showControls();
           break;
         case 'arrowup':
@@ -4178,8 +4321,7 @@
           if (subtitleActive) {
             turnOffSubtitles();
           } else {
-            const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-            autoLoadSubtitlesWithLocal(currentMovie.title, lang);
+            loadSubtitleForCurrentSelection();
             showToast('Loading subtitles…');
           }
           updateSubtitleToggleUI();
@@ -4198,8 +4340,6 @@
 
     const settingsPanel = document.getElementById('settings-panel');
     const subtitleStatus = document.getElementById('subtitle-status');
-    const subtitleResults = document.getElementById('subtitle-results');
-    const btnSubtitleSearch = document.getElementById('btn-subtitle-search');
     const btnSubtitleOff = document.getElementById('btn-subtitle-off');
 
     function toggleSettingsPanel() {
@@ -4367,98 +4507,13 @@
       showToast('Subtitles off');
     }
 
-    async function searchOnlineSubtitles() {
-      if (subtitleStatus) subtitleStatus.textContent = '';
-      if (subtitleResults) subtitleResults.innerHTML = '';
-
-      const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-      const query = currentMovie.title;
-
-      try {
-        if (subtitleStatus) subtitleStatus.textContent = 'Searching "' + query + '" (' + lang + ')…';
-
-        const token = await openSubtitlesLogin();
-        if (!token) throw new Error('Login failed — check your internet connection.');
-
-        const imdbId = await getImdbId(currentMovie);
-        const data = await osSearchSubtitles(token, imdbId, query, lang, '15');
-
-        if (!data || !data.data || data.data.length === 0) {
-          if (subtitleStatus) subtitleStatus.textContent = 'No subtitles found for "' + query + '" in ' + lang + '.';
-          return;
-        }
-
-        if (subtitleStatus) subtitleStatus.textContent = data.data.length + ' result(s) — tap one to load:';
-        data.data.forEach((item) => {
-          const attrs = item.attributes || {};
-          const fileId = attrs.files && attrs.files.length > 0 ? attrs.files[0].file_id : null;
-          const release = attrs.release_name || attrs.file_name || ('Subtitle #' + item.id);
-          const featTitle = attrs.feature_details && attrs.feature_details.title ? ' — ' + attrs.feature_details.title : '';
-          const div = document.createElement('div');
-          div.className = 'subtitle-result-item';
-          div.textContent = release + featTitle + ' · ' + (attrs.language || lang);
-          div.onclick = () => {
-            if (!fileId) {
-              if (subtitleStatus) subtitleStatus.textContent = 'No downloadable file for this result.';
-              return;
-            }
-            downloadAndEnableSubtitle(fileId, attrs.language || lang);
-          };
-          if (subtitleResults) subtitleResults.appendChild(div);
-        });
-      } catch (err) {
-        if (subtitleStatus) subtitleStatus.textContent = 'Search error: ' + err.message;
-      }
-    }
-
-    async function downloadAndEnableSubtitle(fileId, label) {
-      try {
-        if (subtitleStatus) subtitleStatus.textContent = 'Downloading subtitle…';
-        const token = await openSubtitlesLogin();
-        if (!token) throw new Error('Login failed — cannot download subtitle.');
-
-        const dlRes = await osFetch('/download', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ file_id: fileId, token: token })
-        });
-        if (!dlRes.ok) throw new Error('Download failed (' + dlRes.status + ')');
-        const dlData = await dlRes.json();
-        if (!dlData.link) throw new Error('No subtitle link returned');
-
-        // Fetch subtitle file content
-        let srtText = '';
-        try {
-          const srtRes = await fetch(dlData.link);
-          if (srtRes.ok) srtText = await srtRes.text();
-        } catch (e) {
-          try {
-            const srtRes2 = await fetch((window.__API_BASE__ || '') + '/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
-            if (srtRes2.ok) srtText = await srtRes2.text();
-          } catch (e2) {}
-        }
-        if (!srtText) throw new Error('Could not fetch subtitle file');
-
-        enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, label, srtText);
-        if (subtitleStatus) subtitleStatus.textContent = 'Subtitles enabled (' + label + ').';
-        showToast('Subtitles on: ' + label);
-      } catch (err) {
-        if (subtitleStatus) subtitleStatus.textContent = 'Error: ' + err.message;
-      }
-    }
-
-    if (btnSubtitleSearch) {
-      btnSubtitleSearch.onclick = (e) => {
-        e.stopPropagation();
-        searchOnlineSubtitles();
-      };
-    }
+    // (Search Online / My Subtitles buttons removed — the language dropdown now
+    // auto-searches OpenSubtitles and picks the first result of that language.
+    // The Manual options load straight from the local subtitles folder, and the
+    // Subtitles switch handles on/off.)
     // (Turn Off Subtitles button removed — the Subtitles switch above handles it)
 
     // ============ LOCAL SUBTITLES (the /subtitles folder) ============
-    const btnSubtitleLocal = document.getElementById('btn-subtitle-local');
     const localSubCache = { at: 0, files: [] };
 
     function localSubBase() {
@@ -4486,11 +4541,16 @@
       } else {
         push(m.title);
         if (m.imdbId) push(m.imdbId);
+        // Series opened without a clicked episode: the default video is episode 1
+        if (m.isSeries) {
+          push(m.title + '-ep1');
+          push(m.title + ' s01e01');
+        }
       }
       return list;
     }
 
-    function fileMatchesMovie(fileName) {
+    function fileMatchesMovie(fileName, epOverride) {
       // fileName may include subfolders: "Crew Girl/ep1.srt"
       const parts = String(fileName).split('/');
       const dir = parts.slice(0, -1).join(' ');   // "Crew Girl"
@@ -4499,15 +4559,18 @@
       const d = normalizeSubName(dir);
       if (!f) return false;
       const m = currentMovie || {};
+      const effEp = (epOverride !== undefined && epOverride !== null) ? epOverride : m._episodeNum;
       // Reject files for other episodes: "... ep3" must not match "...-ep2"
-      if (m._episodeNum) {
+      if (effEp) {
         const epRe = /\b(?:ep?\.?\s*)(\d{1,2})\b|\bs(\d{1,2})\s*e(\d{1,2})\b/g;
         let mm;
         while ((mm = epRe.exec(f)) !== null) {
+          // "epN" captures in group 1; "sNeN" captures in groups 2+3 — read ALL of them
+          const n0 = mm[1] ? parseInt(mm[1], 10) : null;
           const n1 = mm[2] ? parseInt(mm[2], 10) : null;
           const n2 = mm[3] ? parseInt(mm[3], 10) : null;
-          const n = (n1 !== null && !isNaN(n1)) ? n1 : (n2 !== null ? n2 : null);
-          if (n !== null && n !== m._episodeNum) return false;
+          const n = (n0 !== null && !isNaN(n0)) ? n0 : (n1 !== null && !isNaN(n1)) ? n1 : (n2 !== null ? n2 : null);
+          if (n !== null && n !== effEp) return false;
         }
       }
       const cands = movieSubCandidates().map(normalizeSubName).filter(Boolean);
@@ -4530,15 +4593,6 @@
         });
     }
 
-    function applyLocalSubtitle(fileName, silent) {
-      return loadLocalSubText(fileName).then(srtText => {
-        const label = fileName.replace(/\.(srt|vtt|ass|ssa)$/i, '');
-        enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, 'en', srtText);
-        if (!silent) showToast('Subtitles loaded: ' + label);
-        if (subtitleStatus) subtitleStatus.textContent = 'Loaded from your subtitles folder: ' + fileName;
-      });
-    }
-
     function fetchLocalSubList(force) {
       const now = Date.now();
       if (!force && localSubCache.files.length && (now - localSubCache.at) < 30000) {
@@ -4555,80 +4609,201 @@
     }
 
     // Priority loader: local folder first, then OpenSubtitles online search
-    async function autoLoadSubtitlesWithLocal(title, lang) {
-      try {
-        const files = await fetchLocalSubList();
-        const match = files.find(fileMatchesMovie);
-        if (match) {
-          await applyLocalSubtitle(match, true);
-          showToast('Subtitles loaded: ' + match.replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
-          return; // local match wins — skip online search
-        }
-      } catch (e) { /* fall through */ }
-      // No-backend hosting (GitHub Pages, Live Server, file://): try conventional paths.
-      // Covers both layouts: top-level files AND series subfolders (subtitles/Crew Girl/ep1.srt)
-      try {
-        const m = currentMovie || {};
-        const enc = s => encodeURIComponent(s);
-        const guesses = [];
-        if (m._episodeNum) {
-          const n = m._episodeNum;
-          guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
-          guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
-          guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
-          guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
-        } else {
-          guesses.push('subtitles/' + enc(m.title) + '.srt');
-        }
-        for (const g of guesses) {
-          try {
-            const resp = await fetch(g);
-            if (resp.ok) {
-              const txt = await resp.text();
-              if (txt && txt.indexOf('-->') !== -1) { // sanity: it's really a subtitle, not a 404 page
-                const label = m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title;
-                enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, 'en', txt);
-                showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
-                return;
-              }
-            }
-          } catch (e) {}
-        }
-      } catch (e) { /* fall through to online */ }
-      return autoLoadSubtitles(title, lang);
-      }
+    // ── Local subtitle language detection ──
+    // Naming convention: "<Title> Engsub.srt" = English, "<Title> PHsub.srt" = Tagalog.
+    // English always wins when both exist.
+    function localFileLang(fileName) {
+      const f = String(fileName).toLowerCase();
+      if (/engsub|\.en\b|-en\b|\.eng\b/.test(f)) return 'en';
+      if (/phsub|tagalog|\.tl\b|-ph\b|\.fil\b/.test(f)) return 'tl';
+      return '';
+    }
 
-    function renderLocalSubList() {
-      if (!subtitleResults) return;
-      subtitleResults.innerHTML = '';
-      fetchLocalSubList(true).then(files => {
-        if (!files.length) {
-          if (subtitleStatus) subtitleStatus.textContent = 'No files in your subtitles folder yet. Drop .srt files in /subtitles on the server.';
-          return;
-        }
-        if (subtitleStatus) subtitleStatus.textContent = files.length + ' file(s) in your subtitles folder — tap one to load:';
-        files.forEach(fn => {
-          const div = document.createElement('div');
-          div.className = 'subtitle-result-item' + (fileMatchesMovie(fn) ? ' local-sub-match' : '');
-          div.textContent = fn + (fileMatchesMovie(fn) ? '  ★ match' : ''); // subfolder paths shown as-is: "Crew Girl/ep1.srt"
-          div.onclick = () => {
-            applyLocalSubtitle(fn).catch(() => {
-              if (subtitleStatus) subtitleStatus.textContent = 'Could not load ' + fn;
-            });
-          };
-          subtitleResults.appendChild(div);
-        });
+    // Find local files for this movie, English first. Returns [] when none.
+    async function findLocalSubtitleFiles() {
+      let files = [];
+      try { files = await fetchLocalSubList(); } catch (e) {}
+      const m = currentMovie || {};
+      // Series default load (no episode clicked) = episode 1
+      const epDefault = m._episodeNum || (m.isSeries ? 1 : null);
+      const matches = files.filter(f => fileMatchesMovie(f, epDefault));
+      // Natural episode order — never trust file mtime (ep2 is usually newer)
+      const epOf = name => {
+        const n = normalizeSubName(name);
+        const mm2 = n.match(/\bep\.?\s*(\d{1,2})\b/) || n.match(/\bs\d{1,2}\s*e(\d{1,2})\b/);
+        return mm2 ? parseInt(mm2[1], 10) : 99;
+      };
+      matches.sort((a, b) => epOf(a) - epOf(b));
+      // English first, then Tagalog, then unlabeled (legacy names like "Title.srt")
+      const eng = matches.filter(f => localFileLang(f) === 'en');
+      const tag = matches.filter(f => localFileLang(f) === 'tl');
+      const other = matches.filter(f => !localFileLang(f));
+      return eng.concat(tag, other);
+    }
+
+    // Apply a local file as a specific language track
+    function applyLocalSubtitleAs(fileName, lang, silent) {
+      return loadLocalSubText(fileName).then(srtText => {
+        const base = fileName.replace(/\.(srt|vtt|ass|ssa)$/i, '');
+        const label = lang === 'tl' ? (base + ' (Tagalog)') : (base + ' (English)');
+        enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, lang, srtText);
+        if (!silent) showToast('Subtitles loaded: ' + label);
+        if (subtitleStatus) subtitleStatus.textContent = 'Loaded from your subtitles folder: ' + fileName;
       });
     }
 
-    if (btnSubtitleLocal) {
-      btnSubtitleLocal.onclick = (e) => {
+    // ── Master subtitle loader ──
+
+    // Language dropdown: picking a language loads it immediately — no search button
+    const subtitleLanguageSelect = document.getElementById('subtitle-language');
+    if (subtitleLanguageSelect) {
+      subtitleLanguageSelect.addEventListener('change', (e) => {
         e.stopPropagation();
-        renderLocalSubList();
-      };
+        if (subtitleStatus) subtitleStatus.textContent = '';
+        loadSubtitleForCurrentSelection();
+      });
+      subtitleLanguageSelect.addEventListener('click', (e) => e.stopPropagation());
     }
 
-    // Minimal .ass/.ssa → .srt converter (dialogue lines + timing)
+    // ── Manual load: a specific language from the /subtitles folder ──
+    async function applyLocalLanguage(lang) {
+      try {
+        if (subtitleStatus) subtitleStatus.textContent = 'Looking in your subtitles folder…';
+        const files = await fetchLocalSubList(true);
+        const m0 = currentMovie || {};
+        const epDefault0 = m0._episodeNum || (m0.isSeries ? 1 : null);
+        const matches = files.filter(f => fileMatchesMovie(f, epDefault0));
+        const wanted = matches.filter(f => localFileLang(f) === lang);
+        const unlabeled = matches.filter(f => localFileLang(f) === '');
+        const other = matches.filter(f => localFileLang(f) !== '' && localFileLang(f) !== lang);
+        const pick = wanted[0] || (lang === 'en' ? unlabeled[0] : null) || other[0] || null;
+        if (!pick) {
+          const langName = (lang === 'tl') ? 'Tagalog (PHsub)' : 'English (Engsub)';
+          if (subtitleStatus) subtitleStatus.textContent = 'No ' + langName + ' subtitle in your subtitles folder for this title.';
+          showToast('No local ' + langName + ' subtitle found');
+          return;
+        }
+        await applyLocalSubtitleAs(pick, localFileLang(pick) === 'tl' ? 'tl' : 'en');
+      } catch (e) {
+        if (subtitleStatus) subtitleStatus.textContent = 'Could not load local subtitle.';
+      }
+    }
+
+    // ── One loader for every subtitle entry point (dropdown, CC button, C key) ──
+    function loadSubtitleForCurrentSelection() {
+      subtitleAttempted = true; // user-initiated — counts as the attempt for this load
+      const langEl = document.getElementById('subtitle-language');
+      const lang = langEl ? (langEl.value || 'en') : 'en';
+      if (lang === 'local-en' || lang === 'local-tl') {
+        applyLocalLanguage(lang === 'local-tl' ? 'tl' : 'en');
+      } else {
+        autoLoadSubtitlesWithLocal(currentMovie.title, lang);
+      }
+    }
+
+    // ── Master subtitle loader ──
+    // Priority: 1) LOCAL subtitles folder — Engsub (English) first, then PHsub (Tagalog)
+    //           2) OpenSubtitles.com in the chosen language (first result auto-picked)
+    // Manual picks of a specific foreign language (es/fr/ja…) still search
+    // OpenSubtitles first — the local folder only holds English/Tagalog.
+    async function autoLoadSubtitlesWithLocal(title, lang) {
+      const isAutoLike = (lang === 'auto' || lang === 'local-en' || lang === 'local-tl' || lang === 'en' || lang === 'tl');
+      const osLang = (lang === 'auto' || lang === 'local-en' || lang === 'local-tl') ? 'en' : lang;
+
+      // Try the /subtitles folder: API listing first, then conventional paths
+      // (no-backend hosting on Live Server / GitHub Pages).
+      const tryLocalFolder = async () => {
+        try {
+          const ordered = await findLocalSubtitleFiles();
+          if (ordered.length) {
+            await applyLocalSubtitleAs(ordered[0], localFileLang(ordered[0]) === 'tl' ? 'tl' : 'en', true);
+            // If both languages exist locally, mount the second as an extra track
+            if (ordered.length > 1 && localFileLang(ordered[0]) !== localFileLang(ordered[1])) {
+              try {
+                const srt2 = await loadLocalSubText(ordered[1]);
+                addExtraSubtitleTrack(srtToVtt(srt2, subtitleOffsetMs),
+                  ordered[1].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (Tagalog)', 'tl');
+              } catch (e) {}
+            }
+            showToast('Subtitles loaded: ' + ordered[0].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
+            return true;
+          }
+        } catch (e) { /* fall through to guesses */ }
+
+        // No-backend hosting (GitHub Pages, Live Server): conventional paths.
+        try {
+          const m = currentMovie || {};
+          const enc = s => encodeURIComponent(s);
+          const guesses = [];
+          if (m._episodeNum) {
+            const n = m._episodeNum;
+            guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
+            guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
+            guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
+            guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
+          } else {
+            guesses.push('subtitles/' + enc(m.title) + '%20Engsub.srt');
+            guesses.push('subtitles/' + enc(m.title) + '%20PHsub.srt');
+            guesses.push('subtitles/' + enc(m.title) + '.srt');
+          }
+          for (const g of guesses) {
+            try {
+              const resp = await fetch(g);
+              if (resp.ok) {
+                const txt = await resp.text();
+                if (txt && txt.indexOf('-->') !== -1) { // sanity: it's really a subtitle, not a 404 page
+                  const isTag = /phsub/i.test(g);
+                  const label = (m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title) + (isTag ? ' (Tagalog)' : ' (English)');
+                  enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, isTag ? 'tl' : 'en', txt);
+                  showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
+                  return true;
+                }
+              }
+            } catch (e) {}
+          }
+        } catch (e) { /* fall through */ }
+        return false;
+      };
+
+      if (isAutoLike) {
+        // 1) My subtitles folder first
+        if (await tryLocalFolder()) return;
+        // 2) OpenSubtitles.com fallback
+        try { await autoLoadSubtitles(title, osLang); } catch (e) {}
+        if (subtitleActive) return;
+      } else {
+        // Specific foreign language requested: OpenSubtitles first, then local
+        try { await autoLoadSubtitles(title, osLang); } catch (e) {}
+        if (subtitleActive) return;
+        await tryLocalFolder();
+        if (subtitleActive) return;
+      }
+
+      // 3) Nothing found anywhere
+      if (!subtitleActive) {
+        if (subtitleStatus) subtitleStatus.textContent = 'No subtitles found (in your subtitles folder or online).';
+      }
+    }
+
+    // Mount an additional language track without removing the active one
+    function addExtraSubtitleTrack(vttText, label, lang) {
+      try {
+        const blob = new Blob([vttText], { type: 'text/vtt' });
+        const url = URL.createObjectURL(blob);
+        const track = document.createElement('track');
+        track.kind = 'subtitles';
+        track.label = label;
+        track.srclang = lang;
+        track.src = url;
+        directPlayer.appendChild(track);
+        // Keep the FIRST track (main language) showing; extras ride along hidden
+        for (let i = 0; i < directPlayer.textTracks.length; i++) {
+          directPlayer.textTracks[i].mode = (i === 0) ? 'showing' : 'disabled';
+        }
+      } catch (e) {}
+    }
+
+    // Minimal .ass/.ssa → .srt converter (dialogue lines + timing)    // Minimal .ass/.ssa → .srt converter (dialogue lines + timing)
     function assToSrt(assText) {
       const lines = String(assText).replace(/\r/g, '').split('\n');
       const out = [];
@@ -4959,8 +5134,7 @@
         if (subtitleActive) {
           turnOffSubtitles();
         } else {
-          const lang = document.getElementById('subtitle-language') ? document.getElementById('subtitle-language').value : 'en';
-          autoLoadSubtitlesWithLocal(currentMovie.title, lang);
+          loadSubtitleForCurrentSelection();
           showToast('Loading subtitles…');
         }
         updateSettingsSubToggleUI();
@@ -5683,8 +5857,8 @@
       return null;
     }
 
-    // Fetch VAST tag and extract video URL
-    async function fetchVastAd() {
+    // Fetch VAST tag once and extract video URL
+    async function fetchVastAdOnce() {
       try {
         // Fetch VAST tag through our server-side proxy (avoids CORS)
         let resp;
@@ -5694,14 +5868,7 @@
           console.warn('[VAST] Proxy fetch failed:', err);
           return null;
         }
-        const contentType = resp.headers.get('content-type') || '';
-        let xmlText;
-
-        if (contentType.includes('xml') || contentType.includes('text')) {
-          xmlText = await resp.text();
-        } else {
-          xmlText = await resp.text();
-        }
+        const xmlText = await resp.text();
 
         // Check if it's XML
         if (xmlText.trim().startsWith('<?xml') || xmlText.trim().startsWith('<VAST')) {
@@ -5711,14 +5878,79 @@
         // If it's a redirect URL to another VAST tag
         if (xmlText.trim().startsWith('http')) {
           const resp2 = await fetch(xmlText.trim(), { mode: 'cors' });
-          xmlText = await resp2.text();
-          return parseVastXml(xmlText);
+          return parseVastXml(await resp2.text());
         }
 
         return null;
       } catch (e) {
         console.warn('[VAST] Fetch error:', e);
         return null;
+      }
+    }
+
+    // Fetch VAST ad with one retry — HilltopAds intermittently returns a
+    // no-fill (empty/error VAST), which is the main cause of "ads sometimes
+    // don't show". One quick retry recovers most of those.
+    async function fetchVastAd() {
+      let url = await fetchVastAdOnce();
+      if (!url) {
+        console.warn('[VAST] No fill on first attempt — retrying once...');
+        await new Promise(r => setTimeout(r, 1500));
+        url = await fetchVastAdOnce();
+      }
+      if (!url) console.warn('[VAST] No fill after retry — ad skipped');
+      return url;
+    }
+
+    // 'canplay' handler for the ad video — declared as a named function so it
+    // can be attached BEFORE src is set (a cached ad can fire canplay within
+    // milliseconds of load(), before a later assignment would ever run)
+    function vastOnCanPlay() {
+      // Ad is ready NOW — pause the movie (it buffered all through the fetch)
+      directPlayer.pause();
+      if (vastLoadGuard) { clearTimeout(vastLoadGuard); vastLoadGuard = null; }
+      vastAdPlaying = true;
+      vastTimeLeft = 7; // reset skip countdown for THIS ad (2nd ad otherwise inherits leftovers)
+      vastSkipBtn.classList.remove('visible');
+      vastVideo.muted = adMuted; // honor the ad-mute preference each ad
+      // iOS Safari and other autoplay-blocked browsers require a user gesture
+      // to play the ad video.
+      const playPromise = vastVideo.play();
+      if (playPromise) {
+        playPromise.then(() => {
+          // Playback started successfully
+          vastCountdown = setInterval(() => {
+            vastTimeLeft--;
+            if (vastTimeLeft <= 0) {
+              clearInterval(vastCountdown);
+              vastSkipBtn.classList.add('visible');
+              vastTimer.textContent = 'You can skip now';
+            } else {
+              vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
+            }
+          }, 1000);
+          vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
+          vastSkipBtn.classList.remove('visible');
+        }).catch((err) => {
+          // Autoplay blocked — let the user tap to start the ad manually.
+          // This is the most common iOS scenario.
+          console.warn('[VAST] Autoplay blocked:', err.message);
+          directPlayer.pause(); // ad couldn't start — stop the movie behind the overlay
+          vastTimer.textContent = 'Tap to play ad';
+          vastSkipBtn.classList.remove('visible');
+
+          // Show play button on the ad video
+          vastVideo.controls = true;
+          vastVideo.style.cursor = 'pointer';
+          vastVideo.style.outline = 'none';
+
+          // If the user never taps, don't leave the movie stuck behind the
+          // overlay forever — skip the ad and resume the movie after 12s.
+          if (vastLoadGuard) clearTimeout(vastLoadGuard);
+          vastLoadGuard = setTimeout(function () {
+            if (vastVideo.paused) { console.warn('[VAST] Ad never played — skipping'); skipVastAd(); }
+          }, 12000);
+        });
       }
     }
 
@@ -5733,6 +5965,7 @@
       // ad is actually ready (vastVideo.oncanplay below).
       movieMutedBeforeAd = directPlayer.muted;
       directPlayer.muted = true;
+      syncPcVolumeUI(); // ad mutes the movie — reflect it on the speaker icon
 
       // Safety net: if the ad fetch/load hangs, bail out and resume the movie
       if (vastLoadGuard) clearTimeout(vastLoadGuard);
@@ -5761,6 +5994,9 @@
         console.warn('[VAST] Ad video failed to load — skipping');
         if (!vastAdPlaying) skipVastAd();
       };
+      // Attach canplay BEFORE src — a cached ad can fire canplay within
+      // milliseconds of load(), before an after-src assignment would run.
+      vastVideo.oncanplay = vastOnCanPlay;
       vastVideo.src = videoUrl;
       vastVideo.load();
 
@@ -5770,47 +6006,7 @@
         fireVastPixels(vastTracking.impressions);
         fireVastPixels(vastTracking.start);
         console.log('[VAST] Ad impression fired to ad network');
-      });      vastVideo.oncanplay = function() {
-
-        // Ad is ready NOW — pause the movie (it buffered all through the fetch)
-        directPlayer.pause();
-        if (vastLoadGuard) { clearTimeout(vastLoadGuard); vastLoadGuard = null; }
-        vastAdPlaying = true;
-        vastVideo.muted = adMuted; // honor the ad-mute preference each ad
-        // iOS Safari and other autoplay-blocked browsers require a user gesture
-        // to play the ad video. The 'waiting' -> 'canplay' event sequence is
-        // our best shot — users already tapped to load the ad.
-        const playPromise = vastVideo.play();
-        if (playPromise) {
-          playPromise.then(() => {
-            // Playback started successfully
-            vastCountdown = setInterval(() => {
-              vastTimeLeft--;
-              if (vastTimeLeft <= 0) {
-                clearInterval(vastCountdown);
-                vastSkipBtn.classList.add('visible');
-                vastTimer.textContent = 'You can skip now';
-              } else {
-                vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
-              }
-            }, 1000);
-            vastTimer.textContent = 'Skip in ' + vastTimeLeft + 's';
-            vastSkipBtn.classList.remove('visible');
-          }).catch((err) => {
-            // Autoplay blocked — show a play button overlay so user can tap to
-            // start the ad manually. This is the most common iOS scenario.
-            console.warn('[VAST] Autoplay blocked:', err.message);
-            directPlayer.pause(); // ad couldn't start — stop the movie behind the overlay
-            vastTimer.textContent = 'Tap to play ad';
-            vastSkipBtn.classList.remove('visible');
-
-            // Show play button on the ad video
-            vastVideo.controls = true;
-            vastVideo.style.cursor = 'pointer';
-            vastVideo.style.outline = 'none';
-          });
-        }
-      };
+      });
 
       // Also try to play on the first interaction with the ad container
       const vastContainerTap = function() {
@@ -5879,32 +6075,38 @@
     // Skip / close VAST ad
     function skipVastAd() {
       vastOverlay.classList.remove('active');
+      vastVideo.oncanplay = null; // detach: no stale handler for the next ad
       vastVideo.pause();
       vastVideo.removeAttribute('src');
       vastVideo.load();
       clearInterval(vastCountdown);
+      vastCountdown = null;
       if (vastLoadGuard) { clearTimeout(vastLoadGuard); vastLoadGuard = null; }
       vastAdPlaying = false;
 
       // Restore the sound state the movie had before the ad muted it
       directPlayer.muted = movieMutedBeforeAd;
-      const volPath = document.getElementById('svg-volume-path');
-      if (volPath && !directPlayer.muted) volPath.setAttribute('d', volOnData);
+      syncPcVolumeUI();
       movieMutedBeforeAd = false;
 
       // Resume movie (auto-play) and ensure subtitles are still active
       directPlayer.play().catch(() => {});
-      if (!subtitleActive && currentMovie && currentMovie.title) {
+      // Only auto-retry subtitles if the initial attempt never ran (e.g. sub
+      // search finished after the ad started). Never re-run after a failed
+      // search or after the user turned subtitles off.
+      if (!subtitleActive && !subtitleAttempted && currentMovie && currentMovie.title) {
+        subtitleAttempted = true;
         autoLoadSubtitlesWithLocal(currentMovie.title, 'en');
       }
 
-      // Reset trigger flag
+      // Reset trigger flag so the next movie/episode gets its own ad
       setTimeout(() => { vastTriggered = false; }, 30000);
     }
 
     // Hook into timeupdate to trigger ads at 33% and 66% (1-2 ads per video)
     let vastAdPhase = 0; // 0 = not triggered, 1 = first ad done, 2 = second ad done
     directPlayer.addEventListener('timeupdate', function checkVastAd() {
+      if (vastAdPlaying) return; // don't stack triggers while an ad is live
       if (isNaN(directPlayer.duration) || directPlayer.duration < 30) return;
       const pct = (directPlayer.currentTime / directPlayer.duration) * 100;
       // First ad at 33%
@@ -5997,6 +6199,26 @@
     }
 
     directPlayer.addEventListener('timeupdate', maybeShowNextEpisode);
+    directPlayer.addEventListener('ended', () => {
+      // Mark as finished: remove from Continue Watching (keep a history marker)
+      try {
+        const saveId = currentMovie._episodeId || currentMovie.id;
+        const savedData = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+        const entry = savedData[saveId];
+        if (entry) {
+          savedData[saveId] = {
+            id: saveId,
+            title: currentMovie._episodeTitle || currentMovie.title,
+            poster: currentMovie.poster,
+            finished: true,
+            progress: 100,
+            updatedAt: Date.now()
+          };
+          try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData)); } catch (e) {}
+        }
+      } catch (e) {}
+    });
+
     directPlayer.addEventListener('seeked', () => { if (directPlayer.currentTime < directPlayer.duration * 0.85) { nextEpShown = false; hideNextEpisodeButton(); } });
     directPlayer.addEventListener('ended', () => { // ended with button visible → advance immediately
       if (nextEpBox.classList.contains('visible')) playNextEpisode();

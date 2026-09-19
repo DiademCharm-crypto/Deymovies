@@ -8,7 +8,7 @@
   <title>DEYMFLIX - Reels</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=157.0">
+  <link rel="stylesheet" href="style.css?v=159.5">
 
   <!-- FIREBASE COMPAT SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -666,7 +666,7 @@
   <!-- Coming Soon Tooltip -->
   <div class="coming-soon-tooltip" id="coming-soon-tooltip">🚧 Coming Soon!</div>
 
-  <script src="config.js"></script>
+  <script src="config.js?v=2.0"></script>
   <script>
     // Backend base: '' = same origin; or full URL of the host running proxy-server.js
     // (set window.__DEYMFLIX_CONFIG__.API_BASE in config.js for static hosting).
@@ -675,10 +675,10 @@
       catch (e) { return ''; }
     })();
   </script>
-  <script src="security.js"></script>
+  <script src="security.js?v=2.1"></script>
   <script src="reels-data.js?v=151.0"></script>
-    <script src="filipino-movies.js?v=1.0"></script>
-  <script src="app.js?v=153.0"></script>
+    <script src="filipino-movies.js?v=1.1"></script>
+  <script src="app.js?v=158.2"></script>
   <script>
     function sanitizeHTML(str) {
       if (typeof str !== "string") return "";
@@ -1383,7 +1383,15 @@
       try {
         const resp = await fetch(REEL_VAST_URL);
         const xmlText = await resp.text();
-        const videoUrl = await parseVastXml(xmlText);
+        let videoUrl = await parseVastXml(xmlText);
+        // One quick retry — HilltopAds intermittently returns no-fill (empty
+        // VAST), the main cause of "ads sometimes don't show"
+        if (!videoUrl) {
+          console.warn('[VAST] No fill on first attempt — retrying once...');
+          await new Promise(r => setTimeout(r, 1500));
+          const resp2 = await fetch(REEL_VAST_URL);
+          videoUrl = await parseVastXml(await resp2.text());
+        }
         if (!videoUrl) { clearTimeout(stallGuard); skipReelAd(index); return; }        adVideo.src = videoUrl;
           adVideo.load();
           adVideo.muted = reelAdMuted; // honor the ad-mute preference
@@ -1444,7 +1452,7 @@
       const adVideo = document.getElementById('reel-vast-video-' + index);
       const video = document.getElementById('video-' + index);
       if (overlay) overlay.classList.remove('active');
-      if (adVideo) { clearInterval(adVideo._reelAdTimer); adVideo.pause(); adVideo.removeAttribute('src'); adVideo.load(); }
+      if (adVideo) { clearInterval(adVideo._reelAdTimer); adVideo.oncanplay = null; adVideo.pause(); adVideo.removeAttribute('src'); adVideo.load(); }
       if (video) video.play().catch(() => {});
     }
 

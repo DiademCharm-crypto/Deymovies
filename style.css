@@ -1403,8 +1403,40 @@ header, .navbar, .top-nav {
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(transparent, rgba(0,0,0,0.9));
   padding: 8px 6px;
+}
+
+/* Netflix-style % watched badge (history page) */
+.mylist-progress-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: 10px;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Red watch-progress bar under the poster (was referenced in HTML but had no CSS — never visible) */
+.mylist-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #e50914;
+  z-index: 3;
+  border-radius: 0 2px 0 0;
+  pointer-events: none;
 }
 
 .mylist-item-title {
@@ -1414,6 +1446,33 @@ header, .navbar, .top-nav {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* '⟳ Watch Again' pill on finished items in History */
+.watch-again-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 4px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(229, 9, 20, 0.85);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.watch-again-btn:hover {
+  background: #e50914;
+  transform: scale(1.04);
+}
+
+.watch-again-btn:active {
+  transform: scale(0.97);
 }
 
 .mylist-remove-btn {
@@ -1705,3 +1764,222 @@ body.has-bottom-nav {
   color: #e50914;
 }
 
+
+/* ============================================
+   NETFLIX-STYLE HOVER TRAILER PREVIEW
+   PC: hover a poster. Mobile: long-press a poster.
+   Expands over the grid — poster sizes and spacing are untouched.
+   ============================================ */
+
+/* Base panel styles — OUTSIDE the desktop media query so the mobile
+   long-press preview renders too (the old location hid it on phones). */
+.hover-preview {
+  position: fixed;
+  width: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #141414;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.96);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hover-preview.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Long-press dim backdrop (mobile) — also blocks accidental taps under the panel */
+.hp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.hp-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (any-hover: hover) and (any-pointer: fine) and (min-width: 560px) {
+
+  /* Netflix-style floating landscape preview — lives on <body>, NOT inside the card */
+  @media (min-width: 560px) {
+    .hover-preview { width: 340px; }
+  }
+
+  .hover-preview .hp-video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  .hover-preview .hp-video iframe,
+  .hover-preview .hp-video img.hp-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+    pointer-events: none; /* clicks fall through to the card → player */
+  }
+
+  /* speaker toggle over the video (Netflix preview style) */
+  .hover-preview .hp-mute-toggle {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto; /* the video area itself ignores clicks; this button must not */
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .hover-preview .hp-mute-toggle:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #fff;
+  }
+
+  /* info block under the video: title, buttons, meta, genres */
+  .hover-preview .hp-info {
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hover-preview .hp-title {
+    display: block;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* round Play / Bookmark buttons — Netflix row-preview style */
+  .hover-preview .hp-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hover-preview .hp-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    background: rgba(20, 20, 20, 0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+  }
+
+  .hover-preview .hp-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: #fff;
+  }
+
+  .hover-preview .hp-play {
+    background: #fff;
+    color: #0b0b0b;
+    border-color: #fff;
+  }
+
+  .hover-preview .hp-play:hover {
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  /* bookmarked state: ✓ replaces +, red accent */
+  .hover-preview .hp-bookmark .hp-bm-check { display: none; }
+  .hover-preview .hp-bookmark.in-list { border-color: #e50914; color: #e50914; }
+  .hover-preview .hp-bookmark.in-list .hp-bm-plus { display: none; }
+  .hover-preview .hp-bookmark.in-list .hp-bm-check { display: block; }
+
+  /* match% + year row */
+  .hover-preview .hp-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    color: #d2d2d2;
+  }
+
+  .hover-preview .hp-match {
+    color: #46d369;
+    font-weight: 800;
+  }
+
+  .hover-preview .hp-match:empty { display: none; }
+  .hover-preview .hp-year:empty { display: none; }
+
+  /* genres row */
+  .hover-preview .hp-genres {
+    font-size: 0.72rem;
+    color: #d2d2d2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hover-preview .hp-genres:empty { display: none; }
+
+  /* skeleton text while the trailer resolves */
+  .hover-preview .hp-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e50914;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: hpPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes hpPulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+}
+
+/* ---- MOBILE long-press preview ---- */
+/* Suppress iOS's own callout menu (Open in New Tab etc.) during long-press */
+.poster-card {
+  -webkit-touch-callout: default; /* links keep default elsewhere; cards overridden below */
+}
+@media (hover: none) and (pointer: coarse) {
+  .poster-card {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* Slightly tighter info block on small screens */
+  .hover-preview .hp-info { padding: 8px 10px 10px; gap: 6px; }
+  .hover-preview .hp-title { font-size: 0.85rem; }
+  .hover-preview .hp-btn { width: 30px; height: 30px; }
+}
