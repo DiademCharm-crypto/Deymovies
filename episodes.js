@@ -7,7 +7,7 @@ const seriesData = [
     id: "Love-U-Lots",
     title: "Love U Lots",
     isFilipino: true,
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/example.jpg",
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/qOjY3XE4C4prKGmFyJaPxANrhxI.jpg",
     seasons: [
       {
         seasonNumber: 1,
