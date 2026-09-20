@@ -105,83 +105,80 @@
       display: block !important;
     }
 
-    /* TRAILER START OVERLAY TO BYPASS AUTOPLAY BLOCKS */
-    .trailer-start-card {
-      position: absolute;
-      inset: 0;
-      z-index: 50;
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .trailer-start-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-    }
-
-    .trailer-play-btn {
-      position: relative;
-      z-index: 2;
-      width: 70px;
-      height: 70px;
-      background: #e50914;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 25px rgba(229, 9, 20, 0.8);
-      transition: transform 0.2s ease;
-    }
-
-    .trailer-start-card:hover .trailer-play-btn {
-      transform: scale(1.1);
-    }
-
-    .trailer-play-btn svg {
-      width: 32px;
-      height: 32px;
-      fill: #ffffff;
-      margin-left: 4px;
-    }
-
-    .trailer-play-label {
-      position: relative;
-      z-index: 2;
-      margin-top: 14px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #ffffff;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-    }
-
     .trailer-back-btn {
       position: absolute !important;
       top: max(12px, env(safe-area-inset-top)) !important;
       left: 14px !important;
       z-index: 60 !important;
-      width: 40px !important;
       height: 40px !important;
-      border-radius: 50% !important;
-      background: rgba(0, 0, 0, 0.55) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      padding: 0 14px !important;
+      gap: 8px !important;
+      border-radius: 22px !important;
+      background: rgba(0, 0, 0, 0.62) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
       color: #ffffff !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      font-size: 1.2rem !important;
-      font-weight: 800 !important;
+      font-family: inherit !important;
+      font-size: 0.9rem !important;
+      font-weight: 700 !important;
       cursor: pointer !important;
       -webkit-user-select: none !important;
       user-select: none !important;
       -webkit-tap-highlight-color: transparent !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+      transition: background 0.2s ease, border-color 0.2s ease !important;
+    }
+
+    /* Bare chevron (trailer-only movies: nothing to return to but home) */
+    .trailer-back-btn:not(.labeled) {
+      width: 40px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      font-size: 1.2rem !important;
+    }
+
+    .trailer-back-btn:hover {
+      background: rgba(0, 0, 0, 0.85) !important;
+      border-color: #ffffff !important;
+    }
+
+    /* Trailer sound toggle — sits opposite the back button so users can
+       mute/unmute the trailer without hunting for YouTube's own controls */
+    .trailer-sound-btn {
+      position: absolute !important;
+      top: max(12px, env(safe-area-inset-top)) !important;
+      right: 14px !important;
+      z-index: 60 !important;
+      height: 40px !important;
+      padding: 0 14px !important;
+      gap: 8px !important;
+      border-radius: 22px !important;
+      background: rgba(0, 0, 0, 0.62) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      color: #ffffff !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-family: inherit !important;
+      font-size: 0.9rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+      transition: background 0.2s ease, border-color 0.2s ease !important;
+    }
+
+    .trailer-sound-btn:hover {
+      background: rgba(0, 0, 0, 0.85) !important;
+      border-color: #ffffff !important;
+    }
+
+    .trailer-sound-btn.is-muted {
+      color: #ffb3b3 !important;
     }
 
     .ultimate-ad-shield {
@@ -886,25 +883,31 @@
     }
 
     .network-warning-note {
-      /* Overlaid INSIDE the video player, just above the control bar */
-      position: absolute !important;
-      bottom: 68px !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: calc(100% - 40px) !important;
-      margin: 0 auto !important;
+      /* Sits UNDER the player and ABOVE the title — never overlaid on the video */
+      position: static !important;
+      display: block;
+      width: 100% !important;
+      margin: 14px 0 0 0 !important;
       padding: 10px 16px !important;
-      background: rgba(229, 9, 20, 0.35) !important;
-      border: 1px solid rgba(229, 9, 20, 0.4) !important;
+      background: rgba(229, 9, 20, 0.18) !important;
+      border: 1px solid rgba(229, 9, 20, 0.45) !important;
       border-radius: 8px !important;
       color: #ffffff !important;
       font-size: 0.82rem !important;
       font-weight: 600 !important;
       box-sizing: border-box !important;
       text-align: center !important;
-      z-index: 45 !important;
-      pointer-events: none !important;
-      backdrop-filter: blur(4px);
+      z-index: auto !important;
+    }
+
+    /* Match the player it warns about: the player is 80% centred in this band,
+       so the warning is too (it is full width below 769px and above 1024px). */
+    @media (min-width: 769px) and (max-width: 1023px) {
+      .network-warning-note {
+        max-width: 80% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
     }
 
     .video-info-box {
@@ -936,6 +939,9 @@
       color: #ffffff !important;
       padding-right: 48px !important;
     }
+
+    /* The Trailer / Back-to-Movie pill is wider than the bookmark button; JS sets
+       the title's padding-right from the pill's real width so nothing overlaps. */
 
     /* Title stacked: title on top, genre chips on their own line under it */
     .title-row {
@@ -997,6 +1003,59 @@
       background: rgba(229, 9, 20, 0.2) !important;
       border-color: #e50914 !important;
       color: #e50914 !important;
+    }
+
+    /* WATCH TRAILER pill — sits beside the bookmark button in the info box */
+    .trailer-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 14px;
+      background: #e50914;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .trailer-pill:hover {
+      background: #f6121d;
+      transform: translateY(-1px);
+    }
+
+    .trailer-pill svg {
+      width: 14px;
+      height: 14px;
+      fill: #ffffff;
+      flex-shrink: 0;
+    }
+
+    /* While the trailer is playing the same pill becomes the way back to the movie */
+    .trailer-pill.back-to-movie {
+      background: rgba(0, 0, 0, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .trailer-pill.back-to-movie:hover {
+      background: rgba(0, 0, 0, 0.85);
+      border-color: #ffffff;
+    }
+
+    .trailer-pill.back-to-movie svg {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      width: 15px;
+      height: 15px;
     }
 
     .settings-btn {
@@ -1241,8 +1300,9 @@
       }
 
       .network-warning-note {
-        width: calc(100% - 28px) !important;
+        width: 100% !important;
         font-size: 0.78rem !important;
+        margin-top: 12px !important;
       }
 
       /* Mobile: horizontal scroll row, card size matching index.html posters */
@@ -1836,7 +1896,15 @@
       .pc-main .video-info-box > .pc-rating-row,
       .pc-main .video-info-box > #genre-label { grid-column: 2; }
       .pc-main .video-info-box > .pc-tabs,
-      .pc-main .video-info-box > .pc-panel { grid-column: 1 / -1; }
+      .pc-main .video-info-box > .pc-panel,
+      .pc-main .video-info-box > .episodes-container-section {
+        grid-column: 1 / -1;
+        /* the section's own 80%-width rule was for its old spot below the
+           info box — inside the grid it must span edge-to-edge like the tabs */
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
 
       /* the plain synopsis + Read More are replaced by the Info panel */
       .pc-main .video-info-box.pc-details-ready > #current-description,
@@ -2113,10 +2181,6 @@
   <!-- Video Player Section Container -->
   <div class="video-container" id="playerContainer">
 
-    <!-- Slow-connection warning: overlaid inside the player, above the controls -->
-    <div id="network-note" class="network-warning-note" style="display: none;">
-      ⚠️ Slow connection? Reload the page.
-    </div>
     <div id="player-poster-blur" class="player-poster-blur"></div>
 
     <style>
@@ -2346,27 +2410,18 @@
           </div>
           <div id="settings-subtitle-options" style="display:none;margin-top:6px;">
             <select id="subtitle-language">
-              <optgroup label="OpenSubtitles.org — auto search">
-                <option value="en" selected>English</option>
-                <option value="tl">Tagalog</option>
-                <option value="es">Spanish</option>
-                <option value="ko">Korean</option>
-                <option value="ja">Japanese</option>
-              </optgroup>
-              <optgroup label="My Subtitles — manual">
-                <option value="local-en">English (Engsub)</option>
-                <option value="local-tl">Tagalog (PHsub)</option>
-              </optgroup>
+              <option value="local-en" selected>English (Engsub)</option>
+              <option value="local-tl">Tagalog (PHsub)</option>
             </select>
             <div id="subtitle-status" class="subtitle-status"></div>
-            <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
-              <label style="font-size:0.6rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <button id="sub-offset-minus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">−1s</button>
-                <input type="range" id="sub-offset-slider" min="-5000" max="5000" step="100" value="0" style="flex:1;accent-color:#e50914;height:4px;">
-                <button id="sub-offset-plus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:0.7rem;">+1s</button>
+            <div style="margin-top:4px;display:flex;flex-direction:column;gap:2px;">
+              <label style="font-size:0.55rem;font-weight:800;letter-spacing:0.4px;text-transform:uppercase;color:#e50914;">Timing Offset</label>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <button id="sub-offset-minus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:1px 5px;cursor:pointer;font-size:0.6rem;line-height:1.4;">−1s</button>
+                <input type="range" id="sub-offset-slider" min="-5000" max="5000" step="100" value="0" style="flex:1;min-width:0;accent-color:#e50914;height:3px;margin:0;">
+                <button id="sub-offset-plus" style="background:#1f1f1f;color:#fff;border:1px solid #333;border-radius:4px;padding:1px 5px;cursor:pointer;font-size:0.6rem;line-height:1.4;">+1s</button>
               </div>
-              <div id="sub-offset-label" style="font-size:0.6rem;color:#aaa;text-align:center;">0 ms</div>
+              <div id="sub-offset-label" style="font-size:0.55rem;color:#999;text-align:center;line-height:1.2;">0 ms</div>
             </div>
           </div>
         </div>
@@ -2566,6 +2621,11 @@
   }
   </style>
 
+  <!-- Slow-connection warning: between the player and the movie info, never over the video -->
+  <div id="network-note" class="network-warning-note" style="display: none;">
+    ⚠️ Slow connection? Reload the page.
+  </div>
+
   <div class="video-info-box" id="video-info-box">
 
     <!-- PC ONLY: poster shown beside the title (hidden below 1024px) -->
@@ -2578,6 +2638,9 @@
       <div class="title-actions">
         <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to Bookmarks">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+        <button id="watch-trailer-btn" class="trailer-pill" style="display:none" onclick="watchTrailerFromInfo()" title="Watch Trailer">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Trailer</span>
         </button>
       </div>
     </div>
@@ -2649,7 +2712,7 @@
   </script>
   <script src="security.js?v=2.1"></script>
     <script src="filipino-movies.js?v=1.1"></script>
-  <script src="app.js?v=158.5"></script>
+  <script src="app.js?v=158.6"></script>
   <script src="episodes.js?v=1.1"></script>
   <script>
     function destroyAllPlayers() {
@@ -2668,6 +2731,10 @@
       const trailerBackBtn = document.getElementById('trailer-back-btn');
       if (trailerBackBtn) {
         trailerBackBtn.remove();
+      }
+      const trailerSoundBtn = document.getElementById('trailer-sound-btn');
+      if (trailerSoundBtn) {
+        trailerSoundBtn.remove();
       }
     }
 
@@ -2715,8 +2782,18 @@
 
     const safeMoviesList = (typeof movies !== 'undefined' && Array.isArray(movies)) ? movies : [];
     const safeFeaturedList = (typeof featuredMovies !== 'undefined' && Array.isArray(featuredMovies)) ? featuredMovies : [];
+    // IDs can drift between dash and space variants ("Crew-Girl" vs "Crew Girl"),
+    // so an exact-id miss falls back to a normalized match before giving up —
+    // otherwise a stale link silently shows movies[0]'s data.
+    const normIdKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const wantedKey = normIdKey(movieId);
     const currentMovie = safeMoviesList.find(m => m.id === movieId) || 
                          safeFeaturedList.find(m => m.id === movieId) || 
+                         (wantedKey ? (
+                           safeMoviesList.find(m => normIdKey(m.id) === wantedKey) ||
+                           safeFeaturedList.find(m => normIdKey(m.id) === wantedKey) ||
+                           safeMoviesList.find(m => normIdKey(m.title) === wantedKey)
+                         ) : null) ||
                          safeMoviesList[0] || 
                          { 
                            id: movieId || 'fallback', 
@@ -2760,6 +2837,191 @@
     };
 
     updateBookmarkBtn();
+
+    // ---- Trailer / Back-to-Movie pill (beside the bookmark button).
+    // Only appears when the movie has its own video file AND a trailer, so
+    // trailer-only movies keep their old single-behaviour flow.
+    // Clicking it opens the trailer; while the trailer plays the SAME pill turns
+    // into "Back to Movie", so there is always an obvious way back.
+    const TRAILER_PILL_HTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Trailer</span>';
+    const BACK_PILL_HTML = '<svg viewBox="0 0 24 24"><path d="M15 4.5L7.5 12 15 19.5"/><path d="M7.5 12H18"/></svg><span>Back to Movie</span>';
+
+    function hasOwnVideoFile() {
+      return !!(currentMovie && currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '');
+    }
+    function hasTrailerSource() {
+      return !!(currentMovie && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '');
+    }
+
+    function updateTrailerBtn() {
+      const pill = document.getElementById('watch-trailer-btn');
+      if (!pill) return;
+      const titleEl = document.getElementById('current-title');
+
+      // Trailer-only movies: the trailer IS the movie, no pill needed
+      if (!hasOwnVideoFile() || !hasTrailerSource()) {
+        pill.style.display = 'none';
+        if (titleEl) titleEl.style.removeProperty('padding-right');
+        return;
+      }
+
+      const inTrailer = (playerMode === 'trailer');
+      pill.innerHTML = inTrailer ? BACK_PILL_HTML : TRAILER_PILL_HTML;
+      pill.classList.toggle('back-to-movie', inTrailer);
+      pill.title = inTrailer ? 'Back to the movie' : 'Watch Trailer';
+      // Resolved lazily so the handler exists whenever the click actually happens
+      pill.onclick = function () {
+        if (inTrailer) { if (window.returnFromTrailerToMovie) window.returnFromTrailerToMovie(); }
+        else { if (window.watchTrailerFromInfo) window.watchTrailerFromInfo(); }
+      };
+      pill.style.display = 'flex';
+
+      // Reserve exactly the pill's rendered width so long titles never slide under it
+      if (titleEl) {
+        const w = pill.offsetWidth || (inTrailer ? 165 : 120);
+        titleEl.style.setProperty('padding-right', (w + 14) + 'px', 'important');
+      }
+    }
+    updateTrailerBtn();
+
+    // True when the trailer was started by the user's own click — that carries a
+    // user gesture, so we may turn the sound on immediately. Auto-loaded trailers
+    // must start muted (browser policy) and unmute on the first interaction.
+    let trailerUserInitiated = false;
+
+    // Keeps the user-started trailer audible (YouTube re-mutes itself mid-playback)
+    function stopTrailerSoundPump() {
+      if (window._ytSoundPump) { clearInterval(window._ytSoundPump); window._ytSoundPump = null; }
+    }
+
+    // ── Auto-return when the trailer ends ──
+    // The YouTube widget posts state events (infoDelivery) to the parent via
+    // postMessage. A pre-roll ad can also emit a transient ENDED(0), so the
+    // return is debounced and cancelled if the trailer resumes within 2s.
+    let _ytEndedTimer = null;
+    function cancelTrailerEndReturn() {
+      if (_ytEndedTimer) { clearTimeout(_ytEndedTimer); _ytEndedTimer = null; }
+    }
+    function handleTrailerStateMsg(e) {
+      if (playerMode !== 'trailer') return;
+      if (!e.source || !e.data) return;
+      const f = document.getElementById('main-iframe');
+      if (!f || f.contentWindow !== e.source) return;   // only our trailer iframe
+      let info = null;
+      try { info = (typeof e.data === 'string') ? JSON.parse(e.data) : e.data; } catch (err) { return; }
+      if (!info || info.event !== 'infoDelivery' || !info.info) return;
+      // Track the embed's real mute state so the sound toggle reflects YouTube's
+      // own re-muting (it re-applies the URL's mute=1 after ads/resets).
+      if (typeof info.info.muted === 'boolean') {
+        window._trailerSoundMuted = info.info.muted;
+        if (typeof syncTrailerSoundBtn === 'function') syncTrailerSoundBtn();
+      }
+      const st = Number(info.info.playerState);
+      if (st === 0) {                                   // ENDED
+        if (_ytEndedTimer) return;                      // debounce repeats
+        if (typeof hasOwnVideoFile === 'function' && !hasOwnVideoFile()) return; // trailer-only: nothing to return to
+        _ytEndedTimer = setTimeout(function () {
+          _ytEndedTimer = null;
+          if (playerMode !== 'trailer') return;
+          window.returnFromTrailerToMovie();            // resume movie at saved spot
+        }, 1500);
+      } else if (st === 1 || st === 3) {                // PLAYING / BUFFERING
+        cancelTrailerEndReturn();                       // ad ended, trailer is rolling
+      }
+    }
+    window.addEventListener('message', handleTrailerStateMsg);
+
+    // ── Trailer sound toggle ──
+    // A floating pill (top-right, mirroring the back button) that mutes/unmutes
+    // the YouTube trailer directly — no need to touch YouTube's control bar.
+    // The state it shows is kept honest by infoDelivery.muted events above.
+    function ensureTrailerSoundBtn() {
+      let btn = document.getElementById('trailer-sound-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'trailer-sound-btn';
+        btn.className = 'trailer-sound-btn';
+        btn.setAttribute('aria-label', 'Mute or unmute trailer');
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleTrailerSound();
+        });
+        playerContainer.appendChild(btn);
+      }
+      syncTrailerSoundBtn();
+    }
+    function syncTrailerSoundBtn() {
+      const btn = document.getElementById('trailer-sound-btn');
+      if (!btn) return;
+      const muted = !!window._trailerSoundMuted;
+      btn.classList.toggle('is-muted', muted);
+      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="' + (muted ? volOffData : volOnData) + '"/></svg><span>' + (muted ? 'Unmute' : 'Mute') + '</span>';
+    }
+    function toggleTrailerSound() {
+      const goingMute = !window._trailerSoundMuted;
+      window._trailerSoundMuted = goingMute;
+      const ytPost = (func, args) => {
+        const f = document.getElementById('main-iframe');
+        try { if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*'); } catch (err) {}
+      };
+      if (goingMute) {
+        ytPost('mute');
+        stopTrailerSoundPump();          // stop fighting the user's choice
+      } else {
+        ytPost('unMute');
+        ytPost('setVolume', [100]);
+        // Auto-loaded trailers have no sound pump of their own — start one so
+        // the sound survives YouTube's post-ad re-muting. It stops if the user
+        // mutes again (it checks the flag) or leaves trailer mode.
+        if (!window._ytSoundPump) {
+          window._ytSoundPump = setInterval(() => {
+            if (playerMode !== 'trailer' || window._trailerSoundMuted) { stopTrailerSoundPump(); return; }
+            ytPost('unMute');
+            ytPost('setVolume', [100]);
+          }, 1500);
+        }
+      }
+      syncTrailerSoundBtn();
+    }
+
+    window.watchTrailerFromInfo = function() {
+      if (playerMode === 'trailer') return;          // already watching
+      if (!hasOwnVideoFile() || !hasTrailerSource()) return;
+      // Remember where the user was so returning resumes right there
+      try { sessionStorage.setItem('dfx_trailer_return_' + (currentMovie.id || ''), String(directPlayer.currentTime || 0)); } catch (e) {}
+      trailerUserInitiated = true;
+      playerMode = 'trailer';
+      loadEmbed();
+    };
+
+    window.returnFromTrailerToMovie = function() {
+      const hasOwnFile = hasOwnVideoFile();
+      cancelTrailerEndReturn();
+      // Trailer-only movies have nothing to return to — go home as before
+      if (!hasOwnFile) { forceBackToHome(); return; }
+      playerMode = '';
+      trailerUserInitiated = false;
+      stopTrailerSoundPump();
+      // Leaving trailer mode: remove the trailer back arrow and sound toggle,
+      // restore the pill
+      const tb = document.getElementById('trailer-back-btn');
+      if (tb) tb.remove();
+      const tsb2 = document.getElementById('trailer-sound-btn');
+      if (tsb2) tsb2.remove();
+      window._trailerSoundMuted = false;
+      updateTrailerBtn();
+      let resumeAt = 0;
+      try { resumeAt = parseFloat(sessionStorage.getItem('dfx_trailer_return_' + (currentMovie.id || '')) || '0') || 0; sessionStorage.removeItem('dfx_trailer_return_' + (currentMovie.id || '')); } catch (e) {}
+      loadEmbed();
+      if (resumeAt > 1) {
+        const onMeta = () => {
+          directPlayer.removeEventListener('loadedmetadata', onMeta);
+          try { directPlayer.currentTime = resumeAt; } catch (e) {}
+          directPlayer.play().catch(() => {});
+        };
+        directPlayer.addEventListener('loadedmetadata', onMeta);
+      }
+    };
 
     const descElement = document.getElementById('current-description');
     const readMoreBtn = document.getElementById('toggle-synopsis-btn');
@@ -3492,6 +3754,21 @@
       document.fonts.ready.then(function () { pcCheckSynopsisClamp(); }).catch(function () {});
     }
 
+    /* ── details cache ──
+       Bump the version when the payload shape changes, otherwise browsers keep
+       serving the older, incomplete result for a day (this happened with the
+       stills gallery: a cached payload without stills hid the whole row). */
+    const PC_DETAILS_CACHE_VERSION = 'v2';
+    function pcDetailsCacheKey(imdbId) {
+      return 'deymflix_pcdetails_' + PC_DETAILS_CACHE_VERSION + '_' + imdbId;
+    }
+    // True when a cached TMDB payload has the gallery it should have
+    function pcDetailsComplete(d) {
+      if (!d) return false;
+      if (d.source !== 'tmdb') return true;   // Wikidata never carries stills
+      return Array.isArray(d.stills) && d.stills.length > 0;
+    }
+
     /* ── side-rail score: the same X.X/10 IMDB shown next to each rail card ──
        Ratings live in the server cache (data.score) or in the localStorage
        details cache for that movie's imdb id, so the hero area can skip the
@@ -3499,7 +3776,7 @@
     function pcGetRailScore() {
       if (!(currentMovie && currentMovie.imdbId)) return 0;
       try {
-        const key = 'deymflix_pcdetails_' + currentMovie.imdbId;
+        const key = pcDetailsCacheKey(currentMovie.imdbId);
         const c = JSON.parse(localStorage.getItem(key) || 'null');
         if (c && c.data && c.data.found) return Math.max(0, Number(c.data.score) || 0);
       } catch (e) {}
@@ -3515,17 +3792,23 @@
       const movie = currentMovie;
       if (!movie || movie._episodeNum) return; // episodes keep the series layout
       const imdbId = movie.imdbId ? String(movie.imdbId) : '';
-      if (!/^tt\d{5,}$/.test(imdbId)) return;
+      // A title is enough for the server to resolve details (needed for entries
+      // we added by hand that have no IMDB id yet, e.g. some series).
+      const hasImdbId = /^tt\d{5,}$/.test(imdbId);
+      if (!hasImdbId && !movie.title) return;
       pcDetailsLoaded = true;
+      const apiId = hasImdbId ? imdbId : 'unknown';
 
-      const cacheKey = 'deymflix_pcdetails_' + imdbId;
+      const cacheKey = pcDetailsCacheKey(hasImdbId ? imdbId : ('t:' + String(movie.title).toLowerCase()));
       const ONE_DAY = 24 * 60 * 60 * 1000;
       let data = null;
 
       try {
         const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
         if (cached && cached.data && cached.data.found && (Date.now() - cached.savedAt) < ONE_DAY) {
-          data = cached.data;
+          // ignore an incomplete earlier payload (e.g. saved before the stills
+          // gallery worked) so it gets refetched instead of shown empty
+          if (pcDetailsComplete(cached.data)) data = cached.data;
         }
       } catch (e) {}
 
@@ -3537,7 +3820,7 @@
           const yHint = getMovieYear(movie);
           if (yHint) params.set('year', yHint);
           const qs = params.toString();
-          const resp = await fetch((window.__API_BASE__ || '') + '/api/tmdb/details/' + encodeURIComponent(imdbId) + (qs ? '?' + qs : ''));
+          const resp = await fetch((window.__API_BASE__ || '') + '/api/tmdb/details/' + encodeURIComponent(apiId) + (qs ? '?' + qs : ''));
           if (resp.ok) {
             data = await resp.json();
             if (data && data.found) {
@@ -3917,164 +4200,10 @@
     directPlayer.addEventListener('canplay', hideLoadingSpinner);
     directPlayer.addEventListener('loadeddata', hideLoadingSpinner);
 
-    // IMDB ID helper: returns IMDB ID (tt...) for a movie, fetching from TMDB if needed
-    async function getImdbId(movie) {
-      if (!movie) return '';
-      if (movie.imdbId && String(movie.imdbId).startsWith('tt')) return movie.imdbId;
-      if (!movie.imdbId) return '';
-      const cacheKey = 'deymflix_imdb_' + movie.imdbId;
-      try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) return cached;
-      } catch (e) {}
-      try {
-        const res = await fetchWithTimeout(
-          (window.__API_BASE__ || '') + '/api/tmdb/movie/' + movie.imdbId,
-          5000
-        );
-        if (!res.ok) return '';
-        const data = await res.json();
-        if (data && data.imdb_id) {
-          try { localStorage.setItem(cacheKey, data.imdb_id); } catch (e) {}
-          return data.imdb_id;
-        }
-      } catch (e) {}
-      return '';
-    }
-
-    // OpenSubtitles credentials stay server-side in proxy-server.js.
-    // The browser talks only to our proxy — the API key, username and
-    // password never reach the client.
-    const OS_API = (window.__API_BASE__ || '') + '/api/opensubtitles';
-
-    async function osFetch(path, options = {}) {
-      return fetch(OS_API + path, options);
-    }
-
-    // Subtitle login helper — returns token or empty string
-    async function openSubtitlesLogin() {
-      // Cache token in session to avoid repeated logins
-      const cached = sessionStorage.getItem('os_token');
-      const cachedTime = parseInt(sessionStorage.getItem('os_token_time') || '0', 10);
-      if (cached && Date.now() - cachedTime < 30 * 60 * 1000) return cached;
-
-      try {
-        const res = await osFetch('/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({})
-        });
-        const data = await res.json();
-        if (data.token) {
-          sessionStorage.setItem('os_token', data.token);
-          sessionStorage.setItem('os_token_time', String(Date.now()));
-          return data.token;
-        }
-        console.warn('[OpenSubtitles] Login failed:', res.status, JSON.stringify(data).substring(0, 200));
-        return '';
-      } catch (e) {
-        console.warn('[OpenSubtitles] Login error:', e.message);
-        return '';
-      }
-    }
-
-    // Search subtitles via OpenSubtitles API
-    // Episode-aware: series episodes search by episode metadata (type=episode)
-    async function osSearchSubtitles(token, imdbId, query, lang, limit) {
-      const isEpisode = !!(currentMovie && currentMovie._episodeNum);
-      let url = '/subtitles?languages=' + encodeURIComponent(lang) +
-        '&type=' + (isEpisode ? 'episode' : 'movie') +
-        '&limit=' + (limit || '5');
-      if (isEpisode) {
-        url += '&query=' + encodeURIComponent(currentMovie.title || query || '') +
-               '&season_number=' + encodeURIComponent(currentMovie._episodeSeason || 1) +
-               '&episode_number=' + encodeURIComponent(currentMovie._episodeNum);
-        if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
-      } else {
-        if (imdbId) url += '&imdb_id=' + encodeURIComponent(imdbId);
-        else if (query) url += '&query=' + encodeURIComponent(query);
-      }
-
-      const res = await osSearchSubtitlesFetch('/search?' + new URLSearchParams(url.split('?')[1]).toString() + '&token=' + encodeURIComponent(token), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      return res.json();
-    }
-
-    function osSearchSubtitlesFetch(url, options) {
-      return osFetch(url, options);
-    }
-
-    // Auto-load subtitles silently using IMDB ID for accuracy
-    async function autoLoadSubtitles(title, lang) {
-      if (subtitleActive || !title) return;
-      try {
-        const token = await openSubtitlesLogin();
-        if (!token) return;
-
-        // Episodes: skip IMDB lookup (series-level IMDB would mismatch the episode)
-        const imdbId = (currentMovie && currentMovie._episodeNum) ? '' : await getImdbId(currentMovie);
-        const data = await osSearchSubtitles(token, imdbId, title, lang, '5');
-        if (!data.data || data.data.length === 0) return;
-
-        // Episodes: verify results actually belong to THIS series — the search
-        // can return other shows' episodes with the same S/E numbers.
-        if (currentMovie && currentMovie._episodeNum) {
-          const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
-          const seriesWords = norm(currentMovie.title).split(/\s+/).filter(w => w.length > 1);
-          data.data = data.data.filter(item => {
-            const fd = item.attributes && item.attributes.feature_details;
-            if (!fd) return false;
-            const featTitle = norm(fd.title || fd.movie_title || '');
-            if (!featTitle) return false;
-            const hitCount = seriesWords.filter(w => featTitle.indexOf(w) !== -1).length;
-            return seriesWords.length === 0 || (hitCount / seriesWords.length) >= 0.5;
-          });
-          if (data.data.length === 0) return; // only wrong-show results — don't attach
-        }
-
-        const first = data.data.find(item => item.attributes && item.attributes.files && item.attributes.files.length > 0);
-        if (!first) return;
-        const fileId = first.attributes.files[0].file_id;
-        const label = first.attributes.language || lang;
-
-        // Download subtitle
-        const dlRes = await osFetch('/download', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ file_id: fileId, token: token })
-        });
-        if (!dlRes.ok) return;
-        const dlData = await dlRes.json();
-        if (!dlData.link) return;
-
-        // Fetch the subtitle file content (may need CORS proxy)
-        let srtText = '';
-        try {
-          const srtRes = await fetch(dlData.link);
-          if (srtRes.ok) srtText = await srtRes.text();
-        } catch (e) {
-          // CORS block — try through proxy
-          try {
-            const srtRes2 = await fetch((window.__API_BASE__ || '') + '/api/subtitle-proxy?url=' + encodeURIComponent(dlData.link));
-            if (srtRes2.ok) srtText = await srtRes2.text();
-          } catch (e2) {}
-        }
-        if (!srtText) return;
-
-        enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, lang, srtText);
-        showToast('Subtitles loaded: ' + label);
-      } catch (e) {
-        // Silent fail — don't block playback
-      }
-    }
+    // ── LOCAL-ONLY SUBTITLES (since v160) ──
+    // Per site policy: subtitles come ONLY from the /subtitles folder —
+    // OpenSubtitles.com has been removed entirely. English (Engsub) is the
+    // default; the user can switch to Tagalog (PHsub) in settings.
 
     directPlayer.addEventListener('loadedmetadata', () => {
       if (!isQualitySwitch) hideLoadingSpinner();
@@ -4092,7 +4221,7 @@
       // Reset _episodeId when video loads so next episode starts fresh
       delete currentMovie._episodeId;
 
-      // Auto-load subtitles (OpenSubtitles first, local Engsub/PHsub fallback)
+      // Auto-load subtitles from the /subtitles folder (English first).
       // One automatic attempt per movie/episode load — ad recovery must not re-run it
       subtitleAttempted = false;
       if (!subtitleActive && currentMovie.title) {
@@ -4403,6 +4532,15 @@
       // Don't capture if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
 
+      // Trailer mode: the movie is hidden, so only "back to movie" applies here
+      if (playerMode === 'trailer') {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          e.preventDefault();
+          if (typeof window.returnFromTrailerToMovie === 'function') window.returnFromTrailerToMovie();
+        }
+        return;
+      }
+
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k':
@@ -4593,8 +4731,9 @@
     }
 
     function enableSubtitleTrack(vttText, label, lang, rawSrt) {
-      const existing = directPlayer.querySelector('track');
-      if (existing) existing.remove();
+      // Remove ALL existing track elements — extra-language tracks included —
+      // otherwise switching languages stacks tracks and stale ones keep showing.
+      directPlayer.querySelectorAll('track').forEach(t => t.remove());
 
       const blob = new Blob([vttText], { type: 'text/vtt' });
       const url = URL.createObjectURL(blob);
@@ -4608,8 +4747,11 @@
       directPlayer.appendChild(track);
 
       const forceShow = () => {
-        for (let i = 0; i < directPlayer.textTracks.length; i++) {
-          directPlayer.textTracks[i].mode = 'showing';
+        // Show ONLY this track — the extra-language track (if added later)
+        // stays disabled, otherwise two subtitle languages render at once.
+        try { track.track.mode = 'showing'; } catch (e) {}
+        for (const tt of directPlayer.textTracks) {
+          if (tt !== track.track) tt.mode = 'disabled';
         }
       };
       track.addEventListener('load', forceShow);
@@ -4625,8 +4767,7 @@
     }
 
     function turnOffSubtitles() {
-      const existing = directPlayer.querySelector('track');
-      if (existing) existing.remove();
+      directPlayer.querySelectorAll('track').forEach(t => t.remove());
       subtitleActive = false;
       if (btnSubtitleOff) btnSubtitleOff.classList.remove('show');
       const settingsBtn = document.getElementById('btn-settings');
@@ -4635,10 +4776,9 @@
       showToast('Subtitles off');
     }
 
-    // (Search Online / My Subtitles buttons removed — the language dropdown now
-    // auto-searches OpenSubtitles and picks the first result of that language.
-    // The Manual options load straight from the local subtitles folder, and the
-    // Subtitles switch handles on/off.)
+    // (Search Online / My Subtitles buttons removed — the language dropdown
+    // loads straight from the local subtitles folder, and the Subtitles
+    // switch handles on/off.)
     // (Turn Off Subtitles button removed — the Subtitles switch above handles it)
 
     // ============ LOCAL SUBTITLES (the /subtitles folder) ============
@@ -4702,9 +4842,13 @@
         }
       }
       const cands = movieSubCandidates().map(normalizeSubName).filter(Boolean);
-      // The file (or its subfolder name) must reference this movie/series
+      // The file (or its subfolder name) must reference this movie/series.
+      // The loose "candidate contains filename" direction is only safe for
+      // title-like names — a generic "ep1.srt" would otherwise match EVERY
+      // series' ep1 candidate (Crew Girl subs appearing on Love U Lots).
+      const genericName = /^(ep|episode|s\d{1,2}e\d{1,2}|season|sub|subtitle)/.test(f) || f.length < 5;
       const hay = d ? d + ' ' + f : f;
-      return cands.some(c => c === f || hay.indexOf(c) !== -1 || c.indexOf(f) !== -1);
+      return cands.some(c => c === f || hay.indexOf(c) !== -1 || (!genericName && c.indexOf(f) !== -1));
     }
 
     function subtitleUploadUrl(fileName) {
@@ -4736,7 +4880,7 @@
         .catch(() => []);
     }
 
-    // Priority loader: local folder first, then OpenSubtitles online search
+    // Local-only loader: the /subtitles folder is the single source
     // ── Local subtitle language detection ──
     // Naming convention: "<Title> Engsub.srt" = English, "<Title> PHsub.srt" = Tagalog.
     // English always wins when both exist.
@@ -4776,7 +4920,8 @@
         const label = lang === 'tl' ? (base + ' (Tagalog)') : (base + ' (English)');
         enableSubtitleTrack(srtToVtt(srtText, subtitleOffsetMs), label, lang, srtText);
         if (!silent) showToast('Subtitles loaded: ' + label);
-        if (subtitleStatus) subtitleStatus.textContent = 'Loaded from your subtitles folder: ' + fileName;
+        // Success info stays in the toast — the settings panel stays clean.
+        if (subtitleStatus) subtitleStatus.textContent = '';
       });
     }
 
@@ -4821,96 +4966,76 @@
     function loadSubtitleForCurrentSelection() {
       subtitleAttempted = true; // user-initiated — counts as the attempt for this load
       const langEl = document.getElementById('subtitle-language');
-      const lang = langEl ? (langEl.value || 'en') : 'en';
-      if (lang === 'local-en' || lang === 'local-tl') {
-        applyLocalLanguage(lang === 'local-tl' ? 'tl' : 'en');
-      } else {
-        autoLoadSubtitlesWithLocal(currentMovie.title, lang);
-      }
+      const lang = langEl ? (langEl.value || 'local-en') : 'local-en';
+      // Local-only subtitles: every selection maps to the /subtitles folder
+      applyLocalLanguage(lang === 'local-tl' ? 'tl' : 'en');
     }
 
     // ── Master subtitle loader ──
-    // Priority: 1) LOCAL subtitles folder — Engsub (English) first, then PHsub (Tagalog)
-    //           2) OpenSubtitles.com in the chosen language (first result auto-picked)
-    // Manual picks of a specific foreign language (es/fr/ja…) still search
-    // OpenSubtitles first — the local folder only holds English/Tagalog.
+    // LOCAL-ONLY: subtitles come exclusively from the /subtitles folder.
+    // English (Engsub) first; the user can switch to Tagalog (PHsub) anytime.
+    // OpenSubtitles.com removed per site policy (v160).
     async function autoLoadSubtitlesWithLocal(title, lang) {
-      const isAutoLike = (lang === 'auto' || lang === 'local-en' || lang === 'local-tl' || lang === 'en' || lang === 'tl');
-      const osLang = (lang === 'auto' || lang === 'local-en' || lang === 'local-tl') ? 'en' : lang;
+      // Always local — the lang argument is kept for call compatibility.
+      await tryLocalFolderOnly();
+      if (!subtitleActive) {
+        if (subtitleStatus) subtitleStatus.textContent = 'No subtitle in your subtitles folder for this title.';
+      }
+    }
 
-      // Try the /subtitles folder: API listing first, then conventional paths
-      // (no-backend hosting on Live Server / GitHub Pages).
-      const tryLocalFolder = async () => {
-        try {
-          const ordered = await findLocalSubtitleFiles();
-          if (ordered.length) {
-            await applyLocalSubtitleAs(ordered[0], localFileLang(ordered[0]) === 'tl' ? 'tl' : 'en', true);
-            // If both languages exist locally, mount the second as an extra track
-            if (ordered.length > 1 && localFileLang(ordered[0]) !== localFileLang(ordered[1])) {
-              try {
-                const srt2 = await loadLocalSubText(ordered[1]);
-                addExtraSubtitleTrack(srtToVtt(srt2, subtitleOffsetMs),
-                  ordered[1].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (Tagalog)', 'tl');
-              } catch (e) {}
-            }
-            showToast('Subtitles loaded: ' + ordered[0].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
-            return true;
-          }
-        } catch (e) { /* fall through to guesses */ }
-
-        // No-backend hosting (GitHub Pages, Live Server): conventional paths.
-        try {
-          const m = currentMovie || {};
-          const enc = s => encodeURIComponent(s);
-          const guesses = [];
-          if (m._episodeNum) {
-            const n = m._episodeNum;
-            guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
-            guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
-            guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
-            guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
-          } else {
-            guesses.push('subtitles/' + enc(m.title) + '%20Engsub.srt');
-            guesses.push('subtitles/' + enc(m.title) + '%20PHsub.srt');
-            guesses.push('subtitles/' + enc(m.title) + '.srt');
-          }
-          for (const g of guesses) {
+    async function tryLocalFolderOnly() {
+      try {
+        const ordered = await findLocalSubtitleFiles();
+        if (ordered.length) {
+          // English first (findLocalSubtitleFiles already orders EN before TL)
+          await applyLocalSubtitleAs(ordered[0], localFileLang(ordered[0]) === 'tl' ? 'tl' : 'en', true);
+          // If both languages exist locally, mount the second as an extra track
+          if (ordered.length > 1 && localFileLang(ordered[0]) !== localFileLang(ordered[1])) {
             try {
-              const resp = await fetch(g);
-              if (resp.ok) {
-                const txt = await resp.text();
-                if (txt && txt.indexOf('-->') !== -1) { // sanity: it's really a subtitle, not a 404 page
-                  const isTag = /phsub/i.test(g);
-                  const label = (m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title) + (isTag ? ' (Tagalog)' : ' (English)');
-                  enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, isTag ? 'tl' : 'en', txt);
-                  showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
-                  return true;
-                }
-              }
+              const srt2 = await loadLocalSubText(ordered[1]);
+              addExtraSubtitleTrack(srtToVtt(srt2, subtitleOffsetMs),
+                ordered[1].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (Tagalog)', 'tl');
             } catch (e) {}
           }
-        } catch (e) { /* fall through */ }
-        return false;
-      };
+          showToast('Subtitles loaded: ' + ordered[0].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
+          return true;
+        }
+      } catch (e) { /* fall through to guesses */ }
 
-      if (isAutoLike) {
-        // 1) My subtitles folder first
-        if (await tryLocalFolder()) return;
-        // 2) OpenSubtitles.com fallback
-        try { await autoLoadSubtitles(title, osLang); } catch (e) {}
-        if (subtitleActive) return;
-      } else {
-        // Specific foreign language requested: OpenSubtitles first, then local
-        try { await autoLoadSubtitles(title, osLang); } catch (e) {}
-        if (subtitleActive) return;
-        await tryLocalFolder();
-        if (subtitleActive) return;
-      }
-
-      // 3) Nothing found anywhere
-      if (!subtitleActive) {
-        if (subtitleStatus) subtitleStatus.textContent = 'No subtitles found (in your subtitles folder or online).';
-      }
+      // No-backend hosting (GitHub Pages, Live Server): conventional paths.
+      try {
+        const m = currentMovie || {};
+        const enc = s => encodeURIComponent(s);
+        const guesses = [];
+        if (m._episodeNum) {
+          const n = m._episodeNum;
+          guesses.push('subtitles/' + enc(m.title) + '/' + enc(m.title) + ' ep' + n + ' Engsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
+        } else {
+          guesses.push('subtitles/' + enc(m.title) + '%20Engsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '%20PHsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '.srt');
+        }
+        for (const g of guesses) {
+          try {
+            const resp = await fetch(g);
+            if (resp.ok) {
+              const txt = await resp.text();
+              if (txt && txt.indexOf('-->') !== -1) { // sanity: it's really a subtitle, not a 404 page
+                const isTag = /phsub/i.test(g);
+                const label = (m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title) + (isTag ? ' (Tagalog)' : ' (English)');
+                enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, isTag ? 'tl' : 'en', txt);
+                showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
+                return true;
+              }
+            }
+          } catch (e) {}
+        }
+      } catch (e) { /* fall through */ }
+      return false;
     }
 
     // Mount an additional language track without removing the active one
@@ -4925,9 +5050,13 @@
         track.src = url;
         directPlayer.appendChild(track);
         // Keep the FIRST track (main language) showing; extras ride along hidden
-        for (let i = 0; i < directPlayer.textTracks.length; i++) {
-          directPlayer.textTracks[i].mode = (i === 0) ? 'showing' : 'disabled';
-        }
+        requestAnimationFrame(() => {
+          try {
+            track.track.mode = 'disabled';
+            const first = directPlayer.textTracks[0];
+            if (first) first.mode = 'showing';
+          } catch (e) {}
+        });
       } catch (e) {}
     }
 
@@ -4986,7 +5115,7 @@
       if (subtitleActive && directPlayer) {
         const existingTrack = directPlayer.querySelector('track');
         if (existingTrack && existingTrack._srtSource) {
-          enableSubtitleTrack(srtToVtt(existingTrack._srtSource, subtitleOffsetMs), existingTrack.label, existingTrack.srclang);
+          enableSubtitleTrack(srtToVtt(existingTrack._srtSource, subtitleOffsetMs), existingTrack.label, existingTrack.srclang, existingTrack._srtSource);
         }
       }
     }
@@ -5327,11 +5456,15 @@
         backBtn = document.createElement('button');
         backBtn.id = 'trailer-back-btn';
         backBtn.className = 'trailer-back-btn';
-        backBtn.innerHTML = '❮';
-        backBtn.title = 'Back to Home';
+        // Labeled when there is a movie to go back to, bare chevron otherwise
+        const canReturnToMovie = (typeof hasOwnVideoFile === 'function') && hasOwnVideoFile();
+        backBtn.classList.toggle('labeled', canReturnToMovie);
+        backBtn.innerHTML = canReturnToMovie ? '<span>❮</span><span>Back to Movie</span>' : '❮';
+        backBtn.title = canReturnToMovie ? 'Back to the movie' : 'Back';
         backBtn.onclick = (e) => {
           e.stopPropagation();
-          forceBackToHome();
+          if (typeof window.returnFromTrailerToMovie === 'function') window.returnFromTrailerToMovie();
+          else forceBackToHome();
         };
         playerContainer.appendChild(backBtn);
       } else {
@@ -5484,6 +5617,7 @@
       const tBtn = document.getElementById('codec-watch-trailer');
       if (tBtn) tBtn.onclick = function() {
         screen.style.display = 'none';
+        trailerUserInitiated = true;   // user clicked: start the trailer with sound
         playerMode = 'trailer';
         loadEmbed();
       };
@@ -5549,11 +5683,11 @@
 
     function loadEmbed() {
       startSlowConnectionCheck();
+      if (typeof updateTrailerBtn === 'function') updateTrailerBtn();
 
       // Reset subtitles so auto-load fires for the new movie
       try {
-        const existingTrack = directPlayer.querySelector('track');
-        if (existingTrack) existingTrack.remove();
+        directPlayer.querySelectorAll('track').forEach(t => t.remove());
         subtitleActive = false;
         const offBtn = document.getElementById('btn-subtitle-off');
         if (offBtn) offBtn.classList.remove('show');
@@ -5583,6 +5717,12 @@
 
       if (lowerUrl.includes('.mp4') || lowerUrl.includes('.mkv')) {
         adShield.style.display = 'none';
+        // Back on the movie file: the next trailer should start muted again
+        trailerUserInitiated = false;
+        stopTrailerSoundPump();
+        const tsb = document.getElementById('trailer-sound-btn');
+        if (tsb) tsb.remove();
+        window._trailerSoundMuted = false;
         const oldIframe = document.getElementById('main-iframe');
         if (oldIframe) oldIframe.remove();
 
@@ -5635,31 +5775,74 @@
         hideLoadingSpinner();
 
         ensureTrailerBackButton();
+        ensureTrailerSoundBtn();
 
         const settingsTrailer = document.getElementById('btn-settings');
         if (settingsTrailer) settingsTrailer.style.display = 'none';
 
-        let startCard = document.getElementById('trailer-start-overlay');
-        if (!startCard) {
-          startCard = document.createElement('div');
-          startCard.id = 'trailer-start-overlay';
-          startCard.className = 'trailer-start-card';
-          startCard.style.backgroundImage = `url(${currentMovie.poster})`;
-          startCard.innerHTML = `
-            <div class="trailer-play-btn">
-              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-            <div class="trailer-play-label">Click to Play Trailer</div>
-          `;
+        // AUTOPLAY TRAILER: browsers block audible autoplay but always allow MUTED
+        // autoplay, so the iframe always renders muted (that guarantees the trailer
+        // starts at all) and we turn the sound on right away afterwards.
+        // When the USER clicked the pill, that click is a real gesture — so the
+        // unmute is allowed immediately instead of waiting for a second tap.
+        const wantSoundNow = (playerMode === 'trailer') && trailerUserInitiated;
+        renderFreshIframe(finalEmbedUrl + '&mute=1', true);
 
-          startCard.onclick = () => {
-            startCard.remove();
-            showToast("Playing Trailer...");
-            renderFreshIframe(finalEmbedUrl, true);
-          };
+        const ytPost = (func, args) => {
+          const f = document.getElementById('main-iframe');
+          try { if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*'); } catch (e) {}
+        };
+        // Sound only — never touches playback state, so a user pause sticks
+        const ytSoundOn = () => {
+          ytPost('unMute');
+          ytPost('setVolume', [100]);
+        };
+        // Used for the one-time unlock after an auto-loaded (muted) trailer
+        const ytUnmute = () => {
+          ytSoundOn();
+          ytPost('playVideo');
+        };
 
-          playerContainer.appendChild(startCard);
+        stopTrailerSoundPump();
+        if (wantSoundNow) {
+          // The YouTube player boots a moment after the iframe mounts, so push the
+          // unmute several times instead of once — while the click's user
+          // activation is still valid, this is permitted.
+          const ifr = document.getElementById('main-iframe');
+          if (ifr) ifr.addEventListener('load', ytSoundOn);
+          [250, 600, 1000, 1600, 2400, 3500, 5000].forEach(t => setTimeout(ytSoundOn, t));
+          // YouTube re-applies the URL's mute=1 after its ad playback and on some
+          // player resets, which is why a one-shot unmute drifts back to silent.
+          // YouTube re-applies the URL's mute=1 after its pre-roll ad and on player
+          // resets, so a one-shot unmute always drifts back to silent. Keep
+          // re-asserting the sound while the trailer is on screen — it stops the
+          // moment the user leaves trailer mode. (400 ticks ≈ 10 min is only a
+          // safety net against a forgotten background tab.)
+          let pumpTicks = 0;
+          window._ytSoundPump = setInterval(() => {
+            pumpTicks++;
+            if (playerMode !== 'trailer' || pumpTicks > 400) { stopTrailerSoundPump(); return; }
+            // The user may have muted via the sound toggle — respect that.
+            if (window._trailerSoundMuted) return;
+            ytSoundOn();
+          }, 1500);
         }
+        const ytUnlock = () => {
+          ytUnmute();
+          document.removeEventListener('click', ytUnlock);
+          document.removeEventListener('touchstart', ytUnlock);
+          document.removeEventListener('keydown', ytUnlock);
+        };
+        // Replacing a previous trailer? Drop its unlock listeners first so they don't stack.
+        if (window._ytTrailerUnlock) {
+          document.removeEventListener('click', window._ytTrailerUnlock);
+          document.removeEventListener('touchstart', window._ytTrailerUnlock);
+          document.removeEventListener('keydown', window._ytTrailerUnlock);
+        }
+        window._ytTrailerUnlock = ytUnlock;
+        document.addEventListener('click', ytUnlock);
+        document.addEventListener('touchstart', ytUnlock);
+        document.addEventListener('keydown', ytUnlock);
         return;
       }
 
@@ -5751,7 +5934,7 @@
         const railDate = (function getRailDate(mv) {
           try {
             if (mv.imdbId) {
-              const key = 'deymflix_pcdetails_' + mv.imdbId;
+              const key = pcDetailsCacheKey(mv.imdbId);
               const c = JSON.parse(localStorage.getItem(key) || 'null');
               if (c && c.data && c.data.found && c.data.releaseDate) {
                 const dt = new Date(String(c.data.releaseDate).slice(0, 10) + 'T00:00:00');
@@ -5766,7 +5949,7 @@
         const railScore = (function getRailCardScore(mv) {
           try {
             if (mv.imdbId) {
-              const key = 'deymflix_pcdetails_' + mv.imdbId;
+              const key = pcDetailsCacheKey(mv.imdbId);
               const c = JSON.parse(localStorage.getItem(key) || 'null');
               if (c && c.data && c.data.found && Number(c.data.score) > 0) {
                 return String(Math.round(Number(c.data.score) * 10) / 10);
@@ -5808,8 +5991,10 @@
     let railEnrichStarted = false;
     function railCacheGet(imdbId) {
       try {
-        const c = JSON.parse(localStorage.getItem('deymflix_pcdetails_' + imdbId) || 'null');
-        if (c && c.data && c.data.found && (Date.now() - c.savedAt) < 24 * 60 * 60 * 1000) return c.data;
+        const c = JSON.parse(localStorage.getItem(pcDetailsCacheKey(imdbId)) || 'null');
+        if (c && c.data && c.data.found && (Date.now() - c.savedAt) < 24 * 60 * 60 * 1000 && pcDetailsComplete(c.data)) {
+          return c.data;
+        }
       } catch (e) {}
       return null;
     }
@@ -5837,7 +6022,7 @@
             try { data = await fetchWikidataDirect(mv, imdbId); } catch (e) { data = null; }
           }
           if (data && data.found) {
-            try { localStorage.setItem('deymflix_pcdetails_' + imdbId, JSON.stringify({ savedAt: Date.now(), data: data })); } catch (e) {}
+            try { localStorage.setItem(pcDetailsCacheKey(imdbId), JSON.stringify({ savedAt: Date.now(), data: data })); } catch (e) {}
           }
         }
 
@@ -6124,12 +6309,23 @@
       // Set video source and play
       vastVideo.onerror = function () {
         // Dead ad URL — no auto-skip: keep the overlay up with a clear message
-        // and let the user Skip (after 7s) or reload. The movie is paused and
-        // resumes the moment the user skips.
+        // and let the user Skip (after the 7s countdown) or reload. The movie
+        // is paused and resumes the moment the user skips.
         console.warn('[VAST] Ad video failed to load');
         if (!vastAdPlaying) {
-          vastTimer.textContent = 'Ad unavailable — you can skip';
           directPlayer.pause();
+          // Run the same 7s countdown as the no-fill path — without it the
+          // Skip button never appears and the overlay dead-ends with the
+          // movie stuck paused behind it.
+          (function deadAdCountdown() {
+            let n = 7;
+            vastSkipBtn.classList.remove('visible');
+            const iv = setInterval(() => {
+              n--;
+              if (n <= 0) { clearInterval(iv); vastTimer.textContent = 'Ad unavailable'; vastSkipBtn.classList.add('visible'); }
+              else { vastTimer.textContent = 'Ad unavailable — skip in ' + n + 's'; }
+            }, 1000);
+          })();
         }
       };
       // Attach canplay BEFORE src — a cached ad can fire canplay within

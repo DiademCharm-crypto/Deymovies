@@ -245,7 +245,14 @@ function injectEpisodesUI(series) {
     <div id="episodes-list" class="episodes-square-grid"></div>
   `;
 
-  descriptionElement.insertAdjacentElement('afterend', seriesSection);
+  // Place the Episodes box BEFORE the Info/Cast tabs (inside the info box)
+  // so the order reads: title → synopsis → Episodes → Info/Cast.
+  const pcTabsEl = document.getElementById('pc-tabs');
+  if (pcTabsEl) {
+    pcTabsEl.insertAdjacentElement('beforebegin', seriesSection);
+  } else {
+    descriptionElement.insertAdjacentElement('afterend', seriesSection);
+  }
 
   const seasonSelect = document.getElementById('season-selector');
   seasonSelect.addEventListener('change', (e) => {

@@ -656,21 +656,39 @@ async function handleProxyRoutes(req, res, parsedUrl) {
   // /movie/<id> does NOT accept IMDB ids, so resolve it through /find first.
   if (pathname.startsWith('/api/tmdb/details/')) {
     const rawId = decodeURIComponent(pathname.split('/api/tmdb/details/')[1] || '').trim().replace(/\/.*$/, '');
-    if (!/^tt\d{5,}$/.test(rawId)) return sendError(res, 400, 'Invalid IMDB ID');
-    // Optional title hint (?title=...) helps find movies whose id is unknown/invalid
+    // Optional title hint (?title=...) helps find titles whose id is unknown/invalid
     const titleHint = String((parsedUrl.query && parsedUrl.query.title) || '').trim();
     // Optional year hint (?year=2026) rejects same-title-different-film matches
     const yearHint = parseInt(String((parsedUrl.query && parsedUrl.query.year) || ''), 10) || 0;
+    const hasImdbId = /^tt\d{5,}$/.test(rawId);
+    // Entries we added by hand (some series have no IMDB id yet) can still be
+    // resolved by title, so only reject when we have neither id nor title.
+    if (!hasImdbId && !titleHint) return sendError(res, 400, 'Invalid IMDB ID');
+    const idKey = hasImdbId ? rawId : ('title:' + titleHint.toLowerCase());
+
+    // The cache key carries the title hint: a payload resolved for one title
+    // must never be served for a different title that shares an id, or the page
+    // would show another film's cast/stills/rating.
+    const cacheKey = idKey + (titleHint ? '|' + titleHint.toLowerCase() : '');
 
     try {
-      const cached = tmdbCacheGet(rawId);
-      if (cached) return jsonResponse(res, 200, cached);
+      const cached = tmdbCacheGet(cacheKey);
+      if (cached) {
+        // Gate again on cache reads — cheap insurance against a bad entry
+        if (!titleHint || titlesMatch(titleHint, cached.title) || titlesMatch(titleHint, cached.originalTitle)) {
+          return jsonResponse(res, 200, cached);
+        }
+      }
 
       // 1) TMDB find by IMDB id (needs a valid key). Skipped entirely while
       //    the circuit breaker is open — no point re-failing for 10 minutes.
       let tmdbId = null;
-      let keyWorks = false;
-      if (!tmdbKeyIsDead()) {
+      let mediaType = 'movie';        // our series live in TMDB as tv shows
+      // Whether TMDB is usable right now. Entries WITHOUT an IMDB id never run
+      // the /find step, so this must start from the breaker state — otherwise
+      // their title search would be skipped entirely.
+      let keyWorks = !tmdbKeyIsDead();
+      if (hasImdbId && keyWorks) {
         try {
           const found = await fetchUrl(
             'https://api.themoviedb.org/3/find/' + rawId +
@@ -679,12 +697,17 @@ async function handleProxyRoutes(req, res, parsedUrl) {
           if (found.status === 200) {
             keyWorks = true;
             const fj = JSON.parse(found.body);
-            const hit = (fj.movie_results || [])[0] || (fj.tv_results || [])[0];
-            if (hit) tmdbId = hit.id;
+            const mv = (fj.movie_results || [])[0];
+            const tv = (fj.tv_results || [])[0];
+            // Only fall back to the tv hit when there is no movie hit: same id,
+            // different endpoint — calling /movie for a tv id resolves a random film.
+            if (mv) { tmdbId = mv.id; mediaType = 'movie'; }
+            else if (tv) { tmdbId = tv.id; mediaType = 'tv'; }
           } else {
             console.warn('[TMDB] find', rawId, 'status', found.status);
             if (found.status === 401 || found.status === 403) {
               markTmdbKeyDead();
+              keyWorks = false;
               console.warn('[TMDB] key rejected — skipping TMDB for 10 minutes');
             }
           }
@@ -704,15 +727,30 @@ async function handleProxyRoutes(req, res, parsedUrl) {
           if (s.status === 200) {
             const sj = JSON.parse(s.body);
             const first = (sj.results || [])[0];
-            if (first) tmdbId = first.id;
+            if (first) { tmdbId = first.id; mediaType = 'movie'; }
           }
         } catch (e) {}
+        // …then as a tv show, which is where our series actually live
+        if (!tmdbId) {
+          try {
+            const t = await fetchUrl(
+              'https://api.themoviedb.org/3/search/tv?api_key=' + SECRETS.TMDB_API_KEY +
+              '&language=en-US&query=' + encodeURIComponent(titleHint) +
+              (yearHint ? '&first_air_date_year=' + yearHint : '')
+            );
+            if (t.status === 200) {
+              const tj = JSON.parse(t.body);
+              const first = (tj.results || [])[0];
+              if (first) { tmdbId = first.id; mediaType = 'tv'; }
+            }
+          } catch (e) {}
+        }
       }
 
       // 3) Legacy fallback: some entries may still carry numeric TMDB ids with a
       //    "tt" prefix — try /movie/<digits> directly (title gate below catches
       //    any wrong-film hits this produces).
-      if (!tmdbId && keyWorks) {
+      if (!tmdbId && keyWorks && hasImdbId) {
         try {
           const direct = await fetchUrl(
             'https://api.themoviedb.org/3/movie/' + rawId.slice(2) +
@@ -728,39 +766,79 @@ async function handleProxyRoutes(req, res, parsedUrl) {
       if (tmdbId) {
         try {
           const det = await fetchUrl(
-            'https://api.themoviedb.org/3/movie/' + tmdbId +
+            'https://api.themoviedb.org/3/' + mediaType + '/' + tmdbId +
             '?api_key=' + SECRETS.TMDB_API_KEY + '&language=en-US&append_to_response=credits,images,videos'
           );
           if (det.status === 200) {
             const j = JSON.parse(det.body);
+            const isTv = mediaType === 'tv';
             const credits = j.credits || {};
             const crew = credits.crew || [];
             const castRaw = credits.cast || [];
-            const backdrops = (j.images && j.images.backdrops) || [];
+            let backdrops = (j.images && j.images.backdrops) || [];
+            let posters = (j.images && j.images.posters) || [];
+
+            // append_to_response=images is unreliable: for many titles it comes
+            // back EMPTY even though the title has dozens of backdrops (verified
+            // against /movie/<id>/images). Ask the dedicated endpoint whenever it
+            // did not answer, so the stills gallery is not silently missing.
+            if (!backdrops.length) {
+              try {
+                const im = await fetchUrl(
+                  'https://api.themoviedb.org/3/' + mediaType + '/' + tmdbId + '/images?api_key=' + SECRETS.TMDB_API_KEY
+                );
+                if (im.status === 200) {
+                  const ij = JSON.parse(im.body);
+                  backdrops = ij.backdrops || [];
+                  if (!posters.length) posters = ij.posters || [];
+                } else {
+                  console.warn('[TMDB] images', tmdbId, 'status', im.status);
+                }
+              } catch (e) {}
+            }
+
+            // Gallery = best backdrops, topped up with posters so that movies
+            // without any backdrop still get their picture row.
+            const byScore = function (a, b) {
+              return (b.vote_average || 0) - (a.vote_average || 0) || (b.width || 0) - (a.width || 0);
+            };
+            const stillPaths = backdrops.slice().sort(byScore)
+              .map(function (b) { return b.file_path; })
+              .filter(Boolean);
+            if (stillPaths.length < 6) {
+              posters.slice().sort(byScore).forEach(function (p) {
+                if (stillPaths.length < 6 && p.file_path && stillPaths.indexOf(p.file_path) < 0) {
+                  stillPaths.push(p.file_path);
+                }
+              });
+            }
 
             const payload = {
               found: true,
               source: 'tmdb',
+              mediaType: mediaType,
               tmdbId: tmdbId,
-              imdbId: rawId,
-              title: j.title || '',
-              releaseDate: j.release_date || '',
-              runtime: j.runtime || 0,
+              imdbId: hasImdbId ? rawId : '',
+              title: (isTv ? j.name : j.title) || '',
+              // TMDB often carries a localized English title (Filipino films!)
+              // while we know the original — the gate checks both.
+              originalTitle: (isTv ? j.original_name : j.original_title) || '',
+              releaseDate: (isTv ? j.first_air_date : j.release_date) || '',
+              runtime: (isTv ? (j.episode_run_time || [])[0] : j.runtime) || 0,
               score: typeof j.vote_average === 'number' ? j.vote_average : 0,
               votes: j.vote_count || 0,
               genres: (j.genres || []).map(function (g) { return g.name; }),
               overview: j.overview || '',
               poster: j.poster_path || '',
               backdrop: j.backdrop_path || '',
-              director: crew.filter(function (c) { return c.job === 'Director'; })
-                           .map(function (c) { return c.name; }),
+              director: isTv
+                ? (j.created_by || []).map(function (c) { return c.name; })
+                : crew.filter(function (c) { return c.job === 'Director'; })
+                      .map(function (c) { return c.name; }),
               cast: castRaw.slice(0, 12).map(function (c) {
                 return { name: c.name || '', character: c.character || '', photo: c.profile_path || '' };
               }),
-              stills: backdrops.slice()
-                .sort(function (a, b) { return (b.vote_average || 0) - (a.vote_average || 0); })
-                .slice(0, 6)
-                .map(function (b) { return b.file_path; }),
+              stills: stillPaths.slice(0, 6),
               // Official YouTube trailer key (for hover previews / embeds)
               trailerKey: (function () {
                 const vids = (j.videos && j.videos.results) || [];
@@ -772,9 +850,10 @@ async function handleProxyRoutes(req, res, parsedUrl) {
               })()
             };
 
-            // Reject a wrong-movie match (e.g. a different film with a similar title)
-            if (!titleHint || titlesMatch(titleHint, payload.title)) {
-              tmdbCacheSet(rawId, payload);
+            // Reject a wrong-title match (e.g. a different film with a similar
+            // name). Accept when either TMDB's display or original title matches.
+            if (!titleHint || titlesMatch(titleHint, payload.title) || titlesMatch(titleHint, payload.originalTitle)) {
+              tmdbCacheSet(cacheKey, payload);
               return jsonResponse(res, 200, payload);
             }
           }
@@ -783,14 +862,16 @@ async function handleProxyRoutes(req, res, parsedUrl) {
 
       // 4) Key-free fallbacks: Wikidata by IMDB id, then by title
       let alt = null;
-      try { alt = await wikidataDetailsForImdb(rawId); } catch (e) { console.warn('[WD] id lookup failed:', e.message); }
+      if (hasImdbId) {
+        try { alt = await wikidataDetailsForImdb(rawId); } catch (e) { console.warn('[WD] id lookup failed:', e.message); }
+      }
       if (alt && titleHint && !titlesMatch(titleHint, alt.title)) alt = null;
       if (!alt && titleHint) {
         try { alt = await wikidataDetailsForTitle(titleHint, yearHint); } catch (e) { console.warn('[WD] title lookup failed:', e.message); }
       }
       const out = alt || { found: false };
       // Cache only positive results — a failed lookup should retry later
-      if (out && out.found) tmdbCacheSet(rawId, out);
+      if (out && out.found) tmdbCacheSet(cacheKey, out);
       return jsonResponse(res, 200, out);
     } catch (e) {
       sendError(res, 502, 'TMDB details failed: ' + e.message);
