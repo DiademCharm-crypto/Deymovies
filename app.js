@@ -112,7 +112,7 @@ const movies = [
     imdbId: "tt28014327",
     title: "Mayday", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/%5BSh4dy%5DMayday.2026.4K.atmos.mkv",
+    manualEmbed: "https://deymflix-media.b-cdn.net/movie+1/%5BSh4dy%5DMayday.2026.4K.atmos.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=om5Un9X720M",
     isSeries: false
   },
