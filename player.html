@@ -2372,6 +2372,13 @@
             </div>
           </div>
           <div class="right-utility-btns">
+            <!-- Series only: skip straight to the next episode (hidden for movies) -->
+            <button id="btn-next-episode-inline" class="ctrl-btn-small" title="Next episode" style="display:none;" onclick="playNextEpisode()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+              </svg>
+            </button>
+
             <button id="btn-settings" class="ctrl-btn-small settings-btn" title="Settings">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
@@ -4855,10 +4862,15 @@
       return localSubBase() + '/api/local-subtitles/' + encodeURIComponent(fileName);
     }
 
-    // Returns the raw subtitle text, converting .ass/.ssa to SRT if needed
+    // Returns the raw subtitle text, converting .ass/.ssa to SRT if needed.
+    // API first (Node backend), then the plain static path (GitHub Pages).
     function loadLocalSubText(fileName) {
+      const enc = s => encodeURIComponent(s).replace(/%2F/g, '/'); // keep folder slashes literal
+      const tryStatic = () => fetch('subtitles/' + enc(fileName))
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
       return fetch(subtitleUploadUrl(fileName))
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .catch(tryStatic)
         .then(txt => {
           if (/^\s*\[Script Info\]/i.test(txt)) return assToSrt(txt);
           return txt;
@@ -4870,14 +4882,26 @@
       if (!force && localSubCache.files.length && (now - localSubCache.at) < 30000) {
         return Promise.resolve(localSubCache.files);
       }
+      // 1) Node backend (proxy-server.js) — live folder listing
       return fetch(localSubBase() + '/api/local-subtitles')
-        .then(r => r.ok ? r.json() : { files: [] })
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
         .then(j => {
           localSubCache.files = j.files || [];
           localSubCache.at = now;
           return localSubCache.files;
         })
-        .catch(() => []);
+        .catch(() =>
+          // 2) Static hosting (GitHub Pages): manifest.json ships with the repo.
+          //    Regenerate after adding subtitles:  node .freebuff/gen-sub-manifest.js
+          fetch('subtitles/manifest.json?t=' + now)
+            .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+            .then(j => {
+              localSubCache.files = j.files || [];
+              localSubCache.at = now;
+              return localSubCache.files;
+            })
+            .catch(() => [])
+        );
     }
 
     // Local-only loader: the /subtitles folder is the single source
@@ -5010,14 +5034,21 @@
         if (m._episodeNum) {
           const n = m._episodeNum;
           guesses.push('subtitles/' + enc(m.title) + '/' + enc(m.title) + ' ep' + n + ' Engsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/' + enc(m.title) + ' ep' + n + ' PHsub.srt');
           guesses.push('subtitles/' + enc(m.title) + '/ep' + n + '.srt');
           guesses.push('subtitles/' + enc(m.title) + '/Episode ' + n + '.srt');
           guesses.push('subtitles/' + enc(m.title) + '/S01E' + String(n).padStart(2, '0') + '.srt');
-          guesses.push('subtitles/' + enc(m.title) + '-ep' + n + '.srt');
+        } else if (m.isSeries) {
+          // Series default load (no episode clicked yet) = episode 1,
+          // mirroring the API path — otherwise series get movie-style guesses that never exist.
+          guesses.push('subtitles/' + enc(m.title) + '/' + enc(m.title) + ' ep1 Engsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/' + enc(m.title) + ' ep1 PHsub.srt');
+          guesses.push('subtitles/' + enc(m.title) + '/ep1.srt');
         } else {
           guesses.push('subtitles/' + enc(m.title) + '%20Engsub.srt');
           guesses.push('subtitles/' + enc(m.title) + '%20PHsub.srt');
           guesses.push('subtitles/' + enc(m.title) + '.srt');
+          guesses.push('subtitles/' + enc(m.title) + '-en.srt');
         }
         for (const g of guesses) {
           try {
@@ -5681,6 +5712,13 @@
       }
     }
 
+    // Next-episode state lives here (above loadEmbed's first call) — the
+    // initial loadEmbed() runs before the Netflix-style block below executes.
+    const nextEpBox = document.getElementById('next-episode-box');
+    const nextEpCount = document.getElementById('next-ep-count');
+    let nextEpTimer = null;
+    let nextEpShown = false;
+
     function loadEmbed() {
       startSlowConnectionCheck();
       if (typeof updateTrailerBtn === 'function') updateTrailerBtn();
@@ -5694,6 +5732,11 @@
         const sBtn = document.getElementById('btn-settings');
         if (sBtn) sBtn.classList.remove('subtitle-active-badge');
       } catch(e) {}
+
+      // Reset the Netflix-style next-episode box for the new movie/episode
+      nextEpShown = false;
+      hideNextEpisodeButton();
+      updateNextEpisodeBtn();
 
       let rawUrl = '';
       if (playerMode === 'trailer' && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '') {
@@ -6456,20 +6499,20 @@
     });    // ════════════════════════════════════════════════════════════════
     // NETFLIX-STYLE NEXT EPISODE — appears at 92% of an episode,
     // counts down 10s, auto-advances, disappears if ignored.
+    // (state declarations live just above loadEmbed)
     // ════════════════════════════════════════════════════════════════
-    const nextEpBox = document.getElementById('next-episode-box');
-    const nextEpCount = document.getElementById('next-ep-count');
-    let nextEpTimer = null;
-    let nextEpShown = false;
-
     function getNextEpisodeInfo() {
-      if (typeof seriesData === 'undefined' || !currentMovie || !currentMovie._episodeNum) return null;
+      if (typeof seriesData === 'undefined' || !currentMovie) return null;
+      // Initial series load plays ep1 via manualEmbed without an episode click —
+      // treat that as episode 1 so auto-advance works from the very first watch.
+      const epNum = currentMovie._episodeNum || (currentMovie.isSeries ? 1 : null);
+      if (!epNum) return null;
       const series = seriesData.find(s => s.id === currentMovie.id);
       if (!series || !series.seasons) return null;
       const curSeasonIdx = series.seasons.findIndex(s => s.seasonNumber === (currentMovie._episodeSeason || 1));
       if (curSeasonIdx === -1) return null;
       const curSeason = series.seasons[curSeasonIdx];
-      const epIdx = curSeason.episodes.findIndex(e => e.episodeNumber === currentMovie._episodeNum);
+      const epIdx = curSeason.episodes.findIndex(e => e.episodeNumber === epNum);
       if (epIdx === -1) return null;
       if (epIdx + 1 < curSeason.episodes.length) {
         return { episode: curSeason.episodes[epIdx + 1], season: curSeason,
@@ -6490,6 +6533,7 @@
       const nxt = getNextEpisodeInfo();
       hideNextEpisodeButton();
       if (!nxt) return;
+      nextEpShown = false; // the new episode gets its own countdown/box
       // Reset ad phase so the new episode gets its own ads
       vastAdPhase = 0;
       // Mark the correct button active in the episodes grid
@@ -6554,9 +6598,20 @@
     });
 
     directPlayer.addEventListener('seeked', () => { if (directPlayer.currentTime < directPlayer.duration * 0.85) { nextEpShown = false; hideNextEpisodeButton(); } });
-    directPlayer.addEventListener('ended', () => { // ended with button visible → advance immediately
-      if (nextEpBox.classList.contains('visible')) playNextEpisode();
+    directPlayer.addEventListener('ended', () => { // series: ALWAYS continue to the next episode
+      if (vastAdPlaying) return; // an ad overlay handling the end — don't stack
+      if (getNextEpisodeInfo()) playNextEpisode();
     });
+
+    // ── Inline Next button (left of Settings, series mode only) ──
+    function updateNextEpisodeBtn() {
+      const btn = document.getElementById('btn-next-episode-inline');
+      if (!btn) return;
+      const isSeries = !!(currentMovie && (currentMovie.isSeries || currentMovie._episodeNum));
+      btn.style.display = (isSeries && getNextEpisodeInfo()) ? '' : 'none';
+    }
+    directPlayer.addEventListener('loadedmetadata', updateNextEpisodeBtn);
+    directPlayer.addEventListener('emptied', updateNextEpisodeBtn);
     // Re-allow the button on new episode load
     document.addEventListener('click', (e) => {
       if (e.target.closest && e.target.closest('.episode-square-btn')) {

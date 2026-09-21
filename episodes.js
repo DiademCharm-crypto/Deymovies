@@ -290,7 +290,7 @@ function playEpisodeSource(episode, season) {
   // Reset subtitles so auto-load fires for the new episode
   try {
     const dp = document.getElementById('direct-video-player');
-    if (dp) { const t = dp.querySelector('track'); if (t) t.remove(); }
+    if (dp) { dp.querySelectorAll('track').forEach(t => t.remove()); }
     if (typeof subtitleActive !== 'undefined') subtitleActive = false;
     const offBtn = document.getElementById('btn-subtitle-off');
     if (offBtn) offBtn.classList.remove('show');
