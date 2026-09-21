@@ -1781,6 +1781,24 @@
         border-radius: 4px 4px 0 0 !important;
       }
 
+      /* ── Trailer tab panel (lazy YouTube embed) ── */
+      .pc-trailer-holder {
+        position: relative;
+        width: 100%;
+        max-width: 860px;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .pc-trailer-holder iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
       .pc-panel.is-active { display: block !important; padding: 16px 0 6px 0 !important; }
 
       .pc-panel-title {
@@ -2013,6 +2031,24 @@
         color: #ffffff !important;
         border-bottom-color: #e50914 !important;
         border-radius: 4px 4px 0 0 !important;
+      }
+
+      /* ── Trailer tab panel (lazy YouTube embed) ── */
+      .pc-trailer-holder {
+        position: relative;
+        width: 100%;
+        max-width: 860px;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .pc-trailer-holder iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
       }
 
       .pc-panel.is-active { display: block !important; padding: 22px 0 6px 0 !important; }
@@ -2646,9 +2682,6 @@
         <button id="bookmark-btn" class="action-btn" onclick="toggleBookmark()" title="Add to Bookmarks">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
         </button>
-        <button id="watch-trailer-btn" class="trailer-pill" style="display:none" onclick="watchTrailerFromInfo()" title="Watch Trailer">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Trailer</span>
-        </button>
       </div>
     </div>
 
@@ -2670,10 +2703,11 @@
     <p id="current-description" class="synopsis-text">Loading synopsis...</p>
     <button id="toggle-synopsis-btn" class="read-more-btn" onclick="toggleSynopsis()" style="display: none;">Read More</button>
 
-    <!-- PC ONLY: Info / Cast tabs -->
+    <!-- PC ONLY: Info / Cast / Trailer tabs -->
     <div class="pc-tabs" id="pc-tabs" role="tablist">
       <button type="button" class="pc-tab is-active" data-pc-tab="info">Info</button>
       <button type="button" class="pc-tab" data-pc-tab="cast" id="pc-tab-cast">Cast</button>
+      <button type="button" class="pc-tab pc-tab-trailer" data-pc-tab="trailer" id="pc-tab-trailer" style="display:none">Trailer</button>
     </div>
 
     <div class="pc-panel" id="pc-panel-info">
@@ -2692,6 +2726,11 @@
         <h4 class="pc-panel-title">Cast</h4>
         <div class="pc-cast-grid" id="pc-cast-grid"></div>
       </div>
+    </div>
+
+    <div class="pc-panel" id="pc-panel-trailer">
+      <h4 class="pc-panel-title">Video trailer</h4>
+      <div class="pc-trailer-holder" id="pc-trailer-holder"></div>
     </div>
   </div>
 
@@ -2720,7 +2759,7 @@
   <script src="security.js?v=2.1"></script>
     <script src="filipino-movies.js?v=1.1"></script>
   <script src="app.js?v=158.6"></script>
-  <script src="episodes.js?v=1.1"></script>
+  <script src="episodes.js?v=1.2"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -2850,8 +2889,6 @@
     // trailer-only movies keep their old single-behaviour flow.
     // Clicking it opens the trailer; while the trailer plays the SAME pill turns
     // into "Back to Movie", so there is always an obvious way back.
-    const TRAILER_PILL_HTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Trailer</span>';
-    const BACK_PILL_HTML = '<svg viewBox="0 0 24 24"><path d="M15 4.5L7.5 12 15 19.5"/><path d="M7.5 12H18"/></svg><span>Back to Movie</span>';
 
     function hasOwnVideoFile() {
       return !!(currentMovie && currentMovie.manualEmbed && currentMovie.manualEmbed.trim() !== '');
@@ -2861,33 +2898,10 @@
     }
 
     function updateTrailerBtn() {
-      const pill = document.getElementById('watch-trailer-btn');
-      if (!pill) return;
-      const titleEl = document.getElementById('current-title');
-
-      // Trailer-only movies: the trailer IS the movie, no pill needed
-      if (!hasOwnVideoFile() || !hasTrailerSource()) {
-        pill.style.display = 'none';
-        if (titleEl) titleEl.style.removeProperty('padding-right');
-        return;
-      }
-
-      const inTrailer = (playerMode === 'trailer');
-      pill.innerHTML = inTrailer ? BACK_PILL_HTML : TRAILER_PILL_HTML;
-      pill.classList.toggle('back-to-movie', inTrailer);
-      pill.title = inTrailer ? 'Back to the movie' : 'Watch Trailer';
-      // Resolved lazily so the handler exists whenever the click actually happens
-      pill.onclick = function () {
-        if (inTrailer) { if (window.returnFromTrailerToMovie) window.returnFromTrailerToMovie(); }
-        else { if (window.watchTrailerFromInfo) window.watchTrailerFromInfo(); }
-      };
-      pill.style.display = 'flex';
-
-      // Reserve exactly the pill's rendered width so long titles never slide under it
-      if (titleEl) {
-        const w = pill.offsetWidth || (inTrailer ? 165 : 120);
-        titleEl.style.setProperty('padding-right', (w + 14) + 'px', 'important');
-      }
+      // Trailer pill removed from the title row — the trailer now lives in
+      // its own tab (Info / Cast / Trailer). Trailer-mode back navigation
+      // still works via the floating back arrow (ensureTrailerBackButton).
+      if (typeof updateTrailerTab === 'function') updateTrailerTab();
     }
     updateTrailerBtn();
 
@@ -3401,6 +3415,45 @@
       document.querySelectorAll('.pc-panel').forEach(function (p) {
         p.classList.toggle('is-active', p.id === 'pc-panel-' + name);
       });
+      // Trailer tab: mount the YouTube embed on entry, destroy on leave
+      // (an always-on iframe would keep playing audio behind other tabs)
+      if (name === 'trailer') pcMountTrailer(); else pcUnmountTrailer();
+    }
+
+    function pcTrailerVideoId() {
+      if (!currentMovie || !currentMovie.trailerEmbed) return '';
+      const u = currentMovie.trailerEmbed;
+      let m = u.match(/[?&]v=([\w-]{6,})/) || u.match(/youtu\.be\/([\w-]{6,})/) || u.match(/embed\/([\w-]{6,})/);
+      return m ? m[1] : '';
+    }
+
+    function pcMountTrailer() {
+      const holder = document.getElementById('pc-trailer-holder');
+      if (!holder) return;
+      const vid = pcTrailerVideoId();
+      if (!vid) {
+        holder.innerHTML = '<p style="color:rgba(255,255,255,0.6);padding:18px;">No trailer available for this title.</p>';
+        return;
+      }
+      if (holder.querySelector('iframe')) return; // already mounted
+      const ytOrigin = encodeURIComponent(window.location.origin || window.location.href);
+      holder.innerHTML = '<iframe src="https://www.youtube.com/embed/' + vid +
+        '?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=' + ytOrigin +
+        '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Trailer"></iframe>';
+    }
+
+    function pcUnmountTrailer() {
+      const holder = document.getElementById('pc-trailer-holder');
+      if (holder) holder.innerHTML = '';
+    }
+
+    // Show the Trailer tab only when a trailer exists AND the movie has its own file
+    function updateTrailerTab() {
+      const tab = document.getElementById('pc-tab-trailer');
+      if (!tab) return;
+      const show = hasOwnVideoFile() && hasTrailerSource();
+      tab.style.display = show ? '' : 'none';
+      if (!show) pcUnmountTrailer();
     }
 
     (function initPcTabs() {
@@ -3526,7 +3579,9 @@
         if (castTabBtn) castTabBtn.style.display = 'none';
       }
 
-      pcSwitchTab('info');
+      // Default to Info — but never steal the tab if the user already picked
+      // one (slow details arriving late must not kick them out of Trailer)
+      if (!document.querySelector('.pc-panel.is-active')) pcSwitchTab('info');
 
       const tabs = document.getElementById('pc-tabs');
       if (tabs) tabs.classList.add('is-ready');
@@ -6617,6 +6672,10 @@
       if (e.target.closest && e.target.closest('.episode-square-btn')) {
         nextEpShown = false;
         hideNextEpisodeButton();
+        // Manual episode switch: the new episode gets its own mid-roll ads
+        // (playNextEpisode does this too; this covers direct grid clicks)
+        vastAdPhase = 0;
+        vastTriggered = false;
       }
     });
 

@@ -1,15 +1,18 @@
 # DEYMFLIX Sketchware App — Upgrade Guide (v1.0 → v2.0)
 
+> ## ⚡ v1.3 SHORTCUT — if your only problems are: swipe-refresh dead, spinner
+> stuck after swiping, videos stuck on "Buffering… 00:00:00", or back button
+> not working → skip everything below and do **STEP 13 (v1.3 FIX PACK)** at the
+> bottom of this file. Import `Deymflix v1.3.swb` + paste 3 blocks. Done.
+
 Your app is a WebView wrapper (`com.deymflix.eu.cc`) around your site.
 This guide takes it from "browser in a box" to a proper streaming app.
 
 Work through the steps in order. Each one is independent — if one fails,
 the app still builds with everything before it.
 
-> **Import `Deymflix v1.2 (compile-fixed).swb`** — the v1.1 file had a second
-> duplicate-attribute bug (fixed in v1.2, whose manifest injection is empty).
-> If you already imported v1.1 and fixed the injection manually in Sketchware
-> (Manifest Injection → delete all → save), your project is equivalent — keep it.
+> **Import `Deymflix v1.3.swb`** — same compile fix as v1.2 (empty manifest
+> injection) plus the v1.3 fix-pack instructions in its compile log.
 
 ---
 
@@ -505,3 +508,65 @@ binding.swipeRefresh.setRefreshing(false);
 - [ ] "Download this video" overlay → saves to Downloads
 - [ ] YouTube trailer link opens the YouTube app, not in-WebView
 - [ ] Subtitles: drop a file in /subtitles on the server → appears in player
+
+---
+
+## STEP 13 — v1.3 FIX PACK (swipe refresh, stuck spinner, buffering, back button)
+
+**Use this if:** swipe-to-refresh does nothing, the white spinner circle stays
+on screen after swiping, videos sit on "Buffering… 00:00:00" forever (player
+AND reels), or the back button does nothing.
+
+**Why it all broke at once:** the XML-injected SwipeRefreshLayout never got a
+Sketchware Event page (so no refresh listener existed), nothing ever called
+`setRefreshing(false)` (so the spinner stayed), the WebView never got
+`setMediaPlaybackRequiresUserGesture(false)` (so `video.play()` was silently
+blocked → infinite "Buffering…"), and the old back-button code relied on
+`binding.` which isn't in scope in every injection tab.
+
+### 13a. Import the v1.3 project file
+
+Import `Deymflix v1.3.swb` (Project → Import .swb). It is your existing v1.2
+project — same layout, same library — with updated instructions in its log.
+(If you prefer keeping your imported project: it also works, the fix pack is
+paste-only.)
+
+### 13b. Confirm the layout (30 seconds, View tab)
+
+View → layout editor → ⋮ → **Edit XML** → file `main`. `webview1` must sit
+INSIDE `SwipeRefreshLayout` with id `swipe_refresh` (it already does — that's
+where the spinner circle comes from). Nothing to change here.
+
+### 13c. Paste the three blocks from `DEYMFLIX-APP-v1.3-FIX.java`
+
+Open that file (it's in your Deymflix folder) — it contains exactly three
+sections. In Logic → MainActivity → ⋮ → **Java/Kotlin Injection**:
+
+| File section | Paste into tab |
+|---|---|
+| SECTION 1 | **onCreate** |
+| SECTION 2 | **onBackPressed** |
+| SECTION 3 | **onResume** |
+
+Replace any older injected code in those tabs with these (old code fights the
+new — e.g. two WebChromeClients, two refresh listeners).
+
+**Library check:** Library manager must list
+`androidx.swiperefreshlayout:swiperefreshlayout:1.1.0` (local library).
+v1.2 projects already have it.
+
+### 13d. offline.html into assets (once)
+
+Sketchware → **Storage/Assets** → add `offline.html` from your Deymflix folder.
+The fix pack redirects there automatically when the network drops and returns
+to the site when connectivity is back.
+
+### 13e. Build + test checklist
+
+- [ ] Swipe down on any page → page reloads, spinner appears, **spinner disappears** when load finishes
+- [ ] Play a movie → starts **without tapping** (no more Buffering… 00:00:00)
+- [ ] Reels → same, plays automatically
+- [ ] Player → back button leaves the player page (returns to where you were)
+- [ ] On index.html → back asks "Do you want to exit?" with Yes/No
+- [ ] Fullscreen video → rotates, exits fullscreen **without reloading the page**
+- [ ] Airplane mode → offline.html appears; reconnect → app returns to the site on its own
