@@ -1,0 +1,2779 @@
+1
+00:00:18,852 --> 00:00:20,895
+<font color="white">This is such a precious thing.</font><font color="white"></font>
+
+2
+00:00:20,979 --> 00:00:23,398
+<font color="white">-Are you really giving it to me?</font><font color="white">
+<font color="white">-Yes.</font><font color="white"></font></font>
+
+3
+00:00:25,817 --> 00:00:27,026
+<font color="white">Let him be.</font><font color="white"></font>
+
+4
+00:00:27,110 --> 00:00:28,820
+<font color="white">He is simply delighted.</font><font color="white"></font>
+
+5
+00:00:32,782 --> 00:00:33,616
+<font color="white"><i>Cousin Yun.</i></font><font color="white"></font>
+
+6
+00:00:34,409 --> 00:00:37,495
+<font color="white"><i>Have you ever seen the map</i></font><font color="white">
+<font color="white"><i>drawn by the Italian, Matteo Ricci?</i></font></font><font color="white"></font>
+
+7
+00:00:38,621 --> 00:00:42,250
+<font color="white"><i>It took me quite some time</i></font><font color="white">
+<font color="white"><i>to find Joseon upon it.</i></font></font><font color="white"></font>
+
+8
+00:00:43,334 --> 00:00:45,712
+<font color="white"><i>Joseon, which had always seemed</i></font><font color="white">
+<font color="white"><i>so vast and unmistakable,</i></font></font><font color="white"></font>
+
+9
+00:00:45,795 --> 00:00:47,422
+<font color="white"><i>suddenly felt so small.</i></font><font color="white"></font>
+
+10
+00:00:48,423 --> 00:00:50,383
+<font color="white"><i>It filled me with a sudden fear.</i></font><font color="white"></font>
+
+11
+00:00:51,551 --> 00:00:54,304
+<font color="white"><i>How small must I be,</i></font><font color="white"></font>
+
+12
+00:00:54,387 --> 00:00:56,389
+<font color="white"><i>living in one corner of Hwaseong?</i></font><font color="white"></font>
+
+13
+00:01:13,156 --> 00:01:14,240
+<font color="white">A letter!</font><font color="white"></font>
+
+14
+00:01:15,283 --> 00:01:16,284
+<font color="white">Over here!</font><font color="white"></font>
+
+15
+00:01:16,367 --> 00:01:18,578
+<font color="white">It is for the young lady</font><font color="white">
+<font color="white">of Vice Minister Cho's house!</font><font color="white"></font></font>
+
+16
+00:01:18,661 --> 00:01:19,496
+<font color="white">Yes.</font><font color="white"></font>
+
+17
+00:01:20,121 --> 00:01:21,748
+<font color="white"><i>I unfolded the map</i></font><font color="white"></font>
+
+18
+00:01:21,831 --> 00:01:24,250
+<font color="white"><i>drawn in Joseon centuries ago.</i></font><font color="white"></font>
+
+19
+00:01:25,418 --> 00:01:27,337
+<font color="white"><i>By the standards of Western learning,</i></font><font color="white"></font>
+
+20
+00:01:27,879 --> 00:01:30,590
+<font color="white"><i>the size of Joseon upon it</i></font><font color="white">
+<font color="white"><i>is plainly wrong.</i></font></font><font color="white"></font>
+
+21
+00:01:31,925 --> 00:01:35,261
+<font color="white"><i>And yet, I found myself wondering,</i></font><font color="white"></font>
+
+22
+00:01:35,345 --> 00:01:36,888
+<font color="white"><i>"Is it truly wrong?"</i></font><font color="white"></font>
+
+23
+00:01:37,764 --> 00:01:39,974
+<font color="white"><i>Perhaps they merely wished to capture</i></font><font color="white"></font>
+
+24
+00:01:40,058 --> 00:01:42,393
+<font color="white"><i>the hearts of those</i></font><font color="white">
+<font color="white"><i>who stood upon this small land.</i></font></font><font color="white"></font>
+
+25
+00:01:43,812 --> 00:01:46,606
+<font color="white"><i>And so, through the two different Joseons</i></font><font color="white">
+<font color="white"><i>drawn upon these maps,</i></font></font><font color="white"></font>
+
+26
+00:01:46,689 --> 00:01:47,982
+<font color="white"><i>I came to realize something.</i></font><font color="white"></font>
+
+27
+00:01:49,108 --> 00:01:51,236
+<font color="white"><i>Whether it be large or small,</i></font><font color="white"></font>
+
+28
+00:01:51,903 --> 00:01:53,738
+<font color="white"><i>we see the world through our own eyes,</i></font><font color="white"></font>
+
+29
+00:01:53,822 --> 00:01:56,825
+<font color="white"><i>and they through theirs.</i></font><font color="white"></font>
+
+30
+00:01:58,785 --> 00:02:02,831
+<font color="white"><i>Just as I am simply me,</i></font><font color="white">
+<font color="white"><i>and you are simply you.</i></font></font><font color="white"></font>
+
+31
+00:02:05,542 --> 00:02:06,417
+<font color="white"><i>What do you think?</i></font><font color="white"></font>
+
+32
+00:02:07,502 --> 00:02:09,129
+<font color="white"><i>You may call it sophistry,</i></font><font color="white"></font>
+
+33
+00:02:09,838 --> 00:02:13,758
+<font color="white"><i>yet I am most curious to hear what you,</i></font><font color="white">
+<font color="white"><i>my literary friend, make of it.</i></font></font><font color="white"></font>
+
+34
+00:02:14,884 --> 00:02:16,219
+<font color="white"><i>I shall await your reply.</i></font><font color="white"></font>
+
+35
+00:02:23,184 --> 00:02:25,937
+<font color="white">Keep your blade firm. Straight and strong.</font><font color="white"></font>
+
+36
+00:02:26,604 --> 00:02:28,690
+<font color="white">Uphold the way of a gentleman.</font><font color="white"></font>
+
+37
+00:02:28,773 --> 00:02:29,774
+<font color="white">Do you understand?</font><font color="white"></font>
+
+38
+00:02:48,960 --> 00:02:49,794
+<font color="white">Straight</font><font color="white"></font>
+
+39
+00:02:51,421 --> 00:02:52,297
+<font color="white">and strong.</font><font color="white"></font>
+
+40
+00:02:53,131 --> 00:02:54,090
+<font color="white">Straight</font><font color="white"></font>
+
+41
+00:02:54,883 --> 00:02:55,800
+<font color="white">and strong.</font><font color="white"></font>
+
+42
+00:02:56,467 --> 00:02:57,302
+<font color="white">Strong.</font><font color="white"></font>
+
+43
+00:02:59,679 --> 00:03:01,598
+<font color="white"><i>I lost my father so suddenly,</i></font><font color="white"></font>
+
+44
+00:03:02,432 --> 00:03:04,976
+<font color="white"><i>and there is no stopping</i></font><font color="white">
+<font color="white"><i>this grief that rises within me.</i></font></font><font color="white"></font>
+
+45
+00:03:06,895 --> 00:03:08,521
+<font color="white"><i>I need my father.</i></font><font color="white"></font>
+
+46
+00:03:10,106 --> 00:03:13,359
+<font color="white"><i>I wished to become</i></font><font color="white">
+<font color="white"><i>the sort of son he would be proud of,</i></font></font><font color="white"></font>
+
+47
+00:03:14,402 --> 00:03:15,570
+<font color="white"><i>but now it is too late.</i></font><font color="white"></font>
+
+48
+00:03:16,571 --> 00:03:17,405
+<font color="white"><i>Cousin Yun.</i></font><font color="white"></font>
+
+49
+00:03:18,364 --> 00:03:19,908
+<font color="white"><i>What am I to do?</i></font><font color="white"></font>
+
+50
+00:03:21,659 --> 00:03:24,954
+<font color="white"><i>I am only sorry</i></font><font color="white">
+<font color="white"><i>that I cannot fully fathom your pain.</i></font></font><font color="white"></font>
+
+51
+00:03:26,039 --> 00:03:27,040
+<font color="white"><i>But Won,</i></font><font color="white"></font>
+
+52
+00:03:27,540 --> 00:03:31,669
+<font color="white"><i>the person Uncle wished you to become</i></font><font color="white">
+<font color="white"><i>is not the only true answer.</i></font></font><font color="white"></font>
+
+53
+00:03:32,545 --> 00:03:34,380
+<font color="white"><i>I felt I had to tell you that myself.</i></font><font color="white"></font>
+
+54
+00:03:35,840 --> 00:03:37,967
+<font color="white"><i>Rather than chasing after</i></font><font color="white">
+<font color="white"><i>another's footsteps,</i></font></font><font color="white"></font>
+
+55
+00:03:38,051 --> 00:03:39,802
+<font color="white"><i>you must find yourself.</i></font><font color="white"></font>
+
+56
+00:03:40,887 --> 00:03:44,057
+<font color="white"><i>Though my words</i></font><font color="white">
+<font color="white"><i>may not reach your heart just yet.</i></font></font><font color="white"></font>
+
+57
+00:03:46,267 --> 00:03:47,685
+<font color="white"><i>"I am me,</i></font><font color="white"></font>
+
+58
+00:03:49,103 --> 00:03:50,146
+<font color="white"><i>and you are you."</i></font><font color="white"></font>
+
+59
+00:03:57,820 --> 00:04:02,325
+<font color="white">THE SCANDAL</font><font color="white"></font>
+
+60
+00:04:09,999 --> 00:04:11,834
+<font color="white">How indecent.</font><font color="white"></font>
+
+61
+00:04:17,924 --> 00:04:18,800
+<font color="white">Madam.</font><font color="white"></font>
+
+62
+00:04:19,342 --> 00:04:23,429
+<font color="white">Lady Cho, the wife of Minister Yoo,</font><font color="white">
+<font color="white">is here to see you.</font><font color="white"></font></font>
+
+63
+00:04:26,057 --> 00:04:27,475
+<font color="white">Send her in.</font><font color="white"></font>
+
+64
+00:04:31,104 --> 00:04:33,106
+<font color="white">Though it bears no dye,</font><font color="white"></font>
+
+65
+00:04:33,731 --> 00:04:35,483
+<font color="white">it shines so splendidly.</font><font color="white"></font>
+
+66
+00:04:36,276 --> 00:04:39,946
+<font color="white">I must say, this silk resembles you.</font><font color="white"></font>
+
+67
+00:04:40,989 --> 00:04:43,658
+<font color="white">The tobacco you sent last night</font><font color="white">
+<font color="white">was more than enough,</font><font color="white"></font></font>
+
+68
+00:04:44,450 --> 00:04:46,160
+<font color="white">yet you bring this as well.</font><font color="white"></font>
+
+69
+00:04:47,203 --> 00:04:48,746
+<font color="white">Thank you.</font><font color="white"></font>
+
+70
+00:04:51,499 --> 00:04:53,668
+<font color="white">I shall treasure it.</font><font color="white"></font>
+
+71
+00:04:54,294 --> 00:04:56,045
+<font color="white">You are too gracious.</font><font color="white"></font>
+
+72
+00:04:57,005 --> 00:04:59,048
+<font color="white">I am deeply humbled by your words.</font><font color="white"></font>
+
+73
+00:04:59,674 --> 00:05:03,469
+<font color="white">Though truthfully,</font><font color="white">
+<font color="white">I could not sleep all night for fear</font><font color="white"></font></font>
+
+74
+00:05:03,553 --> 00:05:06,597
+<font color="white">you may have been displeased</font><font color="white">
+<font color="white">by my cousin's misconduct.</font><font color="white"></font></font>
+
+75
+00:05:06,681 --> 00:05:07,682
+<font color="white">Just as I thought.</font><font color="white"></font>
+
+76
+00:05:09,058 --> 00:05:12,729
+<font color="white">Even between cousins,</font><font color="white">
+<font color="white">it could not have been an easy decision.</font><font color="white"></font></font>
+
+77
+00:05:14,105 --> 00:05:16,733
+<font color="white">Since you are a lady</font><font color="white">
+<font color="white">who knows propriety and decorum,</font><font color="white"></font></font>
+
+78
+00:05:16,816 --> 00:05:18,985
+<font color="white">you chose the late hour to inform me,</font><font color="white"></font>
+
+79
+00:05:19,610 --> 00:05:21,446
+<font color="white">the Left State Councilor,</font><font color="white"></font>
+
+80
+00:05:22,196 --> 00:05:24,657
+<font color="white">and our In-ho quietly of the matter.</font><font color="white"></font>
+
+81
+00:05:25,325 --> 00:05:26,367
+<font color="white">Especially</font><font color="white"></font>
+
+82
+00:05:27,285 --> 00:05:29,787
+<font color="white">with a widowed daughter-in-law</font><font color="white">
+<font color="white">in this household.</font><font color="white"></font></font>
+
+83
+00:05:31,664 --> 00:05:33,041
+<font color="white">Thank you, Lady Cho.</font><font color="white"></font>
+
+84
+00:05:34,000 --> 00:05:34,876
+<font color="white">Thanks to you,</font><font color="white"></font>
+
+85
+00:05:35,960 --> 00:05:40,048
+<font color="white">I summoned In-ho</font><font color="white">
+<font color="white">at the crack of dawn and firmly warned him</font><font color="white"></font></font>
+
+86
+00:05:41,215 --> 00:05:43,051
+<font color="white">not to trouble your cousin further.</font><font color="white"></font>
+
+87
+00:05:44,218 --> 00:05:47,138
+<font color="white">One's studies ought to be pursued</font><font color="white">
+<font color="white">by one's own efforts.</font><font color="white"></font></font>
+
+88
+00:05:47,221 --> 00:05:48,931
+<font color="white">Hearing you say so</font><font color="white"></font>
+
+89
+00:05:49,640 --> 00:05:51,976
+<font color="white">finally puts my mind at ease, however…</font><font color="white"></font>
+
+90
+00:05:56,105 --> 00:05:57,148
+<font color="white">What's the matter?</font><font color="white"></font>
+
+91
+00:06:02,737 --> 00:06:07,158
+<font color="white">I wish to believe your daughter-in-law</font><font color="white">
+<font color="white">shall handle the matter wisely,</font><font color="white"></font></font>
+
+92
+00:06:07,241 --> 00:06:10,286
+<font color="white">but I must regretfully say my cousin</font><font color="white"></font>
+
+93
+00:06:11,370 --> 00:06:13,581
+<font color="white">is no ordinary man.</font><font color="white"></font>
+
+94
+00:06:14,165 --> 00:06:15,500
+<font color="white">I know.</font><font color="white"></font>
+
+95
+00:06:15,583 --> 00:06:17,376
+<font color="white">I know that very well indeed.</font><font color="white"></font>
+
+96
+00:06:19,003 --> 00:06:23,466
+<font color="white">With a face so excessively handsome,</font><font color="white"></font>
+
+97
+00:06:23,549 --> 00:06:25,885
+<font color="white">how could anyone fail to suspect as much?</font><font color="white"></font>
+
+98
+00:06:28,930 --> 00:06:30,681
+<font color="white">Which is why I say this.</font><font color="white"></font>
+
+99
+00:06:32,517 --> 00:06:35,978
+<font color="white">In the end,</font><font color="white">
+<font color="white">they are but a young man and woman.</font><font color="white"></font></font>
+
+100
+00:06:37,522 --> 00:06:41,567
+<font color="white">Even two shadows lose their boundaries</font><font color="white">
+<font color="white">beneath the lamplight.</font><font color="white"></font></font>
+
+101
+00:06:43,194 --> 00:06:44,654
+<font color="white">Would it not be safer</font><font color="white"></font>
+
+102
+00:06:45,279 --> 00:06:48,116
+<font color="white">to keep them apart,</font><font color="white">
+<font color="white">even by force if necessary,</font><font color="white"></font></font>
+
+103
+00:06:48,199 --> 00:06:50,076
+<font color="white">so they never cross paths?</font><font color="white"></font>
+
+104
+00:06:56,749 --> 00:06:58,918
+<font color="white">Forgive me. That was presumptuous of me.</font><font color="white"></font>
+
+105
+00:07:16,769 --> 00:07:17,728
+<font color="white">Come now!</font><font color="white"></font>
+
+106
+00:07:21,691 --> 00:07:23,609
+<font color="white">There is no need for that.</font><font color="white"></font>
+
+107
+00:07:26,988 --> 00:07:29,615
+<font color="white">You embarrass me by doing so.</font><font color="white"></font>
+
+108
+00:07:30,616 --> 00:07:31,492
+<font color="white">Goodness.</font><font color="white"></font>
+
+109
+00:07:32,118 --> 00:07:35,746
+<font color="white">If my husband learned of this,</font><font color="white">
+<font color="white">I should never hear the end of it.</font><font color="white"></font></font>
+
+110
+00:07:35,830 --> 00:07:37,999
+<font color="white">Raise your head.</font><font color="white"></font>
+
+111
+00:07:38,082 --> 00:07:39,375
+<font color="white">Come now.</font><font color="white"></font>
+
+112
+00:07:44,797 --> 00:07:46,716
+<font color="white">Right, that reminds me.</font><font color="white"></font>
+
+113
+00:07:47,550 --> 00:07:49,802
+<font color="white">How fares Minister Yoo these days?</font><font color="white"></font>
+
+114
+00:07:50,386 --> 00:07:53,264
+<font color="white">He merely awaits a summons</font><font color="white"></font>
+
+115
+00:07:54,015 --> 00:07:55,600
+<font color="white">from the Left State Councilor.</font><font color="white"></font>
+
+116
+00:08:14,243 --> 00:08:15,953
+<font color="white">My lady!</font><font color="white"></font>
+
+117
+00:08:19,165 --> 00:08:19,999
+<font color="white">My lady.</font><font color="white"></font>
+
+118
+00:08:22,251 --> 00:08:23,127
+<font color="white">My lady.</font><font color="white"></font>
+
+119
+00:08:25,630 --> 00:08:28,216
+<font color="white">The Left State Councilor has invited me</font><font color="white"></font>
+
+120
+00:08:29,217 --> 00:08:30,760
+<font color="white">to the gathering of the ministers.</font><font color="white"></font>
+
+121
+00:08:32,136 --> 00:08:33,804
+<font color="white">Do you know how long it has been?</font><font color="white"></font>
+
+122
+00:08:35,848 --> 00:08:36,807
+<font color="white">My lord.</font><font color="white"></font>
+
+123
+00:08:37,308 --> 00:08:41,395
+<font color="white">It would seem the Left State Councilor</font><font color="white">
+<font color="white">has not forgotten your capabilities.</font><font color="white"></font></font>
+
+124
+00:08:42,605 --> 00:08:44,315
+<font color="white">It is all thanks to you.</font><font color="white"></font>
+
+125
+00:08:45,733 --> 00:08:47,360
+<font color="white">You have paid your respects</font><font color="white"></font>
+
+126
+00:08:47,443 --> 00:08:49,529
+<font color="white">to the Lady of the First Rank</font><font color="white">
+<font color="white">almost every day.</font><font color="white"></font></font>
+
+127
+00:08:49,612 --> 00:08:50,988
+<font color="white">I am well aware of it.</font><font color="white"></font>
+
+128
+00:08:51,072 --> 00:08:53,866
+<font color="white">How could that possibly be my doing?</font><font color="white"></font>
+
+129
+00:08:55,159 --> 00:08:56,077
+<font color="white">My lady.</font><font color="white"></font>
+
+130
+00:09:07,380 --> 00:09:08,297
+<font color="white">My lady.</font><font color="white"></font>
+
+131
+00:09:10,258 --> 00:09:11,133
+<font color="white">Well…</font><font color="white"></font>
+
+132
+00:09:12,885 --> 00:09:13,719
+<font color="white">In truth,</font><font color="white"></font>
+
+133
+00:09:15,346 --> 00:09:17,139
+<font color="white">I know as well.</font><font color="white"></font>
+
+134
+00:09:18,391 --> 00:09:20,685
+<font color="white">That the lack of an heir in this house</font><font color="white"></font>
+
+135
+00:09:21,769 --> 00:09:23,688
+<font color="white">is entirely because of me.</font><font color="white"></font>
+
+136
+00:09:24,855 --> 00:09:26,649
+<font color="white">Though I knew it to be futile,</font><font color="white"></font>
+
+137
+00:09:27,650 --> 00:09:29,110
+<font color="white">I still brought in a concubine.</font><font color="white"></font>
+
+138
+00:09:31,571 --> 00:09:35,116
+<font color="white">Yet I fear I may fail</font><font color="white">
+<font color="white">to fulfill your wish nonetheless.</font><font color="white"></font></font>
+
+139
+00:09:35,658 --> 00:09:39,453
+<font color="white">All the while, you have done nothing</font><font color="white">
+<font color="white">but strive for my sake.</font><font color="white"></font></font>
+
+140
+00:09:43,207 --> 00:09:45,793
+<font color="white">My lord, you must not say such things.</font><font color="white"></font>
+
+141
+00:09:47,420 --> 00:09:49,839
+<font color="white">So-ok shall prove it.</font><font color="white"></font>
+
+142
+00:09:51,007 --> 00:09:55,428
+<font color="white">You shall most certainly have an heir.</font><font color="white"></font>
+
+143
+00:09:58,556 --> 00:09:59,390
+<font color="white">My lady.</font><font color="white"></font>
+
+144
+00:10:09,275 --> 00:10:12,278
+<font color="white">Yes. If you say so, then so it shall be.</font><font color="white"></font>
+
+145
+00:10:13,279 --> 00:10:15,239
+<font color="white">I shall prove yet</font><font color="white"></font>
+
+146
+00:10:15,865 --> 00:10:17,867
+<font color="white">that I am still a vigorous man!</font><font color="white"></font>
+
+147
+00:10:18,618 --> 00:10:22,246
+<font color="white">-You will hurt yourself! Put me down!</font><font color="white">
+<font color="white">-I am not so frail yet!</font><font color="white"></font></font>
+
+148
+00:10:29,795 --> 00:10:31,505
+<font color="white">-My lady.</font><font color="white">
+<font color="white">-Please put me down now.</font><font color="white"></font></font>
+
+149
+00:11:05,790 --> 00:11:06,707
+<font color="white">Mind your step.</font><font color="white"></font>
+
+150
+00:11:15,549 --> 00:11:16,759
+<font color="white">Forgive me.</font><font color="white"></font>
+
+151
+00:11:17,343 --> 00:11:18,344
+<font color="white">No, wait…</font><font color="white"></font>
+
+152
+00:11:22,264 --> 00:11:23,182
+<font color="white">You…</font><font color="white"></font>
+
+153
+00:11:23,891 --> 00:11:24,767
+<font color="white">Yes?</font><font color="white"></font>
+
+154
+00:11:29,688 --> 00:11:31,190
+<font color="white">Where are you going?</font><font color="white"></font>
+
+155
+00:11:32,817 --> 00:11:33,776
+<font color="white">Nowhere.</font><font color="white"></font>
+
+156
+00:11:33,859 --> 00:11:35,611
+<font color="white">I merely stepped out</font><font color="white"></font>
+
+157
+00:11:35,694 --> 00:11:37,988
+<font color="white">because they said</font><font color="white">
+<font color="white">the moon was lovely tonight.</font><font color="white"></font></font>
+
+158
+00:11:44,412 --> 00:11:45,329
+<font color="white">And who was it</font><font color="white"></font>
+
+159
+00:11:46,080 --> 00:11:50,084
+<font color="white">you meant to meet</font><font color="white">
+<font color="white">on such a lovely moonlit night?</font><font color="white"></font></font>
+
+160
+00:11:50,167 --> 00:11:51,836
+<font color="white">-No, it is not that--</font><font color="white">
+<font color="white">-Hush!</font><font color="white"></font></font>
+
+161
+00:11:54,130 --> 00:11:55,131
+<font color="white">And still you persist?</font><font color="white"></font>
+
+162
+00:11:57,091 --> 00:11:59,927
+<font color="white">Young Master In-ho.</font><font color="white"></font>
+
+163
+00:12:25,453 --> 00:12:28,122
+<font color="white">This is a rough sketch</font><font color="white">
+<font color="white">based on what I saw in a book.</font><font color="white"></font></font>
+
+164
+00:12:28,747 --> 00:12:29,874
+<font color="white">It is an alarm clock.</font><font color="white"></font>
+
+165
+00:12:31,292 --> 00:12:33,961
+<font color="white">A thing that lets one see the time.</font><font color="white"></font>
+
+166
+00:12:34,462 --> 00:12:37,131
+<font color="white">This would be about</font><font color="white">
+<font color="white">a quarter of an hour past 9 p.m.</font><font color="white"></font></font>
+
+167
+00:12:37,673 --> 00:12:39,884
+<font color="white">The single drumbeat earlier</font><font color="white">
+<font color="white">signaled 7 p.m.,</font><font color="white"></font></font>
+
+168
+00:12:40,551 --> 00:12:42,011
+<font color="white">so it should be about here.</font><font color="white"></font>
+
+169
+00:12:42,094 --> 00:12:42,970
+<font color="white">Before long,</font><font color="white"></font>
+
+170
+00:12:44,096 --> 00:12:45,306
+<font color="white">the 9 p.m. drum will sound.</font><font color="white"></font>
+
+171
+00:12:48,893 --> 00:12:51,937
+<font color="white">I shall be listening from here as well,</font><font color="white">
+<font color="white">but I must not miss it.</font><font color="white"></font></font>
+
+172
+00:12:52,521 --> 00:12:55,649
+<font color="white">Go stand outside the gate,</font><font color="white">
+<font color="white">and when you hear the drum strike twice,</font><font color="white"></font></font>
+
+173
+00:12:55,733 --> 00:12:57,109
+<font color="white">come tell me at once.</font><font color="white"></font>
+
+174
+00:12:57,860 --> 00:12:58,694
+<font color="white">Yes, sir.</font><font color="white"></font>
+
+175
+00:12:59,570 --> 00:13:00,988
+<font color="white">Two drumbeats.</font><font color="white"></font>
+
+176
+00:13:01,572 --> 00:13:02,573
+<font color="white">My lord!</font><font color="white"></font>
+
+177
+00:13:02,656 --> 00:13:04,492
+<font color="white">So you meant to meet</font><font color="white"></font>
+
+178
+00:13:05,868 --> 00:13:08,621
+<font color="white">when these hands</font><font color="white">
+<font color="white">stretched straight across?</font><font color="white"></font></font>
+
+179
+00:13:09,246 --> 00:13:10,247
+<font color="white">Yes.</font><font color="white"></font>
+
+180
+00:13:10,331 --> 00:13:13,125
+<font color="white">I am so dumbfounded</font><font color="white">
+<font color="white">I scarcely know what to say.</font><font color="white"></font></font>
+
+181
+00:13:13,209 --> 00:13:15,044
+<font color="white">Forgive me, my lord!</font><font color="white"></font>
+
+182
+00:13:15,127 --> 00:13:16,545
+<font color="white">Let me explain.</font><font color="white"></font>
+
+183
+00:13:22,885 --> 00:13:24,345
+<font color="white">It is only proper</font><font color="white"></font>
+
+184
+00:13:25,679 --> 00:13:29,558
+<font color="white">that I tell my cousin</font><font color="white">
+<font color="white">and my brother-in-law of this matter.</font><font color="white"></font></font>
+
+185
+00:13:30,601 --> 00:13:32,186
+<font color="white">Yet if I uphold propriety,</font><font color="white"></font>
+
+186
+00:13:32,853 --> 00:13:35,022
+<font color="white">I betray my loyalty to Young Master In-ho.</font><font color="white"></font>
+
+187
+00:13:36,440 --> 00:13:39,860
+<font color="white">And if I keep faith with him,</font><font color="white">
+<font color="white">I stray from propriety.</font><font color="white"></font></font>
+
+188
+00:13:40,736 --> 00:13:42,613
+<font color="white">Huh? Hold a moment.</font><font color="white"></font>
+
+189
+00:13:43,781 --> 00:13:45,157
+<font color="white">Why did you come out so early?</font><font color="white"></font>
+
+190
+00:13:47,451 --> 00:13:48,285
+<font color="white">Pardon?</font><font color="white"></font>
+
+191
+00:13:54,583 --> 00:13:57,378
+<font color="white">I happen to know how alarm clocks work.</font><font color="white"></font>
+
+192
+00:13:57,461 --> 00:13:58,712
+<font color="white">For these hands</font><font color="white"></font>
+
+193
+00:13:58,796 --> 00:14:02,716
+<font color="white">to stretch straight across like this,</font><font color="white">
+<font color="white">there is still quite some time left.</font><font color="white"></font></font>
+
+194
+00:14:06,554 --> 00:14:07,846
+<font color="white">But I could swear earlier…</font><font color="white"></font>
+
+195
+00:14:08,973 --> 00:14:10,766
+<font color="white">You do not even know how to read it?</font><font color="white"></font>
+
+196
+00:14:11,517 --> 00:14:13,477
+<font color="white">No, I do know how.</font><font color="white"></font>
+
+197
+00:14:15,312 --> 00:14:16,647
+<font color="white">You most certainly do not.</font><font color="white"></font>
+
+198
+00:14:18,357 --> 00:14:19,483
+<font color="white">I tell you, I do…</font><font color="white"></font>
+
+199
+00:14:21,068 --> 00:14:23,237
+<font color="white">But today,</font><font color="white"></font>
+
+200
+00:14:24,446 --> 00:14:27,491
+<font color="white">my mind is troubled</font><font color="white">
+<font color="white">by rather distressing matters.</font><font color="white"></font></font>
+
+201
+00:14:29,201 --> 00:14:30,578
+<font color="white">So I shall pretend</font><font color="white"></font>
+
+202
+00:14:32,079 --> 00:14:33,414
+<font color="white">I saw nothing of your affair.</font><font color="white"></font>
+
+203
+00:14:38,294 --> 00:14:39,545
+<font color="white">Will you, really?</font><font color="white"></font>
+
+204
+00:14:39,628 --> 00:14:40,462
+<font color="white">In return,</font><font color="white"></font>
+
+205
+00:14:41,130 --> 00:14:43,132
+<font color="white">do not wander about and invite trouble.</font><font color="white"></font>
+
+206
+00:14:43,757 --> 00:14:45,009
+<font color="white">Until the appointed hour,</font><font color="white"></font>
+
+207
+00:14:45,759 --> 00:14:49,263
+<font color="white">stay shut away in your room</font><font color="white">
+<font color="white">and read </font><font color="white"></font><font color="white"><i>Elementary Learning</i></font></font><font color="white"><font color="white"> aloud.</font><font color="white"></font></font>
+
+208
+00:14:49,346 --> 00:14:52,099
+<font color="white">I shall be outside listening for it.</font><font color="white"></font>
+
+209
+00:14:54,894 --> 00:14:56,520
+<font color="white"><i>Elementary Learning</i></font><font color="white"><font color="white">?</font><font color="white"></font></font>
+
+210
+00:14:56,604 --> 00:14:58,022
+<font color="white">Do you not know of it?</font><font color="white"></font>
+
+211
+00:14:58,606 --> 00:15:00,232
+<font color="white">No, I know it.</font><font color="white"></font>
+
+212
+00:15:00,316 --> 00:15:01,859
+<font color="white">I do, but…</font><font color="white"></font>
+
+213
+00:15:01,942 --> 00:15:02,860
+<font color="white">But what?</font><font color="white"></font>
+
+214
+00:15:03,360 --> 00:15:04,820
+<font color="white">Well…</font><font color="white"></font>
+
+215
+00:15:04,904 --> 00:15:06,405
+<font color="white">I shall go to my cousin…</font><font color="white"></font>
+
+216
+00:15:06,906 --> 00:15:08,449
+<font color="white">I am going.</font><font color="white"></font>
+
+217
+00:15:08,532 --> 00:15:09,700
+<font color="white">I am going, my lord.</font><font color="white"></font>
+
+218
+00:15:16,040 --> 00:15:18,667
+<font color="white">Young Master In-ho? Now hold a moment.</font><font color="white"></font>
+
+219
+00:15:19,501 --> 00:15:23,088
+<font color="white">That means In-ho and So-ok…</font><font color="white"></font>
+
+220
+00:15:24,256 --> 00:15:25,716
+<font color="white">Good grief.</font><font color="white"></font>
+
+221
+00:15:26,842 --> 00:15:27,927
+<font color="white">What a complete mess.</font><font color="white"></font>
+
+222
+00:15:42,232 --> 00:15:44,318
+<font color="white">Young Master, it is 9 p.m.</font><font color="white"></font>
+
+223
+00:16:14,348 --> 00:16:18,811
+<font color="white">"Once a girl reaches the age of 10,</font><font color="white">
+<font color="white">she must not venture outside."</font><font color="white"></font></font>
+
+224
+00:16:18,894 --> 00:16:23,107
+<font color="white">"She must meekly heed the teachings</font><font color="white">
+<font color="white">of her mother and teacher,</font><font color="white"></font></font>
+
+225
+00:16:23,190 --> 00:16:25,651
+<font color="white">tend hemp and ramie…</font><font color="white"></font>
+
+226
+00:16:31,407 --> 00:16:33,909
+<font color="white">raise silkworms, reel silk,</font><font color="white"></font>
+
+227
+00:16:33,993 --> 00:16:37,162
+<font color="white">weave silk, and braid silk sashes…"</font><font color="white"></font>
+
+228
+00:16:50,009 --> 00:16:51,510
+<font color="white">I was reading it! I was!</font><font color="white"></font>
+
+229
+00:17:00,060 --> 00:17:01,729
+<font color="white">Young Master…</font><font color="white"></font>
+
+230
+00:17:17,911 --> 00:17:18,746
+<font color="white">What?</font><font color="white"></font>
+
+231
+00:17:25,252 --> 00:17:26,211
+<font color="white">Oh, surely not.</font><font color="white"></font>
+
+232
+00:17:26,920 --> 00:17:29,715
+<font color="white">Did he really leave</font><font color="white">
+<font color="white">just because I was a little bit late?</font><font color="white"></font></font>
+
+233
+00:17:47,316 --> 00:17:48,317
+<font color="white">Miss…</font><font color="white"></font>
+
+234
+00:17:55,449 --> 00:17:57,326
+<font color="white">Why were you not there last night?</font><font color="white"></font>
+
+235
+00:17:57,409 --> 00:17:58,243
+<font color="white">Pardon?</font><font color="white"></font>
+
+236
+00:17:59,411 --> 00:18:00,245
+<font color="white">No, I…</font><font color="white"></font>
+
+237
+00:18:01,080 --> 00:18:03,332
+<font color="white">I most certainly was there.</font><font color="white"></font>
+
+238
+00:18:03,415 --> 00:18:04,416
+<font color="white">Of course you were.</font><font color="white"></font>
+
+239
+00:18:05,334 --> 00:18:07,002
+<font color="white">You could not wait even a moment.</font><font color="white"></font>
+
+240
+00:18:09,463 --> 00:18:12,299
+<font color="white">Very well. The fault was entirely mine.</font><font color="white"></font>
+
+241
+00:18:12,800 --> 00:18:15,427
+<font color="white">I have committed</font><font color="white">
+<font color="white">a most unforgivable offense!</font><font color="white"></font></font>
+
+242
+00:18:15,511 --> 00:18:18,305
+<font color="white">No, I did not mean it was your fault.</font><font color="white"></font>
+
+243
+00:18:20,140 --> 00:18:21,350
+<font color="white">You thought</font><font color="white"></font>
+
+244
+00:18:22,434 --> 00:18:24,728
+<font color="white">you could simply disregard a girl like me.</font><font color="white"></font>
+
+245
+00:18:25,354 --> 00:18:27,523
+<font color="white">Disregard? That is ridiculous.</font><font color="white"></font>
+
+246
+00:18:27,606 --> 00:18:29,525
+<font color="white">-It is completely untrue.</font><font color="white">
+<font color="white">-No, it is not!</font><font color="white"></font></font>
+
+247
+00:18:30,150 --> 00:18:32,653
+<font color="white">You look down on me</font><font color="white">
+<font color="white">because I am but a concubine!</font><font color="white"></font></font>
+
+248
+00:18:44,123 --> 00:18:46,667
+<font color="white">What do you mean, a concubine?</font><font color="white"></font>
+
+249
+00:18:48,293 --> 00:18:49,128
+<font color="white">Pardon?</font><font color="white"></font>
+
+250
+00:19:29,084 --> 00:19:30,878
+<font color="white">-My lord.</font><font color="white">
+<font color="white">-Yes.</font><font color="white"></font></font>
+
+251
+00:19:51,940 --> 00:19:55,527
+<font color="white">His Majesty summoned me</font><font color="white">
+<font color="white">on a matter of great importance.</font><font color="white"></font></font>
+
+252
+00:19:57,362 --> 00:20:00,699
+<font color="white">On my way back from the palace,</font><font color="white">
+<font color="white">I bought this for you.</font><font color="white"></font></font>
+
+253
+00:20:01,408 --> 00:20:03,285
+<font color="white">Oh, it is </font><font color="white"><font color="white"><i>yakgwa</i></font></font><font color="white"><font color="white">.</font><font color="white"></font></font>
+
+254
+00:20:04,369 --> 00:20:06,330
+<font color="white">Thank you, my lord.</font><font color="white"></font>
+
+255
+00:20:06,955 --> 00:20:07,789
+<font color="white">Of course.</font><font color="white"></font>
+
+256
+00:20:13,170 --> 00:20:14,463
+<font color="white">-Say, "ah."</font><font color="white">
+<font color="white">-"Ah."</font><font color="white"></font></font>
+
+257
+00:20:24,640 --> 00:20:25,557
+<font color="white">Now,</font><font color="white"></font>
+
+258
+00:20:25,641 --> 00:20:29,478
+<font color="white">I must leave Bukchon for a short while.</font><font color="white"></font>
+
+259
+00:20:29,561 --> 00:20:30,437
+<font color="white">Pardon?</font><font color="white"></font>
+
+260
+00:20:30,979 --> 00:20:32,648
+<font color="white">It should not take long.</font><font color="white"></font>
+
+261
+00:20:33,273 --> 00:20:34,399
+<font color="white">So while I am away,</font><font color="white"></font>
+
+262
+00:20:34,483 --> 00:20:38,278
+<font color="white">learn well the proper conduct of a lady</font><font color="white">
+<font color="white">under my lady's guidance.</font><font color="white"></font></font>
+
+263
+00:20:40,614 --> 00:20:41,865
+<font color="white">Once I return,</font><font color="white"></font>
+
+264
+00:20:42,741 --> 00:20:45,202
+<font color="white">I shall make you my concubine at once.</font><font color="white">
+<font color="white">Do you understand?</font><font color="white"></font></font>
+
+265
+00:20:45,702 --> 00:20:46,620
+<font color="white">Really?</font><font color="white"></font>
+
+266
+00:20:46,703 --> 00:20:47,746
+<font color="white">Yes.</font><font color="white"></font>
+
+267
+00:20:48,372 --> 00:20:50,374
+<font color="white">Thank you, my lord.</font><font color="white"></font>
+
+268
+00:20:59,800 --> 00:21:01,426
+<font color="white">This wretched hat…</font><font color="white"></font>
+
+269
+00:21:10,852 --> 00:21:14,147
+<font color="white">His Majesty is holding Lady Hyegyeong's</font><font color="white">
+<font color="white">60th birthday banquet in Hwaseong,</font><font color="white"></font></font>
+
+270
+00:21:15,274 --> 00:21:16,942
+<font color="white">and the matter has been entrusted to me.</font><font color="white"></font>
+
+271
+00:21:18,860 --> 00:21:20,779
+<font color="white">I shall show you without fail.</font><font color="white"></font>
+
+272
+00:21:20,862 --> 00:21:22,698
+<font color="white">That I can firmly uphold the position</font><font color="white"></font>
+
+273
+00:21:23,949 --> 00:21:25,742
+<font color="white">you have restored to me.</font><font color="white"></font>
+
+274
+00:21:35,544 --> 00:21:36,420
+<font color="white">Dear cousin.</font><font color="white"></font>
+
+275
+00:21:37,379 --> 00:21:39,214
+<font color="white">While your brother-in-law is away,</font><font color="white"></font>
+
+276
+00:21:39,298 --> 00:21:42,175
+<font color="white">why not stay here for a time?</font><font color="white"></font>
+
+277
+00:21:42,259 --> 00:21:44,803
+<font color="white">I imagine there is much you wish to ask.</font><font color="white"></font>
+
+278
+00:21:47,514 --> 00:21:50,434
+<font color="white">What did the widow say?</font><font color="white"></font>
+
+279
+00:21:51,768 --> 00:21:53,770
+<font color="white">How should I know?</font><font color="white"></font>
+
+280
+00:21:54,271 --> 00:21:56,648
+<font color="white">Since sending that filthy letter,</font><font color="white"></font>
+
+281
+00:21:57,232 --> 00:22:00,694
+<font color="white">I have not seen</font><font color="white">
+<font color="white">so much as the hem of her skirt.</font><font color="white"></font></font>
+
+282
+00:22:01,862 --> 00:22:02,696
+<font color="white">Then again,</font><font color="white"></font>
+
+283
+00:22:03,697 --> 00:22:06,783
+<font color="white">who could possibly know</font><font color="white">
+<font color="white">the state of her heart now?</font><font color="white"></font></font>
+
+284
+00:22:08,535 --> 00:22:11,496
+<font color="white">I only hope she has not altogether</font><font color="white">
+<font color="white">lost her senses.</font><font color="white"></font></font>
+
+285
+00:22:13,498 --> 00:22:14,374
+<font color="white">Well,</font><font color="white"></font>
+
+286
+00:22:15,083 --> 00:22:16,209
+<font color="white">who knows?</font><font color="white"></font>
+
+287
+00:22:16,835 --> 00:22:18,545
+<font color="white">She may have lost her senses so completely</font><font color="white"></font>
+
+288
+00:22:19,254 --> 00:22:21,590
+<font color="white">that she secretly indulges in that letter.</font><font color="white"></font>
+
+289
+00:22:42,819 --> 00:22:45,072
+<font color="white">I must become a refined woman now.</font><font color="white"></font>
+
+290
+00:22:46,323 --> 00:22:49,409
+<font color="white">My So-ok has become a lady of Bukchon,</font><font color="white"></font>
+
+291
+00:22:49,493 --> 00:22:51,119
+<font color="white">so I too must rise to the occasion.</font><font color="white"></font>
+
+292
+00:22:51,203 --> 00:22:52,245
+<font color="white">Oh, my goodness.</font><font color="white"></font>
+
+293
+00:22:52,829 --> 00:22:55,207
+<font color="white">You are more innocent than I thought.</font><font color="white"></font>
+
+294
+00:22:55,290 --> 00:22:59,461
+<font color="white">If you knew how the ladies of Bukchon</font><font color="white">
+<font color="white">truly amuse themselves,</font><font color="white"></font></font>
+
+295
+00:22:59,544 --> 00:23:00,712
+<font color="white">you would faint away.</font><font color="white"></font>
+
+296
+00:23:00,796 --> 00:23:02,255
+<font color="white">What does that matter?</font><font color="white"></font>
+
+297
+00:23:02,339 --> 00:23:03,381
+<font color="white">Have you heard?</font><font color="white"></font>
+
+298
+00:23:03,924 --> 00:23:06,218
+<font color="white">Choi was cast out</font><font color="white">
+<font color="white">of the Chief State Councilor's house.</font><font color="white"></font></font>
+
+299
+00:23:06,301 --> 00:23:09,513
+<font color="white">I heard the councilor warned him</font><font color="white">
+<font color="white">never to set foot in Bukchon again.</font><font color="white"></font></font>
+
+300
+00:23:10,472 --> 00:23:12,265
+<font color="white">What on earth did he do?</font><font color="white"></font>
+
+301
+00:23:12,349 --> 00:23:13,934
+<font color="white">The youngest son of that house</font><font color="white"></font>
+
+302
+00:23:15,644 --> 00:23:17,562
+<font color="white">turned out to be left-handed.</font><font color="white"></font>
+
+303
+00:23:17,646 --> 00:23:20,148
+<font color="white">Just like Choi.</font><font color="white"></font>
+
+304
+00:23:20,857 --> 00:23:22,734
+<font color="white">It was his seed, then?</font><font color="white"></font>
+
+305
+00:23:23,276 --> 00:23:25,362
+<font color="white">My, my.</font><font color="white"></font>
+
+306
+00:23:25,445 --> 00:23:28,490
+<font color="white">What sort of place is Bukchon</font><font color="white"></font>
+
+307
+00:23:28,573 --> 00:23:30,951
+<font color="white">that such amusing scandals</font><font color="white">
+<font color="white">break out every day?</font><font color="white"></font></font>
+
+308
+00:23:34,287 --> 00:23:37,457
+<font color="white">Madam, Lord Cho Won is here.</font><font color="white"></font>
+
+309
+00:23:37,541 --> 00:23:38,917
+<font color="white">Yes, send him in…</font><font color="white"></font>
+
+310
+00:23:39,543 --> 00:23:40,710
+<font color="white">What?</font><font color="white"></font>
+
+311
+00:23:40,794 --> 00:23:42,921
+<font color="white">What… What did you say?</font><font color="white"></font>
+
+312
+00:23:51,888 --> 00:23:52,722
+<font color="white">My lord.</font><font color="white"></font>
+
+313
+00:23:54,015 --> 00:23:57,644
+<font color="white">It seems the tobacco</font><font color="white">
+<font color="white">I let you sample pleased you after all.</font><font color="white"></font></font>
+
+314
+00:23:58,603 --> 00:24:01,022
+<font color="white">I could not forget the taste,</font><font color="white">
+<font color="white">so I came for more.</font><font color="white"></font></font>
+
+315
+00:24:02,774 --> 00:24:05,819
+<font color="white">Yet amidst the fragrance of flowers</font><font color="white">
+<font color="white">in full bloom here,</font><font color="white"></font></font>
+
+316
+00:24:08,989 --> 00:24:11,783
+<font color="white">I can hardly recall the scent</font><font color="white">
+<font color="white">of the tobacco I meant to buy.</font><font color="white"></font></font>
+
+317
+00:24:13,076 --> 00:24:13,952
+<font color="white">Oh, my.</font><font color="white"></font>
+
+318
+00:24:15,078 --> 00:24:16,204
+<font color="white">Off with you now.</font><font color="white"></font>
+
+319
+00:24:17,330 --> 00:24:19,082
+<font color="white">I must attend to my esteemed guest.</font><font color="white"></font>
+
+320
+00:24:22,210 --> 00:24:23,545
+<font color="white">Bun-hui.</font><font color="white"></font>
+
+321
+00:24:27,841 --> 00:24:29,801
+<font color="white">Go on now. Quickly.</font><font color="white"></font>
+
+322
+00:24:53,783 --> 00:24:56,244
+<font color="white">It has been so long</font><font color="white">
+<font color="white">since I sent that letter.</font><font color="white"></font></font>
+
+323
+00:24:56,328 --> 00:24:58,455
+<font color="white">When you did not come to see me,</font><font color="white"></font>
+
+324
+00:24:59,706 --> 00:25:02,125
+<font color="white">I thought my heart would break.</font><font color="white"></font>
+
+325
+00:25:04,669 --> 00:25:07,214
+<font color="white">So that is why you dared send</font><font color="white">
+<font color="white">such an audacious letter</font><font color="white"></font></font>
+
+326
+00:25:07,964 --> 00:25:09,674
+<font color="white">without a shred of fear.</font><font color="white"></font>
+
+327
+00:25:17,390 --> 00:25:20,769
+<font color="white">Did you not once say you liked me</font><font color="white">
+<font color="white">because I feared nothing?</font><font color="white"></font></font>
+
+328
+00:25:20,852 --> 00:25:24,606
+<font color="white">That is how I came to be held</font><font color="white">
+<font color="white">so tightly in your arms.</font><font color="white"></font></font>
+
+329
+00:25:25,106 --> 00:25:26,524
+<font color="white">And in the end,</font><font color="white"></font>
+
+330
+00:25:27,317 --> 00:25:30,445
+<font color="white">was it not that very letter</font><font color="white">
+<font color="white">that brought you back to me now?</font><font color="white"></font></font>
+
+331
+00:25:35,867 --> 00:25:36,868
+<font color="white">You…</font><font color="white"></font>
+
+332
+00:25:38,370 --> 00:25:42,040
+<font color="white">You do not realize what you are scribbling</font><font color="white">
+<font color="white">with that reckless brush of yours,</font><font color="white"></font></font>
+
+333
+00:25:43,041 --> 00:25:44,334
+<font color="white">or how greatly</font><font color="white"></font>
+
+334
+00:25:45,377 --> 00:25:47,671
+<font color="white">that scrap of paper might trouble me.</font><font color="white"></font>
+
+335
+00:25:47,754 --> 00:25:49,714
+<font color="white">You never pause to think of such things.</font><font color="white"></font>
+
+336
+00:25:55,804 --> 00:25:56,638
+<font color="white">Bun-hui.</font><font color="white"></font>
+
+337
+00:25:59,349 --> 00:26:00,725
+<font color="white">It is</font><font color="white"></font>
+
+338
+00:26:00,809 --> 00:26:04,312
+<font color="white">that long, wet tongue of yours</font><font color="white">
+<font color="white">that always worries me.</font><font color="white"></font></font>
+
+339
+00:26:09,317 --> 00:26:12,195
+<font color="white">Wag it carelessly, and it may well</font><font color="white">
+<font color="white">tighten the noose around your own neck.</font><font color="white"></font></font>
+
+340
+00:26:13,697 --> 00:26:14,614
+<font color="white">And yet</font><font color="white"></font>
+
+341
+00:26:15,782 --> 00:26:19,619
+<font color="white">all you care for</font><font color="white">
+<font color="white">is indulging yourself in the thrill of it.</font><font color="white"></font></font>
+
+342
+00:26:24,582 --> 00:26:28,086
+<font color="white">You speak as though</font><font color="white">
+<font color="white">your very life hung upon my little letter.</font><font color="white"></font></font>
+
+343
+00:26:34,217 --> 00:26:35,677
+<font color="white">Bun-hui.</font><font color="white"></font>
+
+344
+00:26:36,720 --> 00:26:38,763
+<font color="white">If you care at all for your daughter,</font><font color="white"></font>
+
+345
+00:26:40,307 --> 00:26:43,143
+<font color="white">then from now on</font><font color="white">
+<font color="white">you must at least feign modesty.</font><font color="white"></font></font>
+
+346
+00:26:46,438 --> 00:26:48,231
+<font color="white">Only then may you peek over the walls</font><font color="white"></font>
+
+347
+00:26:48,315 --> 00:26:50,525
+<font color="white">of the scholar-official households</font><font color="white">
+<font color="white">you so admire.</font><font color="white"></font></font>
+
+348
+00:26:51,234 --> 00:26:52,777
+<font color="white">And only then may you set foot</font><font color="white"></font>
+
+349
+00:26:53,695 --> 00:26:56,573
+<font color="white">in the gatherings</font><font color="white">
+<font color="white">of those noblewomen you envy so dearly.</font><font color="white"></font></font>
+
+350
+00:27:04,581 --> 00:27:08,084
+<font color="white">If you wish to enter Bukchon,</font><font color="white"></font>
+
+351
+00:27:11,963 --> 00:27:13,381
+<font color="white">you must pretend</font><font color="white"></font>
+
+352
+00:27:14,674 --> 00:27:16,301
+<font color="white">not to hear what you hear,</font><font color="white"></font>
+
+353
+00:27:19,179 --> 00:27:20,513
+<font color="white">and not to see what you see.</font><font color="white"></font>
+
+354
+00:27:38,239 --> 00:27:39,532
+<font color="white">Keep that in mind, Bun-hui.</font><font color="white"></font>
+
+355
+00:27:58,176 --> 00:28:00,553
+<font color="white">My lord! Forgive me.</font><font color="white"></font>
+
+356
+00:28:01,513 --> 00:28:02,806
+<font color="white">Forgive me.</font><font color="white"></font>
+
+357
+00:28:02,889 --> 00:28:04,808
+<font color="white">My mother is poor with the brush,</font><font color="white"></font>
+
+358
+00:28:04,891 --> 00:28:06,851
+<font color="white">so I always copy her letters in the end.</font><font color="white"></font>
+
+359
+00:28:06,935 --> 00:28:09,771
+<font color="white">If the letter displeased you,</font><font color="white">
+<font color="white">I apologize in her stead.</font><font color="white"></font></font>
+
+360
+00:28:10,939 --> 00:28:13,441
+<font color="white">This matter</font><font color="white">
+<font color="white">shall never pass beyond these walls</font><font color="white"></font></font>
+
+361
+00:28:13,525 --> 00:28:15,652
+<font color="white">for as long as I live.</font><font color="white"></font>
+
+362
+00:28:15,735 --> 00:28:17,487
+<font color="white">I swear it to you, my lord.</font><font color="white"></font>
+
+363
+00:28:19,447 --> 00:28:20,323
+<font color="white">Your mother…</font><font color="white"></font>
+
+364
+00:28:22,659 --> 00:28:26,913
+<font color="white">had you, her own daughter,</font><font color="white">
+<font color="white">copy such a letter for her?</font><font color="white"></font></font>
+
+365
+00:28:32,544 --> 00:28:34,087
+<font color="white">She is not my birth mother.</font><font color="white"></font>
+
+366
+00:28:34,921 --> 00:28:38,258
+<font color="white">She still stands in my mother's place,</font><font color="white">
+<font color="white">so I had no choice but to copy it.</font><font color="white"></font></font>
+
+367
+00:28:38,341 --> 00:28:41,428
+<font color="white">But that woman is so filthy</font><font color="white">
+<font color="white">I wish I had nothing to do with her.</font><font color="white"></font></font>
+
+368
+00:28:58,820 --> 00:28:59,946
+<font color="white">Your mother</font><font color="white"></font>
+
+369
+00:29:00,905 --> 00:29:03,366
+<font color="white">seems to know paintings rather well.</font><font color="white"></font>
+
+370
+00:29:04,075 --> 00:29:05,702
+<font color="white">Do you have an eye for them as well?</font><font color="white"></font>
+
+371
+00:29:05,785 --> 00:29:06,619
+<font color="white">Pardon?</font><font color="white"></font>
+
+372
+00:29:08,371 --> 00:29:10,457
+<font color="white">I know little of what is fine or poor.</font><font color="white"></font>
+
+373
+00:29:10,540 --> 00:29:12,917
+<font color="white">I only know what fetches a price.</font><font color="white"></font>
+
+374
+00:29:14,627 --> 00:29:15,545
+<font color="white">Is that so?</font><font color="white"></font>
+
+375
+00:29:16,796 --> 00:29:19,716
+<font color="white">Then what do you think of this painting?</font><font color="white"></font>
+
+376
+00:29:20,675 --> 00:29:22,427
+<font color="white">Would it fetch a handsome sum?</font><font color="white"></font>
+
+377
+00:29:25,096 --> 00:29:28,183
+<font color="white">The peonies seem to be swaying</font><font color="white">
+<font color="white">in the spring breeze,</font><font color="white"></font></font>
+
+378
+00:29:28,266 --> 00:29:31,478
+<font color="white">so lifelike that their fragrance</font><font color="white">
+<font color="white">seems to rise from them.</font><font color="white"></font></font>
+
+379
+00:29:33,062 --> 00:29:36,441
+<font color="white">And this little bud hidden behind the leaf</font><font color="white"></font>
+
+380
+00:29:36,524 --> 00:29:40,445
+<font color="white">is so charming,</font><font color="white">
+<font color="white">it makes one wish to tap it with a finger.</font><font color="white"></font></font>
+
+381
+00:29:43,531 --> 00:29:46,826
+<font color="white">My lord has long been away from court,</font><font color="white">
+<font color="white">and the affair entrusted to him</font><font color="white"></font></font>
+
+382
+00:29:46,910 --> 00:29:48,745
+<font color="white">is of the utmost importance.</font><font color="white"></font>
+
+383
+00:30:00,882 --> 00:30:01,758
+<font color="white">Here.</font><font color="white"></font>
+
+384
+00:30:02,300 --> 00:30:04,260
+<font color="white">If you and I were to finish</font><font color="white"></font>
+
+385
+00:30:04,344 --> 00:30:07,639
+<font color="white">this peony painting together</font><font color="white">
+<font color="white">and present it to him upon his return,</font><font color="white"></font></font>
+
+386
+00:30:07,722 --> 00:30:10,350
+<font color="white">it would be</font><font color="white">
+<font color="white">a most wonderful act of devotion.</font><font color="white"></font></font>
+
+387
+00:30:12,811 --> 00:30:16,105
+<font color="white">Your handwriting was so firm and elegant</font><font color="white"></font>
+
+388
+00:30:16,189 --> 00:30:18,191
+<font color="white">that I greatly admired it.</font><font color="white"></font>
+
+389
+00:30:18,775 --> 00:30:21,820
+<font color="white">Fill it with your writing.</font><font color="white">
+<font color="white">Anything you wish.</font><font color="white"></font></font>
+
+390
+00:30:48,847 --> 00:30:53,935
+<font color="white">THE PEONIES IN FULL BLOSSOM…</font><font color="white"></font>
+
+391
+00:31:01,192 --> 00:31:04,237
+<font color="white">THE PEONIES IN FULL BLOSSOM,</font><font color="white">
+<font color="white">HOW COULD THEY BE…</font><font color="white"></font></font>
+
+392
+00:31:06,447 --> 00:31:08,533
+<font color="white">This handwriting feels different.</font><font color="white"></font>
+
+393
+00:31:09,868 --> 00:31:12,203
+<font color="white">Quite unlike the one you used</font><font color="white">
+<font color="white">for </font><font color="white"></font><font color="white"><i>Elementary Learning</i></font></font><font color="white"><font color="white">.</font><font color="white"></font></font>
+
+394
+00:31:12,829 --> 00:31:15,623
+<font color="white">To think you could instantly fashion</font><font color="white">
+<font color="white">an entirely new style</font><font color="white"></font></font>
+
+395
+00:31:16,124 --> 00:31:18,501
+<font color="white">so well suited to this peony painting.</font><font color="white"></font>
+
+396
+00:31:19,878 --> 00:31:23,256
+<font color="white">It seems I have brought</font><font color="white">
+<font color="white">quite a remarkable lady into my household.</font><font color="white"></font></font>
+
+397
+00:31:33,349 --> 00:31:34,851
+<font color="white">I deserve to die!</font><font color="white"></font>
+
+398
+00:31:35,435 --> 00:31:37,103
+<font color="white">Please have mercy on me, my lady!</font><font color="white"></font>
+
+399
+00:31:38,438 --> 00:31:42,025
+<font color="white">In truth, it was not I who wrote it.</font><font color="white"></font>
+
+400
+00:31:42,108 --> 00:31:44,110
+<font color="white">Young Master In-ho wrote it for me.</font><font color="white"></font>
+
+401
+00:31:47,071 --> 00:31:50,825
+<font color="white">You mean Young Master Kwon In-ho</font><font color="white">
+<font color="white">of the Left State Councilor's house?</font><font color="white"></font></font>
+
+402
+00:31:50,909 --> 00:31:52,493
+<font color="white">Please spare me… No.</font><font color="white"></font>
+
+403
+00:31:53,119 --> 00:31:55,580
+<font color="white">Just kill me instead.</font><font color="white">
+<font color="white">How dare a mere concubine…</font><font color="white"></font></font>
+
+404
+00:31:59,500 --> 00:32:02,378
+<font color="white">But it is all over now.</font><font color="white"></font>
+
+405
+00:32:03,630 --> 00:32:06,758
+<font color="white">The young master</font><font color="white">
+<font color="white">already learned that I am a concubine,</font><font color="white"></font></font>
+
+406
+00:32:06,841 --> 00:32:07,717
+<font color="white">so…</font><font color="white"></font>
+
+407
+00:32:08,509 --> 00:32:09,636
+<font color="white">So…</font><font color="white"></font>
+
+408
+00:32:17,018 --> 00:32:18,311
+<font color="white">Poor thing.</font><font color="white"></font>
+
+409
+00:32:19,854 --> 00:32:23,399
+<font color="white">Your heart must have been heavy,</font><font color="white">
+<font color="white">preparing to give yourself to my lord</font><font color="white"></font></font>
+
+410
+00:32:23,900 --> 00:32:26,110
+<font color="white">while carrying feelings for another.</font><font color="white"></font>
+
+411
+00:32:32,075 --> 00:32:33,201
+<font color="white">My lady.</font><font color="white"></font>
+
+412
+00:32:33,284 --> 00:32:35,036
+<font color="white">And after learning who you were,</font><font color="white"></font>
+
+413
+00:32:35,119 --> 00:32:37,372
+<font color="white">did Young Master In-ho</font><font color="white">
+<font color="white">pretend not to know you?</font><font color="white"></font></font>
+
+414
+00:32:37,455 --> 00:32:41,209
+<font color="white">I have not seen him since.</font><font color="white"></font>
+
+415
+00:32:48,883 --> 00:32:53,471
+<font color="white">I fear your heart, delicate as a flower,</font><font color="white">
+<font color="white">may have been wounded.</font><font color="white"></font></font>
+
+416
+00:32:58,309 --> 00:33:02,897
+<font color="white">As long as you do not neglect</font><font color="white">
+<font color="white">your duty in serving my lord,</font><font color="white"></font></font>
+
+417
+00:33:03,898 --> 00:33:06,192
+<font color="white">I can overlook such a matter.</font><font color="white"></font>
+
+418
+00:33:08,778 --> 00:33:11,948
+<font color="white">I know well enough how harsh life can be</font><font color="white"></font>
+
+419
+00:33:12,448 --> 00:33:13,950
+<font color="white">for a woman in Bukchon.</font><font color="white"></font>
+
+420
+00:33:15,994 --> 00:33:17,161
+<font color="white">My lady.</font><font color="white"></font>
+
+421
+00:33:17,996 --> 00:33:22,667
+<font color="white">But surely no one else knows of this?</font><font color="white"></font>
+
+422
+00:33:22,750 --> 00:33:24,043
+<font color="white">No one besides Mal-ttong…</font><font color="white"></font>
+
+423
+00:33:27,505 --> 00:33:28,840
+<font color="white">In truth,</font><font color="white"></font>
+
+424
+00:33:29,966 --> 00:33:32,468
+<font color="white">Lord Cho Won knows a little of it as well.</font><font color="white"></font>
+
+425
+00:33:37,557 --> 00:33:38,558
+<font color="white">Oh, dear!</font><font color="white"></font>
+
+426
+00:33:44,022 --> 00:33:45,189
+<font color="white">Go to him.</font><font color="white"></font>
+
+427
+00:33:45,732 --> 00:33:46,566
+<font color="white">Pardon?</font><font color="white"></font>
+
+428
+00:33:46,649 --> 00:33:48,317
+<font color="white">Go and plead your case to him.</font><font color="white"></font>
+
+429
+00:33:50,111 --> 00:33:51,779
+<font color="white">He is a man who knows spring.</font><font color="white"></font>
+
+430
+00:33:53,698 --> 00:33:56,159
+<font color="white">If he hears your heartfelt plea,</font><font color="white"></font>
+
+431
+00:33:57,035 --> 00:34:00,329
+<font color="white">he shall surely turn a blind eye,</font><font color="white">
+<font color="white">no matter his relation to my husband.</font><font color="white"></font></font>
+
+432
+00:34:00,413 --> 00:34:04,333
+<font color="white">Do you truly think so?</font><font color="white"></font>
+
+433
+00:34:05,334 --> 00:34:06,502
+<font color="white">Who knows?</font><font color="white"></font>
+
+434
+00:34:07,587 --> 00:34:11,716
+<font color="white">He may even become a bridge</font><font color="white">
+<font color="white">between you and Young Master In-ho.</font><font color="white"></font></font>
+
+435
+00:34:38,076 --> 00:34:39,202
+<font color="white">My lord.</font><font color="white"></font>
+
+436
+00:34:40,912 --> 00:34:44,415
+<font color="white">Well, there is something I must tell you.</font><font color="white"></font>
+
+437
+00:34:44,499 --> 00:34:45,333
+<font color="white">Now?</font><font color="white"></font>
+
+438
+00:34:46,542 --> 00:34:47,376
+<font color="white">Yes.</font><font color="white"></font>
+
+439
+00:34:51,339 --> 00:34:52,215
+<font color="white">Very well.</font><font color="white"></font>
+
+440
+00:35:03,476 --> 00:35:04,435
+<font color="white">A favor, you say?</font><font color="white"></font>
+
+441
+00:35:05,895 --> 00:35:08,189
+<font color="white">Then this may take some time.</font><font color="white"></font>
+
+442
+00:35:10,817 --> 00:35:11,734
+<font color="white">Would it be wise</font><font color="white"></font>
+
+443
+00:35:12,568 --> 00:35:14,695
+<font color="white">to leave your shoes outside so plainly?</font><font color="white"></font>
+
+444
+00:35:15,696 --> 00:35:16,572
+<font color="white">Huh?</font><font color="white"></font>
+
+445
+00:35:20,201 --> 00:35:21,160
+<font color="white">What I mean is,</font><font color="white"></font>
+
+446
+00:35:23,121 --> 00:35:27,208
+<font color="white">should anyone see you here,</font><font color="white">
+<font color="white">would that not pose a problem?</font><font color="white"></font></font>
+
+447
+00:35:41,097 --> 00:35:42,098
+<font color="white">My lord.</font><font color="white"></font>
+
+448
+00:35:52,567 --> 00:35:54,402
+<font color="white">The young master has learned</font><font color="white"></font>
+
+449
+00:35:54,986 --> 00:35:56,696
+<font color="white">that I am a concubine in this house.</font><font color="white"></font>
+
+450
+00:35:56,779 --> 00:35:59,407
+<font color="white">-You had hidden it from him?</font><font color="white">
+<font color="white">-Not deliberately.</font><font color="white"></font></font>
+
+451
+00:36:00,449 --> 00:36:01,325
+<font color="white">In any case,</font><font color="white"></font>
+
+452
+00:36:02,827 --> 00:36:06,497
+<font color="white">what should I write</font><font color="white">
+<font color="white">to earn his forgiveness?</font><font color="white"></font></font>
+
+453
+00:36:07,582 --> 00:36:09,125
+<font color="white">Well, you…</font><font color="white"></font>
+
+454
+00:36:11,335 --> 00:36:13,671
+<font color="white">You do resemble her somewhat.</font><font color="white"></font>
+
+455
+00:36:14,380 --> 00:36:15,423
+<font color="white">Whom?</font><font color="white"></font>
+
+456
+00:36:20,303 --> 00:36:21,596
+<font color="white">Someone I know.</font><font color="white"></font>
+
+457
+00:36:22,388 --> 00:36:23,472
+<font color="white">How shall I put it?</font><font color="white"></font>
+
+458
+00:36:23,556 --> 00:36:25,474
+<font color="white">A true master in such matters, perhaps?</font><font color="white"></font>
+
+459
+00:36:27,185 --> 00:36:28,019
+<font color="white">A true master?</font><font color="white"></font>
+
+460
+00:36:32,857 --> 00:36:34,233
+<font color="white">"How could you…</font><font color="white"></font>
+
+461
+00:36:36,903 --> 00:36:40,156
+<font color="white">leave after merely brushing my shoulder?"</font><font color="white"></font>
+
+462
+00:36:44,493 --> 00:36:47,747
+<font color="white">"Thoughts of you leave me breathless…</font><font color="white"></font>
+
+463
+00:36:49,832 --> 00:36:51,417
+<font color="white">and I spent the night</font><font color="white"></font>
+
+464
+00:36:52,960 --> 00:36:54,420
+<font color="white">thoroughly drenched."</font><font color="white"></font>
+
+465
+00:36:55,004 --> 00:36:56,214
+<font color="white">"Breath…"</font><font color="white"></font>
+
+466
+00:36:57,215 --> 00:36:58,633
+<font color="white">My lord.</font><font color="white"></font>
+
+467
+00:37:01,594 --> 00:37:03,930
+<font color="white">How does one write "breathless"?</font><font color="white"></font>
+
+468
+00:37:05,056 --> 00:37:07,516
+<font color="white">Is there an "E" after "T-H"?</font><font color="white"></font>
+
+469
+00:37:15,733 --> 00:37:16,734
+<font color="white">Good.</font><font color="white"></font>
+
+470
+00:37:21,822 --> 00:37:23,199
+<font color="white">You are writing it correctly.</font><font color="white"></font>
+
+471
+00:37:33,251 --> 00:37:35,670
+<font color="white">"My thighs seem to part</font><font color="white">
+<font color="white">of their own accord…</font><font color="white"></font></font>
+
+472
+00:37:40,258 --> 00:37:44,053
+<font color="white">yet there are no great hands</font><font color="white">
+<font color="white">to spread them further."</font><font color="white"></font></font>
+
+473
+00:37:47,932 --> 00:37:48,849
+<font color="white">"Tonight…</font><font color="white"></font>
+
+474
+00:37:53,062 --> 00:37:55,231
+<font color="white">I long for you, Young Master."</font><font color="white"></font>
+
+475
+00:38:09,495 --> 00:38:10,913
+<font color="white">"When next we meet…</font><font color="white"></font>
+
+476
+00:38:16,377 --> 00:38:18,963
+<font color="white">scold this drenched little thing of mine."</font><font color="white"></font>
+
+477
+00:38:28,014 --> 00:38:29,640
+<font color="white">"I beg of you."</font><font color="white"></font>
+
+478
+00:39:01,881 --> 00:39:02,757
+<font color="white">Now…</font><font color="white"></font>
+
+479
+00:39:05,343 --> 00:39:06,844
+<font color="white">what will you do next?</font><font color="white"></font>
+
+480
+00:39:10,264 --> 00:39:13,059
+<font color="white">Pretend I am Young Master In-ho</font><font color="white">
+<font color="white">and show me.</font><font color="white"></font></font>
+
+481
+00:39:14,393 --> 00:39:18,105
+<font color="white">What must be done to soothe his anger?</font><font color="white"></font>
+
+482
+00:39:53,349 --> 00:39:54,392
+<font color="white">Young Master.</font><font color="white"></font>
+
+483
+00:40:05,861 --> 00:40:07,321
+<font color="white">It is I, So-ok.</font><font color="white"></font>
+
+484
+00:40:09,782 --> 00:40:10,741
+<font color="white">Young Master.</font><font color="white"></font>
+
+485
+00:40:14,995 --> 00:40:15,996
+<font color="white">Young…</font><font color="white"></font>
+
+486
+00:40:16,831 --> 00:40:17,665
+<font color="white">Wait.</font><font color="white"></font>
+
+487
+00:40:19,041 --> 00:40:21,043
+<font color="white">Do not go, Young Master!</font><font color="white"></font>
+
+488
+00:40:24,255 --> 00:40:25,423
+<font color="white">Miss!</font><font color="white"></font>
+
+489
+00:40:26,757 --> 00:40:27,883
+<font color="white">What…</font><font color="white"></font>
+
+490
+00:40:29,760 --> 00:40:32,888
+<font color="white">-What manner of madness is this?</font><font color="white">
+<font color="white">-It is I, So-ok.</font><font color="white"></font></font>
+
+491
+00:40:33,389 --> 00:40:35,433
+<font color="white">-So-ok.</font><font color="white">
+<font color="white">-A concubine?</font><font color="white"></font></font>
+
+492
+00:40:39,562 --> 00:40:41,856
+<font color="white">From the day I could no longer see you,</font><font color="white"></font>
+
+493
+00:40:43,315 --> 00:40:46,777
+<font color="white">I have not slept a wink</font><font color="white">
+<font color="white">for thoughts of you.</font><font color="white"></font></font>
+
+494
+00:40:48,779 --> 00:40:49,613
+<font color="white">Miss.</font><font color="white"></font>
+
+495
+00:40:53,492 --> 00:40:56,412
+<font color="white">There is not</font><font color="white">
+<font color="white">a shred of falsehood in those words,</font><font color="white"></font></font>
+
+496
+00:40:57,371 --> 00:40:58,372
+<font color="white">is there?</font><font color="white"></font>
+
+497
+00:41:21,270 --> 00:41:22,438
+<font color="white">I have been the same.</font><font color="white"></font>
+
+498
+00:41:23,397 --> 00:41:24,732
+<font color="white">I too</font><font color="white"></font>
+
+499
+00:41:31,530 --> 00:41:33,199
+<font color="white">have spent…</font><font color="white"></font>
+
+500
+00:41:35,910 --> 00:41:38,078
+<font color="white">sleepless nights in agony,</font><font color="white"></font>
+
+501
+00:41:38,162 --> 00:41:40,623
+<font color="white">my heart torn apart by thoughts of you.</font><font color="white"></font>
+
+502
+00:42:28,003 --> 00:42:30,339
+<font color="white">This night of ours…</font><font color="white"></font>
+
+503
+00:42:32,967 --> 00:42:34,927
+<font color="white">that we tucked away…</font><font color="white"></font>
+
+504
+00:42:37,721 --> 00:42:39,056
+<font color="white">in such longing…</font><font color="white"></font>
+
+505
+00:42:41,559 --> 00:42:44,186
+<font color="white">I wish to unfold it here and now.</font><font color="white"></font>
+
+506
+00:42:47,648 --> 00:42:49,483
+<font color="white">Then do so, Young Master.</font><font color="white"></font>
+
+507
+00:42:52,653 --> 00:42:54,613
+<font color="white">Unfold it as you please.</font><font color="white"></font>
+
+508
+00:42:56,574 --> 00:42:58,033
+<font color="white">I wish for it too.</font><font color="white"></font>
+
+509
+00:43:13,882 --> 00:43:15,092
+<font color="white">Good.</font><font color="white"></font>
+
+510
+00:43:16,510 --> 00:43:19,096
+<font color="white">We are nearly there now, Miss.</font><font color="white"></font>
+
+511
+00:43:22,016 --> 00:43:22,975
+<font color="white">Young Master.</font><font color="white"></font>
+
+512
+00:43:24,310 --> 00:43:26,103
+<font color="white">The Young Master In-ho you longed for</font><font color="white"></font>
+
+513
+00:43:27,062 --> 00:43:28,314
+<font color="white">is here before you.</font><font color="white"></font>
+
+514
+00:43:31,483 --> 00:43:33,110
+<font color="white">It is I, So-ok.</font><font color="white"></font>
+
+515
+00:43:45,456 --> 00:43:46,665
+<font color="white">Miss.</font><font color="white"></font>
+
+516
+00:43:51,337 --> 00:43:52,338
+<font color="white">There.</font><font color="white"></font>
+
+517
+00:44:11,148 --> 00:44:12,107
+<font color="white">Your hand.</font><font color="white"></font>
+
+518
+00:44:15,069 --> 00:44:15,903
+<font color="white">Yes.</font><font color="white"></font>
+
+519
+00:44:17,112 --> 00:44:20,157
+<font color="white">I wish for it too, Young Master.</font><font color="white"></font>
+
+520
+00:44:21,116 --> 00:44:22,743
+<font color="white">Yes, Miss.</font><font color="white"></font>
+
+521
+00:44:24,620 --> 00:44:25,788
+<font color="white">Young Master.</font><font color="white"></font>
+
+522
+00:44:33,962 --> 00:44:34,797
+<font color="white">Wait…</font><font color="white"></font>
+
+523
+00:44:39,051 --> 00:44:40,010
+<font color="white">Well…</font><font color="white"></font>
+
+524
+00:44:47,142 --> 00:44:50,104
+<font color="white"><i>Regarding that flower bud</i></font><font color="white">
+<font color="white"><i>you sent me last night.</i></font></font><font color="white"></font>
+
+525
+00:44:50,187 --> 00:44:53,440
+<font color="white"><i>Before I could even lay a hand upon her,</i></font><font color="white">
+<font color="white"><i>she was already baring herself.</i></font></font><font color="white"></font>
+
+526
+00:44:53,524 --> 00:44:54,858
+<font color="white"><i>I nearly lost my senses</i></font><font color="white"></font>
+
+527
+00:44:54,942 --> 00:44:57,528
+<font color="white"><i>-and let the matter end too easily.</i></font><font color="white">
+<font color="white">-It is So-ok, my lady.</font><font color="white"></font></font>
+
+528
+00:44:58,237 --> 00:44:59,488
+<font color="white"><i>But you know me.</i></font><font color="white"></font>
+
+529
+00:45:00,155 --> 00:45:02,449
+<font color="white"><i>If I were simply to grant you</i></font><font color="white">
+<font color="white"><i>what you desire,</i></font></font><font color="white"></font>
+
+530
+00:45:03,117 --> 00:45:06,245
+<font color="white"><i>our wager would become rather pointless.</i></font><font color="white"></font>
+
+531
+00:45:06,328 --> 00:45:07,871
+<font color="white"><i>So I barely managed to send her away.</i></font><font color="white"></font>
+
+532
+00:45:09,415 --> 00:45:11,041
+<font color="white">Did you sleep well through the night?</font><font color="white"></font>
+
+533
+00:45:11,125 --> 00:45:13,752
+<font color="white"><i>I shall now devote myself</i></font><font color="white">
+<font color="white"><i>to my true objective,</i></font></font><font color="white"></font>
+
+534
+00:45:13,836 --> 00:45:15,879
+<font color="white"><i>conquering the widow.</i></font><font color="white"></font>
+
+535
+00:45:17,047 --> 00:45:18,298
+<font color="white"><i>Watch and see.</i></font><font color="white"></font>
+
+536
+00:45:18,799 --> 00:45:21,260
+<font color="white"><i>I shall claim without fail</i></font><font color="white">
+<font color="white"><i>the reward you promised me,</i></font></font><font color="white"></font>
+
+537
+00:45:21,343 --> 00:45:23,387
+<font color="white"><i>the one I could never refuse.</i></font><font color="white"></font>
+
+538
+00:45:25,639 --> 00:45:26,515
+<font color="white">Let me see that.</font><font color="white"></font>
+
+539
+00:45:32,980 --> 00:45:33,981
+<font color="white">Oh, here.</font><font color="white"></font>
+
+540
+00:45:35,524 --> 00:45:39,027
+<font color="white">LIQUOR</font><font color="white"></font>
+
+541
+00:45:45,200 --> 00:45:49,204
+<font color="white">"It was only for idle amusement…"</font><font color="white"></font>
+
+542
+00:45:51,582 --> 00:45:53,542
+<font color="white">What took you so long?</font><font color="white"></font>
+
+543
+00:45:53,625 --> 00:45:57,087
+<font color="white">You rascal,</font><font color="white">
+<font color="white">since when have you ever waited for me?</font><font color="white"></font></font>
+
+544
+00:45:57,671 --> 00:46:00,299
+<font color="white">Here. Take this to the lady.</font><font color="white"></font>
+
+545
+00:46:00,382 --> 00:46:02,676
+<font color="white">She has left,</font><font color="white">
+<font color="white">and she took Eun-sil with her.</font><font color="white"></font></font>
+
+546
+00:46:05,304 --> 00:46:07,222
+<font color="white">I hear she's gone</font><font color="white">
+<font color="white">to her family home in Hwaseong.</font><font color="white"></font></font>
+
+547
+00:46:07,306 --> 00:46:08,932
+<font color="white">I wonder what happened all of a sudden.</font><font color="white"></font>
+
+548
+00:46:36,793 --> 00:46:37,794
+<font color="white">Last night,</font><font color="white"></font>
+
+549
+00:46:39,421 --> 00:46:42,549
+<font color="white">your late father appeared in my dream.</font><font color="white"></font>
+
+550
+00:46:43,967 --> 00:46:45,344
+<font color="white">He held my hand tightly</font><font color="white"></font>
+
+551
+00:46:47,221 --> 00:46:50,307
+<font color="white">and said he wished to see you.</font><font color="white"></font>
+
+552
+00:47:22,172 --> 00:47:23,298
+<font color="white">I suppose</font><font color="white"></font>
+
+553
+00:47:24,174 --> 00:47:26,385
+<font color="white">he longs for you dearly from there.</font><font color="white"></font>
+
+554
+00:47:31,557 --> 00:47:33,809
+<font color="white">Go pay a visit to your family home.</font><font color="white"></font>
+
+555
+00:49:25,087 --> 00:49:26,755
+<font color="white">Eun-sil!</font><font color="white"></font>
+
+556
+00:49:28,882 --> 00:49:29,841
+<font color="white">Eun-sil!</font><font color="white"></font>
+
+557
+00:49:32,427 --> 00:49:33,261
+<font color="white">Eun-sil!</font><font color="white"></font>
+
+558
+00:49:36,598 --> 00:49:38,433
+<font color="white">My lady!</font><font color="white"></font>
+
+559
+00:49:39,559 --> 00:49:41,144
+<font color="white">My lady!</font><font color="white"></font>
+
+560
+00:49:42,771 --> 00:49:43,897
+<font color="white">The lord has come.</font><font color="white"></font>
+
+561
+00:49:45,148 --> 00:49:46,274
+<font color="white">The lord!</font><font color="white"></font>
+
+562
+00:49:47,109 --> 00:49:48,985
+<font color="white">Lord Cho Won has come all the way here.</font><font color="white"></font>
+
+563
+00:49:54,199 --> 00:49:55,409
+<font color="white">My lady.</font><font color="white"></font>
+
+564
+00:50:17,723 --> 00:50:20,267
+<font color="white">Oh, all right.</font><font color="white"></font>
+
+565
+00:50:20,851 --> 00:50:22,644
+<font color="white">What? Come now.</font><font color="white"></font>
+
+566
+00:50:22,728 --> 00:50:23,895
+<font color="white">Why, you…</font><font color="white"></font>
+
+567
+00:50:24,563 --> 00:50:25,439
+<font color="white">Oh, there she is.</font><font color="white"></font>
+
+568
+00:50:30,444 --> 00:50:31,570
+<font color="white">Well…</font><font color="white"></font>
+
+569
+00:50:32,362 --> 00:50:35,073
+<font color="white">Did you tell the lady I was here?</font><font color="white"></font>
+
+570
+00:50:35,782 --> 00:50:36,616
+<font color="white">Yes.</font><font color="white"></font>
+
+571
+00:50:36,700 --> 00:50:40,120
+<font color="white">Right, and what did she say?</font><font color="white"></font>
+
+572
+00:50:40,203 --> 00:50:41,913
+<font color="white">She said</font><font color="white">
+<font color="white">she never wishes to see you again,</font><font color="white"></font></font>
+
+573
+00:50:43,081 --> 00:50:44,916
+<font color="white">so you are to leave.</font><font color="white"></font>
+
+574
+00:50:45,000 --> 00:50:46,460
+<font color="white">Well, that's…</font><font color="white"></font>
+
+575
+00:50:47,669 --> 00:50:48,545
+<font color="white">No, that…</font><font color="white"></font>
+
+576
+00:50:50,380 --> 00:50:51,298
+<font color="white">That cannot be right.</font><font color="white"></font>
+
+577
+00:50:52,966 --> 00:50:54,718
+<font color="white">It cannot.</font><font color="white"></font>
+
+578
+00:50:57,012 --> 00:50:58,013
+<font color="white">Go bring her.</font><font color="white"></font>
+
+579
+00:50:58,096 --> 00:50:59,556
+<font color="white">Go and tell her this.</font><font color="white"></font>
+
+580
+00:51:01,641 --> 00:51:03,310
+<font color="white">Until she agrees to see me,</font><font color="white"></font>
+
+581
+00:51:03,977 --> 00:51:04,853
+<font color="white">I shall not</font><font color="white"></font>
+
+582
+00:51:06,021 --> 00:51:08,190
+<font color="white">take a single step from this place!</font><font color="white"></font>
+
+583
+00:51:08,273 --> 00:51:10,275
+<font color="white">She chose to leave me without a word,</font><font color="white"></font>
+
+584
+00:51:10,358 --> 00:51:11,568
+<font color="white">so I too shall do as I please</font><font color="white"></font>
+
+585
+00:51:12,778 --> 00:51:14,029
+<font color="white">and wait for her here.</font><font color="white"></font>
+
+586
+00:51:14,613 --> 00:51:16,448
+<font color="white">Repeat every word exactly as I said it.</font><font color="white"></font>
+
+587
+00:51:16,531 --> 00:51:18,950
+<font color="white">My lord, please stop this and go at once.</font><font color="white"></font>
+
+588
+00:51:19,034 --> 00:51:22,621
+<font color="white">What if an elder of her family sees you?</font><font color="white"></font>
+
+589
+00:51:22,704 --> 00:51:23,789
+<font color="white">Forgive me.</font><font color="white"></font>
+
+590
+00:51:27,751 --> 00:51:29,836
+<font color="white">Hey! Go deliver my words at once!</font><font color="white"></font>
+
+591
+00:52:12,546 --> 00:52:16,174
+<font color="white">If you mean to go on like this,</font><font color="white">
+<font color="white">you may as well go see the lord outside.</font><font color="white"></font></font>
+
+592
+00:52:20,345 --> 00:52:22,097
+<font color="white">He still has not left.</font><font color="white"></font>
+
+593
+00:52:24,015 --> 00:52:26,226
+<font color="white">He may well freeze to death</font><font color="white">
+<font color="white">out there in the rain soon.</font><font color="white"></font></font>
+
+594
+00:52:40,907 --> 00:52:43,285
+<font color="white">Go back in! Go!</font><font color="white"></font>
+
+595
+00:52:43,368 --> 00:52:45,412
+<font color="white">Go! Quickly!</font><font color="white"></font>
+
+596
+00:52:54,588 --> 00:52:56,256
+<font color="white">Why did that scoundrel Cho Won</font><font color="white"></font>
+
+597
+00:52:56,756 --> 00:53:01,011
+<font color="white">have you write a letter</font><font color="white">
+<font color="white">to explain that earlier one?</font><font color="white"></font></font>
+
+598
+00:53:01,678 --> 00:53:02,846
+<font color="white">That is what I'm asking.</font><font color="white"></font>
+
+599
+00:53:02,929 --> 00:53:05,682
+<font color="white">Mother, I tell you. I truly know nothing.</font><font color="white"></font>
+
+600
+00:53:06,516 --> 00:53:09,519
+<font color="white">Lord Cho Won glared at me</font><font color="white">
+<font color="white">as though he would kill me</font><font color="white"></font></font>
+
+601
+00:53:09,603 --> 00:53:11,271
+<font color="white">and said if I did not write it at once,</font><font color="white"></font>
+
+602
+00:53:11,354 --> 00:53:13,356
+<font color="white">he would bring great disgrace</font><font color="white">
+<font color="white">upon this household.</font><font color="white"></font></font>
+
+603
+00:53:14,524 --> 00:53:19,112
+<font color="white">I only feared some misfortune</font><font color="white">
+<font color="white">might come upon you, Mother.</font><font color="white"></font></font>
+
+604
+00:53:20,447 --> 00:53:22,324
+<font color="white">That is why I did as he commanded.</font><font color="white"></font>
+
+605
+00:53:23,450 --> 00:53:25,243
+<font color="white">Think on it, Mother.</font><font color="white"></font>
+
+606
+00:53:25,785 --> 00:53:28,413
+<font color="white">He is a nobleman. To a girl like me…</font><font color="white"></font>
+
+607
+00:53:29,414 --> 00:53:32,626
+<font color="white">Yes, just as you always say,</font><font color="white"></font>
+
+608
+00:53:32,709 --> 00:53:35,170
+<font color="white">a completely witless girl.</font><font color="white"></font>
+
+609
+00:53:36,588 --> 00:53:37,923
+<font color="white">For heaven's sake.</font><font color="white"></font>
+
+610
+00:53:38,006 --> 00:53:39,799
+<font color="white">Why would he explain his reasons to me?</font><font color="white"></font>
+
+611
+00:53:41,509 --> 00:53:44,262
+<font color="white">I only did as I was told, Mother!</font><font color="white"></font>
+
+612
+00:53:44,346 --> 00:53:45,722
+<font color="white">Please believe me!</font><font color="white"></font>
+
+613
+00:53:49,059 --> 00:53:50,518
+<font color="white">Go pay So-ok a visit.</font><font color="white"></font>
+
+614
+00:53:52,062 --> 00:53:53,521
+<font color="white">So-ok? Why?</font><font color="white"></font>
+
+615
+00:53:54,189 --> 00:53:56,691
+<font color="white">That is Cho Won's cousin's house,</font><font color="white"></font>
+
+616
+00:53:56,775 --> 00:53:59,736
+<font color="white">so go there</font><font color="white">
+<font color="white">and listen for anything you can.</font><font color="white"></font></font>
+
+617
+00:53:59,819 --> 00:54:01,613
+<font color="white">I must know why that man</font><font color="white"></font>
+
+618
+00:54:01,696 --> 00:54:04,157
+<font color="white">had you do such a thing!</font><font color="white"></font>
+
+619
+00:54:06,284 --> 00:54:08,078
+<font color="white">Even for but a moment,</font><font color="white"></font>
+
+620
+00:54:09,829 --> 00:54:12,582
+<font color="white">would you let me see your face?</font><font color="white"></font>
+
+621
+00:54:15,502 --> 00:54:17,003
+<font color="white">I shall wait here!</font><font color="white"></font>
+
+622
+00:54:39,192 --> 00:54:40,860
+<font color="white">My heart is here with you…</font><font color="white"></font>
+
+623
+00:54:45,073 --> 00:54:46,616
+<font color="white">yet I cannot show it.</font><font color="white"></font>
+
+624
+00:55:04,843 --> 00:55:06,302
+<font color="white">Hey, Chil-seong!</font><font color="white"></font>
+
+625
+00:55:06,386 --> 00:55:07,220
+<font color="white">The letter!</font><font color="white"></font>
+
+626
+00:55:13,643 --> 00:55:14,561
+<font color="white">Eun-sil.</font><font color="white"></font>
+
+627
+00:55:16,479 --> 00:55:17,480
+<font color="white">Where is the lady?</font><font color="white"></font>
+
+628
+00:55:34,581 --> 00:55:35,874
+<font color="white">The night grows cold.</font><font color="white"></font>
+
+629
+00:55:38,626 --> 00:55:40,545
+<font color="white">You should return now, my lord.</font><font color="white"></font>
+
+630
+00:55:47,093 --> 00:55:48,386
+<font color="white">Are you all right?</font><font color="white"></font>
+
+631
+00:55:53,349 --> 00:55:56,853
+<font color="white">Will you accept this letter?</font><font color="white"></font>
+
+632
+00:56:02,650 --> 00:56:05,403
+<font color="white">That is all I ask.</font><font color="white"></font>
+
+633
+00:56:07,655 --> 00:56:08,865
+<font color="white">Within this letter…</font><font color="white"></font>
+
+634
+00:56:11,743 --> 00:56:13,286
+<font color="white">lies my true heart.</font><font color="white"></font>
+
+635
+00:56:15,288 --> 00:56:17,665
+<font color="white">It is proof that my feelings</font><font color="white">
+<font color="white">are no falsehood.</font><font color="white"></font></font>
+
+636
+00:56:19,542 --> 00:56:22,879
+<font color="white">I… I cannot leave like this.</font><font color="white"></font>
+
+637
+00:56:24,964 --> 00:56:26,883
+<font color="white">I wish to clear away</font><font color="white">
+<font color="white">your misunderstanding of me.</font><font color="white"></font></font>
+
+638
+00:56:27,383 --> 00:56:28,510
+<font color="white">So please…</font><font color="white"></font>
+
+639
+00:56:30,303 --> 00:56:32,097
+<font color="white">Oh, please,</font><font color="white"></font>
+
+640
+00:56:33,556 --> 00:56:35,433
+<font color="white">will you accept this letter?</font><font color="white"></font>
+
+641
+00:56:47,195 --> 00:56:48,988
+<font color="white">I believed your heart answered mine.</font><font color="white"></font>
+
+642
+00:56:51,908 --> 00:56:53,034
+<font color="white">Your heart and mine</font><font color="white"></font>
+
+643
+00:56:54,953 --> 00:56:57,664
+<font color="white">both desire one another, do they not?</font><font color="white"></font>
+
+644
+00:56:58,164 --> 00:56:59,040
+<font color="white">And yet,</font><font color="white"></font>
+
+645
+00:56:59,791 --> 00:57:01,793
+<font color="white">you will not let me do anything.</font><font color="white"></font>
+
+646
+00:57:01,876 --> 00:57:03,503
+<font color="white">What am I to do?</font><font color="white"></font>
+
+647
+00:57:08,174 --> 00:57:09,092
+<font color="white">Why…</font><font color="white"></font>
+
+648
+00:57:12,387 --> 00:57:14,597
+<font color="white">Why did you appear before me?</font><font color="white"></font>
+
+649
+00:57:16,266 --> 00:57:19,769
+<font color="white">Why appear before this wretched creature</font><font color="white">
+<font color="white">who would otherwise have lived peacefully…</font><font color="white"></font></font>
+
+650
+00:57:22,856 --> 00:57:23,940
+<font color="white">only to leave me…</font><font color="white"></font>
+
+651
+00:57:26,693 --> 00:57:28,278
+<font color="white">longing for you so?</font><font color="white"></font>
+
+652
+00:58:00,643 --> 00:58:01,644
+<font color="white">I…</font><font color="white"></font>
+
+653
+00:58:06,941 --> 00:58:09,194
+<font color="white">wish to live, my lord.</font><font color="white"></font>
+
+654
+00:58:32,926 --> 00:58:33,760
+<font color="white">Then I…</font><font color="white"></font>
+
+655
+00:58:37,972 --> 00:58:39,140
+<font color="white">I shall…</font><font color="white"></font>
+
+656
+00:58:43,311 --> 00:58:44,479
+<font color="white">save you.</font><font color="white"></font>
+
+657
+00:58:48,566 --> 00:58:49,484
+<font color="white">I shall save you…</font><font color="white"></font>
+
+658
+00:58:53,112 --> 00:58:54,405
+<font color="white">no matter what.</font><font color="white"></font>
+
+659
+01:02:33,166 --> 01:02:38,171
+<font color="white">Subtitle translation by: Yoonjung Song</font><font color="white"></font>
+
