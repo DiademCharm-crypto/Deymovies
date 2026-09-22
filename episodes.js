@@ -1,6 +1,7 @@
 // ==========================================
 // DEYMFLIX - TV Series & Episodes Handler
-// ==========================================
+// (Filipino/English series. K-Drama series → kdrama-episode.js)
+ // ==========================================
 
 const seriesData = [
   {
@@ -15,32 +16,32 @@ const seriesData = [
           {
             episodeNumber: 1,
             title: "Episode 1 - The Estranged Girl",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E01.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E01.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           },
           {
             episodeNumber: 2,
             title: "Episode 2 - Meet the Others",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E02.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E02.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           },
           {
             episodeNumber: 3,
             title: "Episode 3 - Paint Me Closer",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E03.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E03.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           },
           {
             episodeNumber: 4,
             title: "Episode 4 - Can't Stay Away",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E04.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E04.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           },
           {
             episodeNumber: 5,
             title: "Episode 5 - The Original One",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E05.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E05.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           },
           {
             episodeNumber: 6,
             title: "Episode 6 - Clingy Past",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E06.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
+            embedUrl: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E06.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv"
           }
         ]
       }
@@ -58,47 +59,49 @@ const seriesData = [
           {
             episodeNumber: 1,
             title: "Episode 1 - The Catch",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 2,
             title: "Episode 2 - The Hateful Eight",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e02.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e02.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 3,
             title: "Episode 3 - Flight Crew",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e03.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e03.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 4,
             title: "Episode 4 - True Rowmance",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e04.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e04.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 5,
             title: "Episode 5 - Anatomy of a Fall Formal",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e05.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e05.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 6,
             title: "Episode 6 - Bad Break",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e06.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e06.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 7,
             title: "Episode 7 - Under Pressure",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e07.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e07.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           },
           {
             episodeNumber: 8,
             title: "Episode 8 - O Coxswain, My Coxswain",
-            embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e08.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
+            embedUrl: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e08.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4"
           }
         ]
       }
     ]
-  }
+  },
+  // NOTE: K-Drama series episodes live in kdrama-episode.js now.
+  // This file is for non-K-Drama series only (Filipino/English).
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -111,7 +114,10 @@ function initSeriesEpisodes() {
 
   if (!currentId) return;
 
-  const currentSeries = seriesData.find(s => s.id === currentId);
+  // Tolerant id match: URLs treat '+' as a space, so "The+Scandal" arrives as
+  // "The Scandal". Compare normalized forms so both spellings resolve.
+  const normId = v => String(v || '').toLowerCase().replace(/[\s\+]+/g, '-');
+  const currentSeries = seriesData.find(s => s.id === currentId || normId(s.id) === normId(currentId));
   if (!currentSeries || !currentSeries.seasons || currentSeries.seasons.length === 0) return;
 
   injectEpisodesUI(currentSeries);
@@ -299,6 +305,12 @@ function playEpisodeSource(episode, season) {
   } catch(e) {}
 
   if (typeof currentMovie !== 'undefined') {
+    currentMovie.manualEmbed = episode.embedUrl;
+    if (episode.hlsUrl) {
+      currentMovie._episodeHlsUrl = episode.hlsUrl;
+    } else {
+      delete currentMovie._episodeHlsUrl;
+    }
     currentMovie.manualEmbed = episode.embedUrl;
     currentMovie._episodeId = currentMovie.id + '-ep' + (episode.episodeNumber || '');
     currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + episode.episodeNumber);

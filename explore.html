@@ -8,7 +8,7 @@
   <title>DEYMFLIX - Explore</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <link rel="stylesheet" href="style.css?v=159.5">
+  <link rel="stylesheet" href="style.css?v=159.6">
   <style>
     body { padding-top: 80px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important; }
 
@@ -197,6 +197,7 @@
   <div class="explore-tabs" id="explore-tabs">
     <button class="explore-tab active" data-tab="movies" onclick="switchExploreTab('movies')">🎬 Movies</button>
     <button class="explore-tab" data-tab="tagalog" onclick="switchExploreTab('tagalog')">🇵🇭 Tagalog</button>
+    <button class="explore-tab" data-tab="kdrama" onclick="switchExploreTab('kdrama')">🇰🇷 K-Drama</button>
     <button class="explore-tab" data-tab="reels" onclick="switchExploreTab('reels')">🎞️ Reels</button>
   </div>
 
@@ -249,9 +250,10 @@
 
   <script src="config.js?v=2.0"></script>
   <script src="security.js?v=2.1"></script>
-  <script src="reels-data.js?v=151.0"></script>
-    <script src="filipino-movies.js?v=1.1"></script>
-  <script src="app.js?v=158.6"></script>
+  <script src="reels-data.js?v=151.2"></script>
+    <script src="filipino-movies.js?v=1.3"></script>
+    <script src="kdramas.js?v=1.0"></script>
+  <script src="app.js?v=159.2"></script>
   <script>
     let exploreActiveTab = 'movies';
     let exploreSearchQuery = '';
@@ -261,11 +263,12 @@
       const movieList = typeof movies !== 'undefined' ? movies : [];
       const reelsList = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
 
-      const allMovies = movieList.filter(m => !m.isSeries && !m.isFilipino);
+      const allMovies = movieList.filter(m => !m.isSeries && !m.isFilipino && !m.isKdrama);
       const tagalogMovies = movieList.filter(m => m.isFilipino);
+      const kdramaSeries = movieList.filter(m => m.isKdrama);
       const reels = reelsList;
 
-      return { allMovies, tagalogMovies, reels };
+      return { allMovies, tagalogMovies, kdramaSeries, reels };
     }
 
     // ── SEARCH ──
@@ -305,13 +308,14 @@
     // ── RENDER ──
     function renderExploreContent() {
       const container = document.getElementById('explore-content');
-      const { allMovies, tagalogMovies, reels } = getCategorizedContent();
+      const { allMovies, tagalogMovies, kdramaSeries, reels } = getCategorizedContent();
 
       // When searching, search across ALL categories and show combined results
       if (exploreSearchQuery) {
         const allItems = [
           ...allMovies.map(m => ({ ...m, _type: 'movie' })),
           ...tagalogMovies.map(m => ({ ...m, _type: 'tagalog' })),
+          ...kdramaSeries.map(m => ({ ...m, _type: 'kdrama' })),
           ...reels.map(r => ({ ...r, _type: 'reel' }))
         ];
         const results = filterBySearch(allItems, exploreSearchQuery);
@@ -341,6 +345,12 @@
           emptyIcon = '🇵🇭';
           emptyText = 'No Tagalog movies yet.<br>Add Filipino movies with isFilipino: true.';
           break;
+        case 'kdrama':
+          items = kdramaSeries;
+          badgeType = '🇰🇷';
+          emptyIcon = '🇰🇷';
+          emptyText = 'No K-Dramas yet.<br>Add Korean series to kdramas.js with isKdrama: true.';
+          break;
         case 'reels':
           items = reels;
           badgeType = '';
@@ -354,7 +364,7 @@
         return;
       }
 
-      const type = exploreActiveTab === 'reels' ? 'reel' : (exploreActiveTab === 'tagalog' ? 'tagalog' : 'movie');
+      const type = exploreActiveTab === 'reels' ? 'reel' : (exploreActiveTab === 'tagalog' ? 'tagalog' : (exploreActiveTab === 'kdrama' ? 'kdrama' : 'movie'));
       container.innerHTML = `<div class="explore-grid">${items.map(item => renderExploreCard(item, type)).join('')}</div>`;
     }
 
@@ -397,9 +407,9 @@
 
     // ── UPDATE TAB COUNTS ──
     function updateTabCounts() {
-      const { allMovies, tagalogMovies, reels } = getCategorizedContent();
+      const { allMovies, tagalogMovies, kdramaSeries, reels } = getCategorizedContent();
       const tabs = document.querySelectorAll('.explore-tab');
-      const counts = { movies: allMovies.length, tagalog: tagalogMovies.length, reels: reels.length };
+      const counts = { movies: allMovies.length, tagalog: tagalogMovies.length, kdrama: kdramaSeries.length, reels: reels.length };
       tabs.forEach(tab => {
         const key = tab.dataset.tab;
         const count = counts[key] || 0;

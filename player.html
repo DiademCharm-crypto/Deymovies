@@ -15,7 +15,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=159.5">
+  <link rel="stylesheet" href="style.css?v=159.6">
 
   <style>
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
@@ -287,6 +287,52 @@
       pointer-events: auto !important;
     }
 
+    /* ── Episode title overlays (PC + series only) ──
+       Both live inside #player-gesture-overlay so they fade in/out with the controls. */
+    .pc-ep-title-bottom {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      max-width: 44% !important;
+      font-size: 0.9rem !important;
+      font-weight: 600 !important;
+      color: rgba(255, 255, 255, 0.92) !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      pointer-events: none !important;
+      z-index: 25 !important;
+      display: none;
+      text-align: center;
+    }
+    .pc-ep-title-bottom.show { display: block !important; }
+    .pc-ep-num-top {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      max-width: 30% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      font-size: 0.85rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.5px !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+      pointer-events: none !important;
+      z-index: 25 !important;
+      display: none;
+    }
+    .pc-ep-num-top.show { display: block !important; }
+    @media (max-width: 768px) {
+      /* Doubled classes: must out-rank .pc-ep-title-bottom.show / .pc-ep-num-top.show */
+      .pc-ep-title-bottom.pc-ep-title-bottom,
+      .pc-ep-num-top.pc-ep-num-top { display: none !important; }
+    }
+
     .player-top-bar {
       display: flex !important;
       align-items: center !important;
@@ -294,13 +340,22 @@
       padding: 16px 20px !important;
       color: #ffffff !important;
       align-self: flex-start !important;
-      width: fit-content !important;
+      width: 100% !important;
       max-width: 100% !important;
       box-sizing: border-box !important;
       z-index: 30 !important;
       cursor: pointer !important;
+      position: relative !important;
+      /* Full-width bar so the centered episode label anchors to the video —
+         clicks only register on the back button / title, not the empty strip. */
+      pointer-events: none !important;
       -webkit-user-select: none !important;
       user-select: none !important;
+    }
+
+    .player-top-bar .icon-btn-back,
+    .player-top-bar .overlay-title-text {
+      pointer-events: auto !important;
     }
 
     .icon-btn-back {
@@ -432,6 +487,7 @@
       justify-content: space-between !important;
       color: #ffffff !important;
       width: 100% !important;
+      position: relative !important;
     }
 
     .left-controls-group {
@@ -468,6 +524,10 @@
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
+    }
+    /* Wins over the !important flex above so JS can actually hide these buttons */
+    .ctrl-btn-small.force-hidden {
+      display: none !important;
     }
 
     .ctrl-btn-small svg,
@@ -2324,14 +2384,14 @@
     <div id="iframe-ad-shield" class="ultimate-ad-shield" onclick="absorbAdClicks(event)" style="display: none;"></div>
 
     <!-- Speed Up Floating Badge -->
-    <div id="speed-badge" class="loklok-speed-badge">2.0x Speed</div>
-
-    <div id="player-gesture-overlay" class="player-overlay active">
-      <!-- TOP-LEFT BACK HEADER -->
-      <div class="player-top-bar" onclick="forceBackToHome()">
-        <button id="btn-back-nav" class="icon-btn-back">❮</button>
-        <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
-      </div>
+    <div id="speed-badge" class="loklok-speed-badge">2.0x Speed</div>      <div id="player-gesture-overlay" class="player-overlay active">
+        <!-- TOP-LEFT BACK HEADER -->
+        <div class="player-top-bar" onclick="forceBackToHome()">
+          <button id="btn-back-nav" class="icon-btn-back">❮</button>
+          <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
+          <!-- PC/SERIES: episode number, centered on the same line as the title -->
+          <div id="pc-ep-num-top" class="pc-ep-num-top"></div>
+        </div>
 
       <div id="brightness-slider-container" class="vertical-slider-bar left-bar">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
@@ -2433,6 +2493,8 @@
               </svg>
             </button>
           </div>
+          <!-- PC/SERIES: episode name, centered on the same line as the time display -->
+          <div id="pc-ep-title-bottom" class="pc-ep-title-bottom"></div>
         </div>
       </div>
 
@@ -2756,10 +2818,13 @@
       catch (e) { return ''; }
     })();
   </script>
-  <script src="security.js?v=2.1"></script>
-    <script src="filipino-movies.js?v=1.1"></script>
-  <script src="app.js?v=158.6"></script>
-  <script src="episodes.js?v=1.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
+<script src="security.js?v=2.1"></script>
+    <script src="filipino-movies.js?v=1.3"></script>
+    <script src="kdramas.js?v=1.0"></script>
+  <script src="app.js?v=159.2"></script>
+  <script src="episodes.js?v=1.5"></script>
+  <script src="kdrama-episode.js?v=1.0"></script>
   <script>
     function destroyAllPlayers() {
       window.onbeforeunload = null;
@@ -5076,7 +5141,7 @@
                 ordered[1].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (Tagalog)', 'tl');
             } catch (e) {}
           }
-          showToast('Subtitles loaded: ' + ordered[0].replace(/\.(srt|vtt|ass|ssa)$/i, '') + ' (my subtitles)');
+          // Auto-load is silent by design — no toast on page open.
           return true;
         }
       } catch (e) { /* fall through to guesses */ }
@@ -5114,7 +5179,7 @@
                 const isTag = /phsub/i.test(g);
                 const label = (m._episodeNum ? (m.title + ' ep' + m._episodeNum) : m.title) + (isTag ? ' (Tagalog)' : ' (English)');
                 enableSubtitleTrack(srtToVtt(txt, subtitleOffsetMs), label, isTag ? 'tl' : 'en', txt);
-                showToast('Subtitles loaded: ' + decodeURIComponent(g).replace('subtitles/', '') + ' (my subtitles)');
+                // Auto-load is silent by design — no toast on page open.
                 return true;
               }
             }
@@ -5234,8 +5299,115 @@
     let previousQualityIndex = 0;
     let isQualitySwitch = false;
 
+    // ============ Bunny Stream / HLS support ============
+    // A movie/episode provides hlsUrl (Bunny Stream playlist). When present it
+    // replaces the direct file: adaptive quality on every browser, native on
+    // iOS/Safari (no library), hls.js elsewhere. Fallback URL = original file.
+    let hlsActive = false;          // is the current source an HLS playlist?
+    let hlsUrlCurrent = '';
+    let hlsDirectFallback = '';
+
+    function isHlsSupportedNatively() {
+      const v = document.createElement('video');
+      return !!(v.canPlayType('application/vnd.apple.mpegurl') ||
+                v.canPlayType('application/x-mpegURL'));
+    }
+
+    function stopHls() {
+      try {
+        if (window.hls && window.hls.destroy) { window.hls.destroy(); }
+      } catch (e) {}
+      window.hls = null;
+      hlsActive = false;
+      hlsUrlCurrent = '';
+    }
+
+    function hlsLevels() {
+      if (!window.hls) return [];
+      return (window.hls.levels || []).map((l, i) => ({
+        index: i,
+        height: l.height || 0,
+        label: (l.height ? l.height + 'p' : (l.bitrate ? Math.round(l.bitrate / 1000) + ' kbps' : 'Level ' + i))
+      }));
+    }
+
+    // Attach playlist to directPlayer. Returns true when HLS is in charge.
+    function attachHls(playlistUrl, directUrl) {
+      if (!playlistUrl || typeof playlistUrl !== 'string' || playlistUrl.trim() === '') return false;
+      stopHls();
+      hlsUrlCurrent = playlistUrl.trim();
+      hlsDirectFallback = directUrl || '';
+
+      if (isHlsSupportedNatively()) {
+        // iOS / Safari: the video element handles HLS natively (and prefers it)
+        hlsActive = true;
+        return true;
+      }
+
+      if (!window.Hls || !window.Hls.isSupported()) {
+        // No MSE and no native HLS: keep direct file if we have one
+        hlsDirectFallback = hlsDirectFallback || hlsUrlCurrent;
+        hlsActive = false;
+        return false;
+      }
+
+      window.hls = new Hls({
+        maxBufferLength: 30,
+        backBufferLength: 30,
+        capLevelToPlayerSize: true,
+        startLevel: -1
+      });
+      window.hls.loadSource(hlsUrlCurrent);
+      window.hls.attachMedia(directPlayer);
+      window.hls.on(Hls.Events.ERROR, function (_evt, data) {
+        if (!data || !data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          // Origin/CDN hiccup: try to recover once, else fall back
+          if (hlsDirectFallback) { playHlsFallback(); }
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          try { window.hls.recoverMediaError(); } catch (e) { if (hlsDirectFallback) playHlsFallback(); }
+        } else {
+          if (hlsDirectFallback) playHlsFallback();
+        }
+      });
+      hlsActive = true;
+      return true;
+    }
+
+    function playHlsFallback() {
+      const t = directPlayer.currentTime, wasPlaying = !directPlayer.paused;
+      stopHls();
+      if (hlsDirectFallback) {
+        directPlayer.src = hlsDirectFallback;
+        directPlayer.load();
+        try { directPlayer.currentTime = t; } catch (e) {}
+        if (wasPlaying) directPlayer.play().catch(function () {});
+      }
+    }
+
+    function resetDirectPlayerForNewSource() {
+      stopHls();
+      try {
+        directPlayer.pause();
+        directPlayer.removeAttribute('src');
+        directPlayer.load();
+      } catch (e) {}
+    }
+
     function buildQualityOptions() {
       const opts = [];
+      if (hlsActive && window.hls) {
+        const levels = hlsLevels();
+        if (levels.length > 1) {
+          opts.push({ label: 'Auto', hlsLevel: -1, hint: 'Adapts to your internet' });
+          levels.slice().reverse().forEach(l => {
+            opts.push({ label: l.label, hlsLevel: l.index, hint: '' });
+          });
+        } else {
+          opts.push({ label: 'Auto (Best)', url: hlsUrlCurrent, hint: 'Best available quality' });
+        }
+        return opts;
+      }
       const url = currentMovie.manualEmbed || currentMovie.trailerEmbed;
       if (url && typeof url === 'string' && url.trim() !== '') {
         opts.push({ label: 'Auto (Best)', url: url, hint: 'Best available quality' });
@@ -5321,6 +5493,13 @@
       activeQualityIndex = index;
       applyQualitySelection();
       renderQualityMenu();
+
+      // HLS rendition switch: instant, no reload
+      if (hlsActive && window.hls && typeof opt.hlsLevel === 'number') {
+        window.hls.currentLevel = opt.hlsLevel;
+        closeSettingsPanel();
+        return;
+      }
 
       isQualitySwitch = true;
       showLoadingSpinner();
@@ -5774,6 +5953,49 @@
     let nextEpTimer = null;
     let nextEpShown = false;
 
+    // ── Episode title overlays (PC, series only) ──
+    // Top-center: "Episode N" (or "S2 E3" for multi-season). Bottom-center: episode
+    // name only ("The Fateful Proposition"), stripped of the "Series - Episode N - "
+    // prefixes so it never overflows. Movies and trailer mode hide both.
+    function updateEpisodeTitleOverlay() {
+      const bot = document.getElementById('pc-ep-title-bottom');
+      const top = document.getElementById('pc-ep-num-top');
+      if (!bot || !top) return;
+      const m = (typeof currentMovie !== 'undefined') ? currentMovie : null;
+      const isTrailer = (typeof playerMode !== 'undefined' && playerMode === 'trailer');
+      let name = '', epTop = '', raw = '';
+      if (m && !isTrailer && (m.isSeries || m._episodeNum)) {
+        if (m._episodeNum) {
+          epTop = (m._episodeSeason && m._episodeSeason > 1)
+            ? ('S' + m._episodeSeason + ' E' + m._episodeNum)
+            : ('Episode ' + m._episodeNum);
+          raw = m._episodeTitle || m._episodeName || '';
+        } else if (m.isSeries) {
+          // Initial series load plays episode 1 by default — resolve its title
+          // from seriesData (episodes.js + kdrama-episode.js merged array).
+          try {
+            if (typeof seriesData !== 'undefined' && Array.isArray(seriesData)) {
+              const normId = v => String(v || '').toLowerCase().replace(/[\s\+]+/g, '-');
+              const series = seriesData.find(s => s.id === m.id || normId(s.id) === normId(m.id));
+              const ep1 = series && series.seasons && series.seasons[0] && series.seasons[0].episodes && series.seasons[0].episodes[0];
+              if (ep1) { epTop = 'Episode ' + (ep1.episodeNumber || 1); raw = ep1.title || ''; }
+              else epTop = 'Episode 1';
+            } else epTop = 'Episode 1';
+          } catch (e) { epTop = 'Episode 1'; }
+        }
+        if (raw) {
+          const parts = String(raw).split(' - ');
+          if (parts.length >= 3) name = parts.slice(2).join(' - ');
+          else if (parts.length === 2 && /^episode\s*\d+$/i.test(parts[0])) name = parts[1];
+          else name = String(raw).replace(m.title || '', '').replace(/^\s*-\s*/, '');
+        }
+      }
+      bot.textContent = name;
+      bot.classList.toggle('show', !!name);
+      top.textContent = epTop;
+      top.classList.toggle('show', !!epTop);
+    }
+
     function loadEmbed() {
       startSlowConnectionCheck();
       if (typeof updateTrailerBtn === 'function') updateTrailerBtn();
@@ -5792,6 +6014,7 @@
       nextEpShown = false;
       hideNextEpisodeButton();
       updateNextEpisodeBtn();
+      updateEpisodeTitleOverlay();
 
       let rawUrl = '';
       if (playerMode === 'trailer' && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '') {
@@ -5828,15 +6051,28 @@
         playerOverlay.style.display = 'flex';
 
         // Codec preflight: avoid silent black screens for HEVC/AV1 files
-        const unsupportedCodec = detectUnsupportedCodec(targetUrl);
-        let forcePlay = false;
-        try { forcePlay = !!sessionStorage.getItem('dfx_force_play_' + (currentMovie && currentMovie.id || '')); } catch (e) {}
-        if (unsupportedCodec && !forcePlay) {
-          showUnsupportedCodecScreen(unsupportedCodec, targetUrl);
-          return;
+        // Bunny Stream: prefer the HLS playlist when the title has one
+        const hlsUrl = currentMovie.hlsUrl || (currentMovie._episodeHlsUrl || '');
+        if (hlsUrl && hlsUrl.trim() !== '') {
+          resetDirectPlayerForNewSource();
+          attachHls(hlsUrl, targetUrl);
+          // Nudge hls.js to build its level list, then rebuild the menu
+          if (window.hls) {
+            window.hls.on(Hls.Events.MANIFEST_PARSED, function () {
+              setupQualityControl();
+            });
+          }
+        } else {
+          const unsupportedCodec = detectUnsupportedCodec(targetUrl);
+          let forcePlay = false;
+          try { forcePlay = !!sessionStorage.getItem('dfx_force_play_' + (currentMovie && currentMovie.id || '')); } catch (e) {}
+          if (unsupportedCodec && !forcePlay) {
+            showUnsupportedCodecScreen(unsupportedCodec, targetUrl);
+            return;
+          }
         }
 
-        directPlayer.src = targetUrl;
+        if (!hlsActive) directPlayer.src = targetUrl;
         startBlackScreenWatch(targetUrl);
 
         attemptAutoUnmute();
@@ -6562,7 +6798,9 @@
       // treat that as episode 1 so auto-advance works from the very first watch.
       const epNum = currentMovie._episodeNum || (currentMovie.isSeries ? 1 : null);
       if (!epNum) return null;
-      const series = seriesData.find(s => s.id === currentMovie.id);
+      // Tolerant id match (URLs turn '+' into spaces: "The+Scandal" ↔ "The Scandal")
+      const normSeriesId = v => String(v || '').toLowerCase().replace(/[\s\+]+/g, '-');
+      const series = seriesData.find(s => s.id === currentMovie.id || normSeriesId(s.id) === normSeriesId(currentMovie.id));
       if (!series || !series.seasons) return null;
       const curSeasonIdx = series.seasons.findIndex(s => s.seasonNumber === (currentMovie._episodeSeason || 1));
       if (curSeasonIdx === -1) return null;
@@ -6597,6 +6835,11 @@
       btns.forEach(b => {
         if (b.textContent.trim() === String(nxt.episode.episodeNumber)) b.classList.add('active');
       });
+      if (nxt.episode && nxt.episode.hlsUrl) {
+        currentMovie._episodeHlsUrl = nxt.episode.hlsUrl;
+      } else {
+        delete currentMovie._episodeHlsUrl;
+      }
       if (typeof playEpisodeSource === 'function') playEpisodeSource(nxt.episode, nxt.season);
     }
 
@@ -6662,8 +6905,10 @@
     function updateNextEpisodeBtn() {
       const btn = document.getElementById('btn-next-episode-inline');
       if (!btn) return;
+      // NOTE: .ctrl-btn-small uses display:flex !important, so inline
+      // style.display can't hide it — toggle the .force-hidden class instead.
       const isSeries = !!(currentMovie && (currentMovie.isSeries || currentMovie._episodeNum));
-      btn.style.display = (isSeries && getNextEpisodeInfo()) ? '' : 'none';
+      btn.classList.toggle('force-hidden', !(isSeries && getNextEpisodeInfo()));
     }
     directPlayer.addEventListener('loadedmetadata', updateNextEpisodeBtn);
     directPlayer.addEventListener('emptied', updateNextEpisodeBtn);

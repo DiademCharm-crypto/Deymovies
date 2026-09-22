@@ -12,7 +12,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=159.5">
+  <link rel="stylesheet" href="style.css?v=159.6">
 
   <!-- Firebase for online counter -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -66,7 +66,16 @@
       <div class="top-picks-scroll" id="top-picks-container"></div>
     </section>
 
-    <!-- 2. AI Reels Section -->
+    <!-- 2. K-Drama Row -->
+    <section class="content-section">
+      <div class="section-header-flex">
+        <h2 class="section-header-title">K-Drama</h2>
+        <a href="category.html?type=kdrama" class="see-all-link">View All ❯</a>
+      </div>
+      <div class="horizontal-scroll" id="kdrama-container"></div>
+    </section>
+
+    <!-- 3. AI Reels Section -->
     <section class="content-section">
       <div class="section-header-flex">
         <h2 class="section-header-title">AI Reels & Shorts</h2>
@@ -75,7 +84,7 @@
       <div class="reels-horizontal-scroll" id="ai-reels-container"></div>
     </section>
 
-    <!-- 3. Tagalog Movies Row -->
+    <!-- 4. Tagalog Movies Row -->
     <section class="content-section">
       <div class="section-header-flex">
         <h2 class="section-header-title">Tagalog Movies PH</h2>
@@ -187,9 +196,12 @@
 
   <script src="config.js?v=2.0"></script>
   <script src="security.js?v=2.1"></script>
-  <script src="reels-data.js?v=151.0"></script>
-    <script src="filipino-movies.js?v=1.1"></script>
-  <script src="app.js?v=158.6"></script>
+  <script src="reels-data.js?v=151.2"></script>
+    <script src="filipino-movies.js?v=1.3"></script>
+    <script src="kdramas.js?v=1.0"></script>
+    <script src="episodes.js?v=1.5"></script>
+    <script src="kdrama-episode.js?v=1.0"></script>
+  <script src="app.js?v=159.2"></script>
 
   <!-- Live Online Counter -->
   <script>

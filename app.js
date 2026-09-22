@@ -43,7 +43,7 @@ const featuredMovies = [
     title: "Moana: Live Action",
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
     trailerEmbed: "",
     isSeries: false
   },
@@ -53,7 +53,7 @@ const featuredMovies = [
     title: "Toy Story 5", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "",
     isSeries: false
   },
@@ -63,7 +63,7 @@ const featuredMovies = [
     title: "The Runner", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg", 
     backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "",
     isSeries: false
   }
@@ -75,7 +75,7 @@ const movies = [
     imdbId: "tt34564059",
     title: "The Runner", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=zz4rsZLcauY",
     isSeries: false
   },
@@ -85,7 +85,7 @@ const movies = [
     imdbId: "tt27419466",
     title: "Moana: Live Action", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=n7f6hlKsxxo",
     isSeries: false
   },
@@ -94,7 +94,7 @@ const movies = [
     imdbId: "tt38218082",
     title: "Crew Girl", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tzf21i1ETZEu7i787ED3WThROH.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/English+Series/Crew+Girl/Crew.Girl.S01e01.720P.Hevc.X265-Megusta%5BEztvx.To%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=Xs5qsfqp-tA",
     isSeries: true
   },
@@ -102,7 +102,7 @@ const movies = [
     id: "Love-U-Lots", 
     title: "Love U Lots", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/qOjY3XE4C4prKGmFyJaPxANrhxI.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E01.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Love+U+Lots/Love.U.Lots.(2026).VONE.S01E01.1080p.WEB-DL.AAC2.0.x264-DarkRip.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=xUcVh_3IUi4",
     isSeries: true,
     isFilipino: true
@@ -117,6 +117,7 @@ const movies = [
     isSeries: false
   },
   ...((typeof filipinoMovieData !== "undefined") ? filipinoMovieData : []),
+  ...((typeof kdramaData !== "undefined") ? kdramaData : []),
   { 
     id: "The Odyssey", 
     imdbId: "tt33764258", 
@@ -141,7 +142,7 @@ const movies = [
     imdbId: "tt32338669",
     title: "Mutiny", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/pu2VxGlpGwffOx292w18b1tv96j.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Mutiny.2026.1080p.WEBRip.10Bit.DDP5.1.x265-NeoNoir.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Mutiny.2026.1080p.WEBRip.10Bit.DDP5.1.x265-NeoNoir.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=FKSdXH89jbo",
     isSeries: false
   },
@@ -150,7 +151,7 @@ const movies = [
     imdbId: "tt37654096",
     title: "The Last Sunrise", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The.Last.Sunrise.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The.Last.Sunrise.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=NhI2UpkFAFw",
     isSeries: false
   },
@@ -159,7 +160,7 @@ const movies = [
     imdbId: "tt39390497",
     title: "Facing El Chapo", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/Facing.El.Chapo.2026.1080p.NF.WEB-DL.Multi.AAC5.1.AV1-4kHdHub.Com.mkv",
+    manualEmbed: "https://deymflix-media.b-cdn.net/movie+1/Facing.El.Chapo.2026.1080p.NF.WEB-DL.Multi.AAC5.1.AV1-4kHdHub.Com.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=cCBC4HX4XqE",
     isSeries: false
   },
@@ -177,7 +178,7 @@ const movies = [
     imdbId: "tt32890033",
     title: "Minions & Monsters", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/4LwvU9SZc8QQzW1X1FAPhNbXnEU.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Minions.and.Monsters.2026.1080p.10bit.WEBRip.6CH.x265-PSA.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Minions.and.Monsters.2026.1080p.10bit.WEBRip.6CH.x265-PSA.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=ZSdOwt-G49w",
     isSeries: false
   },
@@ -186,7 +187,7 @@ const movies = [
     imdbId: "tt37287335",
     title: "Obsession", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Obsession.2026.1080p.WEBRip.x264.AAC5.1-LAMA.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=gMC8kkwbIQQ",
     isSeries: false
   },
@@ -204,7 +205,7 @@ const movies = [
     imdbId: "tt29355505",
     title: "Toy Story 5", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=c51ND9Hdbw0",
     isSeries: false
   },
@@ -213,7 +214,7 @@ const movies = [
     imdbId: "tt30887701",
     title: "Pinocchio: Unstrung", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eUJXk3bTvLBi5Zcb0BCedZU7lVL.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Pinocchio.Unstrung.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Pinocchio.Unstrung.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=uApioBmGpAc",
     isSeries: false
   },
@@ -222,7 +223,7 @@ const movies = [
     imdbId: "tt1756855",
     title: "Coyote vs. Acme", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vhv7lBWYM0DUuNU2a0V7Rhq21dD.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Coyote.vs.Acme.2026.1080p.DCP.DDP5.1.H264-AOC.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Coyote.vs.Acme.2026.1080p.DCP.DDP5.1.H264-AOC.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=H-43VeYGiPM",
     isSeries: false
   },
@@ -231,7 +232,7 @@ const movies = [
     imdbId: "tt34385135",
     title: "Colony", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Colony%202026%201080p%20WebRip%20Opus%202%200%20x265-Lootera.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Colony%202026%201080p%20WebRip%20Opus%202%200%20x265-Lootera.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=Je122ZNo6uw",
     isSeries: false
   },
@@ -240,7 +241,7 @@ const movies = [
     imdbId: "tt9000310",
     title: "Ghost in the Cell", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Ghost.In.The.Cell.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Ghost.In.The.Cell.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=_gxKcg8_pGc",
     isSeries: false
   },
@@ -249,7 +250,7 @@ const movies = [
     imdbId: "tt37275992",
     title: "The Secret Woman", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The%20Secret%20Woman%202026%201080p%20NF%20WEB-DL%20DUAL%20DDP5%201%20H%20264-FLUX.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The%20Secret%20Woman%202026%201080p%20NF%20WEB-DL%20DUAL%20DDP5%201%20H%20264-FLUX.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=FldeGkt4e4k",
     isSeries: false
   },
@@ -258,7 +259,7 @@ const movies = [
     imdbId: "tt43706402",
     title: "Barreda", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Barreda.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Barreda.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=6Otcjy6Vp3A",
     isSeries: false
   },
@@ -276,7 +277,7 @@ const movies = [
     imdbId: "tt11561116",
     title: "The Whisper Man", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/The.Whisper.Man.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The.Whisper.Man.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=ZHRR-1CKYIQ",
     isSeries: false
   },
@@ -285,7 +286,7 @@ const movies = [
     imdbId: "tt43141030",
     title: "Yellow Mirror", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Yellow%20Mirror%202026%20NORDiC%201080p%20WEB-DL%20H%20264%20DDP5%201-ADDICTION.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Yellow%20Mirror%202026%20NORDiC%201080p%20WEB-DL%20H%20264%20DDP5%201-ADDICTION.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=-R2DVd3bWlA",
     isSeries: false
   },
@@ -303,7 +304,7 @@ const movies = [
     imdbId: "tt35519455",
     title: "It Ends", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/It.Ends.2025.1080p.WEBRip.x264.AAC-%5BYTS.LT%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/It.Ends.2025.1080p.WEBRip.x264.AAC-%5BYTS.LT%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=zFszhQLMNXU",
     isSeries: false
   },
@@ -348,7 +349,7 @@ const movies = [
     imdbId: "tt36948232",
     title: "Just Play Dead", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/glALx6QaIgw1u4joXsnfHTjWi6D.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Just.Play.Dead.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Just.Play.Dead.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=LlAajeOoFBo",
     isSeries: false
   },
@@ -357,7 +358,7 @@ const movies = [
     imdbId: "tt35060353",
     title: "The Wrong Girls", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/iEJshwO6g4WKTP4HJgCHRTJMWEd.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Wrong%20Girls%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Wrong.Girls.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/The%20Wrong%20Girls%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Wrong.Girls.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=zrcg8YHSys8",
     isSeries: false
   },
@@ -366,7 +367,7 @@ const movies = [
     imdbId: "tt32332915",
     title: "I Want Your Sex", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/pR7SIX3AwqdoD96OI44oLG98e7g.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/I%20Want%20Your%20Sex%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/I.Want.Your.Sex.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/I%20Want%20Your%20Sex%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/I.Want.Your.Sex.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=kjkTmTmC1iA",
     isSeries: false
   },
@@ -375,7 +376,7 @@ const movies = [
     imdbId: "tt36958999",
     title: "Gohan", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/nVq1Dn88NzVIVTDpGZeP7fxpLa1.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Gohan%20(2026)%20%5B720p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Gohan.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Gohan%20(2026)%20%5B720p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Gohan.2026.720p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=upaQ2e1KHKU",
     isSeries: false
   },
@@ -384,7 +385,7 @@ const movies = [
     imdbId: "tt10794054",
     title: "The Weight", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/8i5iZV50CoEtmDCFM7RSxCkpE8h.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II/The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II.mkv",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II/The.Weight.2026.1080p.SCREENER.WEB-DL.H264.AAC-II.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=7YpuMymmiJ8",
     isSeries: false
   },
@@ -393,7 +394,7 @@ const movies = [
     imdbId: "tt13611778",
     title: "The Mongoose", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Mongoose%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Mongoose.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/The%20Mongoose%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Mongoose.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=aHrMFtt40_Q",
     isSeries: false
   },
@@ -411,7 +412,7 @@ const movies = [
     imdbId: "tt34584846",
     title: "Man of War", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vt0RqHlqfUzeiBEVQvp43yY2076.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Man%20Of%20War%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Man.Of.War.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Man%20Of%20War%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Man.Of.War.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=E6_E8gIWwZA",
     isSeries: false
   },
@@ -420,7 +421,7 @@ const movies = [
     imdbId: "tt36307021",
     title: "Hadestown: The Musical", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/iJNVygzkuOSCOdCPNI1nLSeF7sz.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Hadestown%20The%20Musical%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Hadestown.The.Musical.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Hadestown%20The%20Musical%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Hadestown.The.Musical.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=Xvuvun5sVbY",
     isSeries: false
   },
@@ -429,7 +430,7 @@ const movies = [
     imdbId: "tt36629665",
     title: "Her Private Hell", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kiFacg75KVjy0AM3S4QmbPas8zL.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Her%20Private%20Hell%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Her.Private.Hell.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Her%20Private%20Hell%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Her.Private.Hell.2026.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=C7E-0t1TfzM",
     isSeries: false
   },
@@ -438,7 +439,7 @@ const movies = [
     imdbId: "tt32333324",
     title: "Batman: Knightfall Part 1: Knightfall", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Batman.Knightfall.Part.1.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Batman.Knightfall.Part.1.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=90HAqMk7qv0",
     isSeries: false
   },
@@ -447,7 +448,7 @@ const movies = [
     imdbId: "tt2012616",
     title: "Motor City", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/dx2dblJL3GAKcXXXPjC2FSaMTWW.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Motor%20City%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Motor.City.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Motor%20City%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Motor.City.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=t6RklhKu9os",
     isSeries: false
   },
@@ -456,7 +457,7 @@ const movies = [
     imdbId: "tt29356163",
     title: "PAW Patrol: The Dino Movie", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/qnin56Syy5rbG7KCaxWY7SPuy6p.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/movie+1/PAW.Patrol.The.Dino.Movie.2026.1080p.AMZN.WEB-DL.DDP5.1.H.265-KyoGo.mkv",
+    manualEmbed: "https://deymflix-media.b-cdn.net/movie+1/PAW.Patrol.The.Dino.Movie.2026.1080p.AMZN.WEB-DL.DDP5.1.H.265-KyoGo.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=xgI5iYmOf5Q",
     isSeries: false
   },
@@ -465,7 +466,7 @@ const movies = [
     imdbId: "tt29719182",
     title: "Bury the Devil", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/yQ3GeVsebrhOPIBhIdoSslbndEv.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Bury%20The%20Devil%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Bury.The.Devil.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Bury%20The%20Devil%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Bury.The.Devil.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=ce2udMp6oEc",
     isSeries: false
   },
@@ -483,7 +484,7 @@ const movies = [
     imdbId: "tt33269988",
     title: "The Birthday Party", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sXN4IvB4hM2AYYx9BhdzhokrjvH.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/The%20Birthday%20Party%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Birthday.Party.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/The%20Birthday%20Party%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/The.Birthday.Party.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=7dujBWLtscc",
     isSeries: false
   },
@@ -492,7 +493,7 @@ const movies = [
     imdbId: "tt32881432",
     title: "Yellow Eyes", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tdIqb0g8fimv2bXIEZdWu6Zfywt.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Yellow%20Eyes%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Yellow.Eyes.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Yellow%20Eyes%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Yellow.Eyes.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=QMfl_n0rxm4",
     isSeries: false
   },
@@ -510,7 +511,7 @@ const movies = [
     imdbId: "tt42577081",
     title: "Pose", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/5f23i30nFJz0nrd3DGheOCqXa2P.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Pose%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.LT%5D/Pose.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.LT%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Pose%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.LT%5D/Pose.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.LT%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=1fzXcG5w1J4",
     isSeries: false
   },
@@ -519,7 +520,7 @@ const movies = [
     imdbId: "tt8760666",
     title: "Truly Naked", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/y23B9EnC0LDw8zMKlpXJauyLH7k.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Truly%20Naked%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Truly.Naked.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Truly%20Naked%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Truly.Naked.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=c-2G-drcASo",
     isSeries: false
   },
@@ -528,7 +529,7 @@ const movies = [
     imdbId: "tt6743524",
     title: "Camp Rock 3", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/rS7byWK9cfPfdLeFNlRIaJxH9mN.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH/Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH.mkv",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH/Camp%20Rock%203%202026%201080p%20WEBRip%20x265-DH.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=02-RDIZ5Rdw",
     isSeries: false
   },
@@ -636,7 +637,7 @@ const movies = [
     imdbId: "tt38906892",
     title: "Night Nurse", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/cvj1d5avMYRxK8FVpq07UqLrcbZ.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Night%20Nurse%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Night.Nurse.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Night%20Nurse%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Night.Nurse.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/results?search_query=Night+Nurse+trailer",
     isSeries: false
   },
@@ -654,7 +655,7 @@ const movies = [
     imdbId: "tt35050712",
     title: "Saccharine", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bCHPB5WZy4T0Rerh1GTuQLzU0rF.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Saccharine%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Saccharine.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Saccharine%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Saccharine.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=uIY13LD3RUY",
     isSeries: false
   },
@@ -663,7 +664,7 @@ const movies = [
     imdbId: "tt32104007",
     title: "Young Washington", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/6CdoTKnRQHJkjRGxTefFGkPQplB.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Young%20Washington%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Young.Washington.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Young%20Washington%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Young.Washington.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=LJek-kc384w",
     isSeries: false
   },
@@ -699,7 +700,7 @@ const movies = [
     imdbId: "tt39316472",
     title: "Jackass: Best and Last", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tfgccePxnswMqhmtxafliLlcCVR.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Jackass%20Best%20And%20Last%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Jackass.Best.And.Last.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Jackass%20Best%20And%20Last%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Jackass.Best.And.Last.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=sNwzFhGwA94",
     isSeries: false
   },
@@ -717,7 +718,7 @@ const movies = [
     imdbId: "tt35887288",
     title: "Casa Grande", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/mE9E4nsGM91Cf4b1s6nOOdUAE9P.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Casa%20Grande%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Casa.Grande.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Casa%20Grande%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Casa.Grande.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=iIFEYdBGJoU",
     isSeries: false
   },
@@ -735,7 +736,7 @@ const movies = [
     imdbId: "tt27543632",
     title: "Housemaid", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/cWsBscZzwu5brg9YjNkGewRUvJX.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Housemaid%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Housemaid.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Housemaid%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Housemaid.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=48CtX6OgU3s",
     isSeries: false
   },
@@ -744,7 +745,7 @@ const movies = [
     imdbId: "tt19035928",
     title: "Lucky Strike", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/7AEBdyGYXumXWmMFeynE8227KeZ.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Lucky%20Strike%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Lucky.Strike.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Lucky%20Strike%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Lucky.Strike.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=vtEnjikCXyA",
     isSeries: false
   },
@@ -789,7 +790,7 @@ const movies = [
     imdbId: "tt32654916",
     title: "Soulm8te", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bNErActDctl6cdUGw9pnjSCmyhQ.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/SOULM8TE%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/SOULM8TE.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/SOULM8TE%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/SOULM8TE.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=gpMQ1bYbDnc",
     isSeries: false
   },
@@ -798,7 +799,7 @@ const movies = [
     imdbId: "tt39163015",
     title: "Time and Water", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1hksIYHtsHCG70nZKbnrYBPk600.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Time%20And%20Water%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Time.And.Water.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Time%20And%20Water%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Time.And.Water.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=6oR0iVwdY7M",
     isSeries: false
   },
@@ -807,7 +808,7 @@ const movies = [
     imdbId: "tt37675037",
     title: "Maddie's Secret", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/vADal7sH7E9xFr4w2k4V3EPSzF6.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Maddies%20Secret%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Maddies.Secret.2025.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Maddies%20Secret%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Maddies.Secret.2025.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=8ZvsjbF785g",
     isSeries: false
   },
@@ -825,7 +826,7 @@ const movies = [
     imdbId: "tt35674521",
     title: "Rose of Nevada", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/aDBZ2PGgUbcGjyX7ZCXLOk4AFQH.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Rose%20Of%20Nevada%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Rose.Of.Nevada.2025.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Rose%20Of%20Nevada%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Rose.Of.Nevada.2025.1080p.WEBRip.x264.AAC-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=suFnFzUNXJ4",
     isSeries: false
   },
@@ -834,7 +835,7 @@ const movies = [
     imdbId: "tt42839367",
     title: "Snoopy Presents: There's No Place Like Home Snoopy", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES/Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES.mkv",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES/Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=A-NQmpNsZIc",
     isSeries: false
   },
@@ -843,7 +844,7 @@ const movies = [
     imdbId: "tt36958312",
     title: "The Devil's Mouth", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/dx2dblJL3GAKcXXXPjC2FSaMTWW.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/www.UIndex.org%20%20%20%20-%20%20%20%20The%20Devils%20Mouth%20(2026)%201080p%20BluRay%205.1-LAMA/The.Devils.Mouth.2026.1080p.BluRay.x264.AAC5.1-LAMA.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20The%20Devils%20Mouth%20(2026)%201080p%20BluRay%205.1-LAMA/The.Devils.Mouth.2026.1080p.BluRay.x264.AAC5.1-LAMA.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=2bp4Viru6Xc",
     isSeries: false
   },
@@ -852,7 +853,7 @@ const movies = [
     imdbId: "tt35224721",
     title: "Neglected", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/A0gqKFmJ7OArcFob49PErNvzN66.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Neglected%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Neglected.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Neglected%20(2025)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.BZ%5D/Neglected.2025.1080p.WEBRip.x264.AAC5.1-%5BYTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=LHCfP3tozTU",
     isSeries: false
   },
@@ -870,7 +871,7 @@ const movies = [
     imdbId: "tt39143902",
     title: "Leviticus", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gnAsZvBygplNpp8PtjoTEYv3VPB.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Leviticus%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Leviticus.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Leviticus%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Leviticus.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=gfkLVd23T64",
     isSeries: false
   },
@@ -888,12 +889,49 @@ const movies = [
     imdbId: "tt8814476",
     title: "Supergirl", 
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uhzRnTW4DM13UQBvZP3eVNzQTuz.jpg",
-    manualEmbed: "https://video.nbanaapp.eu.cc/Supergirl%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Supergirl.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Supergirl%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5Bx265%5D%20%5B10bit%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Supergirl.2026.1080p.WEBRip.x265.10bit.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=s1-pfiVMKAs",
     isSeries: false
   },
 
 ];
+
+// Latest episode across all seasons of a series (reads seriesData from episodes.js).
+// Guarded so pages without episodes.js (or with no match) never break card rendering.
+function getLatestEpisodeNumber(seriesId) {
+  try {
+    if (typeof seriesData === 'undefined' || !Array.isArray(seriesData)) return null;
+    const series = seriesData.find(s => s.id === seriesId);
+    if (!series || !Array.isArray(series.seasons) || series.seasons.length === 0) return null;
+    let latest = null;
+    series.seasons.forEach(season => {
+      if (!Array.isArray(season.episodes)) return;
+      // Highest season number wins; compare episode numbers within it
+      season.episodes.forEach(ep => {
+        const total = (season.seasonNumber || 1) * 1000 + (ep.episodeNumber || 0);
+        if (latest === null || total > latest) latest = total;
+      });
+    });
+    if (latest === null) return null;
+    const seasonNum = Math.floor(latest / 1000);
+    const epNum = latest % 1000;
+    return seasonNum > 1 ? ('S' + seasonNum + 'E' + epNum) : String(epNum);
+  } catch (e) { return null; }
+}
+
+// Total episode count across all seasons of a series (for "N Episodes" badges).
+function getTotalEpisodeCount(seriesId) {
+  try {
+    if (typeof seriesData === 'undefined' || !Array.isArray(seriesData)) return null;
+    const series = seriesData.find(s => s.id === seriesId);
+    if (!series || !Array.isArray(series.seasons)) return null;
+    let count = 0;
+    series.seasons.forEach(season => {
+      if (Array.isArray(season.episodes)) count += season.episodes.length;
+    });
+    return count > 0 ? count : null;
+  } catch (e) { return null; }
+}
 
 function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
@@ -906,8 +944,24 @@ function createMovieCard(movie, rankNumber = null) {
   const rankHTML = rankNumber ? `<div class="rank-badge-box">#${sanitizeHTML(String(rankNumber))}</div>` : '';
 
   const hasManualLink = movie.manualEmbed && movie.manualEmbed.trim() !== '';
-  const qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
-  const qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
+  // K-Drama series: badge shows completion status instead of HD/Trailer.
+  //   completed: true            → "Complete"
+  //   still airing (default)     → "Updated to Ep N" (N = latest episode in seriesData)
+  let qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
+  let qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
+  if (movie.isKdrama && movie.isSeries) {
+    if (movie.completed) {
+      // Completed: show the episode count, e.g. "8 Episodes" (Netflix convention).
+      // Falls back to "Complete" when no episode data exists yet.
+      const total = getTotalEpisodeCount(movie.id);
+      qualityLabel = total ? (total + ' Episodes') : 'Complete';
+      qualityClass = 'quality-complete';
+    } else {
+      const latest = getLatestEpisodeNumber(movie.id);
+      qualityLabel = latest ? ('Updated to Ep. ' + latest) : 'Ongoing';
+      qualityClass = 'quality-updated';
+    }
+  }
 
   const safeTitle = sanitizeHTML(movie.title);
   const safePoster = sanitizeHTML(movie.poster);
@@ -1342,6 +1396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAiReels();
     requestIdleCallback(() => {
       renderFilipinoMovies();
+      renderKdramas();
       requestIdleCallback(() => {
         renderAllMoviesGrid();
       });
@@ -1572,6 +1627,26 @@ function renderFilipinoMovies() {
   const displayList = filipinoMovies.slice(0, 10);
 
   displayList.forEach(movie => {
+    container.appendChild(createMovieCard(movie));
+  });
+}
+
+function renderKdramas() {
+  const container = document.getElementById('kdrama-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const kdramas = movies.filter(m => m.isKdrama);
+  if (kdramas.length === 0) {
+    // Row stays hidden when the list is empty — no empty gaps on the home page
+    const section = container.closest('.content-section');
+    if (section) section.style.display = 'none';
+    return;
+  }
+  const section = container.closest('.content-section');
+  if (section) section.style.display = '';
+
+  kdramas.slice(0, 10).forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }

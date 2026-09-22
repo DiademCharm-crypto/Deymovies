@@ -14,7 +14,7 @@ const filipinoMovieData = [
     title: "Love, Ngo", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/ix86rEFrhvH3pJtCX7FBpjdKahG.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/lovengo.mp4",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/lovengo.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=nkpTJeSrDd8",
     isSeries: false
   },
@@ -24,7 +24,7 @@ const filipinoMovieData = [
     title: "Filipiñana", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/paJZyL5uwTJZLlWbEcN6MbFLGYA.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Filipi%C3%B1ana+%E2%80%93+DLPAPS.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Filipi%C3%B1ana+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=m_HVhPPSeyY",
     isSeries: false
   },
@@ -34,7 +34,7 @@ const filipinoMovieData = [
     title: "Ganito, Ganyan, Ganoon", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/voT1x4FdnBieu1en3CeKhf7N0n8.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/This%2C+That+and+Everything+in+Between.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/This%2C+That+and+Everything+in+Between.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=ueGNj0fC8rU",
     isSeries: false
   },
@@ -44,7 +44,7 @@ const filipinoMovieData = [
     title: "Us in the End (Tayo sa Wakas)", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/jWK3fep9bswDb6EuarNgoIihDBa.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Us.In.The.End.2026.1080p.WEB-DLH264-TRICKFLIX+(1).mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Us.In.The.End.2026.1080p.WEB-DLH264-TRICKFLIX+(1).mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=E1kcUHGLlnI",
     isSeries: false
   },
@@ -54,7 +54,7 @@ const filipinoMovieData = [
     title: "Wonderful Nightmare", 
     isFilipino: true,
     poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRL77Wnd_A1xbSaSkiIIpZWYPBnhrFZmaK9MEOtnYb78A&s=10",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Wonderful+Nightmare.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Wonderful+Nightmare.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=t5ZypDnCq7Q",
     isSeries: false
   },
@@ -64,7 +64,7 @@ const filipinoMovieData = [
     title: "A Special Memory", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/1ucCvNfCUlhacBZseLik4IWg797.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/A+Special+Memory.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/A+Special+Memory.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=HT3dagVqPds",
     isSeries: false
   },
@@ -74,7 +74,7 @@ const filipinoMovieData = [
     title: "Until She Remembers", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/xLjqaHCbdX8Rh3vRvR9XQbgGk85.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Until+She+Remembers+%E2%80%93+DLPAPS.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Until+She+Remembers+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=fRND_au0wXo",
     isSeries: false
   },
@@ -84,7 +84,7 @@ const filipinoMovieData = [
     title: "Call Me Mother", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/kMc1VvhyRdK9w43jaurzfxmnH4x.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Call%20Me%20Mother%202025%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=cFZmGrP108E",
     isSeries: false
   },
@@ -95,7 +95,7 @@ const filipinoMovieData = [
     synopsis: "RR has always been in love with his best friend, Janine. But she's infatuated with Kenzo, the star of her own fan fiction. The film explores the complicated space between love, timing, and the relationships that leave us wondering, 'What if?'",
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/gQurSKUKrCFHa90ydVJRtSMyjLB.jpg",
-    manualEmbed: "https://video.deymflix.eu.cc/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv",
+    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Almost%20Us%202026%201080p%20Filipino%20WEB-DL%20HEVC%20x265%205%201-BONE.mkv",
     trailerEmbed: "https://www.youtube.com/watch?v=7Syb_uhtdN0",
     isSeries: false
   },
@@ -105,7 +105,7 @@ const filipinoMovieData = [
     title: "The Lotto Winner", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sdPxiTp9bf2muVWyxptC5TSsalU.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/The+Lotto+Winner.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/The+Lotto+Winner.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=uAtanD32rs8",
     isSeries: false
   },
@@ -115,7 +115,7 @@ const filipinoMovieData = [
     title: "The Loved One",
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/rVZQcphJRWVJgQZtWztrauB6Fwe.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/The+Loved+One.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/The+Loved+One.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=zvbs8E667tQ",
     isSeries: true
   },
@@ -125,7 +125,7 @@ const filipinoMovieData = [
     title: "UnMarry", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/tesrfUyiRpiFAaE9OybSoTo12W5.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/UnMarry+%E2%80%93+DLPAPS.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/UnMarry+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=3bLDu6QxdNE",
     isSeries: false
   },
@@ -135,7 +135,7 @@ const filipinoMovieData = [
     title: "Love You So Bad", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/h2VnqqAbO290tQ6QkynsHhgerjC.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Love+You+So+Bad+%E2%80%93+DLPAPS_2.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Love+You+So+Bad+%E2%80%93+DLPAPS_2.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=HkUHfI4DG1E",
     isSeries: false
   },
@@ -145,7 +145,7 @@ const filipinoMovieData = [
     title: "Bar Boys: After School", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/4Gb7BfPyMuVWYoCDC8VQLLKgncl.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Bar+Boys-+After+School.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Bar+Boys-+After+School.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=K4fQCnApsW8",
     isSeries: false
   },
@@ -155,7 +155,7 @@ const filipinoMovieData = [
     title: "Rekonek", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/lUcZ7eAzhol9oB3hgfmA8HldPq.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Rekonek+%E2%80%93+DLPAPS.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Rekonek+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=n7csBgJqmKQ",
     isSeries: false
   },
@@ -165,7 +165,7 @@ const filipinoMovieData = [
     title: "Salvageland", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3vvQDvrzMPN8sc2n3hLOqrlusDS.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Salvageland.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Salvageland.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=Y1ClNzed-g4",
     isSeries: false
   },
@@ -175,7 +175,7 @@ const filipinoMovieData = [
     title: "Meet, Greet & Bye", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/7gEBNzmaTiBVG3g0eUDPU3kPbcc.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Meet%2C+Greet+%26+Bye.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Meet%2C+Greet+%26+Bye.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=Mtou4LuxFrg",
     isSeries: false
   },
@@ -185,7 +185,7 @@ const filipinoMovieData = [
     title: "Near Death", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/4zJVQlCM2onUs3at8tTGEiHdS4D.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Near+Death.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Near+Death.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=_WDsgMqFoJw",
     isSeries: false
   },
@@ -195,7 +195,7 @@ const filipinoMovieData = [
     title: "Everyone Knows Every Juan", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/lCaEmw7wWqzEuolYJSTWHT5uUKq.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/Everyone+Knows+Every+Juan.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/Everyone+Knows+Every+Juan.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=jZv-Up-P7ik",
     isSeries: true
   },
@@ -205,7 +205,7 @@ const filipinoMovieData = [
     title: "The Last Beergin", 
     isFilipino: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/rdtpEg20TNwu8IOHB2DT7MPbQ9Q.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/The+Last+Beergin+%E2%80%93+DLPAPS.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/The+Last+Beergin+%E2%80%93+DLPAPS.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=C4UMAlD2Khk",
     isSeries: true
   },
@@ -215,7 +215,7 @@ const filipinoMovieData = [
     title: "The Ride", 
     isFilipino: true,
     poster: "https://m.media-amazon.com/images/M/MV5BNzRhZDIyYzItYjAxYi00MjUwLTk0MjAtMDcwODMzNWIzYjUzXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
-    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Tagalog+Movies/The+Ride.mp4",
+    manualEmbed: "https://deymflix-media.b-cdn.net/Tagalog+Movies/The+Ride.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=P-dnzj_iILY",
     isSeries: true
   },

@@ -12,7 +12,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=159.5">
+  <link rel="stylesheet" href="style.css?v=159.6">
 </head>
 <body>
 
@@ -124,7 +124,10 @@
   <script src="security.js?v=2.1"></script>
   <script src="reels-data.js?v=151.0"></script>
     <script src="filipino-movies.js?v=1.1"></script>
-  <script src="app.js?v=158.6"></script>
+    <script src="kdramas.js?v=1.0"></script>
+    <script src="episodes.js?v=1.5"></script>
+    <script src="kdrama-episode.js?v=1.0"></script>
+  <script src="app.js?v=159.2"></script>
   <script>
     let currentPage = 1;
     const itemsPerPage = 18;
@@ -165,6 +168,11 @@
       } else if (categoryType === 'tagalog') {
         titleElement.textContent = 'Tagalog Movies PH';
         itemsList = typeof movies !== 'undefined' ? movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH') : [];
+        const historyBtn = document.getElementById('btn-reel-history');
+        if (historyBtn) historyBtn.style.display = 'none';
+      } else if (categoryType === 'kdrama') {
+        titleElement.textContent = 'K-Drama';
+        itemsList = typeof movies !== 'undefined' ? movies.filter(m => m.isKdrama) : [];
         const historyBtn = document.getElementById('btn-reel-history');
         if (historyBtn) historyBtn.style.display = 'none';
       } else {
