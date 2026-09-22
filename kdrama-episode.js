@@ -65,22 +65,22 @@ const kdramaSeriesData = [
           {
             episodeNumber: 1,
             title: "Episode 1 - The 1.3 Billion",
-            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E1+Free.ts"
+            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E1+Free.mp4"
           },
           {
             episodeNumber: 2,
             title: "Episode 2 - New Attitude",
-            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E2+Free.ts"
+            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E2+Free.mp4"
           },
           {
             episodeNumber: 3,
             title: "Episode 3 - Office Politics",
-            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E3+Free.ts"
+            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E3+Free.mp4"
           },
           {
             episodeNumber: 4,
             title: "Episode 4 - Blast Radius",
-            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E4+Free.ts"
+            embedUrl: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E4+Free.mp4"
           }
         ]
       }

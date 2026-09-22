@@ -28,7 +28,7 @@ const kdramaData = [
     title: "The Ordinary Jackpot", 
     isKdrama: true,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/3jLoiPorNssIfLlEuw8Om7ujca6.jpg",
-    manualEmbed: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E1+Free.ts",
+    manualEmbed: "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E1+Free.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=vxyzFk_z-Wc",
     isSeries: true,
     completed: false
