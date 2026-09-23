@@ -2294,7 +2294,7 @@
         z-index: 5;
       }
       .player-poster-blur.visible {
-        opacity: 0.4;
+        opacity: 1;
       }
 
       /* ── Codec unsupported screen ── */
@@ -2355,7 +2355,7 @@
     <div id="vast-ad-overlay" class="vast-ad-overlay">
       <span class="vast-ad-label">Advertisement</span>
       <span class="vast-ad-timer" id="vast-ad-timer">Loading ad...</span>
-      <video id="vast-ad-video" class="vast-ad-video" playsinline preload="auto"></video>
+      <video id="vast-ad-video" class="vast-ad-video" playsinline preload="auto" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3Crect width='320' height='180' fill='%23161616'/%3E%3C/svg%3E"></video>
       <button class="vast-ad-mute" id="vast-ad-mute" title="Mute ad (M)" onclick="toggleAdMute()">
         <svg id="vast-ad-mute-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
       </button>
@@ -2373,7 +2373,6 @@
     </div>
 
     <video id="direct-video-player" playsinline preload="auto" style="display: none;"></video>
-
     <!-- Animated Loading Buffer Overlay -->
     <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: none;">
       <div class="spinner-ring"></div>
@@ -3994,6 +3993,11 @@
 
     let iframe = null;
     const directPlayer = document.getElementById('direct-video-player');
+
+    // Android WebView paints a huge black play-button glyph over paused videos
+    // with no poster. The player's own #player-poster-blur layer (cover-fit)
+    // shows during buffering instead — so the attribute stays unused.
+    directPlayer.addEventListener('playing', function () { hidePlayerPosterBlur(); });
     const playerContainer = document.getElementById('playerContainer');
     const playerOverlay = document.getElementById('player-gesture-overlay');
 
@@ -5785,10 +5789,12 @@
     let isShowingBlur = false;
 
     function showPlayerPosterBlur() {
-      if (posterShown || isShowingBlur || !playerPosterBlur || !currentMovie.poster) return;
-      posterShown = true; // Mark as shown — only show once per session
+      if (isShowingBlur || !playerPosterBlur || !currentMovie.poster) return;
+      posterShown = true;
       isShowingBlur = true;
-      playerPosterBlur.style.backgroundImage = 'url(' + currentMovie.poster + ')';
+      // cover-fit: fills the 16:9 player, crops overflow — no letterbox bars,
+      // no stacking with the video's own poster attribute (which stays unused)
+      playerPosterBlur.style.backgroundImage = 'linear-gradient(rgba(10,10,11,.18), rgba(10,10,11,.18)), url(' + currentMovie.poster + ')';
       playerPosterBlur.classList.add('visible');
     }
 
@@ -6000,6 +6006,11 @@
       startSlowConnectionCheck();
       if (typeof updateTrailerBtn === 'function') updateTrailerBtn();
 
+      // Show the movie cover (cover-fit, cropped) while the video buffers.
+      // Single layer: the blur div IS the loading screen; the video's poster
+      // attribute stays empty so WebView/browsers never stack two posters.
+      try { posterShown = false; showPlayerPosterBlur(); } catch (e) {}
+
       // Reset subtitles so auto-load fires for the new movie
       try {
         directPlayer.querySelectorAll('track').forEach(t => t.remove());
@@ -6103,6 +6114,7 @@
         directPlayer.removeAttribute('src');
         directPlayer.load();
         directPlayer.style.display = 'none';
+        hidePlayerPosterBlur(); // trailer mode: iframe takes over, drop the cover
 
         playerOverlay.style.setProperty('display', 'none', 'important');
         adShield.style.setProperty('display', 'none', 'important');
@@ -6505,17 +6517,25 @@
     }
 
     // Fetch VAST tag once and extract video URL
+    // NOTE: the Node proxy (/api/vast) is only available when proxy-server.js serves
+    // this page. On static hosting (GitHub Pages, Live Server) /api/vast 404s, so we
+    // fetch the HilltopAds tag DIRECTLY — it sends access-control-allow-origin: *,
+    // so the browser can read the VAST XML cross-origin. Proxy stays as fallback
+    // for any upstream that blocks CORS.
+    const HILLTOP_VAST_DIRECT = 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB';
+
     async function fetchVastAdOnce() {
       try {
-        // Fetch VAST tag through our server-side proxy (avoids CORS)
-        let resp;
-        try {
-          resp = await fetch((window.__API_BASE__ || '') + '/api/vast');
-        } catch (err) {
-          console.warn('[VAST] Proxy fetch failed:', err);
-          return null;
-        }
-        const xmlText = await resp.text();
+        const xmlText = await (async function () {
+          // 1) Direct from HilltopAds — works on every host, no backend needed
+          try {
+            const r = await fetch(HILLTOP_VAST_DIRECT, { cache: 'no-store' });
+            if (r.ok) return await r.text();
+          } catch (e) { console.warn('[VAST] Direct fetch failed, trying proxy:', e); }
+          // 2) Fallback: our own proxy (only exists when served by proxy-server.js)
+          const resp = await fetch((window.__API_BASE__ || '') + '/api/vast');
+          return await resp.text();
+        })();
 
         // Check if it's XML
         if (xmlText.trim().startsWith('<?xml') || xmlText.trim().startsWith('<VAST')) {

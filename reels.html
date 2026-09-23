@@ -858,12 +858,12 @@
       reelCard.innerHTML = `
         <div class="reel-frame" id="frame-${index}">
           <div class="reel-poster-blur" id="poster-blur-${index}" style="background-image: url('${reel.poster || reel.thumbnail || ""}')"></div>
-          <video class="reel-video" id="video-${index}" src="${reel.videoUrl}" loop playsinline preload="none"></video>
+          <video class="reel-video" id="video-${index}" src="${reel.videoUrl}"${reel.poster || reel.thumbnail ? ` poster="${reel.poster || reel.thumbnail}"` : ''} loop playsinline preload="none"></video>
 
           <div class="reel-vast-overlay" id="reel-vast-${index}">
             <span class="reel-vast-label">Ad</span>
             <span class="reel-vast-timer" id="reel-vast-timer-${index}">Loading ad...</span>
-            <video class="reel-vast-video" id="reel-vast-video-${index}" playsinline></video>
+            <video class="reel-vast-video" id="reel-vast-video-${index}" playsinline poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 160'%3E%3Crect width='90' height='160' fill='%23161616'/%3E%3C/svg%3E"></video>
             <button class="reel-vast-mute" id="reel-vast-mute-${index}" title="Mute ad" onclick="event.stopPropagation(); toggleReelAdMute(${index})">
               <svg id="reel-vast-mute-icon-${index}" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
             </button>
@@ -1301,6 +1301,10 @@
 
     // ── Reel VAST Ad System (portrait mode) ──
     let reelAdPlayed = new Set(); // Track which reels already showed an ad
+    // Direct HilltopAds tag (sends access-control-allow-origin: *, safe for browser
+    // fetch). /api/vast on static hosting (GitHub Pages) doesn't exist, so the
+    // proxy URL is only a fallback for when proxy-server.js serves the page.
+    const HILLTOP_VAST_DIRECT = 'https://bouncyeffective.com/dgmTFpzRd.GENgvQZNGJUZ/uekm-9tu/Z-UJllkaPHTQcj0NMmTXYC0/MNzjM/tmNczAQixTN/j/Q/zCN-wB';
     const REEL_VAST_URL = (window.__API_BASE__ || '') + '/api/vast';
 
     // ── Ad mute (shared preference with the player page via localStorage) ──
@@ -1382,16 +1386,28 @@
       // stays on "Loading ad..." until it loads or the user skips (after 7s).
 
       try {
-        const resp = await fetch(REEL_VAST_URL);
-        const xmlText = await resp.text();
+        let xmlText = '';
+        try {
+          const r = await fetch(HILLTOP_VAST_DIRECT, { cache: 'no-store' });
+          if (r.ok) xmlText = await r.text();
+        } catch (e) { console.warn('[VAST] Direct fetch failed, trying proxy:', e); }
+        if (!xmlText) {
+          const resp = await fetch(REEL_VAST_URL);
+          xmlText = await resp.text();
+        }
         let videoUrl = await parseVastXml(xmlText);
         // One quick retry — HilltopAds intermittently returns no-fill (empty
         // VAST), the main cause of "ads sometimes don't show"
         if (!videoUrl) {
           console.warn('[VAST] No fill on first attempt — retrying once...');
           await new Promise(r => setTimeout(r, 1500));
-          const resp2 = await fetch(REEL_VAST_URL);
-          videoUrl = await parseVastXml(await resp2.text());
+          let xmlText2 = '';
+          try {
+            const r2 = await fetch(HILLTOP_VAST_DIRECT, { cache: 'no-store' });
+            if (r2.ok) xmlText2 = await r2.text();
+          } catch (e) {}
+          if (!xmlText2) xmlText2 = await (await fetch(REEL_VAST_URL)).text();
+          videoUrl = await parseVastXml(xmlText2);
         }
         if (!videoUrl) {
           // No fill — let the USER decide (no auto-skip). Skip unlocks after 7s;
