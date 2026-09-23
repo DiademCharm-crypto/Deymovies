@@ -2026,6 +2026,9 @@ body.has-bottom-nav {
   justify-content: center;
   margin-top: 22px;
 }
+
+/* App mode: the user is already IN the app — never advertise the APK */
+html.dfx-app .footer-app-dl { display: none !important; }
 .app-dl-btn {
   display: inline-flex;
   align-items: center;

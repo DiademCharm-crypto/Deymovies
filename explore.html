@@ -253,7 +253,7 @@
   <script src="reels-data.js?v=151.2"></script>
     <script src="filipino-movies.js?v=1.3"></script>
     <script src="kdramas.js?v=1.0"></script>
-  <script src="app.js?v=159.2"></script>
+  <script src="app.js?v=160.1"></script>
   <script>
     let exploreActiveTab = 'movies';
     let exploreSearchQuery = '';
@@ -407,17 +407,11 @@
 
     // ── UPDATE TAB COUNTS ──
     function updateTabCounts() {
-      const { allMovies, tagalogMovies, kdramaSeries, reels } = getCategorizedContent();
+      // Counts removed by design — tabs show labels only
       const tabs = document.querySelectorAll('.explore-tab');
-      const counts = { movies: allMovies.length, tagalog: tagalogMovies.length, kdrama: kdramaSeries.length, reels: reels.length };
       tabs.forEach(tab => {
-        const key = tab.dataset.tab;
-        const count = counts[key] || 0;
         const existing = tab.querySelector('.tab-count');
         if (existing) existing.remove();
-        if (count > 0) {
-          tab.innerHTML += `<span class="tab-count">(${count})</span>`;
-        }
       });
     }
 
