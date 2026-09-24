@@ -1,4 +1,5 @@
-// SECTION 4E of 5 -- paste LAST, directly below 4D in the SAME tab
+// SECTION 4E of 5 -- paste FIFTH, directly below 4D in the SAME tab
+// NOTE: the class name is spelled EXACTLY as your Sketchware project has it.
 private void playDownload85(final long id, final String title, final String subName) {
     try {
         android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(android.content.Context.DOWNLOAD_SERVICE);
@@ -21,7 +22,7 @@ private void playDownload85(final long id, final String title, final String subN
             android.widget.Toast.makeText(getApplicationContext(), msg, android.widget.Toast.LENGTH_LONG).show();
             return;
         }
-        android.content.Intent it = new android.content.Intent(this, LocalPlayerActivity.class);
+        android.content.Intent it = new android.content.Intent(this, LocalplayerActivity.class);
         it.putExtra("path", path);
         it.putExtra("title", title);
         if (subName != null && subName.length() > 0) it.putExtra("sub", subName);
@@ -36,6 +37,21 @@ private android.graphics.drawable.GradientDrawable playBg85() {
     g.setCornerRadius(10f * getResources().getDisplayMetrics().density);
     return g;
 }
+private android.widget.Button mkBtn85(String label, boolean bold, boolean red, float d) {
+    android.widget.Button b = new android.widget.Button(this);
+    b.setText(label);
+    b.setAllCaps(false);
+    if (red) {
+        b.setTextColor(android.graphics.Color.WHITE);
+        if (bold) b.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        b.setBackgroundDrawable(playBg85());
+        b.setPadding((int)(22*d), 0, (int)(22*d), 0);
+    } else {
+        b.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
+        b.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    }
+    return b;
+}
 private String humanSize85(long bytes) {
     if (bytes <= 0) return "-";
     double b = bytes;
@@ -44,4 +60,4 @@ private String humanSize85(long bytes) {
     while (b >= 1024 && i < units.length - 1) { b /= 1024; i++; }
     return String.format(java.util.Locale.US, "%.1f %s", b, units[i]);
 }
-// ========== END OF SECTION 4E -- last line of the DownloadsActivity onCreate tab ==========
+// ========== END OF SECTION 4E -- now paste 4F below ==========

@@ -1,0 +1,85 @@
+// SECTION 4F (extra) -- paste LAST, directly below 4E in the SAME tab
+private android.widget.TextView tabTxt85(String label) {
+    float d = getResources().getDisplayMetrics().density;
+    android.widget.TextView t = new android.widget.TextView(this);
+    t.setText(label);
+    t.setTextSize(15);
+    t.setGravity(android.view.Gravity.CENTER);
+    t.setPadding(0, (int)(6*d), 0, 0);
+    return t;
+}
+private android.view.View tabLine85() {
+    float d = getResources().getDisplayMetrics().density;
+    android.view.View v = new android.view.View(this);
+    android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(-1, (int)(3*d));
+    lp.topMargin = (int)(8*d);
+    v.setLayoutParams(lp);
+    return v;
+}
+private android.widget.LinearLayout tabBox85(android.widget.TextView label, android.view.View line) {
+    android.widget.LinearLayout box = new android.widget.LinearLayout(this);
+    box.setOrientation(android.widget.LinearLayout.VERTICAL);
+    box.addView(label, new android.widget.LinearLayout.LayoutParams(-1, -2));
+    box.addView(line);
+    return box;
+}
+private String[] readDlMeta86(long id) {
+    android.content.SharedPreferences p = getSharedPreferences("deymflix_dl", 0);
+    String raw = p.getString(String.valueOf(id), "");
+    if (raw == null) return new String[] { "", "", "" };
+    if (raw.length() == 0) return new String[] { "", "", "" };
+    String title = raw;
+    String poster = "";
+    String subName = "";
+    int cutSub = raw.indexOf("[SUB]");
+    if (cutSub >= 0) {
+        subName = raw.substring(cutSub + 5);
+        raw = raw.substring(0, cutSub);
+    }
+    int cutPoster = raw.indexOf("[POSTER]");
+    if (cutPoster >= 0) {
+        poster = raw.substring(cutPoster + 8);
+        title = raw.substring(0, cutPoster);
+    }
+    return new String[] { title, poster, subName };
+}
+private void deleteDlMeta86(long id) {
+    android.content.SharedPreferences p = getSharedPreferences("deymflix_dl", 0);
+    p.edit().remove(String.valueOf(id)).apply();
+}
+private android.graphics.drawable.GradientDrawable posterBg85() {
+    android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+    g.setColor(android.graphics.Color.parseColor("#1E1E24"));
+    g.setCornerRadius(8f * getResources().getDisplayMetrics().density);
+    return g;
+}
+private static final java.util.HashMap bitmapCache86 = new java.util.HashMap();
+private void loadPosterInto(final android.widget.ImageView target, final String url, final int wPx, final int hPx) {
+    if (url == null) return;
+    if (url.length() == 0) return;
+    Object cached86 = bitmapCache86.get(url);
+    if (cached86 != null) {
+        target.setImageBitmap((android.graphics.Bitmap) cached86);
+        return;
+    }
+    new Thread(new Runnable() { @Override public void run() {
+        try {
+            java.net.URL u = new java.net.URL(url);
+            java.net.HttpURLConnection c = (java.net.HttpURLConnection) u.openConnection();
+            c.setConnectTimeout(8000);
+            c.setReadTimeout(8000);
+            c.setRequestProperty("User-Agent", "DeymflixApp/1.4");
+            java.io.InputStream in = new java.io.BufferedInputStream(c.getInputStream());
+            final android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeStream(in);
+            in.close();
+            c.disconnect();
+            if (bmp == null) return;
+            final android.graphics.Bitmap scaled = android.graphics.Bitmap.createScaledBitmap(bmp, wPx, hPx, true);
+            bitmapCache86.put(url, scaled);
+            runOnUiThread(new Runnable() { @Override public void run() {
+                try { target.setImageBitmap(scaled); } catch (Exception e) { }
+            }});
+        } catch (Exception e) { /* keep the placeholder background */ }
+    }}).start();
+}
+// ========== END OF SECTION 4F -- last line of the DownloadsActivity onCreate tab ==========

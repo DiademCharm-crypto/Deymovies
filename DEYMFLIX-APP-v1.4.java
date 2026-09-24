@@ -1,6 +1,24 @@
 // ===========================================================================
-//  DEYMFLIX APP v1.4g -- FEATURE PACK (paste blocks, replaces v1.4f/e/d/c/b/a)
+//  DEYMFLIX APP v1.4h -- FEATURE PACK (paste blocks, replaces v1.4g/f/e/d/c/b/a)
 // ===========================================================================
+//  WHAT v1.4h FIXES (78 compile errors in the v1.4g build):
+//    1. SECTION 4A used list85/empty85 inside the tab listeners BEFORE they
+//       were declared -- anonymous inner classes cannot capture a local that
+//       is declared later. The listeners moved below the declarations.
+//    2. The list code called readDlMeta86 / deleteDlMeta86 / posterBg85 /
+//       loadPosterInto, which only existed in MainActivity. A method of one
+//       activity is NOT visible from another, so SECTION 4F now carries the
+//       DownloadsActivity copies (same "deymflix_dl" preferences).
+//    3. The player activity is LocalplayerActivity (lowercase p) in your
+//       project -- Java is case-sensitive, so 4E launches that exact class.
+//    4. URLEncoder.encode throws a CHECKED exception: the player URL build in
+//       SECTION 6 is now wrapped in try/catch.
+//    5. The pending state added TWO Cancel buttons -- now one.
+//    6. Every paste is smaller (max 4.5 KB, was 6.2 KB). The oversized SECTION
+//       4D arrived on the phone with a chunk missing, which is what produced
+//       the "misplaced construct" / "insert } to complete ClassBody" errors.
+//       Copy with Select All (never a hand-drag selection) and check that each
+//       tab ends with its END OF SECTION marker.
 //  WHY v1.4e EXISTS: the past compile failures were NOT Java problems.
 //  The code was being copied THROUGH TELEGRAM / chat apps, which:
 //    - eat the double-pipe operator (spoiler formatting, chunks vanish)
@@ -18,11 +36,17 @@
 //     SECTION 1 -> onCreate tab        (FULL CLEAR first -- replace everything)
 //     SECTION 2 -> onBackPressed tab   (ONE LINE)
 //     SECTION 3 -> onResume tab        (ONE LINE)
-//   DownloadsActivity:
-//     SECTION 4 -> onCreate tab        (FULL CLEAR first)
+//   DownloadsActivity (one tab: onCreate) -- paste IN THIS ORDER, "full clear"
+//   the tab first, each block directly below the previous one:
+//     SECTION 4A (3.9 KB) -> 4B (3.6 KB) -> 4C (4.3 KB) -> 4D (4.5 KB)
+//       -> 4E (3.2 KB) -> 4F (3.9 KB)
+//   LocalplayerActivity (your player activity):
+//     SECTION 6 -> onCreate tab        (FULL CLEAR first)
 //
 //  CLEAN-PASTE CHECK: the LAST line of each tab must be that section's
 //  "END OF SECTION" marker. Anything after it = leftovers -> clear, re-paste.
+//  SECTION 4A must keep "private boolean paste4Acomplete = true;" -- if that
+//  line is missing, the paste was truncated.
 //
 //  MANIFEST (already done on your side -- see guide STEP 0):
 //   MainActivity configChanges attribute (all five values)
@@ -966,34 +990,35 @@ android.widget.LinearLayout.LayoutParams tlp85 = new android.widget.LinearLayout
 tlp85.topMargin = (int)(12*d85);
 root85.addView(tabs85, tlp85);
 
-final android.widget.LinearLayout tabDl85 = new android.widget.LinearLayout(this);
-tabDl85.setOrientation(android.widget.LinearLayout.VERTICAL);
-final android.widget.TextView tabDlTxt85 = new android.widget.TextView(this);
-tabDlTxt85.setText("Downloading");
-tabDlTxt85.setTextSize(15);
-tabDlTxt85.setGravity(android.view.Gravity.CENTER);
-tabDlTxt85.setPadding(0, (int)(6*d85), 0, 0);
-tabDl85.addView(tabDlTxt85, new android.widget.LinearLayout.LayoutParams(-1, -2));
-final android.view.View tabDlLine85 = new android.view.View(this);
-android.widget.LinearLayout.LayoutParams dlp85 = new android.widget.LinearLayout.LayoutParams(-1, (int)(3*d85));
-dlp85.topMargin = (int)(8*d85);
-tabDl85.addView(tabDlLine85, dlp85);
+// Built through helpers (see SECTION 4F) so this paste stays small enough that
+// no clipboard can truncate it. Each tab = label text + red underline bar.
+final android.widget.TextView tabDlTxt85 = tabTxt85("Downloading");
+final android.view.View tabDlLine85 = tabLine85();
+final android.widget.LinearLayout tabDl85 = tabBox85(tabDlTxt85, tabDlLine85);
 tabs85.addView(tabDl85, new android.widget.LinearLayout.LayoutParams(0, -2, 1f));
 
-final android.widget.LinearLayout tabDone85 = new android.widget.LinearLayout(this);
-tabDone85.setOrientation(android.widget.LinearLayout.VERTICAL);
-final android.widget.TextView tabDoneTxt85 = new android.widget.TextView(this);
-tabDoneTxt85.setText("Downloaded");
-tabDoneTxt85.setTextSize(15);
-tabDoneTxt85.setGravity(android.view.Gravity.CENTER);
-tabDoneTxt85.setPadding(0, (int)(6*d85), 0, 0);
-tabDone85.addView(tabDoneTxt85, new android.widget.LinearLayout.LayoutParams(-1, -2));
-final android.view.View tabDoneLine85 = new android.view.View(this);
-android.widget.LinearLayout.LayoutParams finp85 = new android.widget.LinearLayout.LayoutParams(-1, (int)(3*d85));
-finp85.topMargin = (int)(8*d85);
-tabDone85.addView(tabDoneLine85, finp85);
+final android.widget.TextView tabDoneTxt85 = tabTxt85("Downloaded");
+final android.view.View tabDoneLine85 = tabLine85();
+final android.widget.LinearLayout tabDone85 = tabBox85(tabDoneTxt85, tabDoneLine85);
 tabs85.addView(tabDone85, new android.widget.LinearLayout.LayoutParams(0, -2, 1f));
 
+final android.widget.LinearLayout list85 = new android.widget.LinearLayout(this);
+list85.setOrientation(android.widget.LinearLayout.VERTICAL);
+android.widget.LinearLayout.LayoutParams lp85 = new android.widget.LinearLayout.LayoutParams(-1, -2);
+lp85.topMargin = (int)(14*d85);
+root85.addView(list85, lp85);
+
+final android.widget.TextView empty85 = new android.widget.TextView(this);
+empty85.setTextColor(android.graphics.Color.parseColor("#8A8A8A"));
+empty85.setTextSize(14);
+empty85.setGravity(android.view.Gravity.CENTER);
+android.widget.LinearLayout.LayoutParams ep85 = new android.widget.LinearLayout.LayoutParams(-1, -2);
+ep85.topMargin = (int)(40*d85);
+root85.addView(empty85, ep85);
+
+// The tab click listeners live HERE, after list85 and empty85 exist: an
+// anonymous inner class can only capture locals that were declared before it
+// (declaring them later => "cannot be resolved to a variable").
 tabDl85.setOnClickListener(new android.view.View.OnClickListener() {
     @Override public void onClick(android.view.View v) {
         activeTab85 = 0;
@@ -1009,20 +1034,6 @@ tabDone85.setOnClickListener(new android.view.View.OnClickListener() {
     }
 });
 styleDlTabs85(tabDlTxt85, tabDlLine85, tabDoneTxt85, tabDoneLine85);
-
-final android.widget.LinearLayout list85 = new android.widget.LinearLayout(this);
-list85.setOrientation(android.widget.LinearLayout.VERTICAL);
-android.widget.LinearLayout.LayoutParams lp85 = new android.widget.LinearLayout.LayoutParams(-1, -2);
-lp85.topMargin = (int)(14*d85);
-root85.addView(list85, lp85);
-
-final android.widget.TextView empty85 = new android.widget.TextView(this);
-empty85.setTextColor(android.graphics.Color.parseColor("#8A8A8A"));
-empty85.setTextSize(14);
-empty85.setGravity(android.view.Gravity.CENTER);
-android.widget.LinearLayout.LayoutParams ep85 = new android.widget.LinearLayout.LayoutParams(-1, -2);
-ep85.topMargin = (int)(40*d85);
-root85.addView(empty85, ep85);
 
 setContentView(root85);
 
@@ -1224,24 +1235,13 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
     abp.leftMargin = (int)(18*d);
 
     if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-        android.widget.Button play = new android.widget.Button(this);
-        play.setText("Play");
-        play.setAllCaps(false);
-        play.setTextColor(android.graphics.Color.WHITE);
-        play.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        play.setBackgroundDrawable(playBg85());
-        play.setPadding((int)(22*d), 0, (int)(22*d), 0);
+        android.widget.Button play = mkBtn85("Play", true, true, d);
         play.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) { playDownload85(id, title, subName); }
         });
         actRow.addView(play, abp);
     } else if (status == android.app.DownloadManager.STATUS_FAILED) {
-        android.widget.Button retry = new android.widget.Button(this);
-        retry.setText("Retry");
-        retry.setAllCaps(false);
-        retry.setTextColor(android.graphics.Color.WHITE);
-        retry.setBackgroundDrawable(playBg85());
-        retry.setPadding((int)(18*d), 0, (int)(18*d), 0);
+        android.widget.Button retry = mkBtn85("Retry", false, true, d);
         retry.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) {
                 dm.remove(id);
@@ -1252,11 +1252,7 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
         });
         actRow.addView(retry, abp);
     } else if (status == android.app.DownloadManager.STATUS_PAUSED) {
-        android.widget.Button resume = new android.widget.Button(this);
-        resume.setText("Resume");
-        resume.setAllCaps(false);
-        resume.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-        resume.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        android.widget.Button resume = mkBtn85("Resume", false, false, d);
         resume.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) {
                 dm.resume(id);
@@ -1264,64 +1260,48 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
             }
         });
         actRow.addView(resume, abp);
-    } else if (status == android.app.DownloadManager.STATUS_RUNNING) {
+    } else {
+        // Running and Pending share the same Cancel action (one helper, one
+        // button -- PENDING used to add a second identical Cancel)
         appendCancel85(actRow, list, empty, dm, id);
-    } else if (status == android.app.DownloadManager.STATUS_PENDING) {
-        appendCancel85(actRow, list, empty, dm, id);
-        android.widget.Button cancel = new android.widget.Button(this);
-        cancel.setText("Cancel");
-        cancel.setAllCaps(false);
-        cancel.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-        cancel.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        cancel.setOnClickListener(new android.view.View.OnClickListener() {
-            @Override public void onClick(android.view.View v) {
-                dm.remove(id);
-                deleteDlMeta86(id);
-                android.widget.Toast.makeText(getApplicationContext(), "Cancelled", android.widget.Toast.LENGTH_SHORT).show();
-                renderDownloadsList85(list, empty, dm);
-            }
-        });
-        actRow.addView(cancel, abp);
     }
 
-    android.widget.Button del = new android.widget.Button(this);
-    del.setText("Delete");
-    del.setAllCaps(false);
+    android.widget.Button del = mkBtn85("Delete", false, false, d);
     del.setTextColor(android.graphics.Color.parseColor("#E57373"));
-    del.setBackgroundColor(android.graphics.Color.TRANSPARENT);
     del.setOnClickListener(new android.view.View.OnClickListener() {
-        @Override public void onClick(android.view.View v) {
-            if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-                try {
-                    String local = dm.getUriForDownloadedFile(id).toString();
-                    new java.io.File(android.net.Uri.parse(local).getPath()).delete();
-                } catch (Exception e) { }
-                // Remove the subtitle that traveled with the movie
-                if (subName != null && subName.length() > 0) {
-                    try {
-                        java.io.File sdir = new java.io.File(getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES), "Deymflix");
-                        new java.io.File(sdir, subName).delete();
-                    } catch (Exception e2) { }
-                }
-            }
-            dm.remove(id);
-            deleteDlMeta86(id);
-            if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-                android.widget.Toast.makeText(getApplicationContext(), "Deleted", android.widget.Toast.LENGTH_SHORT).show();
-            }
-            renderDownloadsList85(list, empty, dm);
-        }
+        @Override public void onClick(android.view.View v) { deleteDownload85(id, subName, status, list, empty); }
     });
     actRow.addView(del, abp);
 }
-// Cancel button shared by Running and Pending states (kept separate so this
-// file contains zero pipe characters -- chat apps eat them)
+
+// The Delete button's work: file + its subtitle + the registry row. Kept out of
+// the anonymous listener so the listener bodies stay tiny (paste-safe).
+private void deleteDownload85(final long id, final String subName, final int status, final android.widget.LinearLayout list, final android.widget.TextView empty) {
+    android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(android.content.Context.DOWNLOAD_SERVICE);
+    if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+        try {
+            String local = dm.getUriForDownloadedFile(id).toString();
+            new java.io.File(android.net.Uri.parse(local).getPath()).delete();
+        } catch (Exception e) { }
+        // Remove the subtitle that traveled with the movie
+        if (subName != null && subName.length() > 0) {
+            try {
+                java.io.File sdir = new java.io.File(getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES), "Deymflix");
+                new java.io.File(sdir, subName).delete();
+            } catch (Exception e2) { }
+        }
+    }
+    dm.remove(id);
+    deleteDlMeta86(id);
+    if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+        android.widget.Toast.makeText(getApplicationContext(), "Deleted", android.widget.Toast.LENGTH_SHORT).show();
+    }
+    renderDownloadsList85(list, empty, dm);
+}
+
+// Cancel button shared by Running and Pending states
 private void appendCancel85(final android.widget.LinearLayout actRow, final android.widget.LinearLayout list, final android.widget.TextView empty, final android.app.DownloadManager dm, final long id) {
-    android.widget.Button cancel = new android.widget.Button(this);
-    cancel.setText("Cancel");
-    cancel.setAllCaps(false);
-    cancel.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-    cancel.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    android.widget.Button cancel = mkBtn85("Cancel", false, false, getResources().getDisplayMetrics().density);
     cancel.setOnClickListener(new android.view.View.OnClickListener() {
         @Override public void onClick(android.view.View v) {
             dm.remove(id);
@@ -1342,9 +1322,12 @@ private void appendCancel85(final android.widget.LinearLayout actRow, final andr
 // Play launcher + shared helpers. After pasting, the last line of the tab
 // must be the 4E END marker.
 // ---------------------------------------------------------------------------
-// Play a finished download INSIDE the app (LocalPlayerActivity -- no VLC, no
+// Play a finished download INSIDE the app (the player activity -- no VLC, no
 // gallery). Auto-fullscreen landscape: the activity itself is landscape-locked
 // so playback starts fullscreen WITHOUT data (the file is already on disk).
+// NOTE: the class name is spelled EXACTLY as your Sketchware project has it.
+// Java is case-sensitive: the file on the phone is LocalplayerActivity.java,
+// so the class is LocalplayerActivity -- not LocalPlayerActivity.
 private void playDownload85(final long id, final String title, final String subName) {
     try {
         android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(android.content.Context.DOWNLOAD_SERVICE);
@@ -1367,7 +1350,7 @@ private void playDownload85(final long id, final String title, final String subN
             android.widget.Toast.makeText(getApplicationContext(), msg, android.widget.Toast.LENGTH_LONG).show();
             return;
         }
-        android.content.Intent it = new android.content.Intent(this, LocalPlayerActivity.class);
+        android.content.Intent it = new android.content.Intent(this, LocalplayerActivity.class);
         it.putExtra("path", path);
         it.putExtra("title", title);
         if (subName != null && subName.length() > 0) it.putExtra("sub", subName);
@@ -1384,6 +1367,24 @@ private android.graphics.drawable.GradientDrawable playBg85() {
     return g;
 }
 
+// One place that knows how the card buttons look, so SECTION 4D stays short.
+// bold+red = the filled red "Play" style, otherwise a flat grey text button.
+private android.widget.Button mkBtn85(String label, boolean bold, boolean red, float d) {
+    android.widget.Button b = new android.widget.Button(this);
+    b.setText(label);
+    b.setAllCaps(false);
+    if (red) {
+        b.setTextColor(android.graphics.Color.WHITE);
+        if (bold) b.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        b.setBackgroundDrawable(playBg85());
+        b.setPadding((int)(22*d), 0, (int)(22*d), 0);
+    } else {
+        b.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
+        b.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    }
+    return b;
+}
+
 private String humanSize85(long bytes) {
     if (bytes <= 0) return "-";
     double b = bytes;
@@ -1392,15 +1393,127 @@ private String humanSize85(long bytes) {
     while (b >= 1024 && i < units.length - 1) { b /= 1024; i++; }
     return String.format(java.util.Locale.US, "%.1f %s", b, units[i]);
 }
-// ========== END OF SECTION 4E -- last line of the DownloadsActivity onCreate tab ==========
+// ========== END OF SECTION 4E -- now paste 4F below ==========
+
+
+// ---------------------------------------------------------------------------
+// SECTION 4F (extra) -- paste LAST, directly below 4E in the SAME tab.
+// WHY: the list code above calls helpers that USED to exist only inside
+// MainActivity (SECTION 1). A method of MainActivity is not visible from
+// DownloadsActivity, so without this block the build fails with:
+//   "The method readDlMeta86(long) is undefined for the type DownloadsActivity"
+//   "The method posterBg85() is undefined for the type DownloadsActivity"
+//   "The method loadPosterInto(ImageView, String, int, int) is undefined ..."
+//   "The method deleteDlMeta86(long) is undefined ..."
+// These are the DownloadsActivity copies. Both activities read the SAME
+// "deymflix_dl" preferences, so a download started in MainActivity shows its
+// poster here and vice versa.
+// ----- small UI builders (used by the onCreate block above) -----------------
+// Kept as methods so the 4A paste stays tiny (big pastes get truncated by the
+// clipboard, which is what corrupted the first v1.4g paste).
+private android.widget.TextView tabTxt85(String label) {
+    float d = getResources().getDisplayMetrics().density;
+    android.widget.TextView t = new android.widget.TextView(this);
+    t.setText(label);
+    t.setTextSize(15);
+    t.setGravity(android.view.Gravity.CENTER);
+    t.setPadding(0, (int)(6*d), 0, 0);
+    return t;
+}
+
+private android.view.View tabLine85() {
+    float d = getResources().getDisplayMetrics().density;
+    android.view.View v = new android.view.View(this);
+    android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(-1, (int)(3*d));
+    lp.topMargin = (int)(8*d);
+    v.setLayoutParams(lp);
+    return v;
+}
+
+private android.widget.LinearLayout tabBox85(android.widget.TextView label, android.view.View line) {
+    android.widget.LinearLayout box = new android.widget.LinearLayout(this);
+    box.setOrientation(android.widget.LinearLayout.VERTICAL);
+    box.addView(label, new android.widget.LinearLayout.LayoutParams(-1, -2));
+    box.addView(line);
+    return box;
+}
+
+// id -> "title[POSTER]url[SUB]sub.srt" -- written by MainActivity, read here.
+private String[] readDlMeta86(long id) {
+    android.content.SharedPreferences p = getSharedPreferences("deymflix_dl", 0);
+    String raw = p.getString(String.valueOf(id), "");
+    if (raw == null) return new String[] { "", "", "" };
+    if (raw.length() == 0) return new String[] { "", "", "" };
+    String title = raw;
+    String poster = "";
+    String subName = "";
+    int cutSub = raw.indexOf("[SUB]");
+    if (cutSub >= 0) {
+        subName = raw.substring(cutSub + 5);
+        raw = raw.substring(0, cutSub);
+    }
+    int cutPoster = raw.indexOf("[POSTER]");
+    if (cutPoster >= 0) {
+        poster = raw.substring(cutPoster + 8);
+        title = raw.substring(0, cutPoster);
+    }
+    return new String[] { title, poster, subName };
+}
+
+private void deleteDlMeta86(long id) {
+    android.content.SharedPreferences p = getSharedPreferences("deymflix_dl", 0);
+    p.edit().remove(String.valueOf(id)).apply();
+}
+
+private android.graphics.drawable.GradientDrawable posterBg85() {
+    android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+    g.setColor(android.graphics.Color.parseColor("#1E1E24"));
+    g.setCornerRadius(8f * getResources().getDisplayMetrics().density);
+    return g;
+}
+
+// Poster thumbnails for the cards, decoded off the UI thread and cached so the
+// 1s refresh loop never re-downloads the same art (no flicker).
+private static final java.util.HashMap bitmapCache86 = new java.util.HashMap();
+
+private void loadPosterInto(final android.widget.ImageView target, final String url, final int wPx, final int hPx) {
+    if (url == null) return;
+    if (url.length() == 0) return;
+    Object cached86 = bitmapCache86.get(url);
+    if (cached86 != null) {
+        target.setImageBitmap((android.graphics.Bitmap) cached86);
+        return;
+    }
+    new Thread(new Runnable() { @Override public void run() {
+        try {
+            java.net.URL u = new java.net.URL(url);
+            java.net.HttpURLConnection c = (java.net.HttpURLConnection) u.openConnection();
+            c.setConnectTimeout(8000);
+            c.setReadTimeout(8000);
+            c.setRequestProperty("User-Agent", "DeymflixApp/1.4");
+            java.io.InputStream in = new java.io.BufferedInputStream(c.getInputStream());
+            final android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeStream(in);
+            in.close();
+            c.disconnect();
+            if (bmp == null) return;
+            final android.graphics.Bitmap scaled = android.graphics.Bitmap.createScaledBitmap(bmp, wPx, hPx, true);
+            bitmapCache86.put(url, scaled);
+            runOnUiThread(new Runnable() { @Override public void run() {
+                try { target.setImageBitmap(scaled); } catch (Exception e) { }
+            }});
+        } catch (Exception e) { /* keep the placeholder background */ }
+    }}).start();
+}
+// ========== END OF SECTION 4F -- last line of the DownloadsActivity onCreate tab ==========
 
 
 
 
-// SECTION 6 -- paste in LocalPlayerActivity -> onCreate tab (FULL CLEAR first)
-// BEFORE PASTING: Sketchware -> Activity manager -> add a new EMPTY activity
-// named EXACTLY:  LocalPlayerActivity   (layout can be empty -- code builds it)
-// Then: LocalPlayerActivity -> Logic -> (vdots) -> Java/Kotlin Injection -> onCreate
+// SECTION 6 -- paste in the player activity -> onCreate tab (FULL CLEAR first)
+// BEFORE PASTING: the activity must already exist. Yours is LocalplayerActivity
+// (capital L, lowercase p -- that is what the file LocalplayerActivity.java
+// means). Keep that spelling: SECTION 4E launches LocalplayerActivity.class.
+// Then: that activity -> Logic -> (vdots) -> Java/Kotlin Injection -> onCreate
 //
 // WHAT IT IS: a native video player for your downloaded movies. Playback stays
 // inside DEYMFLIX (no VLC, no gallery, no other app can open these files).
@@ -1470,14 +1583,22 @@ pv.addJavascriptInterface(new Object() {
     }
 }, "DeymflixLocal");
 
-String url86 = "file:///android_asset/local-player.html?f="
-        + java.net.URLEncoder.encode(path86, "UTF-8");
-if (title86 != null) {
-    url86 = url86 + "&t=" + java.net.URLEncoder.encode(title86, "UTF-8");
+// URLEncoder.encode throws UnsupportedEncodingException (a checked exception),
+// so the whole URL build must sit inside a try/catch or onCreate will not
+// compile ("Unhandled exception type UnsupportedEncodingException").
+try {
+    String url86 = "file:///android_asset/local-player.html?f="
+            + java.net.URLEncoder.encode(path86, "UTF-8");
+    if (title86 != null) {
+        url86 = url86 + "&t=" + java.net.URLEncoder.encode(title86, "UTF-8");
+    }
+    // The subtitle file that traveled with the movie (same folder, same random name)
+    if (sub86 != null && sub86.length() > 0) {
+        url86 = url86 + "&s=" + java.net.URLEncoder.encode(sub86, "UTF-8");
+    }
+    pv.loadUrl(url86);
+} catch (Exception e) {
+    android.widget.Toast.makeText(getApplicationContext(), "Cannot open this download", android.widget.Toast.LENGTH_LONG).show();
+    finish();
 }
-// The subtitle file that traveled with the movie (same folder, same random name)
-if (sub86 != null && sub86.length() > 0) {
-    url86 = url86 + "&s=" + java.net.URLEncoder.encode(sub86, "UTF-8");
-}
-pv.loadUrl(url86);
-// ============ END OF SECTION 6 -- last line of the LocalPlayerActivity onCreate tab ============
+// ============ END OF SECTION 6 -- last line of the LocalplayerActivity onCreate tab ============

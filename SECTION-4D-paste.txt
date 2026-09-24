@@ -3,24 +3,13 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
     android.widget.LinearLayout.LayoutParams abp = new android.widget.LinearLayout.LayoutParams(-2, -2);
     abp.leftMargin = (int)(18*d);
     if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-        android.widget.Button play = new android.widget.Button(this);
-        play.setText("Play");
-        play.setAllCaps(false);
-        play.setTextColor(android.graphics.Color.WHITE);
-        play.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        play.setBackgroundDrawable(playBg85());
-        play.setPadding((int)(22*d), 0, (int)(22*d), 0);
+        android.widget.Button play = mkBtn85("Play", true, true, d);
         play.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) { playDownload85(id, title, subName); }
         });
         actRow.addView(play, abp);
     } else if (status == android.app.DownloadManager.STATUS_FAILED) {
-        android.widget.Button retry = new android.widget.Button(this);
-        retry.setText("Retry");
-        retry.setAllCaps(false);
-        retry.setTextColor(android.graphics.Color.WHITE);
-        retry.setBackgroundDrawable(playBg85());
-        retry.setPadding((int)(18*d), 0, (int)(18*d), 0);
+        android.widget.Button retry = mkBtn85("Retry", false, true, d);
         retry.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) {
                 dm.remove(id);
@@ -31,11 +20,7 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
         });
         actRow.addView(retry, abp);
     } else if (status == android.app.DownloadManager.STATUS_PAUSED) {
-        android.widget.Button resume = new android.widget.Button(this);
-        resume.setText("Resume");
-        resume.setAllCaps(false);
-        resume.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-        resume.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        android.widget.Button resume = mkBtn85("Resume", false, false, d);
         resume.setOnClickListener(new android.view.View.OnClickListener() {
             @Override public void onClick(android.view.View v) {
                 dm.resume(id);
@@ -43,60 +28,39 @@ private void appendCardActions85(final android.widget.LinearLayout actRow, final
             }
         });
         actRow.addView(resume, abp);
-    } else if (status == android.app.DownloadManager.STATUS_RUNNING) {
+    } else {
         appendCancel85(actRow, list, empty, dm, id);
-    } else if (status == android.app.DownloadManager.STATUS_PENDING) {
-        appendCancel85(actRow, list, empty, dm, id);
-        android.widget.Button cancel = new android.widget.Button(this);
-        cancel.setText("Cancel");
-        cancel.setAllCaps(false);
-        cancel.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-        cancel.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        cancel.setOnClickListener(new android.view.View.OnClickListener() {
-            @Override public void onClick(android.view.View v) {
-                dm.remove(id);
-                deleteDlMeta86(id);
-                android.widget.Toast.makeText(getApplicationContext(), "Cancelled", android.widget.Toast.LENGTH_SHORT).show();
-                renderDownloadsList85(list, empty, dm);
-            }
-        });
-        actRow.addView(cancel, abp);
     }
-    android.widget.Button del = new android.widget.Button(this);
-    del.setText("Delete");
-    del.setAllCaps(false);
+    android.widget.Button del = mkBtn85("Delete", false, false, d);
     del.setTextColor(android.graphics.Color.parseColor("#E57373"));
-    del.setBackgroundColor(android.graphics.Color.TRANSPARENT);
     del.setOnClickListener(new android.view.View.OnClickListener() {
-        @Override public void onClick(android.view.View v) {
-            if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-                try {
-                    String local = dm.getUriForDownloadedFile(id).toString();
-                    new java.io.File(android.net.Uri.parse(local).getPath()).delete();
-                } catch (Exception e) { }
-                if (subName != null && subName.length() > 0) {
-                    try {
-                        java.io.File sdir = new java.io.File(getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES), "Deymflix");
-                        new java.io.File(sdir, subName).delete();
-                    } catch (Exception e2) { }
-                }
-            }
-            dm.remove(id);
-            deleteDlMeta86(id);
-            if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
-                android.widget.Toast.makeText(getApplicationContext(), "Deleted", android.widget.Toast.LENGTH_SHORT).show();
-            }
-            renderDownloadsList85(list, empty, dm);
-        }
+        @Override public void onClick(android.view.View v) { deleteDownload85(id, subName, status, list, empty); }
     });
     actRow.addView(del, abp);
 }
+private void deleteDownload85(final long id, final String subName, final int status, final android.widget.LinearLayout list, final android.widget.TextView empty) {
+    android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(android.content.Context.DOWNLOAD_SERVICE);
+    if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+        try {
+            String local = dm.getUriForDownloadedFile(id).toString();
+            new java.io.File(android.net.Uri.parse(local).getPath()).delete();
+        } catch (Exception e) { }
+        if (subName != null && subName.length() > 0) {
+            try {
+                java.io.File sdir = new java.io.File(getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES), "Deymflix");
+                new java.io.File(sdir, subName).delete();
+            } catch (Exception e2) { }
+        }
+    }
+    dm.remove(id);
+    deleteDlMeta86(id);
+    if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+        android.widget.Toast.makeText(getApplicationContext(), "Deleted", android.widget.Toast.LENGTH_SHORT).show();
+    }
+    renderDownloadsList85(list, empty, dm);
+}
 private void appendCancel85(final android.widget.LinearLayout actRow, final android.widget.LinearLayout list, final android.widget.TextView empty, final android.app.DownloadManager dm, final long id) {
-    android.widget.Button cancel = new android.widget.Button(this);
-    cancel.setText("Cancel");
-    cancel.setAllCaps(false);
-    cancel.setTextColor(android.graphics.Color.parseColor("#DDDDDD"));
-    cancel.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    android.widget.Button cancel = mkBtn85("Cancel", false, false, getResources().getDisplayMetrics().density);
     cancel.setOnClickListener(new android.view.View.OnClickListener() {
         @Override public void onClick(android.view.View v) {
             dm.remove(id);
