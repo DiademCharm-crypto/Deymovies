@@ -931,6 +931,9 @@ private void deleteDlMeta86(long id) {
     p.edit().remove(String.valueOf(id)).apply();
 }
 
+// Truncation tripwire: if this line is missing from the onCreate tab, the paste
+// did not arrive in full -- clear the tab and paste again.
+private boolean paste1complete = true;
 // ============ END OF SECTION 1 -- last line of the onCreate tab ============
 
 
