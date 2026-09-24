@@ -1,1 +1,1 @@
-handleResume();
+MainScreen85.resume(this);

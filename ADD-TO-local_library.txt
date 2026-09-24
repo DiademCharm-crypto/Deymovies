@@ -1,0 +1,7 @@
+[
+ {
+  "dexPath": "/storage/emulated/0/.sketchware/libs/local_libs/deymflix-screens-1.0/classes.dex",
+  "jarPath": "/storage/emulated/0/.sketchware/libs/local_libs/deymflix-screens-1.0/classes.jar",
+  "name": "deymflix-screens-1.0"
+ }
+]

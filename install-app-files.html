@@ -23,27 +23,24 @@
 </head>
 <body>
   <h1>DEYM<span>FLIX</span></h1>
-  <div class="sub">App files for the v1.4h build</div>
+  <div class="sub">App files for the v1.4i build</div>
 
   <div class="card">
-    <div class="name">DlScreen85.java</div>
-    <div class="why">The whole My Downloads screen: Downloading / Downloaded tabs, poster cards, progress bars, Play / Retry / Restart / Cancel / Delete.</div>
-    <a class="btn" href="DlScreen85.java" download="DlScreen85.java">Download DlScreen85.java</a>
+    <div class="name">deymflix-screens-1.0.zip</div>
+    <div class="why">The whole app code as a Sketchware local library: My Downloads, the offline player and all MainActivity logic (splash, JS bridge, download flow, fullscreen). Libraries live outside the project, so nothing can wipe them.</div>
+    <a class="btn" href="deymflix-screens-1.0.zip" download>Download the screens library</a>
   </div>
 
-  <div class="card">
-    <div class="name">LocalPlayer85.java</div>
-    <div class="why">The offline player: landscape, immersive, screenshot-proof, subtitle support, branded controls.</div>
-    <a class="btn" href="LocalPlayer85.java" download="LocalPlayer85.java">Download LocalPlayer85.java</a>
-  </div>
-
-  <div class="path">Put both files in:<br>/storage/emulated/0/.sketchware/mysc/608/app/src/main/java/com/deymflix/eu/cc/</div>
+  <div class="path">After downloading, open the zip and put the two files inside (<code>classes.jar</code> + <code>classes.dex</code>) in:<br>/storage/emulated/0/.sketchware/libs/local_libs/deymflix-screens-1.0/</div>
 
   <div class="note">
-    After downloading, move them out of <code>Download</code> into that folder with a file
-    manager (MT Manager, Zarchiver or Files). The folder starts with a dot, so enable
-    "show hidden files" if you cannot see <code>.sketchware</code>.<br><br>
-    Then paste one line in each activity:<br>
+    Create the folder <code>deymflix-screens-1.0</code> if it does not exist (enable
+    "show hidden files" to see <code>.sketchware</code>). Then register the library in
+    Sketchware once -- the exact steps are in <code>SKETCHWARE-v1.4-GUIDE.md</code>.<br><br>
+    Each activity keeps only one line:<br>
+    MainActivity onCreate -&gt; <code>MainScreen85.install(this);</code><br>
+    MainActivity back -&gt; <code>MainScreen85.back(this);</code><br>
+    MainActivity resume -&gt; <code>MainScreen85.resume(this);</code><br>
     Downloads -&gt; <code>DlScreen85.show(this);</code><br>
     Player -&gt; <code>LocalPlayer85.show(this);</code>
   </div>
