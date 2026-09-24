@@ -1,0 +1,74 @@
+// SECTION 4C of 5 -- paste THIRD, directly below 4B in the SAME tab
+private void buildDownloadCard85(final android.widget.LinearLayout list, final android.widget.TextView empty, final android.app.DownloadManager dm, final long id, final String title, final String poster, final String subName, final int status, final long done, final long total, final float d) {
+    android.widget.LinearLayout card = new android.widget.LinearLayout(this);
+    card.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    card.setGravity(android.view.Gravity.CENTER_VERTICAL);
+    android.widget.LinearLayout.LayoutParams cp = new android.widget.LinearLayout.LayoutParams(-1, -2);
+    cp.topMargin = (int)(12*d);
+    list.addView(card, cp);
+    android.widget.ImageView thumb = new android.widget.ImageView(this);
+    android.widget.LinearLayout.LayoutParams tp = new android.widget.LinearLayout.LayoutParams((int)(104*d), (int)(150*d));
+    tp.rightMargin = (int)(16*d);
+    thumb.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+    thumb.setBackgroundDrawable(posterBg85());
+    loadPosterInto(thumb, poster, (int)(104*d), (int)(150*d));
+    card.addView(thumb, tp);
+    android.widget.LinearLayout right = new android.widget.LinearLayout(this);
+    right.setOrientation(android.widget.LinearLayout.VERTICAL);
+    card.addView(right, new android.widget.LinearLayout.LayoutParams(-1, -2, 1f));
+    android.widget.TextView t = new android.widget.TextView(this);
+    t.setText(title);
+    t.setTextColor(android.graphics.Color.WHITE);
+    t.setTextSize(16);
+    t.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+    t.setSingleLine(true);
+    t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+    right.addView(t);
+    android.widget.TextView sub = new android.widget.TextView(this);
+    sub.setTextSize(14);
+    android.widget.LinearLayout.LayoutParams sp = new android.widget.LinearLayout.LayoutParams(-1, -2);
+    sp.topMargin = (int)(8*d);
+    boolean showBar = false;
+    int barPct = 0;
+    if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) {
+        sub.setText("Downloaded");
+        sub.setTextColor(android.graphics.Color.parseColor("#EDEDED"));
+    } else if (status == android.app.DownloadManager.STATUS_FAILED) {
+        sub.setText("Failed");
+        sub.setTextColor(android.graphics.Color.parseColor("#E57373"));
+    } else if (status == android.app.DownloadManager.STATUS_PAUSED) {
+        sub.setText("Paused");
+        sub.setTextColor(android.graphics.Color.parseColor("#9A9A9A"));
+        showBar = total > 0;
+        barPct = (int)(done * 100 / total);
+    } else if (status == android.app.DownloadManager.STATUS_PENDING) {
+        sub.setText("Waiting...");
+        sub.setTextColor(android.graphics.Color.parseColor("#9A9A9A"));
+    } else if (total > 0) {
+        barPct = (int)(done * 100 / total);
+        sub.setText(humanSize85(done) + " / " + humanSize85(total));
+        sub.setTextColor(android.graphics.Color.parseColor("#9A9A9A"));
+        showBar = true;
+    } else {
+        sub.setText("Starting...");
+        sub.setTextColor(android.graphics.Color.parseColor("#9A9A9A"));
+    }
+    right.addView(sub, sp);
+    if (showBar) {
+        android.widget.ProgressBar bar = new android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);
+        bar.setProgress(barPct);
+        bar.getProgressDrawable().setColorFilter(android.graphics.Color.parseColor("#E50914"), android.graphics.PorterDuff.Mode.SRC_IN);
+        android.widget.LinearLayout.LayoutParams bp2 = new android.widget.LinearLayout.LayoutParams(-1, (int)(3*d));
+        bp2.topMargin = (int)(8*d);
+        right.addView(bar, bp2);
+    }
+    android.widget.LinearLayout actRow = new android.widget.LinearLayout(this);
+    actRow.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    actRow.setGravity(android.view.Gravity.RIGHT + android.view.Gravity.CENTER_VERTICAL);
+    android.widget.LinearLayout.LayoutParams arp = new android.widget.LinearLayout.LayoutParams(-1, -2);
+    arp.topMargin = (int)(10*d);
+    right.addView(actRow, arp);
+    appendCardActions85(actRow, list, empty, dm, id, title, subName, status, d);
+}
+// ========== END OF SECTION 4C -- last line after pasting 4C. Now paste 4D below. ==========

@@ -2029,6 +2029,35 @@ body.has-bottom-nav {
 
 /* App mode: the user is already IN the app — never advertise the APK */
 html.dfx-app .footer-app-dl { display: none !important; }
+
+/* ── APP MODE: Request lives at the bottom of the footer (nav has no room) ── */
+.dfx-app-request-btn {
+  display: none; /* browser footer stays clean */
+}
+html.dfx-app .dfx-app-request-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 18px auto 0;
+  padding: 14px 18px;
+  background: #141418;
+  border: 1px solid #2A2A30;
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+html.dfx-app .dfx-app-request-btn svg { width: 26px; height: 26px; stroke: #E50914; flex: 0 0 auto; }
+html.dfx-app .dfx-app-request-btn strong { display: block; font-size: 15px; }
+html.dfx-app .dfx-app-request-btn small { display: block; color: #9A9A9A; font-size: 12px; margin-top: 2px; }
+html.dfx-app .dfx-app-request-btn:active { background: #1E1E24; }
+
+/* Belt-and-braces: also hide the nav Request item if the JS removal didn't run */
+html.dfx-app .bottom-nav-item[data-page="request"] { display: none !important; }
+/* App-mode pages sit flush at the bottom (no browser chrome to clear) */
+html.dfx-app body { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
 .app-dl-btn {
   display: inline-flex;
   align-items: center;

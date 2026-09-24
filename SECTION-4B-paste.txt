@@ -1,0 +1,63 @@
+// SECTION 4B of 5 -- paste SECOND, directly below 4A in the SAME tab
+private void refreshStorage85(final android.widget.TextView tv) {
+    try {
+        java.io.File dir = android.os.Environment.getExternalStorageDirectory();
+        android.os.StatFs st = new android.os.StatFs(dir.getPath());
+        long freeBytes = st.getAvailableBlocksLong() * st.getBlockSizeLong();
+        tv.setText("Internal storage  " + humanSize85(freeBytes) + " remaining");
+        tv.setTextColor(android.graphics.Color.parseColor("#9A9A9A"));
+    } catch (Exception e) {
+        tv.setText("");
+    }
+}
+private int activeTab85 = 0;
+private void styleDlTabs85(final android.widget.TextView t1, final android.view.View l1, final android.widget.TextView t2, final android.view.View l2) {
+    int on = android.graphics.Color.WHITE;
+    int off = android.graphics.Color.parseColor("#8A8A8A");
+    int red = android.graphics.Color.parseColor("#E50914");
+    if (activeTab85 == 0) {
+        t1.setTextColor(on); t1.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        l1.setBackgroundColor(red);
+        t2.setTextColor(off); t2.setTypeface(android.graphics.Typeface.DEFAULT);
+        l2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    } else {
+        t2.setTextColor(on); t2.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        l2.setBackgroundColor(red);
+        t1.setTextColor(off); t1.setTypeface(android.graphics.Typeface.DEFAULT);
+        l1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+    }
+}
+private void renderDownloadsList85(final android.widget.LinearLayout list, final android.widget.TextView empty, final android.app.DownloadManager dm) {
+    list.removeAllViews();
+    float d = getResources().getDisplayMetrics().density;
+    android.database.Cursor c = dm.query(new android.app.DownloadManager.Query());
+    int shown = 0;
+    if (c != null) {
+        while (c.moveToNext() && shown < 40) {
+            final long id = c.getLong(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_ID));
+            final int status = c.getInt(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_STATUS));
+            final boolean finished = (status == android.app.DownloadManager.STATUS_SUCCESSFUL);
+            final boolean failed = (status == android.app.DownloadManager.STATUS_FAILED);
+            if (activeTab85 == 0 && finished) continue;
+            if (activeTab85 == 1 && !finished) continue;
+            shown++;
+            final long done = c.getLong(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+            final long total = c.getLong(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+            String[] meta = readDlMeta86(id);
+            String title = (meta[0] == null) ? "" : meta[0];
+            if (title.length() == 0) title = "Download";
+            final String poster = meta[1] == null ? "" : meta[1];
+            final String subName = meta[2] == null ? "" : meta[2];
+            buildDownloadCard85(list, empty, dm, id, title, poster, subName, status, done, total, d);
+        }
+        c.close();
+    }
+    boolean any = shown > 0;
+    if (activeTab85 == 0) {
+        empty.setText("No downloads in progress.\nStart one from any movie page.");
+    } else {
+        empty.setText("Nothing downloaded yet.\nOpen any movie and tap the download button.");
+    }
+    empty.setVisibility(any ? android.view.View.GONE : android.view.View.VISIBLE);
+}
+// ========== END OF SECTION 4B -- last line after pasting 4B. Now paste 4C below. ==========

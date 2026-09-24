@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>DEYMFLIX</title>
+<style>
+  html,body{margin:0;padding:0;background:#000;height:100%;overflow:hidden;font-family:Roboto,Arial,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  #vid{position:absolute;top:0;left:0;width:100%;height:100%;background:#000}
+  #msg{position:absolute;top:42%;left:0;right:0;text-align:center;color:#bbb;font-size:14px;padding:0 30px;display:none;z-index:4}
+  /* SUBTITLE TRACK (mirrors player.html style) */
+  #sub{position:absolute;bottom:12%;left:4%;right:4%;text-align:center;color:#fff;font-size:18px;line-height:1.35;
+       text-shadow:0 0 4px rgba(0,0,0,.9),0 2px 6px rgba(0,0,0,.9);z-index:3;display:none;pointer-events:none;white-space:pre-wrap}
+  /* CONTROL BAR (Netflix-like: auto-hide, red progress) */
+  #ctrl{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:0 14px 10px 14px;
+        background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.75) 60%);transition:opacity .3s}
+  #ctrl.hidden{opacity:0;pointer-events:none}
+  #seekWrap{position:relative;height:18px;margin:6px 0 2px 0}
+  #seekTrack{position:absolute;left:0;right:0;top:8px;height:3px;background:rgba(255,255,255,.28);border-radius:2px}
+  #seekBuf{position:absolute;left:0;top:8px;height:3px;width:0;background:rgba(255,255,255,.45);border-radius:2px}
+  #seekFill{position:absolute;left:0;top:8px;height:3px;width:0;background:#E50914;border-radius:2px}
+  #seekDot{position:absolute;top:4px;left:0;width:11px;height:11px;border-radius:50%;background:#E50914;margin-left:-5px}
+  #row{display:flex;align-items:center;gap:6px}
+  .cbtn{background:none;border:none;color:#fff;padding:8px 10px;cursor:pointer}
+  .cbtn svg{width:22px;height:22px;fill:#fff;stroke:#fff}
+  #tcode{color:#ddd;font-size:12px;font-variant-numeric:tabular-nums;margin-left:6px}
+  #title{position:absolute;top:0;left:0;right:0;z-index:6;padding:14px 16px;display:flex;align-items:center;gap:6px;
+         background:linear-gradient(180deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,0) 100%);transition:opacity .3s}
+  #title.hidden{opacity:0;pointer-events:none}
+  #back{color:#E50914;font-size:26px;padding:2px 14px 6px 4px;cursor:pointer}
+  #ttl{color:#fff;font-size:15px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #subsBtn{margin-left:auto}
+</style>
+</head>
+<body>
+<video id="vid" playsinline autoplay></video>
+<div id="sub"></div>
+<div id="title"><span id="back">&#10094;</span><span id="ttl">Now playing</span>
+  <button class="cbtn" id="subsBtn" title="Subtitles">
+    <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 9h5v2H6V9zm0 4h8v2H6v-2zm12 2h-2v-2h2v2zm0-4h-9V9h9v2z"/></svg>
+  </button>
+</div>
+<div id="ctrl">
+  <div id="seekWrap">
+    <div id="seekTrack"></div><div id="seekBuf"></div><div id="seekFill"></div><div id="seekDot"></div>
+  </div>
+  <div id="row">
+    <button class="cbtn" id="bPlay"><svg id="icPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="cbtn" id="bRew"><svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
+    <button class="cbtn" id="bFwd"><svg viewBox="0 0 24 24"><path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/></svg></button>
+    <span id="tcode">0:00 / 0:00</span>
+  </div>
+</div>
+<div id="msg"></div>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var f = q.get('f') || '';
+  var t = q.get('t');
+  var s = q.get('s') || '';
+  if (t) document.getElementById('ttl').textContent = t;
+  var vid = document.getElementById('vid');
+  var msg = document.getElementById('msg');
+  var ctrl = document.getElementById('ctrl');
+  var titleBar = document.getElementById('title');
+  var sub = document.getElementById('sub');
+  var icPlay = document.getElementById('icPlay');
+  var seekFill = document.getElementById('seekFill');
+  var seekDot = document.getElementById('seekDot');
+  var seekBuf = document.getElementById('seekBuf');
+  var seekWrap = document.getElementById('seekWrap');
+  var tcode = document.getElementById('tcode');
+  var hideTimer = null;
+  var subs = [];
+  function fail(m){ msg.textContent = m; msg.style.display = 'block'; }
+  function fmt(x){
+    if (!x || !isFinite(x)) return '0:00';
+    var h = Math.floor(x/3600), m = Math.floor((x%3600)/60), sec = Math.floor(x%60);
+    var r = m + ':' + (sec<10?'0':'') + sec;
+    return h ? (h + ':' + (m<10?'0':'') + r) : r;
+  }
+  function pad(n){ return (n<10?'0':'') + n; }
+  // ---- SRT parsing (same engine idea as the site player) ----
+  function srtToCues(txt){
+    var out = [];
+    var blocks = txt.replace(/\r/g,'').split(/\n\n+/);
+    for (var i=0;i<blocks.length;i++){
+      var b = blocks[i].split('\n');
+      if (b.length < 2) continue;
+      var line = b[0].indexOf('-->') === -1 && b[1] && b[1].indexOf('-->') !== -1 ? b[1] : b[0];
+      var mm = line.match(/(\d+):(\d+):(\d+)[,.](\d+)\s*-->\s*(\d+):(\d+):(\d+)[,.](\d+)/);
+      if (!mm) continue;
+      var st = (+mm[1])*3600+(+mm[2])*60+(+mm[3])+(+mm[4])/1000;
+      var en = (+mm[5])*3600+(+mm[6])*60+(+mm[7])+(+mm[8])/1000;
+      var ti = b.slice(line === b[0] ? 1 : 2).join('\n').trim();
+      if (ti) out.push({start:st,end:en,text:ti});
+    }
+    return out;
+  }
+  function showSubFor(cur){
+    var hit = '';
+    for (var i=0;i<subs.length;i++){
+      if (cur >= subs[i].start && cur <= subs[i].end){ hit = subs[i].text; break; }
+    }
+    if (hit){ sub.textContent = hit; sub.style.display = 'block'; }
+    else { sub.style.display = 'none'; }
+  }
+  function loadSub(name){
+    if (!name) return;
+    var dir = f.substring(0, f.lastIndexOf('/')+1);
+    var url = dir + name;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onload = function(){
+      if (xhr.status !== 200 && xhr.status !== 0){ return; }
+      subs = srtToCues(xhr.responseText);
+    };
+    xhr.onerror = function(){};
+    try { xhr.send(); } catch(e){}
+  }
+  // ---- controls ----
+  function showBars(){
+    ctrl.classList.remove('hidden');
+    titleBar.classList.remove('hidden');
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){
+      ctrl.classList.add('hidden');
+      titleBar.classList.add('hidden');
+    }, 3500);
+  }
+  function syncPlayIcon(){ icPlay.innerHTML = vid.paused ? '<path d="M8 5v14l11-7z"/>' : '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; }
+  function updateUi(){
+    var d = vid.duration || 0, c = vid.currentTime || 0;
+    var pct = d ? (c/d*100) : 0;
+    seekFill.style.width = pct + '%';
+    seekDot.style.left = pct + '%';
+    if (vid.buffered && vid.buffered.length && d){
+      seekBuf.style.width = (vid.buffered.end(vid.buffered.length-1)/d*100) + '%';
+    }
+    tcode.textContent = fmt(c) + ' / ' + fmt(d);
+    showSubFor(c);
+    syncPlayIcon();
+  }
+  vid.addEventListener('timeupdate', updateUi);
+  vid.addEventListener('progress', updateUi);
+  vid.addEventListener('play', syncPlayIcon);
+  vid.addEventListener('pause', syncPlayIcon);
+  vid.addEventListener('loadedmetadata', updateUi);
+  vid.addEventListener('click', function(){ showBars(); vid.paused ? vid.play() : vid.pause(); });
+  document.addEventListener('touchstart', showBars, {passive:true});
+  document.getElementById('bPlay').addEventListener('click', function(e){ e.stopPropagation(); showBars(); vid.paused ? vid.play() : vid.pause(); });
+  document.getElementById('bRew').addEventListener('click', function(e){ e.stopPropagation(); showBars(); vid.currentTime = Math.max(0, vid.currentTime-10); });
+  document.getElementById('bFwd').addEventListener('click', function(e){ e.stopPropagation(); showBars(); vid.currentTime = Math.min(vid.duration||0, vid.currentTime+10); });
+  function seekFromEvent(e){
+    var r = seekWrap.getBoundingClientRect();
+    var x = (e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX) - r.left;
+    var p = Math.max(0, Math.min(1, x/r.width));
+    if (vid.duration) vid.currentTime = p * vid.duration;
+    showBars();
+  }
+  seekWrap.addEventListener('touchstart', function(e){ e.stopPropagation(); seekFromEvent(e); }, {passive:true});
+  seekWrap.addEventListener('touchmove', function(e){ e.stopPropagation(); seekFromEvent(e); }, {passive:true});
+  seekWrap.addEventListener('click', function(e){ e.stopPropagation(); seekFromEvent(e); });
+  document.getElementById('back').addEventListener('click', function(e){
+    e.stopPropagation();
+    try { DeymflixLocal.exitPlayer(); } catch(err) { try { history.back(); } catch(err2) {} }
+  });
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  // ---- boot ----
+  if (!f) { fail('Nothing to play.'); return; }
+  vid.src = f;
+  var p = vid.play();
+  if (p && p.catch) { p.catch(function(){}); }
+  showBars();
+  vid.addEventListener('error', function(){ fail('Cannot play this file. Try deleting the download and getting it again.'); });
+  if (s) loadSub(s);
+})();
+</script>
+</body>
+</html>

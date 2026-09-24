@@ -1,7 +1,7 @@
 {
   "version": "1.3",
   "released": "2026-09-22",
-  "url": "https://download2277.mediafire.com/2lh22ycscsogiFwheg_FfQvyeUZIkHO_-rnRwtIvcPEjFAcrT6cYAOmOhLnVqrSXrJsDTqhW7TaQYmEi4QwmNILBq4cpB_snRSkoHmyNjhgMNdd3Cu89yzq42-3hIP0rcEZNvE106994KkoxeoVo_5RAnq2tAJsQGwykVZshfW70DDU/tbl3isgzyfaxlz8/Deymflix+v1.3.apk",
+  "url": "apk/Deymflix-v1.3.apk",
   "notes": [
     "Fixed swipe-to-refresh not responding",
     "Loading icon no longer stays visible after refresh",
