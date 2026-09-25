@@ -52,9 +52,12 @@ import java.net.URL;
 
 public class DlUpdate85 {
 
-    // The version of the APP this file is compiled into. Bump this on every
-    // release (it must match what you put in app-update.json next release).
-    public static final String CURRENT_VERSION = "1.5";
+    // Fallback ONLY -- used when the real app versionName cannot be read.
+    // The checker now reads the actual versionName from the APK
+    // (PackageManager), so Sketchware's "App Version" setting is the single
+    // source of truth: whatever you set there is what gets compared against
+    // app-update.json. No more second number to maintain.
+    public static final String CURRENT_VERSION = "1.4";
 
     private static final String MANIFEST_URL =
             "https://deymflix.eu.cc/app-update.json";
@@ -74,7 +77,7 @@ public class DlUpdate85 {
         new Thread(new Runnable() { @Override public void run() {
             String remote = fetchManifestVersion();
             if (remote == null) return; // offline / manifest missing: allow
-            if (!isNewer(remote, CURRENT_VERSION)) return;
+            if (!isNewer(remote, appVersion(act))) return;
             String url = fetchManifestUrl();
             final String v = remote;
             final String u = url == null ? "" : url;
@@ -126,6 +129,17 @@ public class DlUpdate85 {
             return json.substring(q1 + 1, q2);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    // The REAL app version, straight from the APK (Sketchware's
+    // "App Version" field -> versionName). Never desyncs from the build.
+    private static String appVersion(Activity act) {
+        try {
+            return act.getPackageManager()
+                    .getPackageInfo(act.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            return CURRENT_VERSION;
         }
     }
 

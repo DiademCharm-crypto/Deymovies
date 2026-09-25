@@ -7129,6 +7129,11 @@
       // style.display can't hide it — toggle the .force-hidden class instead.
       const isSeries = !!(currentMovie && (currentMovie.isSeries || currentMovie._episodeNum));
       btn.classList.toggle('force-hidden', !(isSeries && getNextEpisodeInfo()));
+      // Episodes button: series mode ONLY (plain movies never show it)
+      const epBtn = document.getElementById('btn-episodes');
+      if (epBtn) epBtn.classList.toggle('force-hidden', !isSeries);
+      // a movie with no episode list: close the panel if it was open
+      if (!isSeries && typeof toggleEpList === 'function') toggleEpList(false);
     }
     directPlayer.addEventListener('loadedmetadata', updateNextEpisodeBtn);
     directPlayer.addEventListener('emptied', updateNextEpisodeBtn);

@@ -70,7 +70,7 @@ public class DlScreen85 {
     // Library build tag: shown in the Downloads settings dialog so the
     // running app build can always be identified (matches the deymflix-
     // screens-1.0 zip that was imported into Sketchware).
-    public static final String LIB_BUILD = "screens-2026.09.25-r5";
+    public static final String LIB_BUILD = "screens-2026.09.25-r6";
     private static final String C_RED = "#E50914";
     private static final String C_DIM = "#8A8A8A";
     private static final String C_SOFT = "#DDDDDD";
@@ -272,21 +272,44 @@ public class DlScreen85 {
         headRow.setOrientation(LinearLayout.HORIZONTAL);
         headRow.setGravity(Gravity.CENTER_VERTICAL);
         headRow.addView(head, new LinearLayout.LayoutParams(0, -2, 1f));
-        TextView gear = new TextView(act);
-        gear.setText("Settings");
-        gear.setTextColor(Color.parseColor(C_SOFT));
-        gear.setTextSize(14);
-        gear.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        // GEAR ICON (drawn with Canvas -- no emoji, matches the theme):
+        // opens the Downloads settings dialog.
+        android.view.View gear = new android.view.View(act) {
+            private final android.graphics.Paint gp = new android.graphics.Paint(
+                    android.graphics.Paint.ANTI_ALIAS_FLAG);
+            private final android.graphics.Path path = new android.graphics.Path();
+            @Override protected void onDraw(android.graphics.Canvas c) {
+                super.onDraw(c);
+                int w = getWidth(); int h = getHeight();
+                if (w == 0) return;
+                if (h == 0) return;
+                float s = Math.min(w, h) / 24f;
+                gp.setColor(Color.parseColor("#C9C9CF"));
+                gp.setStyle(android.graphics.Paint.Style.FILL);
+                try {
+                    path.set(androidx.core.graphics.PathParser.createPathFromPathData(
+                            "M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"));
+                } catch (Throwable t) { }
+                c.save();
+                c.translate((w - 24f * s) / 2f, (h - 24f * s) / 2f);
+                c.scale(s, s);
+                c.drawPath(path, gp);
+                c.restore();
+            }
+        };
         android.graphics.drawable.GradientDrawable gearBg = new android.graphics.drawable.GradientDrawable();
         gearBg.setColor(Color.parseColor("#16161C"));
-        gearBg.setCornerRadius(14 * d);
+        gearBg.setCornerRadius(12 * d);
         gearBg.setStroke(1, Color.parseColor("#2A2A30"));
         gear.setBackgroundDrawable(gearBg);
-        gear.setPadding((int) (14 * d), (int) (7 * d), (int) (14 * d), (int) (7 * d));
+        int gs = (int) (32 * d);
+        gear.setPadding(0, 0, 0, 0);
+        gear.setClickable(true);
+        gear.setFocusable(true);
         gear.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { showSettingsDialog(st); }
         });
-        LinearLayout.LayoutParams gearLp = new LinearLayout.LayoutParams(-2, -2);
+        LinearLayout.LayoutParams gearLp = new LinearLayout.LayoutParams(gs, gs);
         gearLp.leftMargin = (int) (10 * d);
         headRow.addView(gear, gearLp);
         root.addView(headRow);
@@ -1565,7 +1588,7 @@ public class DlScreen85 {
         card.addView(title);
 
         TextView sub = new TextView(act);
-        sub.setText("Simultaneous downloads");
+        sub.setText("Max Downloads");
         sub.setTextColor(Color.parseColor(C_DIM));
         sub.setTextSize(13);
         LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(-1, -2);
@@ -1575,20 +1598,35 @@ public class DlScreen85 {
         final TextView[] optBtns = new TextView[3];
         for (int i = 0; i < 3; i++) {
             final int n = i + 1;
-            TextView opt = new TextView(act);
-            opt.setText(n + (n == 1 ? " download at a time" : " downloads at a time"));
-            opt.setTextSize(14);
-            opt.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-            opt.setPadding((int) (16 * d), (int) (11 * d), (int) (16 * d), (int) (11 * d));
+            // checkbox row: [ 1 ]  [ 2 ]  [ 3 ]  -- square boxes, red = on
+            LinearLayout row = new LinearLayout(act);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setClickable(true);
+            row.setFocusable(true);
+            row.setPadding((int) (6 * d), (int) (7 * d), (int) (6 * d), (int) (7 * d));
+            TextView box = new TextView(act);
+            box.setTextSize(13);
+            box.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            box.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams((int) (26 * d), (int) (26 * d));
+            bLp.rightMargin = (int) (12 * d);
+            row.addView(box, bLp);
+            TextView lbl = new TextView(act);
+            lbl.setText(String.valueOf(n));
+            lbl.setTextColor(Color.WHITE);
+            lbl.setTextSize(14);
+            lbl.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            row.addView(lbl, new LinearLayout.LayoutParams(-2, -2));
             LinearLayout.LayoutParams oLp = new LinearLayout.LayoutParams(-1, -2);
-            oLp.topMargin = (int) (8 * d);
-            card.addView(opt, oLp);
-            optBtns[i] = opt;
-            opt.setOnClickListener(new View.OnClickListener() {
+            oLp.topMargin = (int) (6 * d);
+            card.addView(row, oLp);
+            optBtns[i] = box;
+            row.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
                     DlSpeed85.setMaxConcurrent(act, n);
                     styleSettingsOptions(st, optBtns);
-                    Toast.makeText(act, "Will download " + n + " at a time", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(act, "Max downloads: " + n, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -1635,22 +1673,26 @@ public class DlScreen85 {
     }
 
     // Highlights the option matching the current limit (red) and dims the rest.
+    // Checkbox squares: the chosen count gets a filled red box with a white
+    // check; the others stay dark and empty.
     private static void styleSettingsOptions(State85 st, TextView[] optBtns) {
         int cur = DlSpeed85.getMaxConcurrent(st.act);
         for (int i = 0; i < optBtns.length; i++) {
-            TextView opt = optBtns[i];
-            if (opt == null) continue;
+            TextView box = optBtns[i];
+            if (box == null) continue;
             android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
-            g.setCornerRadius(12 * st.d);
+            g.setCornerRadius(6 * st.d);
             if (i + 1 == cur) {
                 g.setColor(Color.parseColor(C_RED));
-                opt.setTextColor(Color.WHITE);
+                box.setTextColor(Color.WHITE);
+                box.setText(String.valueOf((char) 0x2713));
             } else {
                 g.setColor(Color.parseColor("#1E1E24"));
                 g.setStroke(1, Color.parseColor("#2A2A30"));
-                opt.setTextColor(Color.parseColor(C_SOFT));
+                box.setTextColor(Color.TRANSPARENT);
+                box.setText(String.valueOf((char) 0x2713));
             }
-            opt.setBackgroundDrawable(g);
+            box.setBackgroundDrawable(g);
         }
     }
 
