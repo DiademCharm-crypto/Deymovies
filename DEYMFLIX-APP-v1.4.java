@@ -23,7 +23,8 @@
 //    1. copy deymflix-screens-lib/ (classes.jar + classes.dex) to
 //       /storage/emulated/0/.sketchware/libs/local_libs/deymflix-screens-1.0/
 //    2. add the registration line (see SKETCHWARE-v1.4-GUIDE.md) to
-//       .sketchware/data/608/data/local_library  (its own data file,
+//       .sketchware/data/608/local_library  (project 608's own registration
+//       file - NOTE: directly in the 608 folder, NOT a "data" subfolder)
 //       same format your swiperefreshlayout entry already uses)
 //
 //  MainActivity NOTE: the MainActivity layout keeps its WebView (webview1) --

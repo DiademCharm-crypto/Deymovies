@@ -684,6 +684,36 @@
     @media (max-width: 768px) {
       body.is-ios .mobile-volume-control { display: none !important; }
       .video-container.fullscreen-active .mobile-volume-control { display: flex; }
+
+      /* ===== EPISODES "List" PANEL (right side, over the video) =======
+         PC mode: an Episodes button in the control bar opens it any time.
+         Mobile/app: the button appears only while fullscreen is active.
+         Matches the reference: dark translucent panel, bold "List" header,
+         current episode highlighted, close button. */
+      .ep-list-panel {
+        position: absolute; top: 0; right: -340px; width: 300px; max-width: 42%;
+        height: 100%; z-index: 60;
+        background: rgba(10, 10, 12, 0.86);
+        backdrop-filter: blur(8px);
+        color: #fff; padding: 22px 18px; box-sizing: border-box;
+        transition: right .28s ease; overflow-y: auto;
+      }
+      .ep-list-panel.open { right: 0; }
+      .ep-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+      .ep-list-title { font-size: 1.25rem; font-weight: 800; }
+      .ep-list-close { background: none; border: none; color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 4px; }
+      .ep-item { display: block; width: 100%; text-align: left; background: none; border: none;
+        color: #e0e0e0; font-size: 1.15rem; font-weight: 600; padding: 14px 16px; margin: 8px 0;
+        border-radius: 8px; cursor: pointer; }
+      .ep-item:hover { background: rgba(255,255,255,.12); }
+      .ep-item.current { background: #6c5ce7; color: #fff; }
+      .ep-item .ep-item-name { display: block; font-size: .8rem; font-weight: 400; color: #bbb; margin-top: 2px; }
+      .ep-item.current .ep-item-name { color: #eee; }
+      /* The Episodes control-bar button (PC: always visible; mobile/app:
+         only when .fullscreen-active is on the container) */
+      #btn-episodes { display: none; }
+      .pc-main #btn-episodes { display: inline-flex; }
+      .video-container.fullscreen-active #btn-episodes { display: inline-flex; }
     }
 
     /* Download Modal */
@@ -2378,7 +2408,15 @@
 
     <video id="direct-video-player" playsinline preload="auto" style="display: none;"></video>
     <!-- Animated Loading Buffer Overlay -->
-    <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: none;">
+    <div id="ep-list-panel" class="ep-list-panel">
+      <div class="ep-list-head">
+        <span class="ep-list-title">List</span>
+        <button class="ep-list-close" title="Close" onclick="toggleEpList(false)">&times;</button>
+      </div>
+      <div id="ep-list-items"></div>
+    </div>
+
+    <!-- Animated Loading Buffer Overlay -->
       <div class="spinner-ring"></div>
       <div class="spinner-text">Buffering...</div>
     </div>
@@ -2471,7 +2509,13 @@
             </div>
           </div>
           <div class="right-utility-btns">
-            <!-- Series only: skip straight to the next episode (hidden for movies) -->
+            <!-- PC/SERIES: skip straight to the next episode (hidden for movies) -->
+            <button id="btn-episodes" class="ctrl-btn-small" title="Episodes" onclick="toggleEpList(event)">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+              </svg>
+            </button>
+
             <button id="btn-next-episode-inline" class="ctrl-btn-small" title="Next episode" style="display:none;" onclick="playNextEpisode()">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
@@ -5690,17 +5734,21 @@
     };
 
     function toggleFullscreen() {
-      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      // APP MODE: fullscreen state lives in the .fullscreen-active class
+      // (the native side pins the video over everything) -- the standard
+      // document.fullscreenElement is always false in a WebView.
+      const appFs = () => !!(playerContainer && playerContainer.classList && playerContainer.classList.contains('fullscreen-active'));
+      const isFS = appFs() || !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
-      // APP MODE: Android WebView has no Fullscreen API, so the native side
-      // handles it. isVideo=true ONLY when the <video> element itself goes
-      // fullscreen -- then the app rotates landscape (Netflix/LokLok style).
-      // Page fullscreens (trailer iframe, containers) stay portrait: the app
-      // just hides the status bars. The page itself never rotates anymore.
       if (window.DFX_IS_APP && window.DeymflixApp && typeof window.DeymflixApp.toggleFullscreen === 'function') {
         try {
-          const fsOnVideo = !isFS && !!directPlayer; // this button always controls the main <video>
-          window.DeymflixApp.toggleFullscreen(!isFS, fsOnVideo);
+          const entering = !isFS;
+          if (entering) {
+            playerContainer.classList.add('fullscreen-active');
+          } else {
+            playerContainer.classList.remove('fullscreen-active');
+          }
+          window.DeymflixApp.toggleFullscreen(entering, false);
           return;
         } catch (e) { /* fall through to web fullscreen */ }
       }
@@ -6028,6 +6076,15 @@
     }
 
     function loadEmbed() {
+      // Series opened without a clicked episode: stamp ep1 metadata so the
+      // app-mode Download button labels the file "Series ep1" (the app's
+      // series folder then groups it with ep2, ep3...).
+      try {
+        if (currentMovie && currentMovie.isSeries && !currentMovie._episodeNum) {
+          currentMovie._episodeNum = 1;
+          currentMovie._episodeSeason = 1;
+        }
+      } catch (e) {}
       startSlowConnectionCheck();
       if (typeof updateTrailerBtn === 'function') updateTrailerBtn();
 
@@ -6479,11 +6536,16 @@
 
     function handleFullscreenChange() {
       const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-      
+
       if (isFullscreen) {
         playerContainer.classList.add('fullscreen-active');
       } else {
         playerContainer.classList.remove('fullscreen-active');
+        // App mode: also tell the native side to lower its bars in case the
+        // fullscreen ended through some other path (back gesture, etc.).
+        if (window.DFX_IS_APP && window.DeymflixApp && typeof window.DeymflixApp.toggleFullscreen === 'function') {
+          try { window.DeymflixApp.toggleFullscreen(false, false); } catch (e) {}
+        }
         if (screen.orientation && screen.orientation.unlock) {
           try {
             screen.orientation.unlock();
@@ -6900,6 +6962,76 @@
         }
       }
       return null; // series finished
+    }
+
+    // ===== EPISODES "List" PANEL ==========================================
+    // PC mode: opened any time with the Episodes control-bar button.
+    // Mobile/app: the button shows only while fullscreen is active.
+    // Clicking an episode switches playback via the site's own
+    // playEpisodeSource(); the current episode is highlighted.
+    function currentEpNum() {
+      try { return (currentMovie && (currentMovie._episodeNum || (currentMovie.isSeries ? 1 : null))) || null; }
+      catch (e) { return null; }
+    }
+
+    function buildEpListItems() {
+      const normSeriesId = v => String(v || '').toLowerCase().replace(/[\s\+]+/g, '-');
+      const series = seriesData.find(s => s.id === currentMovie.id || normSeriesId(s.id) === normSeriesId(currentMovie.id));
+      if (!series || !series.seasons) return [];
+      const out = [];
+      series.seasons.forEach(season => {
+        (season.episodes || []).forEach(ep => {
+          out.push({ ep: ep, season: season,
+            num: ep.episodeNumber,
+            name: ep.title || '',
+            multiSeason: series.seasons.length > 1 });
+        });
+      });
+      return out;
+    }
+
+    function renderEpList() {
+      const host = document.getElementById('ep-list-items');
+      if (!host) return;
+      host.innerHTML = '';
+      const items = buildEpListItems();
+      const cur = currentEpNum();
+      items.forEach(it => {
+        const b = document.createElement('button');
+        b.className = 'ep-item' + (it.ep.episodeNumber === cur ? ' current' : '');
+        b.type = 'button';
+        b.innerHTML = 'Episode ' + it.num
+          + (it.name ? '<span class="ep-item-name">' + it.name + '</span>' : '')
+          + (it.multiSeason ? '<span class="ep-item-name">Season ' + it.season.seasonNumber + '</span>' : '');
+        b.onclick = () => {
+          // same switch path as the episodes grid + next-episode button
+          document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
+          document.querySelectorAll('.episode-square-btn').forEach(el => {
+            if (el.textContent.trim() === String(it.ep.episodeNumber)) el.classList.add('active');
+          });
+          if (it.ep && it.ep.hlsUrl) { currentMovie._episodeHlsUrl = it.ep.hlsUrl; }
+          else { delete currentMovie._episodeHlsUrl; }
+          vastAdPhase = 0;
+          vastTriggered = false;
+          if (typeof playEpisodeSource === 'function') playEpisodeSource(it.ep, it.season);
+          toggleEpList(false);
+        };
+        host.appendChild(b);
+      });
+      if (!items.length) {
+        const p = document.createElement('div');
+        p.style.cssText = 'color:#bbb;font-size:.95rem;padding:8px 4px;';
+        p.textContent = 'No episode list for this title.';
+        host.appendChild(p);
+      }
+    }
+
+    function toggleEpList(force) {
+      const panel = document.getElementById('ep-list-panel');
+      if (!panel) return;
+      const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+      if (open) renderEpList();
+      panel.classList.toggle('open', open);
     }
 
     function playNextEpisode() {

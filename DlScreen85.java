@@ -44,6 +44,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -87,8 +88,80 @@ public class DlScreen85 {
         TextView tabDoneTxt;
         View tabDlLine;
         View tabDoneLine;
+        android.widget.EditText search;   // filter box under the tabs
+        String query = "";                // current lowercase filter
+        java.util.HashSet<String> expanded = new java.util.HashSet<String>();
         int tab = 0;      // 0 = Downloading (active), 1 = Downloaded (finished)
         float d = 1f;     // density
+
+        // SELECTION MODE (bulk delete): long-press a card to enter. Keys are
+        // engine rowIds ("M...") or DownloadManager ids prefixed "D".
+        boolean selectMode = false;
+        java.util.HashSet<String> selected = new java.util.HashSet<String>();
+        LinearLayout actionBar;   // bottom Delete / Cancel bar
+        Button deleteBtn;
+
+        // SERIES PAGE (LokLok style): tapping a series folder opens a
+        // dedicated page instead of an inline dropdown. While open,
+        // seriesName is the series title and st.list points at the series
+        // list host; the 1s refresh renders it until back is pressed.
+        View mainRoot;            // main downloads content view
+        LinearLayout mainList;    // main list host (st.list swap target)
+        String seriesName;        // null = main list, non-null = series page
+        TextView seriesStorage;
+        TextView seriesEdit;
+        LinearLayout seriesBar;
+        Button seriesDeleteBtn;
+    }
+
+    // "Series Name ep3" -> "Series Name" (null when the title is a movie,
+    // i.e. no episode marker). Mirrors the site's series grouping.
+    private static String seriesOf(String title) {
+        if (title == null) return null;
+        int ep = episodeNumOf(title);
+        if (ep <= 0) return null;
+        String s = title.replaceAll("\\bep?\\.?\\s*\\d{1,2}\\b", " ");
+        s = s.replaceAll("\\s+", " ").trim();
+        if (s.length() == 0) return null;
+        return s;
+    }
+
+    // Episode sub-title: the descriptive episode name saved at download
+    // time (registry key "st_<rowId>" -> the raw episode title from the
+    // site, e.g. "Episode 3 - Testing Her Faith"). Empty when unknown.
+    private static String episodeSubTitleOf(String title) {
+        if (title == null) return "";
+        String raw = STATE_NAME_CACHE.get(title.toLowerCase(java.util.Locale.US));
+        return raw == null ? "" : raw;
+    }
+
+    // in-memory map title -> episode name for cards rendered this session
+    static final java.util.HashMap<String, String> STATE_NAME_CACHE =
+            new java.util.HashMap<String, String>();
+
+    // Series key for the ep1 pre-pass: title minus its episode marker.
+    private static String seriesKeyOf(String title) {
+        if (title == null) return "";
+        String s = title.replaceAll("\\bep?\\.?\\s*\\d{1,2}\\b", " ");
+        return s.replaceAll("\\s+", " ").trim().toLowerCase(java.util.Locale.US);
+    }
+
+    // "Series Name ep3" -> 3 (0 when not an episode)
+    private static int episodeNumOf(String t) {
+        if (t == null) return 0;
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("\\bep?\\.?\\s*(\\d{1,2})\\b")
+                .matcher(t.toLowerCase());
+        if (m.find()) {
+            try { return Integer.parseInt(m.group(1)); } catch (Exception e) { return 0; }
+        }
+        return 0;
+    }
+
+    private static boolean matchesQuery(String title, String q) {
+        if (q.length() == 0) return true;
+        if (title == null) return false;
+        return title.toLowerCase().indexOf(q) >= 0;
     }
 
     // -----------------------------------------------------------------------
@@ -99,14 +172,27 @@ public class DlScreen85 {
         private final State85 st;
         private final int kind;
         private final long id;
+        private final boolean eng;   // true = DlSpeed85 engine row
+        private final String rowId;  // engine registry key ("M...")
         private final String title;
         private final String subName;
         private final int status;
 
         Act85(State85 st, int kind, long id, String title, String subName, int status) {
+            this(st, kind, id, false, "", title, subName, status);
+        }
+
+        Act85(State85 st, int kind, String rowId, String title, String subName, int status) {
+            this(st, kind, 0L, true, rowId == null ? "" : rowId, title, subName, status);
+        }
+
+        private Act85(State85 st, int kind, long id, boolean eng, String rowId,
+                String title, String subName, int status) {
             this.st = st;
             this.kind = kind;
             this.id = id;
+            this.eng = eng;
+            this.rowId = rowId;
             this.title = title;
             this.subName = subName;
             this.status = status;
@@ -115,16 +201,32 @@ public class DlScreen85 {
         @Override public void onClick(View v) {
             DownloadManager dm = (DownloadManager) st.act.getSystemService(Context.DOWNLOAD_SERVICE);
             if (kind == 1) {
-                playDownload(st.act, id, title, subName);
+                if (eng) playEngine(st.act, rowId, title, subName);
+                else playDownload(st.act, id, title, subName);
             } else if (kind == 2) {
-                try { dm.remove(id); } catch (Exception e) { }
-                forgetMeta(st.act, id);
-                Toast.makeText(st.act, "Open the movie again and tap download", Toast.LENGTH_SHORT).show();
+                // Failed DownloadManager row: retry through the fast engine.
+                // The url is pulled back out of DownloadManager, the row is
+                // removed, and the engine shows "Retrieving files..." while
+                // it probes the size, then starts over.
+                String[] m = readMeta(st.act, id);
+                DlSpeed85.restartFromDm(st.act, id, title, m[1], subName);
                 render(st);
             } else if (kind == 4) {
                 try { dm.remove(id); } catch (Exception e) { }
                 forgetMeta(st.act, id);
                 Toast.makeText(st.act, "Cancelled", Toast.LENGTH_SHORT).show();
+                render(st);
+            } else if (kind == 6) {
+                // Engine row retry: wipes the parts, restarts the same url.
+                DlSpeed85.restartRow(st.act, rowId);
+                render(st);
+            } else if (kind == 7) {
+                DlSpeed85.cancelRow(st.act, rowId);
+                Toast.makeText(st.act, "Cancelled", Toast.LENGTH_SHORT).show();
+                render(st);
+            } else if (kind == 8) {
+                DlSpeed85.deleteRow(st.act, rowId);
+                Toast.makeText(st.act, "Deleted", Toast.LENGTH_SHORT).show();
                 render(st);
             } else {
                 deleteDownload(st.act, id, subName, status);
@@ -159,7 +261,30 @@ public class DlScreen85 {
         head.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { act.finish(); }
         });
-        root.addView(head);
+
+        // Header row: back title on the left, Settings on the right.
+        LinearLayout headRow = new LinearLayout(act);
+        headRow.setOrientation(LinearLayout.HORIZONTAL);
+        headRow.setGravity(Gravity.CENTER_VERTICAL);
+        headRow.addView(head, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView gear = new TextView(act);
+        gear.setText("Settings");
+        gear.setTextColor(Color.parseColor(C_SOFT));
+        gear.setTextSize(14);
+        gear.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        android.graphics.drawable.GradientDrawable gearBg = new android.graphics.drawable.GradientDrawable();
+        gearBg.setColor(Color.parseColor("#16161C"));
+        gearBg.setCornerRadius(14 * d);
+        gearBg.setStroke(1, Color.parseColor("#2A2A30"));
+        gear.setBackgroundDrawable(gearBg);
+        gear.setPadding((int) (14 * d), (int) (7 * d), (int) (14 * d), (int) (7 * d));
+        gear.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { showSettingsDialog(st); }
+        });
+        LinearLayout.LayoutParams gearLp = new LinearLayout.LayoutParams(-2, -2);
+        gearLp.leftMargin = (int) (10 * d);
+        headRow.addView(gear, gearLp);
+        root.addView(headRow);
 
         // "Internal storage  x.x GB remaining"
         final TextView storage = new TextView(act);
@@ -190,13 +315,98 @@ public class DlScreen85 {
         tabDone.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { st.tab = 1; styleTabs(st); render(st); }
         });
+        final android.widget.EditText search = new android.widget.EditText(act);
+        st.search = search;
+        search.setHint("Search downloads...");
+        search.setSingleLine(true);
+        search.setTextColor(Color.WHITE);
+        search.setHintTextColor(Color.parseColor("#6E6E76"));
+        search.setTextSize(14);
+        search.setBackgroundDrawable(null);
+        search.setPadding((int) (12 * d), (int) (9 * d), (int) (12 * d), (int) (9 * d));
+        android.graphics.drawable.GradientDrawable sBg =
+                new android.graphics.drawable.GradientDrawable();
+        sBg.setColor(Color.parseColor("#16161C"));
+        sBg.setCornerRadius(12 * d);
+        sBg.setStroke(1, Color.parseColor("#2A2A30"));
+        search.setBackgroundDrawable(sBg);
+        LinearLayout.LayoutParams seLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        seLp.topMargin = (int) (10 * d);
+        root.addView(search, seLp);
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b2, int c2) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b2, int c2) { }
+            @Override public void afterTextChanged(android.text.Editable s) {
+                String q = String.valueOf(s);
+                if (q.equals(st.query)) return;
+                st.query = q.toLowerCase();
+                render(st);
+            }
+        });
 
-        // The list + the empty state (both created BEFORE render() is used)
-        st.list = new LinearLayout(act);
-        st.list.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-        lp.topMargin = (int) (14 * d);
-        root.addView(st.list, lp);
+        // The scrollable list + empty state. Everything below the tabs lives
+        // in one ScrollView so long lists scroll (they previously fell off
+        // the bottom of the screen with no way to reach them).
+        final android.widget.ScrollView scroller = new android.widget.ScrollView(act);
+        scroller.setVerticalScrollBarEnabled(true);
+        scroller.setFillViewport(true);
+        LinearLayout listHost = new LinearLayout(act);
+        listHost.setOrientation(LinearLayout.VERTICAL);
+        scroller.addView(listHost, new android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams scLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
+        scLp.topMargin = (int) (14 * d);
+        root.addView(scroller, scLp);
+
+        // SELECTION MODE bottom bar: Delete + Cancel for bulk deleting.
+        LinearLayout actionBar = new LinearLayout(act);
+        actionBar.setOrientation(LinearLayout.HORIZONTAL);
+        actionBar.setGravity(Gravity.CENTER_VERTICAL + Gravity.RIGHT);
+        android.graphics.drawable.GradientDrawable abBg = new android.graphics.drawable.GradientDrawable();
+        abBg.setColor(Color.parseColor("#14141A"));
+        abBg.setCornerRadius(14 * d);
+        abBg.setStroke(1, Color.parseColor("#2A2A30"));
+        actionBar.setBackgroundDrawable(abBg);
+        actionBar.setPadding((int) (14 * d), (int) (10 * d), (int) (14 * d), (int) (10 * d));
+        LinearLayout.LayoutParams abLp = new LinearLayout.LayoutParams(-1, -2);
+        abLp.topMargin = (int) (10 * d);
+        actionBar.setVisibility(View.GONE);
+        root.addView(actionBar, abLp);
+        st.actionBar = actionBar;
+
+        Button bulkDelete = new Button(act);
+        bulkDelete.setAllCaps(false);
+        bulkDelete.setTextColor(Color.WHITE);
+        bulkDelete.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        bulkDelete.setBackgroundDrawable(rounded(C_RED, 12f * d));
+        bulkDelete.setPadding((int) (20 * d), 0, (int) (20 * d), 0);
+        bulkDelete.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { bulkDeleteSelected(st); }
+        });
+        actionBar.addView(bulkDelete, new LinearLayout.LayoutParams(-2, (int) (40 * d)));
+        st.deleteBtn = bulkDelete;
+
+        Button bulkCancel = new Button(act);
+        bulkCancel.setAllCaps(false);
+        bulkCancel.setTextColor(Color.parseColor(C_SOFT));
+        bulkCancel.setBackgroundDrawable(rounded("#00000000", 0f));
+        bulkCancel.setPadding((int) (14 * d), 0, (int) (4 * d), 0);
+        bulkCancel.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                st.selectMode = false;
+                st.selected.clear();
+                render(st);
+            }
+        });
+        LinearLayout.LayoutParams bcLp = new LinearLayout.LayoutParams(-2, (int) (40 * d));
+        bcLp.leftMargin = (int) (8 * d);
+        actionBar.addView(bulkCancel, bcLp);
+
+        st.list = listHost;
 
         st.empty = new TextView(act);
         st.empty.setTextColor(Color.parseColor(C_DIM));
@@ -204,10 +414,12 @@ public class DlScreen85 {
         st.empty.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(-1, -2);
         ep.topMargin = (int) (40 * d);
-        root.addView(st.empty, ep);
+        listHost.addView(st.empty, ep);
 
         styleTabs(st);
         act.setContentView(root);
+        st.mainRoot = root;
+        st.mainList = listHost;
 
         // Live refresh (1s) while the screen is open: storage line + the cards.
         // Cards are rebuilt in place, posters come from the bitmap cache.
@@ -215,7 +427,12 @@ public class DlScreen85 {
         h.post(new Runnable() {
             @Override public void run() {
                 if (act.isFinishing()) return;
-                refreshStorage(act, storage);
+                // storage line follows the active page (main or series)
+                if (st.seriesName == null) {
+                    refreshStorage(act, storage);
+                } else if (st.seriesStorage != null) {
+                    refreshStorage(act, st.seriesStorage);
+                }
                 render(st);
                 h.postDelayed(this, 1000);
             }
@@ -286,6 +503,14 @@ public class DlScreen85 {
         st.tabDoneTxt.setTextColor(first ? off : on);
         st.tabDoneTxt.setTypeface(first ? android.graphics.Typeface.DEFAULT : android.graphics.Typeface.DEFAULT_BOLD);
         st.tabDoneLine.setBackgroundColor(first ? Color.TRANSPARENT : red);
+        // the searchbar exists only on the Downloaded tab
+        if (st.search != null) {
+            st.search.setVisibility(first ? View.GONE : View.VISIBLE);
+            if (first && st.query.length() > 0) {
+                st.query = "";
+                st.search.setText("");
+            }
+        }
     }
 
     // =======================================================================
@@ -305,46 +530,538 @@ public class DlScreen85 {
     // =======================================================================
     //  The list
     // =======================================================================
-    private static void render(State85 st) {
-        if (st.list == null) return;
-        st.list.removeAllViews();
+    private static class Row85 {
+        String kind;     // "dm" or "eng"
+        long dmId;
+        String rowId;
+        String title;
+        String poster;
+        String subName;
+        int status;
+        long done;
+        long total;
+        String reason;
+        String msg;
+        int est;
+        String series;   // series name when the title is "... epN", else null
+        int ep;
+    }
 
-        int shown = 0;
+    private static void render(State85 st) {
+        if (st.seriesName != null) { renderSeriesPage(st); return; }
+        renderMain(st);
+    }
+
+    // All registry rows (DownloadManager legacy + fast engine), newest last.
+    private static java.util.ArrayList<Row85> collectRows(State85 st) {
+        java.util.ArrayList<Row85> rows = new java.util.ArrayList<Row85>();
         try {
             DownloadManager dm = (DownloadManager) st.act.getSystemService(Context.DOWNLOAD_SERVICE);
             Cursor c = dm.query(new DownloadManager.Query());
             if (c != null) {
-                while (c.moveToNext() && shown < 40) {
-                    long id = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_ID));
-                    int status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
-                    boolean finished = status == DownloadManager.STATUS_SUCCESSFUL;
-                    if (st.tab == 0 && finished) continue;
-                    if (st.tab == 1 && !finished) continue;
-                    long done = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                    long total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                    String[] meta = readMeta(st.act, id);
-                    String title = meta[0] == null ? "" : meta[0];
-                    if (title.length() == 0) title = "Download";
-                    String poster = meta[1] == null ? "" : meta[1];
-                    String subName = meta[2] == null ? "" : meta[2];
-                    shown++;
-                    addCard(st, id, title, poster, subName, status, done, total);
+                while (c.moveToNext() && rows.size() < 80) {
+                    Row85 r = new Row85();
+                    r.kind = "dm";
+                    r.dmId = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_ID));
+                    r.status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                    r.done = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                    r.total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    try { r.reason = c.getString(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON)); } catch (Exception eR) { }
+                    String[] meta = readMeta(st.act, r.dmId);
+                    r.title = meta[0] == null ? "" : meta[0];
+                    if (r.title.length() == 0) r.title = "Download";
+                    r.poster = meta[1] == null ? "" : meta[1];
+                    r.subName = meta[2] == null ? "" : meta[2];
+                    r.series = seriesOf(r.title);
+                    r.ep = episodeNumOf(r.title);
+                    rows.add(r);
                 }
                 c.close();
             }
-        } catch (Exception e) {
-            // a broken query must never crash the screen -- show what we have
+        } catch (Exception e) { }
+        try {
+            java.util.ArrayList<String> ids = DlSpeed85.engineRowIds(st.act);
+            for (int i = 0; i < ids.size() && rows.size() < 100; i++) {
+                Row85 r = new Row85();
+                r.kind = "eng";
+                r.rowId = ids.get(i);
+                r.est = DlSpeed85.statusOf(r.rowId);
+                String[] meta = DlSpeed85.readRow(st.act, r.rowId);
+                r.title = meta[0].length() == 0 ? "Download" : meta[0];
+                r.poster = meta[1];
+                r.subName = meta[3];
+                // episode sub-title for the card (index 6 = [NAME])
+                if (meta.length > 6 && meta[6] != null && meta[6].length() > 0) {
+                    STATE_NAME_CACHE.put(r.title.toLowerCase(java.util.Locale.US), meta[6]);
+                }
+                long[] pg = DlSpeed85.progressOf(r.rowId);
+                r.done = pg[0];
+                r.total = pg[1];
+                r.msg = DlSpeed85.msgOf(r.rowId);
+                r.series = seriesOf(r.title);
+                r.ep = episodeNumOf(r.title);
+                rows.add(r);
+            }
+        } catch (Exception e2) { }
+        return rows;
+    }
+
+    private static void renderMain(State85 st) {
+        if (st.list == null) return;
+        st.list.removeAllViews();
+        java.util.ArrayList<Row85> rows = collectRows(st);
+
+        // ---- search filter -------------------------------------------
+        java.util.ArrayList<Row85> visible = new java.util.ArrayList<Row85>();
+        for (int i = 0; i < rows.size(); i++) {
+            Row85 r = rows.get(i);
+            boolean finished = (r.kind.equals("dm"))
+                    ? r.status == DownloadManager.STATUS_SUCCESSFUL
+                    : r.est == DlSpeed85.ST_DONE;
+            if (st.tab == 0 && finished) continue;
+            if (st.tab == 1 && !finished) continue;
+            if (!matchesQuery(r.title, st.query)) continue;
+            visible.add(r);
+        }
+
+        int shown = 0;
+        if (st.tab == 1) {
+            // ---- DOWNLOADED tab: group series into folders -------------
+            assignImplicitEp1(visible);
+
+            java.util.LinkedHashMap<String, java.util.ArrayList<Row85>> groups =
+                    new java.util.LinkedHashMap<String, java.util.ArrayList<Row85>>();
+            java.util.ArrayList<Row85> movies = new java.util.ArrayList<Row85>();
+            for (int i = 0; i < visible.size(); i++) {
+                Row85 r = visible.get(i);
+                if (r.series != null) {
+                    java.util.ArrayList<Row85> g = groups.get(r.series);
+                    if (g == null) {
+                        g = new java.util.ArrayList<Row85>();
+                        groups.put(r.series, g);
+                    }
+                    g.add(r);
+                } else {
+                    movies.add(r);
+                }
+            }
+            // movies first (newest first), then series folders
+            for (int i = movies.size() - 1; i >= 0 && shown < 40; i--) {
+                shown++;
+                addRowCard(st, movies.get(i));
+            }
+            for (java.util.Map.Entry<String, java.util.ArrayList<Row85>> en : groups.entrySet()) {
+                if (shown >= 40) break;
+                java.util.ArrayList<Row85> eps = en.getValue();
+                // newest episode first inside each group
+                java.util.Collections.sort(eps, new java.util.Comparator<Row85>() {
+                    @Override public int compare(Row85 a, Row85 b) {
+                        return b.ep - a.ep;
+                    }
+                });
+                shown++;
+                addSeriesFolder(st, en.getKey(),
+                        eps.get(0).poster, eps.size(), eps);
+            }
+        } else {
+            // ---- DOWNLOADING tab: flat list, newest first --------------
+            for (int i = visible.size() - 1; i >= 0 && shown < 40; i--) {
+                shown++;
+                addRowCard(st, visible.get(i));
+            }
+        }
+
+        // selection bar state: visible only with something selected
+        if (st.actionBar != null) {
+            boolean barOn = st.selectMode && !st.selected.isEmpty();
+            st.actionBar.setVisibility(barOn ? View.VISIBLE : View.GONE);
+            if (st.deleteBtn != null) {
+                st.deleteBtn.setText("Delete (" + String.valueOf(st.selected.size()) + ")");
+            }
         }
 
         if (st.empty != null) {
-            st.empty.setText(st.tab == 0
-                    ? "No downloads in progress.\nStart one from any movie page."
-                    : "Nothing downloaded yet.\nOpen any movie and tap the download button.");
+            boolean searching = st.query.length() > 0;
+            st.empty.setText(searching
+                    ? "No downloads match \"" + st.query + "\"."
+                    : (st.tab == 0
+                        ? "No downloads in progress.\nStart one from any movie page."
+                        : "Nothing downloaded yet.\nOpen any movie and tap the download button."));
             st.empty.setVisibility(shown > 0 ? View.GONE : View.VISIBLE);
         }
     }
 
-    private static void addCard(State85 st, final long id, final String title, final String poster, final String subName, final int status, final long done, final long total) {
+    // One row (movie card or one episode inside an expanded folder)
+    private static void addRowCard(State85 st, Row85 r) {
+        if (r.kind.equals("dm")) {
+            addCard(st, r.dmId, r.title, r.poster, r.subName, r.status,
+                    r.done, r.total, r.reason == null ? "" : r.reason);
+        } else {
+            addEngineCard(st, r.rowId, r.title, r.poster, r.subName,
+                    r.est, r.done, r.total, r.msg == null ? "" : r.msg);
+        }
+    }
+
+    // A title with NO episode marker ("The Ordinary Jackpot") counts as
+    // EPISODE 1 when other rows of the same series exist. The site only
+    // stamps "ep1" when you CLICK ep1; the auto-played first episode
+    // downloads without the marker, which used to strand it outside the
+    // folder. Runs on every list that groups or shows a series.
+    private static void assignImplicitEp1(java.util.ArrayList<Row85> rows) {
+        java.util.ArrayList<String> presentSeries = new java.util.ArrayList<String>();
+        for (int i = 0; i < rows.size(); i++) {
+            Row85 r = rows.get(i);
+            if (r.series != null && presentSeries.indexOf(r.series) < 0) presentSeries.add(r.series);
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            Row85 r = rows.get(i);
+            if (r.series != null) continue;
+            if (r.ep > 0) continue;
+            for (int k = 0; k < presentSeries.size(); k++) {
+                if (seriesKeyOf(r.title).equalsIgnoreCase(presentSeries.get(k))) {
+                    r.series = presentSeries.get(k);
+                    r.ep = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    // =======================================================================
+    //  SERIES PAGE (LokLok style): dedicated screen with back arrow +
+    //  centered series title + Edit on the right, storage line, a
+    //  "Download more" button, and the episode list. Replaces the old
+    //  inline dropdown.
+    // =======================================================================
+    private static void openSeriesPage(final State85 st, final String name) {
+        final Activity act = st.act;
+        final float d = st.d;
+
+        LinearLayout page = new LinearLayout(act);
+        page.setOrientation(LinearLayout.VERTICAL);
+        page.setBackgroundColor(Color.parseColor(C_BG));
+        page.setPadding((int) (18 * d), (int) (14 * d), (int) (18 * d), (int) (14 * d));
+
+        // -- header: back arrow, centered title, Edit on the right --------
+        LinearLayout headRow = new LinearLayout(act);
+        headRow.setOrientation(LinearLayout.HORIZONTAL);
+        headRow.setGravity(Gravity.CENTER_VERTICAL);
+        TextView back = new TextView(act);
+        back.setText("<");
+        back.setTextColor(Color.WHITE);
+        back.setTextSize(20);
+        back.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        back.setPadding(0, (int) (6 * d), (int) (12 * d), (int) (6 * d));
+        headRow.addView(back, new LinearLayout.LayoutParams(-2, -2));
+        TextView title = new TextView(act);
+        title.setText(name);
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(18);
+        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        title.setSingleLine(true);
+        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        title.setGravity(Gravity.CENTER);
+        headRow.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView edit = new TextView(act);
+        edit.setText("Edit");
+        edit.setTextColor(Color.WHITE);
+        edit.setTextSize(15);
+        edit.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        edit.setPadding((int) (12 * d), (int) (6 * d), 0, (int) (6 * d));
+        headRow.addView(edit, new LinearLayout.LayoutParams(-2, -2));
+        page.addView(headRow, new LinearLayout.LayoutParams(-1, -2));
+
+        // -- storage line --------------------------------------------------
+        final TextView storage2 = new TextView(act);
+        storage2.setTextSize(13);
+        storage2.setPadding(0, (int) (8 * d), 0, (int) (2 * d));
+        page.addView(storage2, new LinearLayout.LayoutParams(-1, -2));
+        st.seriesStorage = storage2;
+
+        // -- "Download more" button: back to the app browser, where the
+        //    series page offers the Download button (episode checklist).
+        TextView more = new TextView(act);
+        more.setText((char) 0x2295 + "   Download more");
+        more.setTextColor(Color.WHITE);
+        more.setTextSize(15);
+        more.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        more.setGravity(Gravity.CENTER);
+        android.graphics.drawable.GradientDrawable moreBg = new android.graphics.drawable.GradientDrawable();
+        moreBg.setColor(Color.parseColor("#14141A"));
+        moreBg.setCornerRadius(12 * d);
+        moreBg.setStroke(1, Color.parseColor("#2A2A30"));
+        more.setBackgroundDrawable(moreBg);
+        more.setPadding(0, (int) (12 * d), 0, (int) (12 * d));
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { closeSeriesPage(st); act.finish(); }
+        });
+        LinearLayout.LayoutParams moreLp = new LinearLayout.LayoutParams(-1, -2);
+        moreLp.topMargin = (int) (10 * d);
+        page.addView(more, moreLp);
+
+        // -- episode list (scrollable) --------------------------------------
+        android.widget.ScrollView sc = new android.widget.ScrollView(act);
+        sc.setFillViewport(true);
+        LinearLayout listHost = new LinearLayout(act);
+        listHost.setOrientation(LinearLayout.VERTICAL);
+        sc.addView(listHost, new android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams scLp = new LinearLayout.LayoutParams(
+                -1, 0, 1f);
+        scLp.topMargin = (int) (6 * d);
+        page.addView(sc, scLp);
+
+        // -- selection bottom bar (Delete / Cancel) for this page -----------
+        LinearLayout bar = new LinearLayout(act);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        bar.setGravity(Gravity.CENTER_VERTICAL + Gravity.RIGHT);
+        android.graphics.drawable.GradientDrawable barBg = new android.graphics.drawable.GradientDrawable();
+        barBg.setColor(Color.parseColor("#14141A"));
+        barBg.setCornerRadius(14 * d);
+        barBg.setStroke(1, Color.parseColor("#2A2A30"));
+        bar.setBackgroundDrawable(barBg);
+        bar.setPadding((int) (14 * d), (int) (10 * d), (int) (14 * d), (int) (10 * d));
+        LinearLayout.LayoutParams barLp = new LinearLayout.LayoutParams(-1, -2);
+        barLp.topMargin = (int) (10 * d);
+        bar.setVisibility(View.GONE);
+        page.addView(bar, barLp);
+        st.seriesBar = bar;
+
+        Button sdel = new Button(act);
+        sdel.setAllCaps(false);
+        sdel.setTextColor(Color.WHITE);
+        sdel.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        sdel.setBackgroundDrawable(rounded(C_RED, 12f * d));
+        sdel.setPadding((int) (20 * d), 0, (int) (20 * d), 0);
+        sdel.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { bulkDeleteSelected(st); }
+        });
+        bar.addView(sdel, new LinearLayout.LayoutParams(-2, (int) (40 * d)));
+        st.seriesDeleteBtn = sdel;
+
+        Button scan = new Button(act);
+        scan.setAllCaps(false);
+        scan.setTextColor(Color.parseColor(C_SOFT));
+        scan.setBackgroundDrawable(rounded("#00000000", 0f));
+        scan.setPadding((int) (14 * d), 0, (int) (4 * d), 0);
+        scan.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                st.selectMode = false;
+                st.selected.clear();
+                render(st);
+            }
+        });
+        LinearLayout.LayoutParams scanLp = new LinearLayout.LayoutParams(-2, (int) (40 * d));
+        scanLp.leftMargin = (int) (8 * d);
+        bar.addView(scan, scanLp);
+
+        // back arrow exits the series page; the hardware BACK key does the
+        // same (the focused page view consumes the key so the activity is
+        // not finished while a series page is open).
+        page.setFocusableInTouchMode(true);
+        page.setFocusable(true);
+        page.setOnKeyListener(new View.OnKeyListener() {
+            @Override public boolean onKey(View v, int keyCode, android.view.KeyEvent ev) {
+                if (keyCode == android.view.KeyEvent.KEYCODE_BACK
+                        && ev.getAction() == android.view.KeyEvent.ACTION_UP) {
+                    closeSeriesPage(st);
+                    return true;
+                }
+                return false;
+            }
+        });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { closeSeriesPage(st); }
+        });
+        // Edit selects every episode of this series at once
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                st.selectMode = true;
+                st.selected.clear();
+                java.util.ArrayList<Row85> eps = seriesEpisodes(st, st.seriesName);
+                for (int i = 0; i < eps.size(); i++) st.selected.add(keyOf(eps.get(i)));
+                render(st);
+            }
+        });
+
+        st.seriesName = name;
+        st.list = listHost;
+        act.setContentView(page);
+        render(st);
+    }
+
+    private static void closeSeriesPage(State85 st) {
+        st.seriesName = null;
+        st.seriesStorage = null;
+        st.seriesBar = null;
+        st.seriesDeleteBtn = null;
+        st.selectMode = false;
+        st.selected.clear();
+        st.list = st.mainList;
+        st.act.setContentView(st.mainRoot);
+        render(st);
+    }
+
+    // Every FINISHED row belonging to the given series (ep 1..N order).
+    private static java.util.ArrayList<Row85> seriesEpisodes(State85 st, String name) {
+        java.util.ArrayList<Row85> out = new java.util.ArrayList<Row85>();
+        if (name == null) return out;
+        java.util.ArrayList<Row85> rows = collectRows(st);
+        assignImplicitEp1(rows);
+        for (int i = 0; i < rows.size(); i++) {
+            Row85 r = rows.get(i);
+            if (r.series == null) continue;
+            if (!r.series.equals(name)) continue;
+            boolean finished = r.kind.equals("dm")
+                    ? r.status == DownloadManager.STATUS_SUCCESSFUL
+                    : r.est == DlSpeed85.ST_DONE;
+            if (finished) out.add(r);
+        }
+        java.util.Collections.sort(out, new java.util.Comparator<Row85>() {
+            @Override public int compare(Row85 a, Row85 b) { return a.ep - b.ep; }
+        });
+        return out;
+    }
+
+    // The series page list: every episode of st.seriesName (finished or not),
+    // Episode 1 first, like the LokLok reference.
+    private static void renderSeriesPage(State85 st) {
+        if (st.list == null) return;
+        st.list.removeAllViews();
+        String name = st.seriesName;
+        if (name == null) return;
+        java.util.ArrayList<Row85> eps = new java.util.ArrayList<Row85>();
+        java.util.ArrayList<Row85> rows = collectRows(st);
+        assignImplicitEp1(rows);
+        for (int i = 0; i < rows.size(); i++) {
+            Row85 r = rows.get(i);
+            if (r.series != null && r.series.equals(name)) eps.add(r);
+        }
+        java.util.Collections.sort(eps, new java.util.Comparator<Row85>() {
+            @Override public int compare(Row85 a, Row85 b) { return a.ep - b.ep; }
+        });
+        for (int i = 0; i < eps.size() && i < 40; i++) {
+            addRowCard(st, eps.get(i));
+        }
+
+        // selection bar on the series page mirrors the main one
+        if (st.seriesBar != null) {
+            boolean barOn = st.selectMode && !st.selected.isEmpty();
+            st.seriesBar.setVisibility(barOn ? View.VISIBLE : View.GONE);
+            if (st.seriesDeleteBtn != null) {
+                st.seriesDeleteBtn.setText("Delete (" + String.valueOf(st.selected.size()) + ")");
+            }
+        }
+    }
+
+    // A series folder: poster + "Series Name" + "N episodes", tap opens the
+    // dedicated series page (LokLok style).
+    private static void addSeriesFolder(State85 st, final String name,
+            final String poster, final int count, final java.util.ArrayList<Row85> eps) {
+        Activity act = st.act;
+        final float d = st.d;
+
+        LinearLayout card = new LinearLayout(act);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setClickable(true);
+        card.setFocusable(true);
+        android.graphics.drawable.GradientDrawable bg =
+                new android.graphics.drawable.GradientDrawable();
+        bg.setColor(Color.parseColor("#14141A"));
+        bg.setCornerRadius(12 * d);
+        card.setBackgroundDrawable(bg);
+        int pad = (int) (10 * d);
+        card.setPadding(pad, pad, pad, pad);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cp.topMargin = (int) (12 * d);
+        st.list.addView(card, cp);
+
+        ImageView thumb = new ImageView(act);
+        LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(
+                (int) (64 * d), (int) (92 * d));
+        tp.rightMargin = (int) (14 * d);
+        thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        thumb.setBackgroundDrawable(rounded(C_POSTER_BG, 8f * d));
+        card.addView(thumb, tp);
+        loadPoster(act, thumb, poster, (int) (64 * d), (int) (92 * d));
+
+        LinearLayout right = new LinearLayout(act);
+        right.setOrientation(LinearLayout.VERTICAL);
+        card.addView(right, new LinearLayout.LayoutParams(-1, -2, 1f));
+
+        TextView t = new TextView(act);
+        t.setText(name);
+        t.setTextColor(Color.WHITE);
+        t.setTextSize(16);
+        t.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        t.setSingleLine(true);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        right.addView(t);
+
+        TextView subT = new TextView(act);
+        subT.setText(String.valueOf(count) + " episodes downloaded");
+        subT.setTextColor(Color.parseColor(C_DIM));
+        subT.setTextSize(13);
+        right.addView(subT);
+
+        TextView chev = new TextView(act);
+        chev.setText(String.valueOf((char) 0x203A));
+        chev.setTextColor(Color.parseColor(C_DIM));
+        chev.setTextSize(22);
+        chev.setPadding(0, 0, (int) (4 * d), 0);
+        card.addView(chev, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        final String seriesTitle = name;
+        card.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                openSeriesPage(st, seriesTitle);
+            }
+        });
+
+        // SELECTION MODE: tapping the folder selects/deselects the WHOLE
+        // series; long-press starts selection with everything in it.
+        card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override public boolean onLongClick(View v) {
+                if (!st.selectMode) { st.selectMode = true; st.selected.clear(); }
+                for (int i = 0; i < eps.size(); i++) st.selected.add(keyOf(eps.get(i)));
+                render(st);
+                return true;
+            }
+        });
+        if (st.selectMode) {
+            int selCount = 0;
+            for (int i = 0; i < eps.size(); i++) {
+                if (st.selected.contains(keyOf(eps.get(i)))) selCount++;
+            }
+            android.graphics.drawable.GradientDrawable selBg = new android.graphics.drawable.GradientDrawable();
+            selBg.setColor(Color.parseColor("#14141A"));
+            selBg.setCornerRadius(12 * d);
+            if (selCount > 0) selBg.setStroke((int) (2 * d), Color.parseColor(C_RED));
+            card.setBackgroundDrawable(selBg);
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    boolean anySel = false;
+                    for (int i = 0; i < eps.size(); i++) {
+                        if (st.selected.contains(keyOf(eps.get(i)))) { anySel = true; break; }
+                    }
+                    for (int i = 0; i < eps.size(); i++) {
+                        String k = keyOf(eps.get(i));
+                        if (anySel) st.selected.remove(k);
+                        else st.selected.add(k);
+                    }
+                    render(st);
+                }
+            });
+        }
+
+    }
+
+    private static void addCard(State85 st, final long id, final String title, final String poster, final String subName, final int status, final long done, final long total, final String reason) {
         Activity act = st.act;
         final float d = st.d;
 
@@ -376,6 +1093,22 @@ public class DlScreen85 {
         t.setEllipsize(android.text.TextUtils.TruncateAt.END);
         right.addView(t);
 
+        // EPISODE SUB-TITLE: episodes saved with a descriptive name show it
+        // here in small dim text prefixed with "Sub-title" (e.g. under
+        // "Crew Girl ep3" -> "Sub-title: The Crew Scandal").
+        String subTitle = episodeSubTitleOf(title);
+        if (subTitle.length() > 0) {
+            TextView stv = new TextView(act);
+            stv.setText("Sub-title: " + subTitle);
+            stv.setTextColor(Color.parseColor("#8A8A92"));
+            stv.setTextSize(11);
+            stv.setSingleLine(true);
+            stv.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams stLp = new LinearLayout.LayoutParams(-1, -2);
+            stLp.topMargin = (int) (2 * d);
+            right.addView(stv, stLp);
+        }
+
         TextView sub = new TextView(act);
         sub.setTextSize(14);
         boolean showBar = false;
@@ -384,8 +1117,10 @@ public class DlScreen85 {
             sub.setText("Downloaded");
             sub.setTextColor(Color.parseColor("#EDEDED"));
         } else if (status == DownloadManager.STATUS_FAILED) {
-            sub.setText("Failed");
-            sub.setTextColor(Color.parseColor(C_BAD));
+            // ERROR_INSUFFICIENT_SPACE arrives as the reason code "1006"
+            boolean noSpace = String.valueOf(DownloadManager.ERROR_INSUFFICIENT_SPACE).equals(reason);
+            sub.setText(noSpace ? "Insufficient Storage" : "Failed");
+            sub.setTextColor(Color.parseColor(noSpace ? C_RED : C_BAD));
         } else if (status == DownloadManager.STATUS_PAUSED) {
             sub.setText("Paused");
             sub.setTextColor(Color.parseColor(C_DIM));
@@ -395,11 +1130,11 @@ public class DlScreen85 {
             sub.setTextColor(Color.parseColor(C_DIM));
         } else if (total > 0) {
             pct = (int) (done * 100 / total);
-            sub.setText(humanSize(done) + " / " + humanSize(total));
+            sub.setText(humanSize(done) + " / " + humanSize(total) + speedText(String.valueOf(id), done));
             sub.setTextColor(Color.parseColor(C_DIM));
             showBar = true;
         } else {
-            sub.setText("Starting...");
+            sub.setText("Starting..." + speedText(String.valueOf(id), done));
             sub.setTextColor(Color.parseColor(C_DIM));
         }
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(-1, -2);
@@ -453,6 +1188,244 @@ public class DlScreen85 {
         del.setTextColor(Color.parseColor(C_BAD));
         del.setOnClickListener(new Act85(st, 5, id, title, subName, status));
         row.addView(del, abp);
+
+        // SELECTION MODE: long-press enters selection; tap toggles the row.
+        final String selKey = "D" + String.valueOf(id);
+        card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override public boolean onLongClick(View v) {
+                if (!st.selectMode) { st.selectMode = true; st.selected.clear(); }
+                st.selected.add(selKey);
+                render(st);
+                return true;
+            }
+        });
+        if (st.selectMode) {
+            card.setClickable(true);
+            card.setFocusable(true);
+            android.graphics.drawable.GradientDrawable selBg = new android.graphics.drawable.GradientDrawable();
+            selBg.setCornerRadius(12 * d);
+            if (st.selected.contains(selKey)) {
+                selBg.setColor(Color.parseColor("#14141A"));
+                selBg.setStroke((int) (2 * d), Color.parseColor(C_RED));
+            }
+            card.setBackgroundDrawable(selBg);
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { toggleSelect(st, selKey); }
+            });
+        }
+    }
+
+    // =======================================================================
+    //  Engine cards (fast 4-connection downloads)
+    // =======================================================================
+    private static void addEngineCard(State85 st, final String rowId, final String title,
+            final String poster, final String subName, final int est, final long done,
+            final long total, final String msg) {
+        Activity act = st.act;
+        final float d = st.d;
+
+        LinearLayout card = new LinearLayout(act);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, -2);
+        cp.topMargin = (int) (12 * d);
+        st.list.addView(card, cp);
+
+        ImageView thumb = new ImageView(act);
+        LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams((int) (104 * d), (int) (150 * d));
+        tp.rightMargin = (int) (16 * d);
+        thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        thumb.setBackgroundDrawable(rounded(C_POSTER_BG, 8f * d));
+        card.addView(thumb, tp);
+        loadPoster(act, thumb, poster, (int) (104 * d), (int) (150 * d));
+
+        LinearLayout right = new LinearLayout(act);
+        right.setOrientation(LinearLayout.VERTICAL);
+        card.addView(right, new LinearLayout.LayoutParams(-1, -2, 1f));
+
+        TextView t = new TextView(act);
+        t.setText(title);
+        t.setTextColor(Color.WHITE);
+        t.setTextSize(16);
+        t.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        t.setSingleLine(true);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        right.addView(t);
+
+        // EPISODE SUB-TITLE: episodes saved with a descriptive name show it
+        // here in small dim text prefixed with "Sub-title" (e.g. under
+        // "Crew Girl ep3" -> "Sub-title: The Crew Scandal").
+        String subTitle = episodeSubTitleOf(title);
+        if (subTitle.length() > 0) {
+            TextView stv = new TextView(act);
+            stv.setText("Sub-title: " + subTitle);
+            stv.setTextColor(Color.parseColor("#8A8A92"));
+            stv.setTextSize(11);
+            stv.setSingleLine(true);
+            stv.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams stLp = new LinearLayout.LayoutParams(-1, -2);
+            stLp.topMargin = (int) (2 * d);
+            right.addView(stv, stLp);
+        }
+
+        TextView sub = new TextView(act);
+        sub.setTextSize(14);
+        boolean showBar = false;
+        int pct = 0;
+        if (est == DlSpeed85.ST_DONE) {
+            sub.setText("Downloaded");
+            sub.setTextColor(Color.parseColor("#EDEDED"));
+        } else if (est == DlSpeed85.ST_FAILED) {
+            boolean noSpace = DlSpeed85.MSG_NOSPACE.equals(msg);
+            boolean emptyMsg = msg == null;
+            if (!emptyMsg) emptyMsg = msg.length() == 0;
+            sub.setText(noSpace ? "Insufficient Storage" : (emptyMsg ? "Failed" : msg));
+            sub.setTextColor(Color.parseColor(noSpace ? C_RED : C_BAD));
+        } else if (est == DlSpeed85.ST_PENDING) {
+            // queued behind the concurrency limit (Downloads settings)
+            sub.setText("Pending...");
+            sub.setTextColor(Color.parseColor(C_DIM));
+        } else {
+            // running: "Retrieving files..." while probing, then size + speed
+            if (msg != null && msg.length() > 0) {
+                sub.setText(msg);
+            } else if (total > 0) {
+                pct = (int) (done * 100 / total);
+                sub.setText(humanSize(done) + " / " + humanSize(total) + speedText(rowId, done));
+            } else {
+                sub.setText(humanSize(done) + speedText(rowId, done));
+            }
+            sub.setTextColor(Color.parseColor(C_DIM));
+            if (total > 0) showBar = true;
+        }
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(-1, -2);
+        sp.topMargin = (int) (8 * d);
+        right.addView(sub, sp);
+
+        if (showBar) {
+            ProgressBar bar = new ProgressBar(act, null, android.R.attr.progressBarStyleHorizontal);
+            bar.setMax(100);
+            bar.setProgress(pct);
+            try {
+                bar.getProgressDrawable().setColorFilter(Color.parseColor(C_RED), android.graphics.PorterDuff.Mode.SRC_IN);
+            } catch (Exception e) { }
+            LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(-1, (int) (3 * d));
+            bp.topMargin = (int) (8 * d);
+            right.addView(bar, bp);
+        }
+
+        LinearLayout row = new LinearLayout(act);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.RIGHT + Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(-1, -2);
+        rp.topMargin = (int) (10 * d);
+        right.addView(row, rp);
+
+        LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(-2, -2);
+        abp.leftMargin = (int) (18 * d);
+
+        if (est == DlSpeed85.ST_DONE) {
+            Button play = mkBtn(act, "Play", true, true, d);
+            play.setOnClickListener(new Act85(st, 1, rowId, title, subName, 0));
+            row.addView(play, abp);
+        } else if (est == DlSpeed85.ST_FAILED) {
+            Button retry = mkBtn(act, "Retry", false, true, d);
+            retry.setOnClickListener(new Act85(st, 6, rowId, title, subName, 0));
+            row.addView(retry, abp);
+        } else {
+            Button cancel = mkBtn(act, "Cancel", false, false, d);
+            cancel.setOnClickListener(new Act85(st, 7, rowId, title, subName, 0));
+            row.addView(cancel, abp);
+        }
+
+        Button del = mkBtn(act, "Delete", false, false, d);
+        del.setTextColor(Color.parseColor(C_BAD));
+        del.setOnClickListener(new Act85(st, 8, rowId, title, subName, 0));
+        row.addView(del, abp);
+
+        // SELECTION MODE: long-press enters selection; tap toggles the row.
+        final String selKeyE = rowId;
+        card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override public boolean onLongClick(View v) {
+                if (!st.selectMode) { st.selectMode = true; st.selected.clear(); }
+                st.selected.add(selKeyE);
+                render(st);
+                return true;
+            }
+        });
+        if (st.selectMode) {
+            card.setClickable(true);
+            card.setFocusable(true);
+            android.graphics.drawable.GradientDrawable selBg = new android.graphics.drawable.GradientDrawable();
+            selBg.setCornerRadius(12 * d);
+            if (st.selected.contains(selKeyE)) {
+                selBg.setColor(Color.parseColor("#14141A"));
+                selBg.setStroke((int) (2 * d), Color.parseColor(C_RED));
+            }
+            card.setBackgroundDrawable(selBg);
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { toggleSelect(st, selKeyE); }
+            });
+        }
+    }
+
+    // =======================================================================
+    //  Live speed: bytes/sec measured between 1s screen refreshes
+    // =======================================================================
+    private static final HashMap<String, long[]> SPEED = new HashMap<String, long[]>();
+
+    private static String speedText(String key, long done) {
+        long now = SystemClock.elapsedRealtime();
+        long[] s = SPEED.get(key);
+        if (s == null) {
+            // slot 0: last bytes, 1: last time, 2: ms stalled so far
+            SPEED.put(key, new long[] { done, now, 0L });
+            return "";
+        }
+        long dBytes = done - s[0];
+        long dMs = now - s[1];
+        s[0] = done;
+        s[1] = now;
+        if (dMs < 500) return "";  // first tick after (re)build
+        if (dBytes < 0) return "";
+        if (dBytes == 0) {
+            // nothing moved this second: show "stalled" briefly, then nothing
+            s[2] = s[2] + dMs;
+            if (s[2] > 8000) return "";
+            return "  (stalled)";
+        }
+        s[2] = 0;
+        return "  " + humanSize((long) (dBytes * 1000.0 / dMs)) + "/s";
+    }
+
+    // =======================================================================
+    //  Play an engine download (same landscape player, by class name)
+    // =======================================================================
+    private static void playEngine(Activity act, String rowId, String title, String subName) {
+        try {
+            String path = DlSpeed85.finalPath(rowId);
+            boolean noFile = path == null;
+            if (!noFile) noFile = path.length() == 0;
+            if (noFile) {
+                Toast.makeText(act, "File is gone -- delete this row and download again.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Intent it = new Intent();
+            it.putExtra("path", path);
+            it.putExtra("title", title);
+            if (subName != null && subName.length() > 0) it.putExtra("sub", subName);
+            String[] names = { "com.deymflix.eu.cc.LocalplayerActivity", "com.deymflix.eu.cc.LocalPlayerActivity" };
+            for (int i = 0; i < names.length; i++) {
+                try {
+                    it.setClassName(act, names[i]);
+                    act.startActivity(it);
+                    return;
+                } catch (Exception e) { }
+            }
+            Toast.makeText(act, "Player activity not found -- check its name in Sketchware", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(act, "Cannot open this download", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // =======================================================================
@@ -555,6 +1528,173 @@ public class DlScreen85 {
     private static void forgetMeta(Activity act, long id) {
         SharedPreferences p = act.getSharedPreferences("deymflix_dl", 0);
         p.edit().remove(String.valueOf(id)).apply();
+    }
+
+    // =======================================================================
+    //  DOWNLOAD SETTINGS dialog: how many downloads run at once (1 / 2 / 3).
+    //  Dark card matching the other DEYMFLIX dialogs. Also carries the
+    //  bulk-select tip.
+    // =======================================================================
+    private static void showSettingsDialog(final State85 st) {
+        final Activity act = st.act;
+        final float d = st.d;
+        final android.app.Dialog dlg = new android.app.Dialog(act);
+        dlg.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dlg.setCanceledOnTouchOutside(true);
+
+        LinearLayout card = new LinearLayout(act);
+        card.setOrientation(LinearLayout.VERTICAL);
+        android.graphics.drawable.GradientDrawable cbg = new android.graphics.drawable.GradientDrawable();
+        cbg.setColor(Color.parseColor("#141418"));
+        cbg.setCornerRadius(22 * d);
+        cbg.setStroke(1, Color.parseColor("#2A2A30"));
+        card.setBackgroundDrawable(cbg);
+        int pad = (int) (20 * d);
+        card.setPadding(pad, pad, pad, pad);
+
+        TextView title = new TextView(act);
+        title.setText("Download settings");
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(18);
+        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        card.addView(title);
+
+        TextView sub = new TextView(act);
+        sub.setText("Simultaneous downloads");
+        sub.setTextColor(Color.parseColor(C_DIM));
+        sub.setTextSize(13);
+        LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(-1, -2);
+        subLp.topMargin = (int) (14 * d);
+        card.addView(sub, subLp);
+
+        final TextView[] optBtns = new TextView[3];
+        for (int i = 0; i < 3; i++) {
+            final int n = i + 1;
+            TextView opt = new TextView(act);
+            opt.setText(n + (n == 1 ? " download at a time" : " downloads at a time"));
+            opt.setTextSize(14);
+            opt.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            opt.setPadding((int) (16 * d), (int) (11 * d), (int) (16 * d), (int) (11 * d));
+            LinearLayout.LayoutParams oLp = new LinearLayout.LayoutParams(-1, -2);
+            oLp.topMargin = (int) (8 * d);
+            card.addView(opt, oLp);
+            optBtns[i] = opt;
+            opt.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    DlSpeed85.setMaxConcurrent(act, n);
+                    styleSettingsOptions(st, optBtns);
+                    Toast.makeText(act, "Will download " + n + " at a time", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        styleSettingsOptions(st, optBtns);
+
+        TextView tip = new TextView(act);
+        tip.setText("Tip: press and hold a download to select several, then delete them all at once.");
+        tip.setTextColor(Color.parseColor("#8A8A92"));
+        tip.setTextSize(12);
+        LinearLayout.LayoutParams tipLp = new LinearLayout.LayoutParams(-1, -2);
+        tipLp.topMargin = (int) (14 * d);
+        card.addView(tip, tipLp);
+
+        TextView done = new TextView(act);
+        done.setText("DONE");
+        done.setTextColor(Color.WHITE);
+        done.setTextSize(14);
+        done.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        done.setGravity(Gravity.CENTER);
+        done.setBackgroundDrawable(rounded(C_RED, 12f * d));
+        done.setPadding(0, (int) (11 * d), 0, (int) (11 * d));
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { dlg.dismiss(); }
+        });
+        LinearLayout.LayoutParams doneLp = new LinearLayout.LayoutParams(-1, (int) (42 * d));
+        doneLp.topMargin = (int) (16 * d);
+        card.addView(done, doneLp);
+
+        dlg.setContentView(card, new android.view.ViewGroup.LayoutParams(
+                (int) (act.getResources().getDisplayMetrics().widthPixels * 0.84f),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+        dlg.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        dlg.show();
+    }
+
+    // Highlights the option matching the current limit (red) and dims the rest.
+    private static void styleSettingsOptions(State85 st, TextView[] optBtns) {
+        int cur = DlSpeed85.getMaxConcurrent(st.act);
+        for (int i = 0; i < optBtns.length; i++) {
+            TextView opt = optBtns[i];
+            if (opt == null) continue;
+            android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+            g.setCornerRadius(12 * st.d);
+            if (i + 1 == cur) {
+                g.setColor(Color.parseColor(C_RED));
+                opt.setTextColor(Color.WHITE);
+            } else {
+                g.setColor(Color.parseColor("#1E1E24"));
+                g.setStroke(1, Color.parseColor("#2A2A30"));
+                opt.setTextColor(Color.parseColor(C_SOFT));
+            }
+            opt.setBackgroundDrawable(g);
+        }
+    }
+
+    // =======================================================================
+    //  SELECTION MODE helpers (bulk delete)
+    // =======================================================================
+    private static void toggleSelect(State85 st, String key) {
+        if (st.selected.contains(key)) st.selected.remove(key);
+        else st.selected.add(key);
+        render(st);
+    }
+
+    // Stable identity of a row card for the selection set.
+    private static String keyOf(Row85 r) {
+        return r.kind.equals("eng") ? r.rowId : ("D" + String.valueOf(r.dmId));
+    }
+
+    private static void bulkDeleteSelected(State85 st) {
+        int n = st.selected.size();
+        for (String key : new java.util.ArrayList<String>(st.selected)) {
+            if (key.startsWith("D")) {
+                try { deleteDownloadQuiet(st.act, Long.parseLong(key.substring(1))); } catch (Exception e) { }
+            } else {
+                DlSpeed85.deleteRow(st.act, key);
+            }
+        }
+        st.selected.clear();
+        st.selectMode = false;
+        Toast.makeText(st.act, "Deleted " + String.valueOf(n)
+                + (n == 1 ? " download" : " downloads"), Toast.LENGTH_SHORT).show();
+        render(st);
+    }
+
+    // Quiet per-row delete for bulk mode (single summary toast instead of one
+    // per row). Removes the movie, its sidecar subtitle and the registry row.
+    private static void deleteDownloadQuiet(Activity act, long id) {
+        DownloadManager dm = (DownloadManager) act.getSystemService(Context.DOWNLOAD_SERVICE);
+        String subName = "";
+        Cursor c = dm.query(new DownloadManager.Query().setFilterById(id));
+        if (c != null && c.moveToFirst()) {
+            try {
+                int status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    String[] meta = readMeta(act, id);
+                    subName = meta[2] == null ? "" : meta[2];
+                    android.net.Uri u = dm.getUriForDownloadedFile(id);
+                    if (u != null && u.getPath() != null) new File(u.getPath()).delete();
+                }
+            } catch (Exception e) { }
+        }
+        if (c != null) c.close();
+        if (subName.length() > 0) {
+            try {
+                File dir = new File(act.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Deymflix");
+                new File(dir, subName).delete();
+            } catch (Exception e) { }
+        }
+        try { dm.remove(id); } catch (Exception e) { }
+        forgetMeta(act, id);
     }
 
     // =======================================================================

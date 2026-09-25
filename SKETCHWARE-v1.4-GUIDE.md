@@ -47,9 +47,10 @@ so the two files sit directly inside it. `.sketchware` starts with a dot — ena
 
 ## STEP 2 — Register the library in the project (one-time)
 
-1. Open the file `.sketchware/data/608/data/local_library` with a text editor
+1. Open the file `.sketchware/data/608/local_library` with a text editor
    (MT Manager's editor works). It is one JSON array — your current entries start
-   with swiperefreshlayout.
+   with swiperefreshlayout. NOTE: it is directly in the `608` folder — there is
+   no second `data` subfolder, despite what older notes said.
 2. Add this object as one more element of that array (comma between elements):
 
 ```
@@ -115,6 +116,8 @@ opens landscape fullscreen offline with subtitles.
 | Message | Meaning |
 |---|---|
 | `cannot find symbol: class MainScreen85` / `DlScreen85` / `LocalPlayer85` | STEP 1 or STEP 2 is incomplete: the folder must contain both files, and the JSON entry must be inside the project's `data/local_library` array. Re-check the exact path characters |
+| Files in the folder are named `deymflix-screens-1.0_classes.jar` / `_classes.dex` | wrong names — many Android file managers/extractors prepend the zip name. Rename them to exactly `classes.jar` and `classes.dex` (long-press → Rename), keeping them in the `deymflix-screens-1.0` folder. The registration JSON points at the plain names, so any other filename = invisible library |
+| Library shows enabled but its classes don't resolve | the project's `data/608/local_library` entry is just `{"name":"…"}` with no paths (Sketchware saves that when the folder was missing at registration time). The entry needs all three keys: `dexPath`, `jarPath`, `name` |
 | `Duplicate method` / stray `}` | old code still in a tab — clear every tab of that activity |
 | App builds but Downloads opens blank/empty | DownloadsActivity's `downloads.xml` must stay empty; the screen builds itself |
 | App builds but tapping a download shows nothing | the old 4A–4F text is still somewhere; clear all DownloadsActivity tabs |
