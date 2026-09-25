@@ -1,6 +1,7 @@
 name: Deymflix
 options:
   bundleIdPrefix: eu.cc.deymflix
+  objectVersion: 56
   deploymentTarget:
     iOS: "15.0"
   createIntermediateGroups: true
