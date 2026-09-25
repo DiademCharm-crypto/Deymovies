@@ -1,0 +1,42 @@
+name: Build iOS IPA (unsigned)
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Build (no signing)
+        working-directory: ios
+        run: |
+          xcodebuild -project Deymflix.xcodeproj \
+            -scheme Deymflix \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r ios/build/Build/Products/Release-iphoneos/Deymflix.app Payload/
+          zip -qr Deymflix-unsigned.ipa Payload
+        shell: bash
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Deymflix-unsigned-ipa
+          path: Deymflix-unsigned.ipa
