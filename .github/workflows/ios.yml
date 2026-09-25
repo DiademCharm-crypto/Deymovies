@@ -14,6 +14,13 @@ jobs:
       - name: Install xcodegen
         run: brew install xcodegen
 
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app || true
+          X=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X/Contents/Developer"; fi
+          xcodebuild -version
+
       - name: Generate Xcode project
         working-directory: ios
         run: xcodegen generate
@@ -31,11 +38,13 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log | grep -E "error:|warning:|BUILD|Compiling|Swift" || true
-          echo "---- FULL ERROR TAIL ----"
-          tail -n 60 build.log
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log | grep -E "error:|BUILD" || true
+          echo "---- ERROR TAIL ----"
+          grep -E "error:" build.log | head -40 || true
+          tail -n 30 build.log
 
       - name: Package unsigned IPA
+        if: success()
         run: |
           mkdir -p Payload
           cp -r ios/build/Build/Products/Release-iphoneos/Deymflix.app Payload/
@@ -43,6 +52,7 @@ jobs:
         shell: bash
 
       - name: Upload IPA artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Deymflix-unsigned-ipa
