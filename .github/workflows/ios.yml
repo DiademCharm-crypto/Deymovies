@@ -18,15 +18,22 @@ jobs:
         working-directory: ios
         run: xcodegen generate
 
+      - name: List schemes
+        working-directory: ios
+        run: xcodebuild -project Deymflix.xcodeproj -list
+
       - name: Build (no signing)
         working-directory: ios
         run: |
+          set -o pipefail
           xcodebuild -project Deymflix.xcodeproj \
             -scheme Deymflix \
             -configuration Release \
-            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
             -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log | grep -E "error:|warning:|BUILD|Compiling|Swift" || true
+          echo "---- FULL ERROR TAIL ----"
+          tail -n 60 build.log
 
       - name: Package unsigned IPA
         run: |
