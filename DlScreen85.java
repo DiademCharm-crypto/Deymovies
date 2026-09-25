@@ -66,6 +66,11 @@ public class DlScreen85 {
 
     // Colours shared by the widgets (kept as strings so every widget agrees).
     private static final String C_BG = "#0B0B0F";
+
+    // Library build tag: shown in the Downloads settings dialog so the
+    // running app build can always be identified (matches the deymflix-
+    // screens-1.0 zip that was imported into Sketchware).
+    public static final String LIB_BUILD = "screens-2026.09.25-r5";
     private static final String C_RED = "#E50914";
     private static final String C_DIM = "#8A8A8A";
     private static final String C_SOFT = "#DDDDDD";
@@ -1596,6 +1601,16 @@ public class DlScreen85 {
         LinearLayout.LayoutParams tipLp = new LinearLayout.LayoutParams(-1, -2);
         tipLp.topMargin = (int) (14 * d);
         card.addView(tip, tipLp);
+
+        // build tag, bottom corner: which library build the running app has
+        TextView ver = new TextView(act);
+        ver.setText("build " + LIB_BUILD);
+        ver.setTextColor(Color.parseColor("#55555C"));
+        ver.setTextSize(10);
+        LinearLayout.LayoutParams verLp = new LinearLayout.LayoutParams(-2, -2);
+        verLp.topMargin = (int) (8 * d);
+        verLp.gravity = Gravity.CENTER_HORIZONTAL;
+        card.addView(ver, verLp);
 
         TextView done = new TextView(act);
         done.setText("DONE");

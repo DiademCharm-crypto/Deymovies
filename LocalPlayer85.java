@@ -875,7 +875,7 @@ public class LocalPlayer85 {
             epHead.setOrientation(LinearLayout.HORIZONTAL);
             epHead.setGravity(Gravity.CENTER_VERTICAL);
             TextView epTitle = new TextView(a);
-            epTitle.setText("List");
+            epTitle.setText("Episodes");
             epTitle.setTextColor(Color.WHITE);
             epTitle.setTextSize(18);
             epTitle.setTypeface(Typeface.DEFAULT_BOLD);

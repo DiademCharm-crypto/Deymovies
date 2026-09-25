@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- DEYMFLIX player build 2026-09-25.4 (compact red Episodes panel, PC fullscreen fixes) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -91,6 +92,9 @@
       padding: 0 !important;
       border-radius: 0 !important;
       background-color: #000000 !important;
+      /* paint ABOVE every page section (sidebar, More Like This) while
+         fullscreen -- otherwise later siblings bleed over the movie */
+      z-index: 1000 !important;
     }
 
     #direct-video-player,
@@ -684,37 +688,35 @@
     @media (max-width: 768px) {
       body.is-ios .mobile-volume-control { display: none !important; }
       .video-container.fullscreen-active .mobile-volume-control { display: flex; }
-
-      /* ===== EPISODES "List" PANEL (right side, over the video) =======
-         PC mode: an Episodes button in the control bar opens it any time.
-         Mobile/app: the button appears only while fullscreen is active.
-         Matches the reference: dark translucent panel, bold "List" header,
-         current episode highlighted, close button. */
-      .ep-list-panel {
-        position: absolute; top: 0; right: -340px; width: 300px; max-width: 42%;
-        height: 100%; z-index: 60;
-        background: rgba(10, 10, 12, 0.86);
-        backdrop-filter: blur(8px);
-        color: #fff; padding: 22px 18px; box-sizing: border-box;
-        transition: right .28s ease; overflow-y: auto;
-      }
-      .ep-list-panel.open { right: 0; }
-      .ep-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-      .ep-list-title { font-size: 1.25rem; font-weight: 800; }
-      .ep-list-close { background: none; border: none; color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 4px; }
-      .ep-item { display: block; width: 100%; text-align: left; background: none; border: none;
-        color: #e0e0e0; font-size: 1.15rem; font-weight: 600; padding: 14px 16px; margin: 8px 0;
-        border-radius: 8px; cursor: pointer; }
-      .ep-item:hover { background: rgba(255,255,255,.12); }
-      .ep-item.current { background: #6c5ce7; color: #fff; }
-      .ep-item .ep-item-name { display: block; font-size: .8rem; font-weight: 400; color: #bbb; margin-top: 2px; }
-      .ep-item.current .ep-item-name { color: #eee; }
-      /* The Episodes control-bar button (PC: always visible; mobile/app:
-         only when .fullscreen-active is on the container) */
-      #btn-episodes { display: none; }
-      .pc-main #btn-episodes { display: inline-flex; }
-      .video-container.fullscreen-active #btn-episodes { display: inline-flex; }
     }
+
+    /* ===== EPISODES "List" PANEL (right side, over the video) =======
+       PC mode: an Episodes button in the control bar opens it any time.
+       Mobile/app: the button appears only while fullscreen is active.
+       DEYMFLIX theme: dark translucent panel, bold "List" header, current
+       episode highlighted in the brand red, close button. */
+    .ep-list-panel {
+      position: absolute; top: 0; right: -260px; width: 240px; max-width: 60%;
+      height: 100%; z-index: 60;
+      background: rgba(10, 10, 12, 0.86);
+      backdrop-filter: blur(8px);
+      color: #fff; padding: 14px 12px; box-sizing: border-box;
+      transition: right .28s ease; overflow-y: auto;
+    }
+    .ep-list-panel.open { right: 0; }
+    .ep-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .ep-list-title { font-size: 1.05rem; font-weight: 800; }
+    .ep-list-close { background: none; border: none; color: #fff; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px; }
+    .ep-item { display: block; width: 100%; text-align: left; background: none; border: none;
+      color: #e0e0e0; font-size: 0.92rem; font-weight: 600; padding: 9px 12px; margin: 5px 0;
+      border-radius: 6px; cursor: pointer; }
+    .ep-item:hover { background: rgba(255,255,255,.10); }
+    .ep-item.current { background: #e50914; color: #fff; }
+    /* The Episodes control-bar button (PC: always visible; mobile/app:
+       only when .fullscreen-active is on the container) */
+    #btn-episodes { display: none; }
+    .pc-main #btn-episodes { display: inline-flex; }
+    .video-container.fullscreen-active #btn-episodes { display: inline-flex; }
 
     /* Download Modal */
     .download-modal {
@@ -1665,6 +1667,13 @@
         max-width: 100vw !important;
         border-radius: 0 !important;
         margin: 0 !important;
+        z-index: 1000 !important;
+        /* this block comes AFTER the pc-main aspect-ratio rule, so it must
+           re-assert full-viewport height or the movie stays 16:9 and page
+           content peeks out at the bottom */
+        height: 100vh !important;
+        height: 100dvh !important;
+        aspect-ratio: auto !important;
       }
 
       /* Movie info sits directly beneath the player. */
@@ -2410,13 +2419,14 @@
     <!-- Animated Loading Buffer Overlay -->
     <div id="ep-list-panel" class="ep-list-panel">
       <div class="ep-list-head">
-        <span class="ep-list-title">List</span>
+        <span class="ep-list-title">Episodes</span>
         <button class="ep-list-close" title="Close" onclick="toggleEpList(false)">&times;</button>
       </div>
       <div id="ep-list-items"></div>
     </div>
 
     <!-- Animated Loading Buffer Overlay -->
+    <div id="video-loading-spinner" class="loading-spinner-overlay" style="display: none;">
       <div class="spinner-ring"></div>
       <div class="spinner-text">Buffering...</div>
     </div>
@@ -7000,9 +7010,7 @@
         const b = document.createElement('button');
         b.className = 'ep-item' + (it.ep.episodeNumber === cur ? ' current' : '');
         b.type = 'button';
-        b.innerHTML = 'Episode ' + it.num
-          + (it.name ? '<span class="ep-item-name">' + it.name + '</span>' : '')
-          + (it.multiSeason ? '<span class="ep-item-name">Season ' + it.season.seasonNumber + '</span>' : '');
+        b.innerHTML = 'Episode ' + it.num;
         b.onclick = () => {
           // same switch path as the episodes grid + next-episode button
           document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
