@@ -2321,6 +2321,14 @@
       } catch (e) {}
 
       window.onbeforeunload = function (e) {
+        // APP: the native WebViewClient already cancels hijack navigations
+        // SILENTLY (shouldOverrideUrlLoading) — returning a string here only
+        // makes Android WebView pop a "Confirm Navigation" dialog. Never
+        // prompt in-app; the native firewall is the enforcement layer.
+        if (window.DFX_IS_APP || /DeymflixApp/i.test(navigator.userAgent || '')) {
+          console.warn('[DEYMFLIX Shield] Top-level navigation hijack — blocked natively by the app firewall.');
+          return undefined; // no dialog, navigation still cancelled natively
+        }
         if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
           console.warn('[DEYMFLIX Shield] Blocked top-level frame navigation hijack.');
           e.preventDefault();
@@ -2918,7 +2926,7 @@
     <script src="filipino-movies.js?v=1.3"></script>
     <script src="kdramas.js?v=1.0"></script>
   <script src="app.js?v=160.4"></script>
-  <script src="episodes.js?v=1.5"></script>
+  <script src="episodes.js?v=1.6"></script>
   <script src="kdrama-episode.js?v=1.0"></script>
   <script>
     function destroyAllPlayers() {
@@ -6022,16 +6030,26 @@
         if (extra.length) url = url + '&' + extra.join('&');
       }
 
-      // ── BROWSER: new-tab strategy ──
-      // Unsandboxed provider embeds can top-navigate the whole page (ads).
-      // In a plain browser we cannot intercept that, so the embed opens in its
-      // OWN tab — a redirect trashes only that tab, our site stays intact.
-      // In the APP the native firewall (shouldInterceptRequest) blocks those
-      // domains, so the embed stays in-page with our back button there.
+      // ── BROWSER STRATEGY — split by provider cleanliness ──
+      // VidLink (the default) is audited ad-free (zero ad networks in its
+      // page, verified 2026-09-26), so the hijack risk that once forced the
+      // new-tab flow is gone — it now plays IN-PAGE in browsers too, with
+      // autoplay (muted-start per browser policy, tap to unmute), the poster
+      // backdrop and our back chip, exactly like the app.
+      // The ad-carrying providers (autoembed, vidsrc*, superembed, 2embed —
+      // or any explicit @pin) keep the new-tab strategy: an unsandboxed
+      // cross-origin embed from THEM can top-navigate the page (ads), and a
+      // browser cannot intercept that — a redirect then trashes only their
+      // own tab, not our site. In the APP the native firewall blocks those
+      // domains, so every provider stays in-page there.
       const inApp = !!(window.DFX_IS_APP
         || (window.DeymflixApp && typeof window.DeymflixApp.playOnline === 'function')
         || /DeymflixApp/i.test(navigator.userAgent || '')); // belt & suspenders if app.js hiccups
-      if (!inApp) {
+      const cosClean = (order[0] === 'vidlink');
+      // _forceInPage: set by the hijack tripwire when it fails over — the
+      // replacement provider mounts in-page (under tripwire watch) instead of
+      // going through the new-tab flow.
+      if (!inApp && !cosClean && !src._forceInPage) {
         try { stopTrailerSoundPump(); } catch (e) {}
         // BROWSER POPUP RULE: window.open is only honored inside a real user
         // gesture on THIS page. The auto-mount on page load has no gesture,
@@ -6094,6 +6112,28 @@
       adShield.style.setProperty('display', 'none', 'important');
       try { stopTrailerSoundPump(); } catch (e) {}
       window._cosActive = true;
+      // Arm the hijack tripwire for this in-page session (browser only; the
+      // app's native firewall already blocks hijack domains outright).
+      try { if (window._cosHijackGuard && !window.DFX_IS_APP) window._cosHijackGuard.arm(src); } catch (e) {}
+
+      // ── APP: EMBED DOWNLOAD (IDM-style stream capture) ──
+      // The provider's HLS playlist (.m3u8) flows through the app's own
+      // firewall (shouldInterceptRequest) — the same trick IDM uses on PC.
+      // requestEmbedDownload() arms a 2-minute capture window natively; the
+      // firewall watches what the embed actually fetches for PLAYBACK and
+      // locks onto the newest media playlist. The app then downloads every
+      // segment (AES-128 decryption included) and stitches one .mp4 that
+      // appears on My Downloads like any other.
+      if (window.DFX_IS_APP && window.DeymflixApp && typeof window.DeymflixApp.requestEmbedDownload === 'function') {
+        var _dlBtn = document.getElementById('download-btn');
+        if (_dlBtn && !_dlBtn._cosHooked) {
+          _dlBtn._cosHooked = true;
+          _dlBtn.addEventListener('click', function () {
+            if (!window._cosActive) return; // normal download path
+            try { window.DeymflixApp.requestEmbedDownload(); } catch (e) {}
+          }, true);
+        }
+      }
 
       // COS POSTER BACKDROP: the provider iframe takes seconds to paint its
       // first frame — until then Android WebView shows an ugly gray play
@@ -6119,7 +6159,8 @@
         if (!window._cosActive) return;
         try {
           var raw = typeof ev.data === 'string' ? ev.data : JSON.stringify(ev.data || '');
-          if (/play|time/i.test(raw)) hidePlayerPosterBlur();
+          if (/play|time/i.test(raw)) hidePlayerPosterBlur();      // every VidLink PLAYER_EVENT is another chance to unmute
+          if (raw.indexOf('PLAYER_EVENT') !== -1) { try { cosPumpUnmute(); } catch (e) {} }
         } catch (e) {}
       });
 
@@ -6134,7 +6175,56 @@
       if (cosIfr) {
         cosIfr.setAttribute('referrerpolicy', 'no-referrer');
         try { cosIfr.setAttribute('credentialless', ''); } catch (e) {}
+        // ── BRAVE-GRADE SANDBOX (VidLink in-page) ──
+        // VidLink works inside a sandboxed iframe (unlike videasy — which
+        // detects and refuses sandboxes). A sandboxed frame CANNOT navigate
+        // our top page and CANNOT window.open — popunders/hijacks become
+        // physically impossible, with zero dialogs. Fullscreen still works
+        // via the allow/allowfullscreen attributes; postMessage flows out.
+        if (!window.DFX_IS_APP && order[0] === 'vidlink') {
+          try { cosIfr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation'); } catch (e) {}
+        }
       }
+
+      // ── AUTO-UNMUTE + AUTOPLAY PUMP ──
+      // VidLink's API is one-way (player→parent) and has no mute parameter,
+      // so if their player boots muted we cannot command it with certainty
+      // from a normal web page. Pump unmute AND play command shapes for the
+      // first ~60s and on every player event — harmless no-ops if unsupported.
+      // The APP goes further: MainScreen85 injects an unmuter INTO the provider
+      // document itself (shouldInterceptRequest), which forces <video> unmute
+      // + play at the source on every episode.
+      try { if (window._cosPumpTimer) { clearInterval(window._cosPumpTimer); window._cosPumpTimer = null; } } catch (e) {}
+      var cosPumpCount = 0;
+      function cosPumpUnmute() {
+        if (!window._cosActive) return;
+        cosPumpCount++;
+        var win = null;
+        try { win = document.getElementById('main-iframe') && document.getElementById('main-iframe').contentWindow; } catch (e) {}
+        if (!win) return;
+        var shapes = [
+          { type: 'command', data: { command: 'unmute' } },
+          { type: 'command', data: { command: 'play' } },
+          { type: 'unmute' },
+          { method: 'setVolume', value: 1 },
+          JSON.stringify({ method: 'setVolume', value: 1 }),
+          JSON.stringify({ method: 'unmute' }),
+          { type: 'PLAYER_EVENT', data: { event: 'unmute' } },
+          'unmute'
+        ];
+        for (var si = 0; si < shapes.length; si++) {
+          try { win.postMessage(shapes[si], '*'); } catch (e) {}
+        }
+      }
+      // Aggressive for the first minute (every 2s), then a steady tick every
+      // 10s FOR THE WHOLE SESSION — episode changes inside the provider's
+      // player (their UI / auto-next) never re-run this mount, so the pump
+      // must outlive the boot phase to re-unmute every episode.
+      var cosPumpTimer = setInterval(function () {
+        if (!window._cosActive) { clearInterval(cosPumpTimer); window._cosPumpTimer = null; return; }
+        if (cosPumpCount <= 30 || cosPumpCount % 5 === 0) cosPumpUnmute();
+      }, 2000);
+      window._cosPumpTimer = cosPumpTimer;
 
       // ── HilltopAds on embeds ──
       // The direct-file VAST trigger listens to OUR <video> timeupdate, which
@@ -6203,6 +6293,7 @@
       if (spanEl) spanEl.style.cssText = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
       back.onclick = function (ev) {
         ev.stopPropagation();
+        try { if (window._cosHijackGuard) window._cosHijackGuard.disarm(); } catch (e) {}
         exitCosMode();
         // If the movie's own file IS this embed, there is no movie underneath —
         // returning would instantly re-mount the embed (loop). Go home instead.
@@ -6247,6 +6338,7 @@
         gate.appendChild(label);
         gate.onclick = function (ev) {
           ev.stopPropagation();
+          try { if (window._cosHijackGuard) window._cosHijackGuard.disarm(); } catch (e) {}
           const u = window._cosPendingUrl || pendingUrl;
           gate.remove();
           window._cosOpening = true;
@@ -6271,9 +6363,12 @@
     function exitCosMode() {
       if (!window._cosActive) return;
       window._cosActive = false;
+      try { if (window._cosHijackGuard) window._cosHijackGuard.disarm(); } catch (e) {}
       document.body.classList.remove('cos-mode');
       hidePlayerPosterBlur(); // clear the COS loading backdrop
       if (window._cosAdTimer) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; }
+      if (window._cosPumpTimer) { clearInterval(window._cosPumpTimer); window._cosPumpTimer = null; }
+      try { var _uc = document.getElementById('cos-unmute-chip'); if (_uc) _uc.remove(); } catch (e) {} // harmless if absent
       window._cosAdPhase = 0;
       window._cosWatchSecs = 0;
       const back = document.getElementById('cos-back-btn');
@@ -6284,6 +6379,82 @@
       const ifr = document.getElementById('main-iframe');
       if (ifr) { ifr.remove(); iframe = null; }
     }
+
+    // ── COS HIJACK TRIPWIRE (browser-only) ─────────────────────────────
+    // In-page embeds (the clean VidLink default) may still, if a provider
+    // turns dirty, attempt to top-navigate our page (popunders/redirects).
+    // Two-layer tripwire:
+    //   Layer 1 (desktop): beforeunload — the browser holds the hijack with a
+    //   "Leave site?" dialog; if the user stays, we failover in-page instantly.
+    //   Layer 2 (mobile): mobile browsers skip that dialog, so if we do get
+    //   unloaded, the bfcache revival on Back (pageshow persisted=true) means
+    //   the player is still alive — failover there instead.
+    // Failover switches to the next clean provider (videasy after vidlink),
+    // pins the source to it so reruns don't re-pick vidlink, and never loops.
+    window._cosHijackGuard = {
+      tripFails: 0,
+      failover: null, // name of the clean provider we failed over to
+      armed: false,
+      src: null,
+      arm: function (src) {
+        this.src = src;
+        this.armed = true;
+      },
+      disarm: function () {
+        this.armed = false;
+        this.src = null;
+      },
+      handleTrip: function () {
+        if (!this.armed) return;
+        this.tripFails++;
+        if (this.tripFails > 1 || !this.src) { this.disarm(); return; }
+        const src = this.src;
+        // Failover to the next clean provider; a user-pinned provider is
+        // respected the first time, but a second trip means the page itself
+        // is hostile — stop trying.
+        const nextClean = (src.provider && src.provider !== 'vidlink') ? null : 'videasy';
+        this.disarm();
+        if (!nextClean) { return; }
+        src.provider = nextClean;
+        src._forceInPage = true; // failover stays in-page, under this tripwire
+        this.failover = nextClean;
+        try {
+          if (typeof exitCosMode === 'function') exitCosMode();
+        } catch (e) {}
+        try {
+          mountCosEmbed(src);
+          showToast('Playback provider switched for your safety');
+        } catch (e) {
+          try { forceBackToHome(); } catch (e2) {}
+          return;
+        }
+        try { window.scrollTo(0, 0); } catch (e) {}
+      }
+    };
+    try {
+      window.addEventListener('beforeunload', function (ev) {
+        const g = window._cosHijackGuard;
+        if (!g || !g.armed) return;
+        // Only guard against embed-initiated top-navigation; our own back/home
+        // controls disarm first, so any remaining unload request while armed
+        // is a hijack.
+        ev.preventDefault();
+        // Chrome requires returnValue to be set to show the dialog
+        ev.returnValue = '';
+        // User chose to STAY → failover now. There is no direct "stay" callback;
+        // a timer that still fires 800ms later means the page wasn't unloaded.
+        setTimeout(function () {
+          if (window._cosHijackGuard && window._cosHijackGuard.armed) g.handleTrip();
+        }, 800);
+      });
+      window.addEventListener('pageshow', function (ev) {
+        const g = window._cosHijackGuard;
+        if (!g || !ev.persisted) return;
+        // Came back via Back after a hijack unload — page state (and guard) intact
+        g.handleTrip();
+      });
+    } catch (e) {}
+    // ── end hijack tripwire ────────────────────────────────────────
 
     
     // Player poster blur during buffering
