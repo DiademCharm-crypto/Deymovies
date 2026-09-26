@@ -4391,11 +4391,16 @@
 
     function startSlowConnectionCheck() {
       clearTimeout(slowConnectionTimer);
+      // COS mode: our <video> is intentionally idle (the provider iframe plays
+      // instead), so its paused/readyState ALWAYS look "stuck" — the warning
+      // would be a permanent false alarm. The pending-url flag also covers the
+      // browser play-gate window (before _cosActive is armed).
+      if (window._cosActive || window._cosPendingUrl) return;
       slowConnectionTimer = setTimeout(() => {
         // An ad owns the screen while vastAdPlaying — the movie is paused by
         // DESIGN then, so "slow connection" would be a false alarm (users
         // reload mid-ad and the impression is lost).
-        if (vastAdPlaying) { networkNote.style.display = 'none'; return; }
+        if (vastAdPlaying || window._cosActive || window._cosPendingUrl) { networkNote.style.display = 'none'; return; }
         if (directPlayer.paused || directPlayer.readyState < 3) {
           networkNote.style.display = 'block';
         }
@@ -5937,6 +5942,17 @@
     // the iframe (set in mountCosEmbed) further strip their cookie-based tracking.
     const COS_DEFAULT_ORDER = ['vidlink', 'videasy', 'autoembed', 'vidsrccc'];
 
+    // Track the last real user interaction (for popup-gesture gating below).
+    // Browsers only allow window.open inside a fresh user gesture — a tap on
+    // the PREVIOUS page does not count once player.html has loaded.
+    if (!window._dfxGestureHooked) {
+      window._dfxGestureHooked = true;
+      window._dfxLastUserGesture = 0;
+      ['pointerdown', 'touchend', 'mousedown', 'keydown'].forEach(function (evn) {
+        document.addEventListener(evn, function () { window._dfxLastUserGesture = Date.now(); }, true);
+      });
+    }
+
     // Accepts: "cos:tv/5920/1/1", "cos:movie/27205", "cos:tv/5920/1/1@vidlink",
     // or pasted cinemaos.live/watch/{tv,movie}/<id>?season=&episode= URLs.
     function parseCosEmbed(raw) {
@@ -6017,7 +6033,24 @@
         || /DeymflixApp/i.test(navigator.userAgent || '')); // belt & suspenders if app.js hiccups
       if (!inApp) {
         try { stopTrailerSoundPump(); } catch (e) {}
-        // Arm the Shield bypass, then open — this is a USER-initiated tap.
+        // BROWSER POPUP RULE: window.open is only honored inside a real user
+        // gesture on THIS page. The auto-mount on page load has no gesture,
+        // so Chrome/Safari block the popup and the old code bounced the user
+        // home ("COS not working again"). Fix: if we have no fresh gesture
+        // (<4s old), DON'T try to open yet — park the embed in-page behind a
+        // big play gate. The user's tap on the gate IS a gesture; the retry
+        // succeeds and the new tab opens.
+        const gestureFresh = (Date.now() - (window._dfxLastUserGesture || 0)) < 4000;
+        if (!gestureFresh) {
+          window._cosPendingUrl = url;
+          // Kill the slow-connection warning BEFORE its 4s timer fires: our
+          // <video> stays idle in COS mode and looks "stuck" to that check.
+          try { networkNote.style.display = 'none'; } catch (e) {}
+          window._cosActive = true; // arm COS state so pending timers no-op
+          showCosPlayGate(url);
+          return;
+        }
+        // Fresh gesture (user tapped an episode / play directly): open now.
         window._cosOpening = true;
         let w = null;
         try { w = window.open(url, '_blank'); } catch (e) {}
@@ -6025,8 +6058,11 @@
           try { w.opener = null; } catch (e) {}
           showToast('Playing in a new tab — switch back when done');
         } else {
+          // Even with a gesture the browser may still block: fall back to the gate.
           window._cosOpening = false;
-          showToast('Popup blocked — tap again or allow popups');
+          window._cosPendingUrl = url;
+          showCosPlayGate(url);
+          return;
         }
         exitCosMode();
         forceBackToHome();
@@ -6183,6 +6219,55 @@
       } catch (e) {}
     }
 
+    // BROWSER play-gate: when the auto-mount has no user gesture (popup
+    // would be blocked), park the COS url behind a poster + big play button.
+    // The tap IS the gesture — window.open from its handler succeeds.
+    function showCosPlayGate(pendingUrl) {
+      try {
+        let gate = document.getElementById('cos-play-gate');
+        if (gate) { gate.remove(); }
+        gate = document.createElement('div');
+        gate.id = 'cos-play-gate';
+        gate.style.cssText = 'position:absolute;inset:0;z-index:1250;display:flex;flex-direction:column;'
+          + 'align-items:center;justify-content:center;gap:16px;cursor:pointer;'
+          + 'background:rgba(10,10,11,0.55);border:none;width:100%;';
+        if (currentMovie && currentMovie.poster) {
+          gate.style.backgroundImage = 'linear-gradient(rgba(10,10,11,.45), rgba(10,10,11,.45)), url(' + currentMovie.poster + ')';
+          gate.style.backgroundSize = 'cover';
+          gate.style.backgroundPosition = 'center';
+        }
+        const playBtn = document.createElement('div');
+        playBtn.style.cssText = 'width:84px;height:84px;border-radius:50%;background:#E50914;display:flex;'
+          + 'align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(229,9,20,.55);';
+        playBtn.innerHTML = '<svg viewBox="0 0 24 24" width="40" height="40" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
+        const label = document.createElement('div');
+        label.textContent = 'Tap to play';
+        label.style.cssText = 'color:#fff;font:700 16px -apple-system,Segoe UI,Roboto,sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.9);';
+        gate.appendChild(playBtn);
+        gate.appendChild(label);
+        gate.onclick = function (ev) {
+          ev.stopPropagation();
+          const u = window._cosPendingUrl || pendingUrl;
+          gate.remove();
+          window._cosOpening = true;
+          let w = null;
+          try { w = window.open(u, '_blank'); } catch (e) {}
+          if (w) {
+            try { w.opener = null; } catch (e) {}
+            showToast('Playing in a new tab — switch back when done');
+          } else {
+            showToast('Popup blocked — allow popups for this site');
+          }
+          exitCosMode();
+          forceBackToHome();
+        };
+        playerContainer.appendChild(gate);
+      } catch (e) {
+        // last-resort: navigate the same tab rather than dead-ending
+        try { window.location.href = pendingUrl; } catch (e2) {}
+      }
+    }
+
     function exitCosMode() {
       if (!window._cosActive) return;
       window._cosActive = false;
@@ -6193,6 +6278,8 @@
       window._cosWatchSecs = 0;
       const back = document.getElementById('cos-back-btn');
       if (back) back.remove();
+      const gate = document.getElementById('cos-play-gate');
+      if (gate) gate.remove();
       playerOverlay.style.removeProperty('pointer-events');
       const ifr = document.getElementById('main-iframe');
       if (ifr) { ifr.remove(); iframe = null; }

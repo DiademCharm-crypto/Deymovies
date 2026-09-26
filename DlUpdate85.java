@@ -305,7 +305,10 @@ public class DlUpdate85 {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         yp.topMargin = (int) (22 * d);
 
-        box.addView(tTitle);
+        // NOTE: tTitle is NOT added here — it already lives inside the
+        // `head` row above. Adding it twice crashed with
+        // "IllegalStateException: The specified child already has a parent"
+        // (ViewGroup.addViewInner) the moment the update dialog appeared.
         box.addView(tMsg, mp);
         box.addView(bar, bp);
         box.addView(pct);
