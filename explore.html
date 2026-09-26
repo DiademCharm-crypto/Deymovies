@@ -373,8 +373,9 @@
       const title = item.title || '';
       const id = item.id || '';
       const isSeries = item.isSeries === true;
-      const hasEmbed = !!(item.manualEmbed && item.manualEmbed.startsWith('http'));
-      const hasTrailer = !!(item.trailerEmbed && item.trailerEmbed.startsWith('http'));
+      // cos: links are CinemaOS embeds — playable like any manualEmbed
+      const hasEmbed = !!(item.manualEmbed && (item.manualEmbed.startsWith('http') || item.manualEmbed.startsWith('cos:')));
+      const hasTrailer = !!(item.trailerEmbed && (item.trailerEmbed.startsWith('http') || item.trailerEmbed.startsWith('cos:')));
 
       let href, badge = '';
 

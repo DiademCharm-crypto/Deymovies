@@ -157,6 +157,12 @@ public class MainScreen85 {
         wv.getSettings().setUseWideViewPort(true);
         wv.getSettings().setSupportZoom(false);
         wv.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        // ANTI-POPUNDER: window.open() in the page does nothing (no multi-window
+        // support = onCreateWindow never fires), so provider ad scripts cannot
+        // spring new "windows"/tabs. Combined with the navigation guard below,
+        // the only thing that can ever navigate the app is our own site.
+        wv.getSettings().setSupportMultipleWindows(false);
+        wv.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
 
         // -- 2) APP-MODE: mark the WebView so the site enables app-only features --
         String baseUa = wv.getSettings().getUserAgentString();
@@ -169,6 +175,95 @@ public class MainScreen85 {
 
         // -- 4) WebViewClient: spinner fix + offline redirect + splash dismiss --
         wv.setWebViewClient(new android.webkit.WebViewClient() {
+            // ── NAVIGATION GUARD (anti-popunder) ──
+            // Free embed providers (Videasy/VidLink/...) run ad scripts that try
+            // to hijack the whole view: popunders, "click redirects" to random
+            // ad/malware hosts (my.rtmk.net, *.cfd, etc.). Policy: only OUR site
+            // and the known embed player hosts may navigate inside the app;
+            // EVERYTHING else is silently cancelled. User taps that should open
+            // external apps (mailto/tel/intent) are dropped too — ads abuse them.
+            private boolean isAllowedHost(String u) {
+                try {
+                    android.net.Uri uri = android.net.Uri.parse(u);
+                    String s = uri.getScheme();
+                    if (s == null) return false;
+                    s = s.toLowerCase();
+                    if (s.equals("blob") || s.equals("data") || s.equals("about") || s.equals("javascript")) return true;
+                    if (!s.equals("http") && !s.equals("https")) return false; // intent:/market:/mailto: ... blocked
+                    String h = uri.getHost();
+                    if (h == null) return false;
+                    h = h.toLowerCase();
+                    String[] ok = {
+                        "deymflix.eu.cc", "localhost", "127.0.0.1",
+                        "videasy.net", "vidlink.pro", "autoembed.cc",
+                        "vidsrc.cc", "vidsrc.su", "vidsrc.in",
+                        "multiembed.mov", "2embed.cc", "cinemaos.live"
+                    };
+                    for (String k : ok) {
+                        if (h.equals(k) || h.endsWith("." + k)) return true;
+                    }
+                    return false;
+                } catch (Throwable t) {
+                    return false;
+                }
+            }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // false = let the WebView load it; true = cancel silently
+                return !isAllowedHost(url);
+            }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest req) {
+                return !isAllowedHost(req.getUrl() == null ? "" : req.getUrl().toString());
+            }
+
+            // ── REQUEST FIREWALL (Brave-style network-level ad blocking) ──
+            // The WebView hands us EVERY resource request — including requests
+            // made by ad scripts INSIDE the provider iframes (their origins are
+            // cross-origin, but request URLs are still visible to the network
+            // stack we own). Matching hosts are answered with an empty response:
+            // the tracker never loads, never fires, never triggers antivirus
+            // warnings. Our own ad revenue (Hilltop) is explicitly protected
+            // from this list, as are the video hosts and YouTube trailers.
+            private final java.util.HashSet<String> AD_HOSTS = new java.util.HashSet<>(java.util.Arrays.asList(
+                // flagged by the user's antivirus on our embeds
+                "rtmk.net",
+                // legacy/observed popunder rotators
+                "zbcrtbk5m2415pw9jkwbejoei125vejja8xk.cfd",
+                // big ad networks these providers commonly use
+                "doubleclick.net", "googlesyndication.com", "googleadservices.com",
+                "google-analytics.com", "adservice.google.com",
+                "popads.net", "popcash.net", "propellerads.com",
+                "exoclick.com", "exosrv.com", "exdynsrv.com", "juicyads.com",
+                "adsterra.com",
+                "adcash.com", "ad-maven.com", "onclickalgo.com", "onclickmega.com",
+                "zeusadx.com", "bidvertiser.com"
+            ));
+            private boolean isAdHost(String h) {
+                if (h == null) return false;
+                h = h.toLowerCase();
+                if (h.endsWith(".")) h = h.substring(0, h.length() - 1);
+                // abuse-heavy TLDs: almost exclusively popunder/redirect infra
+                if (h.endsWith(".cfd")) return true;
+                // suffix walk: ads.rtmk.net → rtmk.net → match
+                while (h.contains(".")) {
+                    if (AD_HOSTS.contains(h)) return true;
+                    h = h.substring(h.indexOf('.') + 1);
+                }
+                return AD_HOSTS.contains(h);
+            }
+            @Override
+            public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, android.webkit.WebResourceRequest request) {
+                try {
+                    String host = request.getUrl() == null ? null : request.getUrl().getHost();
+                    if (host != null && isAdHost(host)) {
+                        return new android.webkit.WebResourceResponse(
+                                "text/plain", "utf-8",
+                                new java.io.ByteArrayInputStream(new byte[0]));
+                    }
+                } catch (Throwable t) { /* never break loading */ }
+                return null; // null = request proceeds normally
+            }
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (swipe != null) swipe.setRefreshing(false);

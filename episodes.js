@@ -100,6 +100,141 @@ const seriesData = [
       }
     ]
   },
+  {
+    id: "The Mentalist",
+    title: "The Mentalist",
+    isFilipino: false,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/acYXu4KaDj1NIkMgObnhe4C4a0T.jpg",
+    seasons: [
+      {
+        seasonNumber: 1,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/1/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/1/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/1/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/1/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/1/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/1/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/1/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/1/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/1/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/1/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/1/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/1/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/1/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/1/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/1/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/1/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/1/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/1/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/1/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/1/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/1/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/1/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/1/23"
+          },
+          {
+            episodeNumber: 24,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/1/24"
+          }
+        ]
+      }
+    ]
+  },
+
+
   // NOTE: K-Drama series episodes live in kdrama-episode.js now.
   // This file is for non-K-Drama series only (Filipino/English).
 ];

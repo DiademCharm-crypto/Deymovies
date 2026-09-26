@@ -19,6 +19,29 @@
   <link rel="stylesheet" href="style.css?v=160.3">
 
   <style>
+    /* ═══ CinemaOS embed mode: the provider's player IS the player. Everything
+       of ours that could cover or intercept taps is display:none. The back
+       chip (#cos-back-btn) is appended outside the overlay and stays visible. */
+    body.cos-mode .player-bottom-bar,
+    body.cos-mode .center-controls-group,
+    body.cos-mode .vertical-slider-bar,
+    body.cos-mode .loklok-speed-badge,
+    body.cos-mode .loklok-seek-badge,
+    body.cos-mode #settings-panel,
+    body.cos-mode #btn-settings,
+    body.cos-mode #btn-subtitle-toggle,
+    body.cos-mode #btn-episodes,
+    body.cos-mode #btn-next-episode-inline,
+    body.cos-mode #btn-fullscreen,
+    body.cos-mode #btn-bottom-play-pause,
+    body.cos-mode #video-seekbar,
+    body.cos-mode .player-top-bar #pc-ep-num-top,
+    body.cos-mode #next-episode-box,
+    body.cos-mode #btn-subtitle-off,
+    body.cos-mode #quality-menu,
+    body.cos-mode #speed-menu {
+      display: none !important;
+    }
     /* RESET & BASE BODY FOR PLAYER PAGE ONLY */
     body {
       padding-top: 0 !important;
@@ -4109,6 +4132,7 @@
     }
 
     function showControls() {
+      if (window._cosActive) return; // CinemaOS embed: the provider's player owns the screen — never raise our chrome
       playerOverlay.classList.add('active');
       showPcVolumeControl();
       updateSubtitleToggleUI();
@@ -4331,6 +4355,7 @@
     function setBufferingUI(on) {
       // Ad is on screen — it owns all overlays; never draw the movie spinner over it
       if (on && vastAdPlaying) return;
+      if (window._cosActive) return; // CinemaOS embed: never stamp inline styles back onto our hidden chrome
       const spinner = document.getElementById('video-loading-spinner');
       const group = document.getElementById('center-controls');
       const bottomBtn = document.getElementById('btn-bottom-play-pause');
@@ -4515,6 +4540,7 @@
 
     directPlayer.addEventListener('pause', () => {
       if (isQualitySwitch) return;
+      if (window._cosActive) return; // CinemaOS embed: our chrome stays down
       hideLoadingSpinner();
       updatePlayStateUI(false);
       playerOverlay.classList.add('active');
@@ -5824,7 +5850,7 @@
       }
     }
 
-    function renderFreshIframe(targetUrl, isYouTube = false) {
+    function renderFreshIframe(targetUrl, isYouTube = false, noSandbox = false) {
       let existingIframe = document.getElementById('main-iframe');
       if (existingIframe) {
         existingIframe.remove();
@@ -5839,7 +5865,7 @@
       newIframe.setAttribute('height', '100%');
       newIframe.allow = "autoplay; fullscreen *; picture-in-picture *; encrypted-media; accelerometer; gyroscope; clipboard-write";
       
-      if (!isYouTube) {
+      if (!isYouTube && !noSandbox) {
         newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
         showLoadingSpinner();
       } else {
@@ -5862,6 +5888,183 @@
       playerContainer.appendChild(newIframe);
       iframe = newIframe;
       newIframe.src = targetUrl;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CINEMAOS EMBED MODE
+    // Manual embeds written as "cos:tv/<tmdbId>/<s>/<e>" or "cos:movie/<tmdbId>"
+    // (past cinemaos.live/watch/... URLs are auto-translated). The provider's
+    // own player takes over the screen: our controls hide, taps pass through,
+    // only the back button (upper left) stays. English stream is default —
+    // providers below are ordered English-first, and "@key" pins one.
+    // ═══════════════════════════════════════════════════════════════
+    const COS_PROVIDERS = {
+      videasy:   (t, id, s, e) => `https://player.videasy.net/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?color=8B0000&autoplay=true&autoplayNextEpisode=false`,
+      vidlink:   (t, id, s, e) => `https://vidlink.pro/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?primaryColor=e50914&secondaryColor=8B0000&iconColor=f5f5f1&icons=default&player=default&title=true&poster=true&autoplay=true&nextbutton=false`,
+      autoembed: (t, id, s, e) => `https://player.autoembed.cc/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
+      vidsrc:    (t, id, s, e) => `https://vidsrc.in/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
+      vidsrccc:  (t, id, s, e) => `https://vidsrc.cc/v3/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoPlay=true`,
+      vidsrcsu:  (t, id, s, e) => `https://vidsrc.su/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
+      superembed:(t, id, s, e) => t === 'tv'
+        ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}&autoplay=true`
+        : `https://multiembed.mov/?video_id=${id}&tmdb=1&autoplay=true`,
+      twoembed:  (t, id, s, e) => t === 'tv'
+        ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`
+        : `https://www.2embed.cc/embed/${id}`
+    };
+    // English-first rotation (Videasy/VidLink carry audio + subtitle menus).
+    // SECURITY/TRACKER NOTE: free embed providers run their own ad networks, and
+    // some (vidsrcsu, superembed, twoembed — and most vidsrc-family forks) load
+    // aggressive trackers (my.rtmk.net, *.cfd popunders, etc.) that trigger
+    // antivirus warnings on the VIEWER's machine. The default rotation therefore
+    // sticks to the cleanest providers; the dirtier ones stay available only via
+    // an explicit "@key" pin in the manualEmbed. credentialless + no-referrer on
+    // the iframe (set in mountCosEmbed) further strip their cookie-based tracking.
+    const COS_DEFAULT_ORDER = ['videasy', 'vidlink', 'autoembed', 'vidsrccc'];
+
+    // Accepts: "cos:tv/5920/1/1", "cos:movie/27205", "cos:tv/5920/1/1@vidlink",
+    // or pasted cinemaos.live/watch/{tv,movie}/<id>?season=&episode= URLs.
+    function parseCosEmbed(raw) {
+      if (!raw || typeof raw !== 'string') return null;
+      let s = raw.trim();
+      let pinned = null;
+      const at = s.indexOf('@');
+      if (at > 0 && !s.startsWith('http')) {
+        pinned = s.slice(at + 1).trim().toLowerCase();
+        if (!COS_PROVIDERS[pinned]) pinned = null;
+        s = s.slice(0, at).trim();
+      }
+      let m = s.match(/^cos:(tv|movie)\/(\d+)(?:\/(\d+)\/(\d+))?$/i);
+      if (m) {
+        return { type: m[1].toLowerCase(), id: m[2], season: m[3] || '1', episode: m[4] || '1', provider: pinned };
+      }
+      if (s.indexOf('cinemaos.live/watch/') !== -1) {
+        try {
+          const u = new URL(s);
+          const pm = u.pathname.match(/watch\/(tv|movie)\/(\d+)/i);
+          if (pm) {
+            return {
+              type: pm[1].toLowerCase(),
+              id: pm[2],
+              season: u.searchParams.get('season') || '1',
+              episode: u.searchParams.get('episode') || '1',
+              provider: pinned
+            };
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    function mountCosEmbed(src) {
+      const order = src.provider ? [src.provider, ...COS_DEFAULT_ORDER.filter(k => k !== src.provider)] : COS_DEFAULT_ORDER;
+      const url = COS_PROVIDERS[order[0]](src.type, src.id, src.season, src.episode);
+
+      directPlayer.pause();
+      directPlayer.removeAttribute('src');
+      directPlayer.load();
+      directPlayer.style.display = 'none';
+      playerMode = 'cos';
+
+      hidePlayerPosterBlur();
+      hideLoadingSpinner();
+
+      // One class hides ALL our chrome (bars, sliders, badges, panels) via CSS,
+      // so nothing can re-show an individual control afterwards.
+      document.body.classList.add('cos-mode');
+      // The pre-mount buffering flow may have stamped inline 'flex !important'
+      // onto these — inline beats stylesheets, so overwrite them inline too.
+      ['center-controls', 'btn-bottom-play-pause', 'video-loading-spinner'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.setProperty('display', 'none', 'important');
+      });
+      // Taps go straight to the embed
+      playerOverlay.style.setProperty('pointer-events', 'none', 'important');
+      playerOverlay.classList.remove('active');
+      clearTimeout(typeof autoHideTimer !== 'undefined' ? autoHideTimer : undefined);
+      adShield.style.setProperty('display', 'none', 'important');
+      try { stopTrailerSoundPump(); } catch (e) {}
+      window._cosActive = true;
+
+      // noSandbox: Videasy/VidLink & co. REFUSE sandboxed frames ("Iframe Sandbox
+      // Detected" — verified even with every sandbox token granted), and CinemaOS
+      // itself excludes these providers from sandboxing. Ad-suppression instead:
+      // credentialless strips third-party cookies/storage from ad networks inside
+      // the frame (Chromium 110+; older browsers just ignore the attribute), and
+      // no-referrer stops referrer-based popunder targeting.
+      renderFreshIframe(url, false, true);
+      const cosIfr = document.getElementById('main-iframe');
+      if (cosIfr) {
+        cosIfr.setAttribute('referrerpolicy', 'no-referrer');
+        try { cosIfr.setAttribute('credentialless', ''); } catch (e) {}
+      }
+
+      // ── HilltopAds on embeds ──
+      // The direct-file VAST trigger listens to OUR <video> timeupdate, which
+      // never plays in COS mode (the iframe plays instead) — so embeds never
+      // saw ads. Schedule by wall-clock watch time instead: ~12 min in, and
+      // ~28 min for long sessions. Only visible-tab time counts.
+      window._cosAdPhase = 0;
+      window._cosWatchSecs = 0;
+      try { vastTriggered = false; } catch (e) {} // scheduler calls showVastAd directly
+      if (window._cosAdTimer) clearInterval(window._cosAdTimer);
+      window._cosAdTimer = setInterval(function () {
+        if (!window._cosActive) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; return; }
+        if (document.visibilityState !== 'visible') return; // background tab: no watch time accrues
+        if (typeof vastAdPlaying !== 'undefined' && vastAdPlaying) return; // an ad is already on screen
+        window._cosWatchSecs += 15;
+        if (window._cosAdPhase === 0 && window._cosWatchSecs >= 720) {
+          window._cosAdPhase = 1;
+          showVastAd();
+        } else if (window._cosAdPhase === 1 && window._cosWatchSecs >= 1680) {
+          window._cosAdPhase = 2;
+          showVastAd();
+        }
+      }, 15000);
+
+      // COS back chip: chevron + movie title, same look as the normal player
+      // top bar. Independent of the (pointer-events:none) overlay.
+      const back = document.createElement('button');
+      back.id = 'cos-back-btn';
+      const cosTitle = (currentMovie && currentMovie.title) ? String(currentMovie.title) : '';
+      back.innerHTML = '&#10094;' + (cosTitle ? ' <span>' + cosTitle.replace(/[<>&]/g, '') + '</span>' : '');
+      back.style.cssText = 'position:absolute;top:0;left:0;z-index:2147483000;display:flex;align-items:center;gap:10px;' +
+        'padding:14px 20px 14px 14px;border:none;border-radius:0 0 14px 0;' +
+        'background:linear-gradient(135deg, rgba(10,10,11,0.85) 0%, rgba(10,10,11,0.55) 60%, rgba(10,10,11,0) 100%);' +
+        'color:#fff;font:700 17px/1 -apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:0.2px;' +
+        'text-shadow:0 1px 3px rgba(0,0,0,0.8);cursor:pointer;pointer-events:auto;max-width:70%;overflow:hidden;';
+      const spanEl = back.querySelector('span');
+      if (spanEl) spanEl.style.cssText = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      back.onclick = function (ev) {
+        ev.stopPropagation();
+        exitCosMode();
+        // If the movie's own file IS this embed, there is no movie underneath —
+        // returning would instantly re-mount the embed (loop). Go home instead.
+        const movieIsEmbed = currentMovie && parseCosEmbed(currentMovie.manualEmbed || '');
+        if (!movieIsEmbed && typeof window.returnFromTrailerToMovie === 'function' && typeof hasOwnVideoFile === 'function' && hasOwnVideoFile()) {
+          window.returnFromTrailerToMovie();
+        } else {
+          forceBackToHome();
+        }
+      };
+      playerContainer.appendChild(back);
+      try {
+        if (window.DFX_IS_APP && window.DeymflixApp && typeof window.DeymflixApp.setSecure === 'function') window.DeymflixApp.setSecure(true);
+      } catch (e) {}
+    }
+
+    function exitCosMode() {
+      if (!window._cosActive) return;
+      window._cosActive = false;
+      document.body.classList.remove('cos-mode');
+      if (window._cosAdTimer) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; }
+      window._cosAdPhase = 0;
+      window._cosWatchSecs = 0;
+      const back = document.getElementById('cos-back-btn');
+      if (back) back.remove();
+      playerOverlay.style.removeProperty('pointer-events');
+      const ifr = document.getElementById('main-iframe');
+      if (ifr) { ifr.remove(); iframe = null; }
     }
 
     
@@ -6130,6 +6333,7 @@
       // App-mode download: only direct files are downloadable (HLS/iframe are not).
       // Cleared at the top of every load; set again in the direct-file branch below.
       window._dfxDownloadUrl = '';
+      exitCosMode(); // fresh state every load — CinemaOS mode is opt-in per URL
 
       let rawUrl = '';
       if (playerMode === 'trailer' && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '') {
@@ -6146,6 +6350,15 @@
 
       if (!targetUrl || targetUrl.trim() === '') {
         showToast("No stream or trailer available.");
+        return;
+      }
+
+      // ── CinemaOS-mode embeds (cos: links and cinemaos.live links) ──
+      // The embed IS the player: our controls hide, clicks pass through,
+      // back button (upper left) stays. English source is the default.
+      const cosSource = parseCosEmbed(targetUrl);
+      if (cosSource) {
+        mountCosEmbed(cosSource);
         return;
       }
 
@@ -6305,6 +6518,7 @@
 
       playerOverlay.style.setProperty('display', 'flex', 'important');
       adShield.style.setProperty('display', 'block', 'important');
+      hidePlayerPosterBlur(); // embed path: the iframe is the show — drop the buffering cover
 
       const settingsEmbed = document.getElementById('btn-settings');
       if (settingsEmbed) settingsEmbed.style.display = 'none';
@@ -6576,7 +6790,11 @@
     const vastSkipBtn = document.getElementById('vast-ad-skip');
     const vastProgress = document.getElementById('vast-ad-progress');
     let vastTriggered = false;
-    let vastAdPlaying = false;
+    // var (not let): setBufferingUI() above reads this during early page load,
+    // before this line runs — a let would throw a TDZ ReferenceError there and
+    // abort the whole embed mount (embed-only titles like CinemaOS links). var
+    // hoists, so early reads simply see undefined/falsy until this init.
+    var vastAdPlaying = false;
     let movieMutedBeforeAd = false;
     let vastLoadGuard = null;
     let vastCountdown = null;

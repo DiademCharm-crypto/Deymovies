@@ -1,54 +1,59 @@
-# DEYMFLIX for iOS — build & install guide
+# DEYMFLIX iOS — Build & Install Guide
 
-This folder contains a complete native iOS app (Swift/Xcode) that mirrors the
-Android app: site in a WebView with the same `DeymflixApp` bridge, native
-AVPlayer for fullscreen/streams, background downloads, Downloads screen,
-splash animation. The Swift sources compile on a Mac or a GitHub-hosted Mac —
-not on this Windows PC.
+The iOS app lives in `ios/`. It mirrors the Android app: splash with the
+spinning-ring logo, the site in a native WebView with the `DeymflixApp`
+bridge, fullscreen handoff to a native AVPlayer (speed + English/Tagalog
+subtitles), and real background downloads with a My Downloads screen.
 
-## What exists here
+Swift cannot be compiled on Windows — the build runs on GitHub's Mac
+servers (free for public repos).
 
-| Path | What it is |
-|---|---|
-| `ios/project.yml` | XcodeGen spec (generates the Xcode project) |
-| `ios/Deymflix/Sources/*.swift` | App code: splash, browser+bridge, player, downloads |
-| `ios/Deymflix/Assets.xcassets` | App icon (1024px, hexagon mark) |
-| `.github/workflows/ios.yml` | Cloud Mac build → unsigned IPA artifact |
+---------------------------------------------------------------------------
+## STEP 1 — Push the ios/ folder to GitHub
 
-## Route A — free, personal install (no Apple account)
+Upload (or git push) these to your repo root:
+- `ios/project.yml`
+- `ios/Deymflix/Sources/` (4 .swift files)
+- `ios/Deymflix/Assets.xcassets/` (the app icon)
+- `.github/workflows/ios.yml`
 
-1. Push this folder to GitHub → Actions tab → run **Build iOS IPA (unsigned)**.
-2. Download the `Deymflix-unsigned-ipa` artifact.
-3. On a PC install [Sideloadly](https://sideloadly.io) or AltStore.
-4. iPhone via USB → Sideloadly → pick the IPA → sign with any free Apple ID
-   → the app installs. Re-sign every 7 days (AltStore refreshes in background).
+## STEP 2 — Get the unsigned IPA from GitHub Actions
 
-## Route B — TestFlight (public beta link on app.html)
+1. Repo → **Actions** tab → "Build iOS IPA (unsigned)"
+2. If it did not start automatically: click it → **Run workflow** → Run
+3. Wait ~5 minutes for the green check
+4. Open the finished run → scroll to **Artifacts** → download
+   **Deymflix-unsigned-ipa** → unzip → `Deymflix-unsigned.ipa`
 
-1. Apple Developer Program **$99/year**.
-2. Same GitHub build, then on any Mac (or a borrowed one / cloud Mac):
-   `xcrun altool --upload-app Deymflix-unsigned.ipa` after signing with your
-   distribution cert.
-3. TestFlight → invite link → up to 10,000 testers install from Safari.
-   Builds expire after 90 days — re-upload a fresh IPA monthly.
+## STEP 3 — Sign & install with Sideloadly (free, needs the iPad attached)
 
-## Route C — App Store (public, permanent)
+One-time setup on this PC:
+1. Install **iTunes** (apple.com version, NOT Microsoft Store) — provides USB drivers
+2. Install **iCloud** (apple.com) — additional drivers
+3. Install **Sideloadly** from sideloadly.io
 
-Same as Route B plus App Store review. Note: streaming apps need content
-rights documentation; this is the slowest route.
+Every install:
+1. Connect the iPad by USB → tap **Trust** on the iPad
+2. Open Sideloadly → drag `Deymflix-unsigned.ipa` into it
+3. Enter your Apple ID (the one signed into the iPad) → **Start**
+4. Enter your Apple ID password when prompted; wait ~2 minutes
+5. On the iPad: **Settings → General → VPN & Device Management** →
+   your Apple ID → **Trust**
 
-## Known gaps vs the Android app
+DEYMFLIX appears on the home screen. Free-signing limits: re-sign every
+7 days (30 seconds in Sideloadly), max 3 sideloaded apps per device.
 
-- iOS blocks true offline storage of large videos inside a WebView; the
-  native `Downloader.swift` handles downloads instead (Documents/Deymflix).
-- Sideloaded builds are personal-use; don't ship the IPA publicly.
-- The site's `_episodeNum` ep1 stamp (player.html) benefits iOS the same as
-  Android once deployed.
+## Route B — TestFlight (no 7-day expiry, up to 10k testers)
 
-## Local build (if you ever get a Mac)
+Needs the $99/year Apple Developer account:
+1. Paid cert + provisioning profile via developer.apple.com
+2. Sign the same IPA (Xcode or Codemagic cloud signing)
+3. Upload to App Store Connect → TestFlight → invite by link
 
-```bash
-cd ios
-xcodegen generate
-open Deymflix.xcodeproj   # set your team in Signing, Cmd+R
-```
+## Troubleshooting the cloud build
+
+If Actions turns red, open the failing log line. Typical causes:
+- Swift syntax error → paste me the log lines, I fix them like Android
+- `xcodegen: not found` → workflow cache issue → re-run the job
+- Code signing noise is expected (we build unsigned) — only red on
+  OTHER steps matters.

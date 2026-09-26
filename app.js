@@ -897,6 +897,15 @@ const movies = [
     trailerEmbed: "https://www.youtube.com/watch?v=s1-pfiVMKAs",
     isSeries: false
   },
+  { 
+    id: "The Mentalist", 
+    imdbId: "tt1196946",
+    title: "The Mentalist", 
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/acYXu4KaDj1NIkMgObnhe4C4a0T.jpg",
+    manualEmbed: "cos:tv/5920/1/1",
+    trailerEmbed: "",
+    isSeries: true
+  },
 
 ];
 
