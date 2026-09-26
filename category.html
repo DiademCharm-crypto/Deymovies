@@ -31,7 +31,7 @@
     <div class="search-overlay-bar">
       <form id="search-form" onsubmit="event.preventDefault();">
         <div class="search-input-wrapper">
-          <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off" oninput="handleCategorySearch()">
+          <input type="search" id="search-input" placeholder="Search movies..." autocomplete="off" enterkeyhint="search" oninput="handleCategorySearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();event.stopPropagation();this.blur();}">
         </div>
       </form>
       <div id="search-suggestions-box" class="search-suggestions-box" style="display: none !important;"></div>
