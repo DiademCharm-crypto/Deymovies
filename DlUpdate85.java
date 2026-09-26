@@ -75,11 +75,27 @@ public class DlUpdate85 {
         if (act == null) return;
         if (dialogShowing) return;
         new Thread(new Runnable() { @Override public void run() {
-            String remote = fetchManifestVersion();
-            if (remote == null) return; // offline / manifest missing: allow
-            if (!isNewer(remote, appVersion(act))) return;
+            // UPDATE DETECTION: prefer the manifest's numeric "code" field vs the
+            // APK's versionCode — Sketchware's wheel can always bump the code by 1,
+            // so releases stay 1.6, 1.7 ... without ever needing a bigger name jump.
+            // Falls back to the old versionName compare when "code" is absent
+            // (manifests older than this release).
+            String remoteVer = fetchManifestVersion();
+            String remoteCodeStr = manifestField("code");
+            Integer remoteCode = null;
+            try { if (remoteCodeStr != null && remoteCodeStr.trim().length() > 0) remoteCode = Integer.parseInt(remoteCodeStr.trim()); } catch (Exception e) { remoteCode = null; }
+
+            boolean newer;
+            if (remoteCode != null) {
+                newer = remoteCode > appCode(act);
+            } else if (remoteVer != null) {
+                newer = isNewer(remoteVer, appVersion(act));
+            } else {
+                return; // offline / manifest missing: allow
+            }
+            if (!newer) return;
             String url = fetchManifestUrl();
-            final String v = remote;
+            final String v = remoteVer != null ? remoteVer : ("code " + remoteCode);
             final String u = url == null ? "" : url;
             act.runOnUiThread(new Runnable() { @Override public void run() {
                 showUpdateDialog(act, v, u);
@@ -122,11 +138,21 @@ public class DlUpdate85 {
             if (k < 0) return null;
             int colon = json.indexOf(':', k);
             if (colon < 0) return null;
-            int q1 = json.indexOf('"', colon);
-            if (q1 < 0) return null;
-            int q2 = json.indexOf('"', q1 + 1);
-            if (q2 < 0) return null;
-            return json.substring(q1 + 1, q2);
+            // Value may be quoted ("1.6") or a bare number (2) -- handle both.
+            int p = colon + 1;
+            while (p < json.length() && json.charAt(p) == ' ') p++;
+            if (p < json.length() && json.charAt(p) == '"') {
+                int q2 = json.indexOf('"', p + 1);
+                if (q2 < 0) return null;
+                return json.substring(p + 1, q2);
+            }
+            int e2 = p;
+            while (e2 < json.length()) {
+                char ch = json.charAt(e2);
+                if (ch == ',' || ch == '}') break;
+                e2++;
+            }
+            return json.substring(p, e2).replace("\"", "").trim();
         } catch (Exception e) {
             return null;
         }
@@ -140,6 +166,17 @@ public class DlUpdate85 {
                     .getPackageInfo(act.getPackageName(), 0).versionName;
         } catch (Exception e) {
             return CURRENT_VERSION;
+        }
+    }
+
+    // The APK's versionCode (the integer wheel in Sketchware's Version Control).
+    // Preferred update signal: bump by 1 each release, manifest "code" matches.
+    private static int appCode(Activity act) {
+        try {
+            return act.getPackageManager()
+                    .getPackageInfo(act.getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            return 1;
         }
     }
 

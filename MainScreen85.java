@@ -126,9 +126,12 @@ public class MainScreen85 {
         this.act = a;
     }
 
-    // Splash shows for AT LEAST 2 seconds, even if the site loads instantly.
+    // Splash shows for AT LEAST 2 seconds, AND never exits before the site
+    // has actually finished loading (no more white flash after the logo).
     private static final long SPLASH_MIN_MS = 2000L;
+    private static final long SPLASH_MAX_MS = 15000L; // absolute safety cap
     private long splashShownAt = 0L;
+    private volatile boolean pageReady85 = false;   // set on onPageFinished
 
     // =======================================================================
     //  BOOT (was: the whole onCreate paste)
@@ -150,6 +153,12 @@ public class MainScreen85 {
 
         // -- 1) WebView settings --
         wv.getSettings().setJavaScriptEnabled(true);
+        // BLACK FROM FRAME ONE: the WebView paints white until the site's dark
+        // CSS arrives -- that was the white flash after the splash. Paint the
+        // whole stack (webview + window) in the brand dark so even a broken
+        // load shows black, never white.
+        wv.setBackgroundColor(Color.parseColor("#0B0B0F"));
+        act.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.parseColor("#0B0B0F")));
         wv.getSettings().setDomStorageEnabled(true);
         wv.getSettings().setDatabaseEnabled(true);
         wv.getSettings().setMediaPlaybackRequiresUserGesture(false);
@@ -195,7 +204,7 @@ public class MainScreen85 {
                     h = h.toLowerCase();
                     String[] ok = {
                         "deymflix.eu.cc", "localhost", "127.0.0.1",
-                        "videasy.net", "vidlink.pro", "autoembed.cc",
+                        "videasy.net", "videasy.to", "vidlink.pro", "autoembed.cc",
                         "vidsrc.cc", "vidsrc.su", "vidsrc.in",
                         "multiembed.mov", "2embed.cc", "cinemaos.live"
                     };
@@ -267,6 +276,9 @@ public class MainScreen85 {
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (swipe != null) swipe.setRefreshing(false);
+                // page load COMPLETE (site or offline.html): only now may the
+                // splash exit -- after the 2s minimum enforced in hideSplash()
+                pageReady85 = true;
                 hideSplash();
                 // NOTE: no play-event handoff here by request -- the site
                 // player plays normally in the page. Only the FULLSCREEN
@@ -278,7 +290,8 @@ public class MainScreen85 {
                     view.loadUrl("file:///android_asset/offline.html");
                 }
                 if (swipe != null) swipe.setRefreshing(false);
-                hideSplash();
+                // no immediate hideSplash(): wait for the (re)load to finish,
+                // the offline page's onPageFinished, or the 15s safety cap
             }
         });
 
@@ -693,14 +706,15 @@ public class MainScreen85 {
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         splashShownAt = System.currentTimeMillis();
 
-        // Safety cap only: hideSplash() enforces the 2s minimum itself.
+        // Safety cap ONLY (site genuinely stuck): hideSplash() additionally
+        // requires pageReady85, so the splash never exits into a white page.
         splashTimeoutTimer = new java.util.Timer();
         splashTimeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
                 act.runOnUiThread(new Runnable() { @Override public void run() { hideSplash(); } });
             }
-        }, 8000);
+        }, SPLASH_MAX_MS);
     }
 
     // The DEYMFLIX splash exactly like the app.html hero: a rounded dark
@@ -792,16 +806,20 @@ public class MainScreen85 {
             int h = getHeight();
             if (w == 0) return;
             float cx = w / 2f;
-            float cy = h / 2f + floatT * h * 0.03f;   // gentle float bob
-            // EVERYTHING must fit inside the view: the old ring square was
-            // larger than the view and clipped at the edges (broken look).
-            float tile = Math.min(w, h) * 0.60f;
+            float cy = h / 2f + floatT * h * 0.02f;   // gentle float bob (reduced)
+            // FIT MATH (the "cut edges" bug): the ring is a rotating SQUARE --
+            // its corners reach half * 1.4142, and the float bob adds excursion
+            // on top. The old 0.40 half pushed corners to 0.57 of the half-width:
+            // outside the view = clipped edges. Cap ring+tile so the corner
+            // radius plus bob can NEVER exceed the half-width.
+            float avail = Math.min(w, h) / 2f;
+            float half = avail * 0.94f / 1.4142f;     // ring half-side, corner-safe
+            float tile = half * 2f * 0.88f;           // tile hugs the ring, like the site
 
             // 1) the spinning ring (square, like the site's .ring) + red dot
             canvas.save();
             canvas.translate(cx, cy);
             canvas.rotate(spin * 360f);
-            float half = Math.min(w, h) * 0.40f;      // ring side = 80% of view
             canvas.drawRect(-half, -half, half, half, ringPaint);
             // the dot rides the top edge midpoint (site: .ring::before)
             float dotR = Math.max(3f, tile * 0.05f);
@@ -832,7 +850,21 @@ public class MainScreen85 {
 
     private void hideSplash() {
         if (splashLayout == null) return;
-        // enforce the 2-second minimum: too early means wait and retry
+        // GATE 1: page must have finished loading (site OR offline.html) --
+        // otherwise the user sees a white/partial page after the logo. Re-check
+        // every 500ms until ready or the safety cap releases us.
+        if (!pageReady85) {
+            if (splashTimeoutTimer != null) { splashTimeoutTimer.cancel(); splashTimeoutTimer = null; }
+            splashTimeoutTimer = new java.util.Timer();
+            splashTimeoutTimer.schedule(new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    act.runOnUiThread(new Runnable() { @Override public void run() { hideSplash(); } });
+                }
+            }, 500);
+            return;
+        }
+        // GATE 2: enforce the 2-second minimum: too early means wait and retry
         long shownFor = System.currentTimeMillis() - splashShownAt;
         if (shownFor < SPLASH_MIN_MS) {
             if (splashTimeoutTimer != null) { splashTimeoutTimer.cancel(); splashTimeoutTimer = null; }

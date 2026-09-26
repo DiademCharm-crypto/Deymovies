@@ -2279,6 +2279,9 @@
     (function () {
       'use strict';
 
+      // keep the native open around so the COS new-tab path can bypass the shield
+      const origOpen = window.open.bind(window);
+
       const voidWindow = {
         focus: function () {},
         blur: function () {},
@@ -2291,7 +2294,13 @@
         Object.defineProperty(window, 'open', {
           configurable: false,
           writable: false,
-          value: function () {
+          value: function (u, t, f) {
+            // COS embeds legitimately open in a new tab (browser anti-redirect
+            // strategy) — a USER tap triggers it, so allow while _cosOpening.
+            if (window._cosOpening) {
+              window._cosOpening = false;
+              return origOpen.call(window, u, t, f);
+            }
             console.warn('[DEYMFLIX Shield] Blocked window.open popup execution.');
             return voidWindow;
           }
@@ -2361,6 +2370,12 @@
       }
       .player-poster-blur.visible {
         opacity: 1;
+      }
+      /* COS mode: the provider iframe (z 1000) must not cover the loading
+         backdrop — lift the poster above it. pointer-events stays none, so
+         taps pass straight through to the embed. */
+      body.cos-mode .player-poster-blur {
+        z-index: 1200 !important;
       }
 
       /* ── Codec unsupported screen ── */
@@ -5901,10 +5916,10 @@
     const COS_PROVIDERS = {
       videasy:   (t, id, s, e) => `https://player.videasy.net/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?color=8B0000&autoplay=true&autoplayNextEpisode=false`,
       vidlink:   (t, id, s, e) => `https://vidlink.pro/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?primaryColor=e50914&secondaryColor=8B0000&iconColor=f5f5f1&icons=default&player=default&title=true&poster=true&autoplay=true&nextbutton=false`,
-      autoembed: (t, id, s, e) => `https://player.autoembed.cc/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
-      vidsrc:    (t, id, s, e) => `https://vidsrc.in/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
+      autoembed: (t, id, s, e) => `https://player.autoembed.cc/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoplay=true`,
+      vidsrc:    (t, id, s, e) => `https://vidsrc.in/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoplay=true`,
       vidsrccc:  (t, id, s, e) => `https://vidsrc.cc/v3/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoPlay=true`,
-      vidsrcsu:  (t, id, s, e) => `https://vidsrc.su/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}`,
+      vidsrcsu:  (t, id, s, e) => `https://vidsrc.su/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoplay=true`,
       superembed:(t, id, s, e) => t === 'tv'
         ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}&autoplay=true`
         : `https://multiembed.mov/?video_id=${id}&tmdb=1&autoplay=true`,
@@ -5920,7 +5935,7 @@
     // sticks to the cleanest providers; the dirtier ones stay available only via
     // an explicit "@key" pin in the manualEmbed. credentialless + no-referrer on
     // the iframe (set in mountCosEmbed) further strip their cookie-based tracking.
-    const COS_DEFAULT_ORDER = ['videasy', 'vidlink', 'autoembed', 'vidsrccc'];
+    const COS_DEFAULT_ORDER = ['vidlink', 'videasy', 'autoembed', 'vidsrccc'];
 
     // Accepts: "cos:tv/5920/1/1", "cos:movie/27205", "cos:tv/5920/1/1@vidlink",
     // or pasted cinemaos.live/watch/{tv,movie}/<id>?season=&episode= URLs.
@@ -5958,7 +5973,65 @@
 
     function mountCosEmbed(src) {
       const order = src.provider ? [src.provider, ...COS_DEFAULT_ORDER.filter(k => k !== src.provider)] : COS_DEFAULT_ORDER;
-      const url = COS_PROVIDERS[order[0]](src.type, src.id, src.season, src.episode);
+      let url = COS_PROVIDERS[order[0]](src.type, src.id, src.season, src.episode);
+
+      // VidLink extras: auto-failover to vidsrc.su when their stream fails, and
+      // per-episode external subtitle (episodes.js subtitleUrl → sub_file=.vtt)
+      if (order[0] === 'vidlink') {
+        const extra = [];
+        try {
+          const subUrl = currentMovie && currentMovie._subtitleUrl;
+          if (subUrl && /^https:/.test(subUrl) && /\.vtt(\?|$)/i.test(subUrl)) {
+            extra.push('sub_file=' + encodeURIComponent(subUrl));
+            extra.push('sub_label=' + encodeURIComponent('English'));
+          }
+        } catch (e) {}
+        // RESUME: if Continue Watching holds an embed entry for this title,
+        // jump the provider player back to the last watch point (VidLink
+        // startAt= is in whole seconds; skip trivially small positions).
+        try {
+          const cwId0 = currentMovie ? (currentMovie._episodeId || currentMovie.id) : null;
+          if (cwId0) {
+            const cw0 = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+            const ent = cw0[cwId0];
+            if (ent && ent.embed && !ent.finished && Number(ent.currentTime) >= 30) {
+              extra.push('startAt=' + Math.floor(Number(ent.currentTime)));
+            }
+          }
+        } catch (e) {}
+        try {
+          const fb = COS_PROVIDERS.vidsrcsu(src.type, src.id, src.season, src.episode);
+          if (fb) extra.push('fallback_url=' + encodeURIComponent(fb));
+        } catch (e) {}
+        if (extra.length) url = url + '&' + extra.join('&');
+      }
+
+      // ── BROWSER: new-tab strategy ──
+      // Unsandboxed provider embeds can top-navigate the whole page (ads).
+      // In a plain browser we cannot intercept that, so the embed opens in its
+      // OWN tab — a redirect trashes only that tab, our site stays intact.
+      // In the APP the native firewall (shouldInterceptRequest) blocks those
+      // domains, so the embed stays in-page with our back button there.
+      const inApp = !!(window.DFX_IS_APP
+        || (window.DeymflixApp && typeof window.DeymflixApp.playOnline === 'function')
+        || /DeymflixApp/i.test(navigator.userAgent || '')); // belt & suspenders if app.js hiccups
+      if (!inApp) {
+        try { stopTrailerSoundPump(); } catch (e) {}
+        // Arm the Shield bypass, then open — this is a USER-initiated tap.
+        window._cosOpening = true;
+        let w = null;
+        try { w = window.open(url, '_blank'); } catch (e) {}
+        if (w) {
+          try { w.opener = null; } catch (e) {}
+          showToast('Playing in a new tab — switch back when done');
+        } else {
+          window._cosOpening = false;
+          showToast('Popup blocked — tap again or allow popups');
+        }
+        exitCosMode();
+        forceBackToHome();
+        return;
+      }
 
       directPlayer.pause();
       directPlayer.removeAttribute('src');
@@ -5986,6 +6059,34 @@
       try { stopTrailerSoundPump(); } catch (e) {}
       window._cosActive = true;
 
+      // COS POSTER BACKDROP: the provider iframe takes seconds to paint its
+      // first frame — until then Android WebView shows an ugly gray play
+      // glyph (screenshot bug). Show the movie's poster as the loading
+      // backdrop instead; hidden when the embed reports playback (below).
+      try {
+        var cosBlur = document.getElementById('player-poster-blur');
+        if (cosBlur && currentMovie && currentMovie.poster) {
+          cosBlur.style.backgroundImage = 'linear-gradient(rgba(10,10,11,.22), rgba(10,10,11,.22)), url(' + currentMovie.poster + ')';
+          cosBlur.classList.add('visible');
+          isShowingBlur = true; // let hidePlayerPosterBlur() actually clear it
+          // belt-and-braces: even if no message ever arrives, the iframe has
+          // painted its own UI by then — never leave the poster stuck
+          setTimeout(function () {
+            if (window._cosActive) hidePlayerPosterBlur();
+          }, 20000);
+        }
+      } catch (e) {}
+      // VidLink/CinemaOS postMessage lifecycle events ('playing', 'timeupdate')
+      // → the embed's own picture is live, lift the poster. Matched loosely
+      // (any payload mentioning play/time) so every provider variant works.
+      window.addEventListener('message', function (ev) {
+        if (!window._cosActive) return;
+        try {
+          var raw = typeof ev.data === 'string' ? ev.data : JSON.stringify(ev.data || '');
+          if (/play|time/i.test(raw)) hidePlayerPosterBlur();
+        } catch (e) {}
+      });
+
       // noSandbox: Videasy/VidLink & co. REFUSE sandboxed frames ("Iframe Sandbox
       // Detected" — verified even with every sandbox token granted), and CinemaOS
       // itself excludes these providers from sandboxing. Ad-suppression instead:
@@ -6005,14 +6106,43 @@
       // saw ads. Schedule by wall-clock watch time instead: ~12 min in, and
       // ~28 min for long sessions. Only visible-tab time counts.
       window._cosAdPhase = 0;
-      window._cosWatchSecs = 0;
-      try { vastTriggered = false; } catch (e) {} // scheduler calls showVastAd directly
+      window._cosWatchSecs = 0;try { vastTriggered = false; } catch (e) {} // scheduler calls showVastAd directly
       if (window._cosAdTimer) clearInterval(window._cosAdTimer);
       window._cosAdTimer = setInterval(function () {
         if (!window._cosActive) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; return; }
         if (document.visibilityState !== 'visible') return; // background tab: no watch time accrues
         if (typeof vastAdPlaying !== 'undefined' && vastAdPlaying) return; // an ad is already on screen
         window._cosWatchSecs += 15;
+
+        // ── COS PROGRESS RECORDER (Continue Watching + History) ──
+        // Our <video> never plays in embed mode, so its timeupdate recorder
+        // never fires and COS titles vanished from Continue Watching/History.
+        // The embed can't report time reliably cross-origin, so we track
+        // wall-clock watch time: 1 tick = 15s of viewing. We don't know the
+        // embed's duration, so progress% grows slowly (watchSecs vs a 45min
+        // assumption) — it exists so the UI has something to show; the entry
+        // is what matters. Marked embed:true so the player can resume by
+        // reopening the same embed.
+        try {
+          var cwId = currentMovie ? (currentMovie._episodeId || currentMovie.id) : null;
+          if (cwId) {
+            var cw = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+            var assumed = 45 * 60; // assumed runtime for % estimate
+            var pct = Math.min(94, (window._cosWatchSecs / assumed) * 100);
+            cw[cwId] = {
+              id: cwId,
+              title: currentMovie._episodeTitle || currentMovie.title,
+              poster: currentMovie.poster,
+              currentTime: window._cosWatchSecs,
+              duration: assumed,
+              progress: pct,
+              embed: true,
+              updatedAt: Date.now()
+            };
+            try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(cw)); } catch (e) {}
+          }
+        } catch (e) {}
+
         if (window._cosAdPhase === 0 && window._cosWatchSecs >= 720) {
           window._cosAdPhase = 1;
           showVastAd();
@@ -6057,6 +6187,7 @@
       if (!window._cosActive) return;
       window._cosActive = false;
       document.body.classList.remove('cos-mode');
+      hidePlayerPosterBlur(); // clear the COS loading backdrop
       if (window._cosAdTimer) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; }
       window._cosAdPhase = 0;
       window._cosWatchSecs = 0;

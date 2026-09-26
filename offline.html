@@ -68,6 +68,26 @@
     .reload-btn:active {
       background-color: #ff0f1b;
     }
+
+    /* My Downloads: subtle outline pill under Reload, app-only (hidden on
+       the website -- there is no downloads screen in a plain browser). */
+    .dl-btn {
+      display: none;
+      background-color: transparent;
+      color: #dddddd;
+      border: 1px solid #3a3a3a;
+      padding: 11px 26px;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .dl-btn:active {
+      background-color: #1e1e24;
+      border-color: #555555;
+    }
   </style>
 </head>
 <body>
@@ -104,12 +124,92 @@
     <div class="error-desc">Please check your internet connection and try again.</div>
 
     <button class="reload-btn" onclick="retryConnection()">↻ Reload</button>
+    <button class="dl-btn" id="dlBtn" onclick="openMyDownloads()">⬇ My Downloads</button>
   </div>
 
   <script src="security.js"></script>
   <script>
     function retryConnection() {
-      window.location.href = "https://deymflix.eu.cc/index.html";
+      // DON'T navigate blindly -- test the connection first. A blind reload
+      // while still offline lands on a broken index (no thumbnails). Probe
+      // the site with a tiny no-cors fetch (works from file:// and https://);
+      // 5s timeout = treated as offline.
+      var btn = document.querySelector('.reload-btn');
+      if (btn && btn.dataset.checking === '1') return; // ignore double-taps
+      if (btn) { btn.dataset.checking = '1'; btn.textContent = '↻ Checking...'; }
+      var probe = fetch('https://deymflix.eu.cc/favicon.svg?_=' + Date.now(), {
+        method: 'GET', mode: 'no-cors', cache: 'no-store'
+      });
+      var timeout = new Promise(function (res) {
+        setTimeout(function () { res('timeout'); }, 5000);
+      });
+      Promise.race([
+        probe.then(function () { return 'ok'; }).catch(function () { return 'fail'; }),
+        timeout
+      ]).then(function (result) {
+        if (btn) { btn.dataset.checking = ''; btn.textContent = '↻ Reload'; }
+        if (result === 'ok') {
+          window.location.href = "https://deymflix.eu.cc/index.html";
+        } else {
+          showNoInternetDialog();
+        }
+      });
+    }
+
+    // NO-INTERNET DIALOG: dark card, app style, ONE centered Close button.
+    // Pops again on every Reload press while still offline.
+    var niOverlay = null;
+    function showNoInternetDialog() {
+      if (niOverlay) { niOverlay.style.display = 'flex'; return; }
+      niOverlay = document.createElement('div');
+      niOverlay.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;'
+        + 'background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;'
+        + 'z-index:99999;';
+      var card = document.createElement('div');
+      card.style.cssText = 'background:#1A1A20;border:1px solid #2A2A32;border-radius:16px;'
+        + 'padding:26px 22px 24px;width:min(320px,82vw);text-align:center;'
+        + 'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;';
+      var icon = document.createElement('div');
+      icon.textContent = '📡';
+      icon.style.cssText = 'font-size:38px;line-height:1;margin-bottom:12px;';
+      var title = document.createElement('div');
+      title.textContent = 'No Internet';
+      title.style.cssText = 'color:#ffffff;font-weight:700;font-size:1.05rem;margin-bottom:8px;';
+      var msg = document.createElement('div');
+      msg.textContent = 'Check your internet connection and try again.';
+      msg.style.cssText = 'color:#9a9a9a;font-size:.85rem;line-height:1.45;margin-bottom:22px;';
+      var btn = document.createElement('button');
+      btn.textContent = 'Close';
+      btn.style.cssText = 'background:#E50914;color:#ffffff;border:none;border-radius:22px;'
+        + 'padding:11px 38px;font-weight:bold;font-size:.9rem;cursor:pointer;'
+        + 'box-shadow:0 4px 12px rgba(229,9,20,0.4);';
+      btn.onclick = function () { niOverlay.style.display = 'none'; };
+      card.appendChild(icon);
+      card.appendChild(title);
+      card.appendChild(msg);
+      card.appendChild(btn);
+      niOverlay.appendChild(card);
+      document.body.appendChild(niOverlay);
+    }
+    // APP ONLY: the downloads library lives inside the Android app, so this
+    // button exists only when the DeymflixApp bridge is present (and the page
+    // runs from the app's assets). On the website it stays hidden.
+    (function () {
+      var inApp = false;
+      try {
+        inApp = !!(window.DeymflixApp && window.DeymflixApp.openDownloads);
+      } catch (e) { inApp = false; }
+      if (inApp) {
+        var b = document.getElementById('dlBtn');
+        if (b) b.style.display = 'inline-block';
+      }
+    })();
+    function openMyDownloads() {
+      try {
+        if (window.DeymflixApp && window.DeymflixApp.openDownloads) {
+          window.DeymflixApp.openDownloads();
+        }
+      } catch (e) { /* bridge hiccup: stay on this page */ }
     }
   </script>
 </body>

@@ -230,6 +230,127 @@ const seriesData = [
             embedUrl: "cos:tv/5920/1/24"
           }
         ]
+      },
+      {
+        seasonNumber: 2,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/2/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/2/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/2/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/2/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/1/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/2/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/2/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/2/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/2/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/2/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/2/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/2/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/2/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/2/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/2/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/2/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/2/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/2/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/2/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/2/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/2/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/2/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/2/23"
+          }
+    
+        ]
       }
     ]
   },
@@ -335,14 +456,16 @@ function injectEpisodesUI(series) {
     .episodes-square-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      max-height: 220px;
+      gap: 8px;
+      max-height: 150px;
       overflow-y: auto;
       padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #333 transparent;
     }
     .episode-square-btn {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -350,11 +473,12 @@ function injectEpisodesUI(series) {
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 6px;
       color: #ffffff;
-      font-size: 0.95rem;
-      font-weight: 800;
+      font-size: 0.82rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
       user-select: none;
+      flex: 0 0 auto;
     }
     .episode-square-btn:hover {
       background: rgba(229, 9, 20, 0.2);
@@ -366,6 +490,12 @@ function injectEpisodesUI(series) {
       border-color: #e50914;
       color: #ffffff;
       box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    }
+    /* Mobile & in-app: tighter squares and a lower scroll cap so the grid
+       stays neat instead of eating the whole page (user screenshot). */
+    @media (max-width: 768px) {
+      .episodes-square-grid { max-height: 118px; gap: 7px; }
+      .episode-square-btn { width: 34px; height: 34px; font-size: 0.78rem; }
     }
   `;
   document.head.appendChild(style);

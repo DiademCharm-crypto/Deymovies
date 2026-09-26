@@ -477,19 +477,23 @@
   
   addInvisibleWatermark();
 
-  // 41. Disable Remote Debugging Detection
+  // 41. Remote-debugging canary — WARN ONLY (fixed 2026-09-26).
+  // The old version body-slamed the WHOLE PAGE with "Access Denied" whenever
+  // anything READ the canary's id. That didn't just catch debuggers: Android
+  // TalkBack, iOS VoiceOver/Reader, translation and password-manager extensions
+  // all scan DOM ids — real users got their screen wiped mid-movie. Actual
+  // debug tools don't read ids through the page's JS anyway, so the trap only
+  // punished innocent software. It now logs instead (detection without harm).
   function detectRemoteDebugging() {
     try {
       const element = document.createElement('div');
       element.style.cssText = 'display:none;position:absolute;width:100px;height:100px;background:red;';
       Object.defineProperty(element, 'id', {
         get: function () {
-          // Remote debugging detected
-          document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px;">Access Denied - Remote debugging detected</h1>';
+          console.warn('%c[DEYMFLIX SECURITY] DOM canary read — possible automation/debug tool', 'color:red;');
+          return '';
         },
-        set: function () {
-          // no-op setter to avoid TypeError when assigning id
-        }
+        set: function () { /* no-op setter to avoid TypeError when assigning id */ }
       });
       document.body.appendChild(element);
       element.id = 'detect';

@@ -1,10 +1,12 @@
 {
-  "version": "1.5",
-  "released": "2026-09-25",
-  "url": "com.deymflix.eu.cc_%231_1.5.apk",
+  "version": "1.6",
+  "code": 2,
+  "released": "2026-09-26",
+  "url": "apk/Deymflix-v1.6.apk",
   "notes": [
-    "Added download management",
-    "Series pages & player updates",
-    "Bug fixes & performance"
+    "Built-in ad & tracker firewall — no more ad redirects",
+    "Splash & offline screen fixes — no more white flash",
+    "CinemaOS & VidLink embed playback",
+    "Download management improvements"
   ]
 }
