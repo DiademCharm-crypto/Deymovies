@@ -1,8 +1,8 @@
 {
   "version": "1.6",
-  "code": 2,
-  "released": "2026-09-26",
-  "url": "apk/Deymflix-v1.6.apk",
+  "code": 3,
+  "released": "2026-09-27",
+  "url": "apk/Deymflix-v1.6-r2.apk",
   "notes": [
     "IMPORTANT: if install fails, uninstall the old version first (one time only)",
     "Built-in ad & tracker firewall — no more ad redirects",
