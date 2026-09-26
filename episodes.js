@@ -351,7 +351,257 @@ const seriesData = [
           }
     
         ]
-      }
+      },
+      {
+        seasonNumber: 3,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/3/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/3/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/3/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/3/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/3/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/3/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/3/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/3/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/3/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/3/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/3/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/3/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/3/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/3/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/3/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/3/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/3/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/3/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/3/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/3/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/3/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/3/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/3/23"
+          },
+          {
+            episodeNumber: 24,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/3/24"
+          }
+        ]
+      },
+      {
+        seasonNumber: 4,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/4/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/4/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/4/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/4/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/4/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/4/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/4/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/4/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/4/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/4/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/4/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/4/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/4/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/4/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/4/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/4/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/4/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/4/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/4/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/4/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/4/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/4/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/4/23"
+          },
+          {
+            episodeNumber: 24,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/4/24"
+          }
+        ]
+      },
     ]
   },
 
@@ -577,7 +827,11 @@ function playEpisodeSource(episode, season) {
       delete currentMovie._episodeHlsUrl;
     }
     currentMovie.manualEmbed = episode.embedUrl;
-    currentMovie._episodeId = currentMovie.id + '-ep' + (episode.episodeNumber || '');
+    // Season-aware resume key: without the season, S1E3 and S2E3 share one
+    // Continue-Watching slot (timestamp leaked across seasons — fixed).
+    // Old keys ("<id>-ep3") still resolve; new keys are "<id>-s2-ep3".
+    var _sn = (season && season.seasonNumber) || currentMovie._episodeSeason || 1;
+    currentMovie._episodeId = currentMovie.id + '-s' + _sn + '-ep' + (episode.episodeNumber || '');
     currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + episode.episodeNumber);
     // Episode metadata for episode-aware subtitle search (OpenSubtitles)
     currentMovie._episodeSeason = (season && season.seasonNumber) || 1;
