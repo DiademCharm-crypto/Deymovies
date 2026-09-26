@@ -781,10 +781,39 @@ function injectEpisodesUI(series) {
     renderEpisodesGrid(series.seasons[activeSeasonIndex]);
   });
 
-  renderEpisodesGrid(series.seasons[0]);
+  // ── DEEP LINK (?s=N&ep=M from a Continue-Watching series card) ──
+  // Open the grid on that season, highlight that episode, apply its real
+  // title. The player already stamped _episodeId (?s&ep) before loadEmbed(),
+  // so the saved position for THIS episode rules the resume.
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    const dlEp = parseInt(qp.get('ep') || '0', 10) || 0;
+    const dlS = parseInt(qp.get('s') || '0', 10) || 0;
+    if (dlEp && typeof currentMovie !== 'undefined' && currentMovie) {
+      let si = series.seasons.findIndex(x => Number(x.seasonNumber) === dlS);
+      if (si < 0) si = 0;
+      activeSeasonIndex = si;
+      seasonSelect.value = String(si);
+      renderEpisodesGrid(series.seasons[si], dlEp);
+      const target = (series.seasons[si].episodes || []).find(x => Number(x.episodeNumber) === dlEp);
+      if (target) {
+        // the deep-link label was best-effort; apply the REAL episode title
+        currentMovie._episodeTitle = currentMovie.title + ' - ' + (target.title || 'Episode ' + dlEp);
+        currentMovie._episodeName = target.title || '';
+        if (typeof updateEpisodeTitleOverlay === 'function') {
+          try { updateEpisodeTitleOverlay(); } catch (e2) {}
+        }
+      }
+      const btn = document.querySelector('.episode-square-btn.active');
+      if (btn) { try { btn.scrollIntoView({ block: 'nearest' }); } catch (e3) {} }
+      return; // deep-link render is final — skip the default render below
+    }
+  } catch (e) {}
+
+  renderEpisodesGrid(series.seasons[activeSeasonIndex]);
 }
 
-function renderEpisodesGrid(season) {
+function renderEpisodesGrid(season, highlightEp) {
   const episodesList = document.getElementById('episodes-list');
   if (!episodesList || !season || !season.episodes) return;
 
@@ -792,7 +821,11 @@ function renderEpisodesGrid(season) {
 
   season.episodes.forEach((ep, idx) => {
     const btn = document.createElement('button');
-    btn.className = `episode-square-btn ${idx === 0 ? 'active' : ''}`;
+    // highlight the deep-linked episode when present, else the first one
+    const isActive = highlightEp
+      ? (Number(ep.episodeNumber) === Number(highlightEp))
+      : (idx === 0);
+    btn.className = `episode-square-btn ${isActive ? 'active' : ''}`;
     btn.type = 'button';
     btn.textContent = ep.episodeNumber || (idx + 1);
     btn.title = ep.title || `Episode ${ep.episodeNumber || (idx + 1)}`;            btn.onclick = () => {
