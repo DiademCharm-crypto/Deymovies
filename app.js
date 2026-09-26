@@ -1240,7 +1240,7 @@ const HOVER_PREVIEW = (function () {
     // trailer lookup runs); playYouTube swaps in the iframe when a key exists.
     const vid0 = pv.querySelector('.hp-video');
     if (vid0 && !vid0.querySelector('iframe')) {
-      vid0.innerHTML = '<img class="hp-fallback" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
+      vid0.innerHTML = '<img class="hp-fallback" loading="lazy" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
     }
     // Reveal on the next frame so the transition plays
     requestAnimationFrame(function () { pv.classList.add('visible'); });
@@ -1299,7 +1299,7 @@ const HOVER_PREVIEW = (function () {
       }
     } else {
       // No trailer: Netflix-style static fallback — the poster fills the video area
-      vid.innerHTML = '<img class="hp-fallback" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
+      vid.innerHTML = '<img class="hp-fallback" loading="lazy" src="' + (movie.backdrop || movie.poster || '') + '" alt="">';
     }
   }
 
@@ -1480,9 +1480,40 @@ function renderContinueWatching() {
 
   // Continue Watching = unfinished only. Finished movies (user completed them
   // or progress hit 95%+) are removed here; they still appear on the History page.
-  const items = Object.values(savedData)
-    .filter(item => item && !item.finished && Number(item.progress) < 95)
-    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  // ONE CARD PER SERIES: episode entries (new keys "<id>-s<n>-ep<m>", legacy
+  // keys "<id>-ep<m>", and plain "<id>" rows written before season support)
+  // are grouped by their series base id and only the most recently watched
+  // entry is shown — exactly like Netflix. Going back to season 1 later just
+  // moves the series' single card to that episode; it never spawns extra
+  // cards. True movies (no episode keys sharing their id) pass through.
+  const byBase = {};
+  // New season-aware keys: "<id>-s<n>-ep<m>". Legacy: "<id>-ep<m>" — its base
+  // is the plain id; both must land in the SAME series group.
+  const epKeyRe = /^(.*)-s\d+-ep\d+$/;
+  const legacyEpKeyRe = /^(.*)-ep\d+$/;
+  Object.keys(savedData).forEach(key => {
+    const it = savedData[key];
+    if (!it || it.finished || Number(it.progress) >= 95) return;
+    let base = key, isEpisode = false, sNum = null, eNum = null;
+    let m = epKeyRe.exec(key);
+    if (m) {
+      base = m[1]; isEpisode = true;
+      const sm = /-s(\d+)-ep(\d+)$/.exec(key);
+      sNum = parseInt(sm[1], 10); eNum = parseInt(sm[2], 10);
+    } else {
+      m = legacyEpKeyRe.exec(key);
+      if (m) { base = m[1]; isEpisode = true; eNum = parseInt(/-ep(\d+)$/.exec(key)[1], 10); }
+    }
+    it._baseId = base;
+    it._key = key;
+    it._isEpisode = isEpisode;
+    it._season = sNum;
+    it._epNum = eNum;
+    const prev = byBase[base];
+    if (!prev || (it.updatedAt || 0) > (prev.updatedAt || 0)) byBase[base] = it;
+  });
+  const items = Object.keys(byBase).map(b => byBase[b]);
+  items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
   if (items.length === 0) {
     section.style.display = 'none';
@@ -1498,7 +1529,16 @@ function renderContinueWatching() {
     card.style.position = 'relative';
 
     card.onclick = () => {
-      window.location.href = `player.html?id=${encodeURIComponent(item.id)}`;
+      // series card: deep-link straight to the exact season + episode so the
+      // player opens THAT episode with its saved position (not ep1).
+      // Legacy episode keys (no season) still deep-link the episode; the
+      // player defaults them to season 1.
+      if (item._isEpisode) {
+        const sPart = item._season ? ('&s=' + item._season) : '';
+        window.location.href = `player.html?id=${encodeURIComponent(item._baseId)}${sPart}&ep=${item._epNum}`;
+      } else {
+        window.location.href = `player.html?id=${encodeURIComponent(item.id)}`;
+      }
     };
 
     const safeTitle = sanitizeHTML(item.title);
@@ -1525,12 +1565,29 @@ function renderContinueWatching() {
     const removeBtn = card.querySelector('.remove-continue-btn');
     if (removeBtn) {
       removeBtn.addEventListener('click', (e) => {
-        removeContinueWatching(item.id, e);
+        // series card: removing clears EVERY episode entry of that series,
+        // so older episodes can't resurface as a new "latest" card
+        if (item._baseId) removeSeriesContinueWatching(item._baseId, e);
+        else removeContinueWatching(item.id, e);
       });
     }
 
     container.appendChild(card);
   });
+}
+
+// Remove every episode entry of one series (card X button on the series card)
+function removeSeriesContinueWatching(baseId, event) {
+  event.stopPropagation();
+  let savedData = {};
+  try {
+    savedData = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+  } catch (e) {}
+  const re = new RegExp('^' + String(baseId).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '-s\\d+-ep\\d+$');
+  Object.keys(savedData).forEach(k => { if (re.test(k)) delete savedData[k]; });
+  localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData));
+  renderContinueWatching();
+  showToast('Removed from Continue Watching');
 }
 
 function removeContinueWatching(movieId, event) {
@@ -1553,21 +1610,97 @@ function setupHeroBanner() {
 
   heroWrapper.innerHTML = `
     <div class="hero-carousel-track" id="hero-carousel-track">
-      ${featuredMovies.map(item => `
-        <div class="hero-slide-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
+      ${featuredMovies.map((item, idx) => `
+        <div class="hero-slide-item" data-hero-idx="${idx}" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
           <img class="hero-backdrop-img" src="${sanitizeHTML(item.backdrop || item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
           <div class="hero-fade-overlay"></div>
           <div class="hero-details-container">
+            <div class="hero-kicker"><span class="hero-n-badge">DEYMFLIX</span><span class="hero-top10">Featured</span></div>
             <h1 class="hero-title-text">${sanitizeHTML(item.title)}</h1>
-            <button class="hero-action-btn">▶ Watch Now</button>
+            <div class="hero-meta-row">
+              <span class="hero-match"></span>
+              <span class="hero-year"></span>
+              <span class="hero-genres"></span>
+            </div>
+            <p class="hero-synopsis"></p>
+            <div class="hero-btn-row">
+              <button class="hero-action-btn">▶ Watch Now</button>
+              <button class="hero-info-btn" aria-label="More info">ⓘ More Info</button>
+            </div>
           </div>
         </div>
       `).join('')}
+    </div>
+    <div class="hero-dots" id="hero-dots">
+      ${featuredMovies.map((_, i) => `<button class="hero-dot${i === 0 ? ' active' : ''}" data-dot-idx="${i}" aria-label="Featured ${i + 1}"></button>`)}
     </div>
   `;
 
   const track = document.getElementById('hero-carousel-track');
   if (!track) return;
+
+  // ── HERO ENRICHMENT: match% / year / genres / synopsis per slide ──
+  // Uses the same TMDB details endpoint as the hover-preview panel; local
+  // fallbacks keep the rows useful when TMDB is unavailable.
+  featuredMovies.forEach((item, idx) => {
+    const slide = track.querySelector('[data-hero-idx="' + idx + '"]');
+    if (!slide) return;
+    const matchEl = slide.querySelector('.hero-match');
+    const yearEl = slide.querySelector('.hero-year');
+    const genEl = slide.querySelector('.hero-genres');
+    const synEl = slide.querySelector('.hero-synopsis');
+    const localYear = (item.releaseDate || item.year || '').toString().match(/\d{4}/);
+    if (yearEl && localYear) yearEl.textContent = localYear[0];
+    if (genEl && item.genres && item.genres.length) genEl.textContent = item.genres.slice(0, 3).join(' · ');
+    const imdb = item.imdbId || '';
+    if (!/^tt\d{5,}$/.test(imdb)) return;
+    const qs = new URLSearchParams({ title: item.title || '' });
+    if (localYear) qs.set('year', localYear[0]);
+    fetch(apiBase() + '/api/tmdb/details/' + encodeURIComponent(imdb) + '?' + qs.toString())
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d || !d.found) return;
+        if (matchEl) {
+          const pct = Math.round((d.score || 0) * 10);
+          if (pct > 0) matchEl.textContent = pct + '% Match';
+        }
+        const y = (d.releaseDate || '').match(/\d{4}/);
+        if (y && yearEl) yearEl.textContent = y[0];
+        if (d.genres && d.genres.length && genEl) genEl.textContent = d.genres.slice(0, 3).join(' · ');
+        if (d.overview && synEl) {
+          const short = d.overview.length > 180 ? d.overview.slice(0, 177).replace(/\s+\S*$/, '') + '…' : d.overview;
+          synEl.textContent = short;
+        }
+      })
+      .catch(() => {});
+  });
+
+  // More Info = same player page (details view); Watch Now stays primary
+  track.querySelectorAll('.hero-info-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const slide = btn.closest('.hero-slide-item');
+      const idx = slide ? slide.getAttribute('data-hero-idx') : '0';
+      const item = featuredMovies[Number(idx)];
+      if (item) window.location.href = 'player.html?id=' + encodeURIComponent(item.id);
+    });
+  });
+
+  // ── DOTS: click to jump + auto-sync with the carousel position ──
+  const dotsBox = document.getElementById('hero-dots');
+  const dots = dotsBox ? Array.from(dotsBox.querySelectorAll('.hero-dot')) : [];
+  function syncDots() {
+    if (!dots.length) return;
+    const slideW = track.firstElementChild ? track.firstElementChild.clientWidth : 1;
+    const idx = Math.round(track.scrollLeft / slideW);
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+  dots.forEach((d, i) => d.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const slideW = track.firstElementChild ? track.firstElementChild.clientWidth : 0;
+    track.scrollTo({ left: i * slideW, behavior: 'smooth' });
+  }));
+  track.addEventListener('scroll', syncDots, { passive: true });
 
   startAutoScroll(track);
   track.addEventListener('touchstart', () => clearInterval(heroCarouselTimer), { passive: true });
@@ -1708,8 +1841,18 @@ function setupSearchHandlers() {
 
   searchInput.addEventListener('input', handleTyping);
 
-  // Prevent Enter when empty, clear on Escape
+  // ENTER IS A NO-OP everywhere (PC keyboard, mobile keyboards, IME confirm):
+  // search is live-as-you-type, so Enter adds nothing — and on Android the
+  // IME "Search" key used to resubmit/reload the page. We swallow it in BOTH
+  // the keydown and the form-submit paths, without stopping the input's
+  // normal composition behavior.
   searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      try { searchInput.blur(); } catch (err) {} // politely closes mobile keyboards
+      return;
+    }
     if (e.key === 'Escape') {
       searchInput.value = '';
       hideSuggestions();
@@ -1719,11 +1862,11 @@ function setupSearchHandlers() {
   });
 
   if (searchForm) {
+    // form submit (Enter in some mobile browsers arrives this way): killed
     searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      searchInput.blur();
-      hideSuggestions();
-      executeSearch();
+      try { searchInput.blur(); } catch (err) {}
+      return; // nothing happens — live filtering already did the work
     });
   }
 }
@@ -1745,7 +1888,7 @@ function renderSuggestions(matches) {
     const safePoster = sanitizeHTML(movie.poster);
 
     item.innerHTML = `
-      <img src="${safePoster}" alt="${safeTitle}">
+      <img src="${safePoster}" alt="${safeTitle}" loading="lazy">
       <span class="suggestion-title">${safeTitle}</span>
     `;
     item.onclick = () => {
@@ -1959,6 +2102,17 @@ document.addEventListener('click', (e) => {
 // ═══════════════════════════════════════════════════════════════
 // APP-MODE EXTRAS (Android WebView only — invisible in browsers)
 //
+// ── PWA: service worker (offline shell + poster cache) ──
+// Skipped in the Android app (its WebView already has native offline + the
+// firewall); Safari/Chrome browsers get the installable, offline-capable site.
+try {
+  if ('serviceWorker' in navigator && !/DeymflixApp/i.test(navigator.userAgent || '')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+} catch (e) {}
+
 // The Sketchware app identifies itself by appending " DeymflixApp/1.4"
 // to its WebView user agent, and exposes a JS bridge named "DeymflixApp".
 // Browsers never match the UA, so none of this UI ever appears for them.
