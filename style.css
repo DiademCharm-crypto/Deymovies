@@ -633,7 +633,9 @@ body {
   justify-content: center;
   gap: 8px;
   margin-top: 36px;
-  padding-bottom: 20px;
+  /* clearance for the floating bottom nav (fixed, z-index 9999) so the
+     page-number / prev-next buttons are never overlaid on phone screens */
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
 }
 
 .page-num-btn,

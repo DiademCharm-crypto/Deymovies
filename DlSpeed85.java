@@ -1076,4 +1076,247 @@ public class DlSpeed85 {
             }
         } catch (Exception e) { }
     }
+
+    // =======================================================================
+    //  HLS / EMBED ENGINE -- downloads an .m3u8 stream (VidLink etc.) as a
+    //  single .mp4 so embeds become downloadable like any direct file.
+    //  IDM-equivalent: the app OWNS the network stack, so it can see exactly
+    //  which playlist the embed plays and re-fetch every segment itself.
+    //  Handles: master playlists (picks highest bandwidth), relative +
+    //  absolute segment URLs, AES-128 keys, ENCRYPTION=NONE gaps.
+    //  Registry layout is identical to the direct-file engine, so the My
+    //  Downloads screen (progress, Retry, Play, Delete) needs no changes.
+    // =======================================================================
+    public static boolean startEmbedHls(final Activity act, final String playlistUrl,
+            final String title, final String poster, final String subUrl) {
+        if (act == null || playlistUrl == null || playlistUrl.length() == 0) return false;
+        rememberCtx(act);
+        try {
+            File dir = dlDir(act);
+            long free = freeBytes();
+            if (free < 268435456L) {
+                Toast.makeText(act.getApplicationContext(),
+                        MSG_NOSPACE + " -- free up space and try again", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            String rowId = "M" + String.valueOf(System.currentTimeMillis())
+                    + String.valueOf((long) (Math.random() * 1000L));
+            String token = "dfx_" + randomToken() + ".mp4";
+            String subName = token.replace(".mp4", ".srt");
+            String finalPath = new File(dir, token).getAbsolutePath();
+            SharedPreferences p = act.getSharedPreferences("deymflix_dl", 0);
+            p.edit().putString(rowId,
+                    (title == null ? "Embed video" : title)
+                    + "[URL]" + playlistUrl
+                    + "[POSTER]" + (poster == null ? "" : poster)
+                    + "[SUB]" + subName
+                    + K_PATH + finalPath
+                    + K_SIZE + "-1").apply();
+            PATHS.put(rowId, finalPath);
+            STOP.put(rowId, new boolean[] { false });
+            STATUS.put(rowId, ST_RUNNING);
+            MSG.put(rowId, MSG_RETRIEVING);
+            PROGRESS.put(rowId, new long[SEGMENTS + 1]);
+            runEmbedEngine(act.getApplicationContext(), rowId, playlistUrl, subUrl);
+            pump(act.getApplicationContext());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Concurrency for the embed engine shares the same slots as direct rows:
+    // running embed rows are counted in engineRowIds by their ST_RUNNING
+    // status, and pump() admits them the same way (startEmbedHls registers
+    // the row BEFORE pump() runs).
+
+    private static void runEmbedEngine(final Context ctx, final String rowId,
+            final String playlistUrl, final String subUrl) {
+        new Thread(new Runnable() { @Override public void run() {
+            final boolean[] stop = STOP.get(rowId);
+            final long[] prog = PROGRESS.get(rowId);
+            File dir = dlDir(ctx);
+            File finalFile = new File(PATHS.get(rowId));
+            try {
+                // -- 1) resolve the MEDIA playlist ----------------------
+                String plText = httpGet(playlistUrl, null);
+                if (plText == null) throw new Exception("playlist unreachable");
+                String mediaUrl = playlistUrl;
+                if (plText.contains("#EXT-X-STREAM-INF")) {
+                    // master playlist: pick the highest-bandwidth variant
+                    String best = null;
+                    long bestBw = -1;
+                    String[] lines = plText.split("\n");
+                    for (int i = 0; i < lines.length; i++) {
+                        String L = lines[i].trim();
+                        if (L.startsWith("#EXT-X-STREAM-INF")) {
+                            long bw = 0;
+                            java.util.regex.Matcher m = java.util.regex.Pattern
+                                    .compile("BANDWIDTH=(\\d+)").matcher(L);
+                            if (m.find()) bw = Long.parseLong(m.group(1));
+                            String target = "";
+                            for (int j = i + 1; j < lines.length; j++) {
+                                String t = lines[j].trim();
+                                if (t.length() > 0 && !t.startsWith("#")) { target = t; break; }
+                            }
+                            if (target.length() > 0 && bw > bestBw) {
+                                bestBw = bw;
+                                best = absolutize(target, playlistUrl);
+                            }
+                        }
+                    }
+                    if (best == null) throw new Exception("no variant found");
+                    mediaUrl = best;
+                    plText = httpGet(mediaUrl, null);
+                    if (plText == null) throw new Exception("media playlist unreachable");
+                }
+                if (stop[0]) return;
+
+                // -- 2) parse segments + keys -------------------------
+                java.util.ArrayList<String> segUrls = new java.util.ArrayList<String>();
+                java.util.ArrayList<byte[]> segKeys = new java.util.ArrayList<byte[]>();
+                java.util.ArrayList<String> segIvs = new java.util.ArrayList<String>();
+                byte[] curKey = null;
+                String curIv = "";
+                String[] lines = plText.split("\n");
+                for (int i = 0; i < lines.length; i++) {
+                    String L = lines[i].trim();
+                    if (L.startsWith("#EXT-X-KEY")) {
+                        if (L.contains("METHOD=NONE")) {
+                            curKey = null;
+                        } else {
+                            java.util.regex.Matcher km = java.util.regex.Pattern
+                                    .compile("URI=\\\"([^\\\"]+)\\\"").matcher(L);
+                            if (km.find()) {
+                                String keyUrl = absolutize(km.group(1), mediaUrl);
+                                String kb = httpGet(keyUrl, null);
+                                curKey = kb == null ? null : kb.getBytes("ISO-8859-1");
+                            }
+                            java.util.regex.Matcher im = java.util.regex.Pattern
+                                    .compile("IV=0[xX]([0-9a-fA-F]+)").matcher(L);
+                            curIv = im.find() ? im.group(1) : "";
+                        }
+                    } else if (L.length() > 0 && !L.startsWith("#")) {
+                        segUrls.add(absolutize(L, mediaUrl));
+                        segKeys.add(curKey);
+                        segIvs.add(curIv);
+                    }
+                }
+                int total = segUrls.size();
+                if (total == 0) throw new Exception("no segments found");
+
+                // -- 3) storage guard -----------------------------------
+                long free = freeBytes();
+                if (free < 262144000L) {
+                    STATUS.put(rowId, ST_FAILED);
+                    MSG.put(rowId, MSG_NOSPACE);
+                    return;
+                }
+                // segments are small; estimate nothing, count as we go. The
+                // row shows MBs counting up (progress ticks per segment).
+                if (prog != null) prog[SEGMENTS] = -1L;
+
+                // -- 4) fetch every segment sequentially ----------------
+                File tmp = new File(dir, rowId + ".hls");
+                java.io.FileOutputStream out = new java.io.FileOutputStream(tmp);
+                javax.crypto.Cipher cipher = null;
+                for (int i = 0; i < total; i++) {
+                    if (stop[0]) { out.close(); tmp.delete(); return; }
+                    byte[] data = httpGetBytes(segUrls.get(i), mediaUrl);
+                    if (data == null) throw new Exception("segment " + (i + 1) + "/" + total + " failed");
+                    byte[] k = segKeys.get(i);
+                    if (k != null) {
+                        String ivHex = segIvs.get(i);
+                        byte[] iv;
+                        if (ivHex.length() > 0) {
+                            iv = new byte[16];
+                            int off = ivHex.length() - 32;
+                            if (off < 0) off = 0;
+                            int len = Math.min(16, ivHex.length() / 2);
+                            for (int b = 0; b < len; b++) {
+                                iv[16 - len + b] = (byte) Integer.parseInt(ivHex.substring(off + b * 2, off + b * 2 + 2), 16);
+                            }
+                        } else {
+                            iv = new byte[16];
+                            iv[12] = (byte) ((i >> 24) & 0xff);
+                            iv[13] = (byte) ((i >> 16) & 0xff);
+                            iv[14] = (byte) ((i >> 8) & 0xff);
+                            iv[15] = (byte) (i & 0xff);
+                        }
+                        cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
+                        cipher.init(javax.crypto.Cipher.DECRYPT_MODE,
+                                new javax.crypto.spec.SecretKeySpec(k, "AES"),
+                                new javax.crypto.spec.IvParameterSpec(iv));
+                        data = cipher.doFinal(data);
+                    }
+                    out.write(data);
+                    if (prog != null) {
+                        synchronized (prog) { prog[0] += data.length; }
+                    }
+                }
+                out.close();
+                if (stop[0]) { tmp.delete(); return; }
+
+                // -- 5) finalize ---------------------------------------
+                if (!tmp.renameTo(finalFile)) {
+                    java.io.FileInputStream fis = new java.io.FileInputStream(tmp);
+                    java.io.FileOutputStream fos = new java.io.FileOutputStream(finalFile);
+                    byte[] buf = new byte[65536];
+                    int n;
+                    while ((n = fis.read(buf)) > 0) fos.write(buf, 0, n);
+                    fis.close();
+                    fos.close();
+                    tmp.delete();
+                }
+                storeSize(ctx, rowId, finalFile.length());
+                STATUS.put(rowId, ST_DONE);
+                MSG.put(rowId, "");
+                pump(ctx);
+            } catch (final Exception e) {
+                if (stop[0]) return;
+                STATUS.put(rowId, ST_FAILED);
+                MSG.put(rowId, "Embed stream failed -- tap Retry");
+            }
+        }}).start();
+    }
+
+    // resolve a relative HLS url against its playlist
+    private static String absolutize(String ref, String base) {
+        try {
+            if (ref.startsWith("http://") || ref.startsWith("https://")) return ref;
+            if (ref.startsWith("//")) return "https:" + ref;
+            return new java.net.URL(new java.net.URL(base), ref).toString();
+        } catch (Exception e) {
+            return ref;
+        }
+    }
+
+    private static String httpGet(String url, String referer) {
+        byte[] b = httpGetBytes(url, referer);
+        try { return b == null ? null : new String(b, "UTF-8"); } catch (Exception e) { return null; }
+    }
+
+    private static byte[] httpGetBytes(String url, String referer) {
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            try {
+                HttpURLConnection c = open(url);
+                if (referer != null && referer.length() > 0) {
+                    c.setRequestProperty("Referer", referer);
+                }
+                int code = c.getResponseCode();
+                if (code < 200 || code >= 300) { c.disconnect(); sleep(900L * attempt); continue; }
+                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                InputStream in = new BufferedInputStream(c.getInputStream(), 262144);
+                byte[] buf = new byte[65536];
+                int n;
+                while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+                in.close();
+                c.disconnect();
+                return bos.toByteArray();
+            } catch (Exception e) {
+                sleep(900L * attempt);
+            }
+        }
+        return null;
+    }
 }

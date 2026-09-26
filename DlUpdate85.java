@@ -426,8 +426,19 @@ public class DlUpdate85 {
                             return;
                         }
                         if (st == DownloadManager.STATUS_FAILED) {
+                            int reason = -1;
+                            try {
+                                reason = c.getInt(c.getColumnIndexOrThrow(
+                                        DownloadManager.COLUMN_REASON));
+                            } catch (Exception eR) { }
                             c.close();
-                            pct.setText("Download failed -- tap Download again");
+                            // 404/410 (or generic HTTP errors): the release file is
+                            // not (yet) on the server -- say so plainly.
+                            if (reason >= 400 && reason < 500) {
+                                pct.setText("Update not published yet -- try again in a few minutes");
+                            } else {
+                                pct.setText("Download failed -- tap Download again");
+                            }
                             dialogShowing = false;
                             return;
                         }

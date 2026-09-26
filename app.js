@@ -1604,6 +1604,15 @@ function removeContinueWatching(movieId, event) {
 }
 
 
+// Global TMDB base (also used by setupHeroBanner — the HOVER_PREVIEW closure
+// has its own copy, but that one is not in scope at top level).
+function dfxTmdbBase() {
+  try {
+    var cfg = window.__DEYMFLIX_CONFIG__ || {};
+    return cfg.API_BASE || window.__API_BASE__ || '';
+  } catch (e) { return ''; }
+}
+
 function setupHeroBanner() {
   const heroWrapper = document.getElementById('hero-billboard-wrapper') || document.querySelector('.hero-wrapper');
   if (!heroWrapper || !featuredMovies || featuredMovies.length === 0) return;
@@ -1656,7 +1665,7 @@ function setupHeroBanner() {
     if (!/^tt\d{5,}$/.test(imdb)) return;
     const qs = new URLSearchParams({ title: item.title || '' });
     if (localYear) qs.set('year', localYear[0]);
-    fetch(apiBase() + '/api/tmdb/details/' + encodeURIComponent(imdb) + '?' + qs.toString())
+    fetch(dfxTmdbBase() + '/api/tmdb/details/' + encodeURIComponent(imdb) + '?' + qs.toString())
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (!d || !d.found) return;

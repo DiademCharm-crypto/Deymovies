@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.Path;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Environment;
@@ -77,11 +78,184 @@ public class MainScreen85 {
     public static void install(final Activity act) {
         if (act == null) return;
         purgeDeadInstances();
-        MainScreen85 m = new MainScreen85(act);
-        INSTANCES.put(act, m);
-        m.boot();
-        // force-update: block the app when the site manifest is newer
-        DlUpdate85.checkAndEnforce(act);
+        // ── FIRST-LAUNCH PERMISSION GATES ──
+        // The app is unusable until "Install unknown apps" is enabled for
+        // DEYMFLIX: without it, Android BLOCKS every self-update (and any
+        // install of new versions), which breaks the app for good after the
+        // first release. The gate is a non-dismissible branded screen with a
+        // one-tap shortcut to the exact Android switch. boot() only runs
+        // after the gate passes.
+        runFirstLaunchGates(act, new Runnable() { @Override public void run() {
+            MainScreen85 m = new MainScreen85(act);
+            INSTANCES.put(act, m);
+            m.boot();
+            // force-update: block the app when the site manifest is newer
+            DlUpdate85.checkAndEnforce(act);
+            // friendly one-time notifications prompt (update notices land)
+            maybeAskNotifications(act);
+        }});
+    }
+
+    // =======================================================================
+    //  PERMISSION GATES (first launch + revocation guard)
+    // =======================================================================
+    private static android.app.Dialog installGateDialog = null;
+    private static Runnable installGateContinuation = null;
+
+    private static boolean canInstallPackages(final Activity act) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                return act.getPackageManager().canRequestPackageInstalls();
+            }
+            // Android 7 and below: unknown sources is a global install-time
+            // checkbox -- nothing to pre-authorize at app level.
+            return true;
+        } catch (Exception e) {
+            return false; // unsure -> keep the gate up (fail-closed by design)
+        }
+    }
+
+    private static void runFirstLaunchGates(final Activity act, final Runnable onDone) {
+        try {
+            if (canInstallPackages(act)) { onDone.run(); return; }
+        } catch (Exception e) { }
+        installGateContinuation = onDone;
+        showInstallGate(act);
+    }
+
+    // Non-dismissible full-screen gate. The ONLY way forward is the Android
+    // switch; returning from Settings auto-continues (handled in resume()).
+    private static void showInstallGate(final Activity act) {
+        try {
+            if (installGateDialog != null) {
+                try { installGateDialog.dismiss(); } catch (Exception e) { }
+                installGateDialog = null;
+            }
+            if (act.isFinishing()) return;
+            float d = act.getResources().getDisplayMetrics().density;
+            LinearLayout root = new LinearLayout(act);
+            root.setOrientation(LinearLayout.VERTICAL);
+            root.setGravity(Gravity.CENTER_HORIZONTAL);
+            root.setBackgroundColor(Color.parseColor("#0B0B0F"));
+            int pad = (int) (28 * d);
+            root.setPadding(pad, (int) (60 * d), pad, pad);
+
+            View mark = new MainScreen85.HexagonLogoView(act);
+            root.addView(mark, new LinearLayout.LayoutParams(
+                    (int) (72 * d), (int) (72 * d)));
+
+            TextView title = new TextView(act);
+            title.setText("Welcome to DEYMFLIX");
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(22);
+            title.setTypeface(Typeface.DEFAULT_BOLD);
+            title.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            tp.topMargin = (int) (22 * d);
+            root.addView(title, tp);
+
+            TextView msg = new TextView(act);
+            msg.setText("One quick setting is needed before you start:\n\n\u25CF  Automatic app updates\n\u25CF  Installing new versions without problems\n\u25CF  Downloads that keep working\n\nAndroid requires DEYMFLIX to be allowed to \"Install unknown apps\". It is safe -- this permission belongs to DEYMFLIX only and is used exclusively to install DEYMFLIX updates.");
+            msg.setTextColor(Color.parseColor("#B9B9C2"));
+            msg.setTextSize(15);
+            msg.setLineSpacing(3 * d, 1f);
+            LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            mp.topMargin = (int) (18 * d);
+            root.addView(msg, mp);
+
+            TextView step = new TextView(act);
+            step.setText("Tap the button below, then switch ON\n\"Allow from this source\" and come back.");
+            step.setTextColor(Color.parseColor("#FF8A90"));
+            step.setTextSize(14);
+            step.setTypeface(Typeface.DEFAULT_BOLD);
+            step.setGravity(Gravity.CENTER);
+            step.setLineSpacing(3 * d, 1f);
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.topMargin = (int) (18 * d);
+            root.addView(step, sp);
+
+            Button allow = new Button(act);
+            allow.setText("ALLOW INSTALLING");
+            allow.setAllCaps(true);
+            allow.setTextColor(Color.WHITE);
+            allow.setTypeface(Typeface.DEFAULT_BOLD);
+            allow.setTextSize(15);
+            GradientDrawable rb = new GradientDrawable();
+            rb.setColor(Color.parseColor("#E50914"));
+            rb.setCornerRadius(14 * d);
+            allow.setBackgroundDrawable(rb);
+            LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, (int) (54 * d));
+            ap.topMargin = (int) (30 * d);
+            root.addView(allow, ap);
+
+            final android.app.Dialog gate = new android.app.Dialog(act,
+                    android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+            gate.setContentView(root);
+            gate.setCancelable(false);
+            gate.setCanceledOnTouchOutside(false);
+            installGateDialog = gate;
+
+            allow.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    try {
+                        act.startActivity(new android.content.Intent(
+                                android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                android.net.Uri.parse("package:" + act.getPackageName())));
+                    } catch (Exception e) {
+                        try {
+                            act.startActivity(new android.content.Intent(
+                                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    android.net.Uri.parse("package:" + act.getPackageName())));
+                        } catch (Exception e2) { }
+                    }
+                }
+            });
+            gate.show();
+        } catch (Exception e) {
+            // never dead-end: if the gate itself cannot render, continue
+            Runnable cont = installGateContinuation;
+            installGateContinuation = null;
+            if (cont != null) cont.run();
+        }
+    }
+
+    // resume() re-checks the gate: covers BOTH the return from Settings
+    // (first launch) and a user revoking the toggle later mid-session.
+    private static void checkInstallGateOnResume(final Activity act) {
+        try {
+            boolean ok = canInstallPackages(act);
+            if (ok) {
+                if (installGateDialog != null) {
+                    try { installGateDialog.dismiss(); } catch (Exception e) { }
+                    installGateDialog = null;
+                }
+                Runnable cont = installGateContinuation;
+                installGateContinuation = null;
+                if (cont != null) cont.run();
+            } else {
+                if (installGateDialog == null) {
+                    installGateContinuation = null; // app already booted behind
+                    showInstallGate(act);
+                }
+            }
+        } catch (Exception e) { }
+    }
+
+    // One-time friendly notifications prompt (Android 13+): update notices.
+    private static void maybeAskNotifications(final Activity act) {
+        try {
+            SharedPreferences p = act.getSharedPreferences("deymflix_perms", 0);
+            if (p.getBoolean("notif_asked", false)) return;
+            p.edit().putBoolean("notif_asked", true).apply();
+            if (android.os.Build.VERSION.SDK_INT < 33) return;
+            if (act.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED) return;
+            act.requestPermissions(new String[]{ android.Manifest.permission.POST_NOTIFICATIONS }, 4102);
+        } catch (Exception e) { }
     }
 
     public static void back(final Activity act) {
@@ -99,6 +273,9 @@ public class MainScreen85 {
     public static void resume(final Activity act) {
         if (act == null) return;
         purgeDeadInstances();
+        // permission gate re-check FIRST: returning from the Android settings
+        // screen lands here, and a mid-session revocation re-locks the app
+        checkInstallGateOnResume(act);
         MainScreen85 m = INSTANCES.get(act);
         if (m != null) m.handleResume();
         // force-update: re-check on every resume so dismissing the install
@@ -216,14 +393,50 @@ public class MainScreen85 {
                     return false;
                 }
             }
+            // ── TOP-FRAME NAVIGATION GUARD ──
+            // Blocks ALL top-frame navigation away from our player after the
+            // initial load — including from ALLOWED hosts. This is what stops
+            // an ad iframe inside an embed from dragging the whole player to a
+            // different page (the "Confirm Navigation" popups / lost player
+            // bug). Everything is cancelled SILENTLY: no dialog, no lost page.
+            private boolean isInternalNavigation(String url) {
+                try {
+                    android.net.Uri u = android.net.Uri.parse(url == null ? "" : url);
+                    String s = u.getScheme();
+                    if (s == null) return false;
+                    s = s.toLowerCase();
+                    // first load of our own site unlocks the guard
+                    if ("http".equals(s) || "https".equals(s)) {
+                        String h = u.getHost();
+                        if (h != null && (h.equalsIgnoreCase("deymflix.eu.cc") || h.endsWith(".deymflix.eu.cc"))) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    // in-page anchors, asset pages (offline.html) and JS stay
+                    // functional; intent:// and mailto: stay cancelled exactly
+                    // like the previous guard did
+                    return "about".equals(s) || "data".equals(s) || "blob".equals(s)
+                            || "javascript".equals(s) || "file".equals(s);
+                } catch (Throwable t) {
+                    return false;
+                }
+            }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // false = let the WebView load it; true = cancel silently
-                return !isAllowedHost(url);
+                if (!isInternalNavigation(url)) {
+                    // cancel silently — never let the page leave our player
+                    return true;
+                }
+                return false;
             }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest req) {
-                return !isAllowedHost(req.getUrl() == null ? "" : req.getUrl().toString());
+                String u = req.getUrl() == null ? "" : req.getUrl().toString();
+                if (!isInternalNavigation(u)) {
+                    return true;
+                }
+                return false;
             }
 
             // ── REQUEST FIREWALL (Brave-style network-level ad blocking) ──
@@ -261,14 +474,111 @@ public class MainScreen85 {
                 }
                 return AD_HOSTS.contains(h);
             }
+
+            // ── UNMUTE+PLAY INJECTION (network-level page rewriting) ──
+            // Provider players (VidLink etc.) boot their autoplay muted. Their
+            // API is one-way, so the page can't command them. Instead we patch
+            // the provider document ITSELF as it streams through this firewall:
+            // every <video> is force-unmuted, volume 1, and play() is retried
+            // for 90s. A play() hook unmutes before their player's own autoplay
+            // call, so playback starts WITH SOUND (the WebView allows unmuted
+            // autoplay). Re-applies on EVERY episode change — each episode is a
+            // fresh document request, freshly patched.
+            private final java.util.HashSet<String> INJECT_HOSTS = new java.util.HashSet<>(java.util.Arrays.asList(
+                "vidlink.pro", "player.videasy.net", "vidsrc.cc", "vidsrc.su", "vidsrc.in",
+                "player.autoembed.cc", "multiembed.mov", "www.2embed.cc"
+            ));
+            private final String UNMUTE_JS =
+                "<script>(function(){var n=0;var iv=setInterval(function(){n++;try{var vs=document.querySelectorAll('video');" +
+                "for(var i=0;i<vs.length;i++){var v=vs[i];if(v.muted){v.muted=false;}v.volume=1;" +
+                "if(v.paused){var p=v.play();if(p&&p.catch){p.catch(function(e){});}}}}catch(e){}" +
+                "if(n>90)clearInterval(iv);},1000);" +
+                "try{var pp=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){" +
+                "try{this.muted=false;this.volume=1;}catch(e){}return pp.apply(this,arguments);};}catch(e){}" +
+                "try{var mo=new MutationObserver(function(){try{var vs=document.querySelectorAll('video');" +
+                "for(var i=0;i<vs.length;i++){var v=vs[i];if(v.muted){v.muted=false;}v.volume=1;" +
+                "if(v.paused){var p=v.play();if(p&&p.catch){p.catch(function(e){});}}}}catch(e){}});" +
+                "mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}})();</script>";
+
+            private android.webkit.WebResourceResponse injectUnmute(android.webkit.WebResourceRequest request, String url) {
+                java.net.HttpURLConnection c = null;
+                try {
+                    java.net.URL u = new java.net.URL(url);
+                    c = (java.net.HttpURLConnection) u.openConnection();
+                    c.setConnectTimeout(8000);
+                    c.setReadTimeout(12000);
+                    c.setInstanceFollowRedirects(true);
+                    java.util.Map<String, String> rh = request.getRequestHeaders();
+                    if (rh != null) {
+                        String ua = rh.get("User-Agent");
+                        if (ua != null) c.setRequestProperty("User-Agent", ua);
+                        String acc = rh.get("Accept");
+                        if (acc != null) c.setRequestProperty("Accept", acc);
+                    }
+                    if (c.getResponseCode() != 200) return null;
+                    String ct = c.getContentType();
+                    if (ct == null || !ct.toLowerCase().contains("text/html")) return null;
+                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                    java.io.InputStream in = c.getInputStream();
+                    byte[] buf = new byte[8192];
+                    int r;
+                    while ((r = in.read(buf)) > 0) bos.write(buf, 0, r);
+                    in.close();
+                    String html = new String(bos.toByteArray(), "UTF-8");
+                    int idx = html.toLowerCase().lastIndexOf("</body>");
+                    if (idx >= 0) {
+                        html = html.substring(0, idx) + UNMUTE_JS + html.substring(idx);
+                    } else {
+                        html = html + UNMUTE_JS;
+                    }
+                    // serve plain utf-8 (we hold decompressed bytes)
+                    return new android.webkit.WebResourceResponse("text/html", "utf-8",
+                            new java.io.ByteArrayInputStream(html.getBytes("UTF-8")));
+                } catch (Throwable t) {
+                    return null; // fall through: WebView fetches normally
+                } finally {
+                    try { if (c != null) c.disconnect(); } catch (Throwable t2) {}
+                }
+            }
+
             @Override
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, android.webkit.WebResourceRequest request) {
                 try {
-                    String host = request.getUrl() == null ? null : request.getUrl().getHost();
+                    android.net.Uri u0 = request.getUrl();
+                    String host = u0 == null ? null : u0.getHost();
                     if (host != null && isAdHost(host)) {
                         return new android.webkit.WebResourceResponse(
                                 "text/plain", "utf-8",
                                 new java.io.ByteArrayInputStream(new byte[0]));
+                    }
+                    // embed capture: log playlists, lock on while armed
+                    if (host != null && u0.toString().toLowerCase().contains(".m3u8")) {
+                        try {
+                            EMBED_RECENT_M3U8.add(u0.toString());
+                            while (EMBED_RECENT_M3U8.size() > 12) EMBED_RECENT_M3U8.poll();
+                        } catch (Exception eQ) { }
+                        if (embedCaptureArmed && embedCapturedM3u8 == null) {
+                            embedCapturedM3u8 = u0.toString();
+                            embedCaptureArmed = false;
+                            embedCaptureEnqueued = true;
+                            startEmbedHlsDownload(u0.toString());
+                            // page badge: "Stream captured — saving…" (see player.html)
+                            try {
+                                WebView wvL = findWebView(act);
+                                if (wvL != null) wvL.post(new Runnable() { @Override public void run() {
+                                    try { wvL.evaluateJavascript("if(window._dfxCaptureLocked){window._dfxCaptureLocked();}", null); } catch (Exception eL) { }
+                                }});
+                            } catch (Exception eN) { }
+                        }
+                    }
+                    // provider document: stream it through with the unmute patch
+                    if (host != null && INJECT_HOSTS.contains(host)) {
+                        java.util.Map<String, String> rh = request.getRequestHeaders();
+                        String acc = rh != null ? rh.get("Accept") : null;
+                        if (acc != null && acc.contains("text/html")) {
+                            android.webkit.WebResourceResponse rr = injectUnmute(request, u0.toString());
+                            if (rr != null) return rr;
+                        }
                     }
                 } catch (Throwable t) { /* never break loading */ }
                 return null; // null = request proceeds normally
@@ -352,14 +662,24 @@ public class MainScreen85 {
             swipe.setDistanceToTriggerSync(220);
         }
 
-        // -- 7) JS BRIDGE --
+        // -- 7) JS BRIDGE (hardened) --
+        // File access OFF: injected/provider JS must never touch local files.
+        // SafeBrowsing ON: Chrome's malware/deceptive-site list guards the
+        // WebView too. Everything else (JS, DOM storage) stays as configured.
+        try { wv.getSettings().setAllowFileAccess(false); } catch (Exception eF) { }
+        try { wv.getSettings().setAllowContentAccess(false); } catch (Exception eC) { }
+        try { wv.getSettings().setSafeBrowsingEnabled(true); } catch (Exception eS) { }
         wv.addJavascriptInterface(getDeymflixBridge(), "DeymflixApp");
 
-        // -- 8) DownloadListener: bare-link fallback --
+        // -- 8) DownloadListener: bare-link fallback (VALIDATED) --
         wv.setDownloadListener(new android.webkit.DownloadListener() {
             @Override
             public void onDownloadStart(final String url, String userAgent, String contentDisposition, String mimeType, final long contentLength) {
                 act.runOnUiThread(new Runnable() { @Override public void run() {
+                    // Only http(s) from a deymflix/embed context is honored;
+                    // anything weird (ftp:, data:, javascript:) is dropped.
+                    String u = url == null ? "" : url.trim().toLowerCase();
+                    if (!u.startsWith("https://") && !u.startsWith("http://")) return;
                     confirmAndDownload(url, guessTitleFromUrl(url), "", "");
                 }});
             }
@@ -958,6 +1278,15 @@ public class MainScreen85 {
                     launchNativePlayer(use, title);
                 }});
             }
+            // ── EMBED DOWNLOAD (IDM-style) ── the player calls this when the
+            // user taps Download while watching an embed; arms the capture
+            // window the request firewall needs to lock onto the stream.
+            @android.webkit.JavascriptInterface
+            public void requestEmbedDownload() {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    armEmbedCaptureWindow();
+                }});
+            }
             @android.webkit.JavascriptInterface
             public void setSecure(final boolean on) {
                 act.runOnUiThread(new Runnable() { @Override public void run() {
@@ -969,6 +1298,108 @@ public class MainScreen85 {
                 }});
             }
         };
+    }
+
+    // =======================================================================
+    //  EMBED STREAM CAPTURE (IDM-style) -- state + window
+    // =======================================================================
+    // True while "Downloading embed stream..." is armed (2 minutes).
+    private volatile boolean embedCaptureArmed = false;
+    // Walls off the capture to the embed's own requests (excludes our site).
+    private volatile String embedCapturePageUrl = "";
+    // The locked media playlist, consumed by the firewall.
+    private volatile String embedCapturedM3u8 = null;
+    // Title/poster snapshot at arm time, for the registry row.
+    private volatile String embedCaptureTitle = "";
+    private volatile String embedCapturePoster = "";
+    // One-shot guard so a locked stream enqueues exactly once.
+    private volatile boolean embedCaptureEnqueued = false;
+    // Rolling log of the playlists seen recently (any request, armed or not):
+    // lets us lock on instantly if the video was ALREADY playing when the
+    // user tapped Download. Written by the request firewall (inner class),
+    // read here -- hence a ConcurrentLinkedQueue.
+    private final java.util.concurrent.ConcurrentLinkedQueue<String> EMBED_RECENT_M3U8 =
+            new java.util.concurrent.ConcurrentLinkedQueue<String>();
+
+    private void armEmbedCaptureWindow() {
+        try {
+            // already have a capture running? say so and stop
+            if (embedCaptureEnqueued) {
+                Toast.makeText(act.getApplicationContext(),
+                        "Embed download already started -- see My Downloads", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // snapshot current movie title/poster from the page
+            embedCaptureTitle = "";
+            embedCapturePoster = "";
+            try {
+                WebView wvT = findWebView(act);
+                if (wvT != null) {
+                    wvT.evaluateJavascript(
+                        "(function(){try{var cm=window.__dfxCurrentMovie;var t=document.getElementById('current-title');" +
+                        "return JSON.stringify({t:(cm&&cm.title)||((t&&t.textContent)||'').trim()||'Embed video'," +
+                        "p:(cm&&cm.poster)||'',ep:(cm&&cm._episodeTitle)||''});}catch(e){return '{}'}})()",
+                        new android.webkit.ValueCallback<String>() {
+                            @Override public void onReceiveValue(String raw) {
+                                String j = raw == null ? "" : raw;
+                                if (j.length() > 1 && j.startsWith("\"") && j.endsWith("\"")) {
+                                    j = j.substring(1, j.length() - 1).replace("\\\"", "\"").replace("\\\\", "\\");
+                                }
+                                try {
+                                    org.json.JSONObject o = new org.json.JSONObject(j);
+                                    embedCaptureTitle = o.optString("t", "Embed video");
+                                    String ep = o.optString("ep", "");
+                                    if (ep.length() > 0) embedCaptureTitle = embedCaptureTitle + " - " + ep;
+                                    embedCapturePoster = o.optString("p", "");
+                                } catch (Exception e) { }
+                            }
+                        });
+                }
+            } catch (Exception eT) { }
+            try { embedCapturePageUrl = String.valueOf(findWebView(act).getUrl()); } catch (Exception eU) { }
+            embedCapturedM3u8 = null;
+            embedCaptureEnqueued = false;
+            embedCaptureArmed = true;
+            Toast.makeText(act.getApplicationContext(),
+                    "Waiting for the video stream... keep the episode playing", Toast.LENGTH_LONG).show();
+            // capture window closes after 2 minutes
+            new Thread(new Runnable() { @Override public void run() {
+                try { Thread.sleep(120000); } catch (Exception e) { }
+                if (embedCaptureArmed && embedCapturedM3u8 == null && !embedCaptureEnqueued) {
+                    embedCaptureArmed = false;
+                    act.runOnUiThread(new Runnable() { @Override public void run() {
+                        Toast.makeText(act.getApplicationContext(),
+                                "No stream detected -- let the video play a few seconds, then try again",
+                                Toast.LENGTH_LONG).show();
+                    }});
+                }
+            }}).start();
+            // also probe what already flowed (a playing video may have the
+            // playlist in the recent-request log already)
+            tryEmbedCaptureFromRecent();
+        } catch (Exception e) { }
+    }
+
+    // The firewall records every .m3u8 request; if one already flowed for
+    // this page, lock on immediately without waiting for new traffic.
+    private void tryEmbedCaptureFromRecent() {
+        try {
+            String u = EMBED_RECENT_M3U8.peek();
+            if (u != null && embedCaptureArmed && embedCapturedM3u8 == null) {
+                embedCapturedM3u8 = u;
+                embedCaptureArmed = false;
+                startEmbedHlsDownload(u);
+                embedCaptureEnqueued = true;
+            }
+        } catch (Exception e) { }
+    }
+
+    private void startEmbedHlsDownload(final String playlistUrl) {
+        try {
+            DlSpeed85.startEmbedHls(act, playlistUrl, embedCaptureTitle, embedCapturePoster, "");
+        } catch (Exception e) {
+            Toast.makeText(act.getApplicationContext(), "Embed download failed to start", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // The Downloads screen is launched by NAME so this jar never needs a

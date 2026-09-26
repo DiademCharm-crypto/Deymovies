@@ -1271,8 +1271,26 @@ public class DlScreen85 {
         right.setOrientation(LinearLayout.VERTICAL);
         card.addView(right, new LinearLayout.LayoutParams(-1, -2, 1f));
 
+        // S/E LABEL: make season/episode visible on the card title
+        // ("The Mentalist S2 E3"). Reads the stored episode number; season
+        // defaults to 1 for legacy rows.
+        String shownTitle = title;
+        try {
+            int epN = MainScreen85.episodeNumFromTitle(title);
+            if (epN > 0) {
+                String base = title;
+                int cut = base.toLowerCase().indexOf(" ep" + epN);
+                if (cut > 0) base = base.substring(0, cut);
+                int sN = 1;
+                java.util.regex.Matcher sm = java.util.regex.Pattern
+                        .compile(" - s(\\d+) - ").matcher(title);
+                if (sm.find()) sN = Integer.parseInt(sm.group(1));
+                shownTitle = base + " S" + sN + " E" + epN;
+            }
+        } catch (Exception eSE) { }
+
         TextView t = new TextView(act);
-        t.setText(title);
+        t.setText(shownTitle);
         t.setTextColor(Color.WHITE);
         t.setTextSize(16);
         t.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
