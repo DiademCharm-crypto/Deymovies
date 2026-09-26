@@ -4,6 +4,7 @@
   "released": "2026-09-26",
   "url": "apk/Deymflix-v1.6.apk",
   "notes": [
+    "IMPORTANT: if install fails, uninstall the old version first (one time only)",
     "Built-in ad & tracker firewall — no more ad redirects",
     "Splash & offline screen fixes — no more white flash",
     "CinemaOS & VidLink embed playback",
