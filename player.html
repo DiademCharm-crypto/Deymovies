@@ -16,9 +16,16 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css?v=160.3">
+  <!-- SPEED: warm up the origins the player always needs -->
+  <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
+  <link rel="preconnect" href="https://vidlink.pro" crossorigin>
+  <link rel="dns-prefetch" href="https://player.videasy.net">
+  <link rel="dns-prefetch" href="https://vidsrc.cc">
+
+  <link rel="stylesheet" href="style.css?v=160.4">
 
   <style>
+    @keyframes dfxPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
     /* ═══ CinemaOS embed mode: the provider's player IS the player. Everything
        of ours that could cover or intercept taps is display:none. The back
        chip (#cos-back-btn) is appended outside the overlay and stays visible. */
@@ -2925,8 +2932,8 @@
 <script src="security.js?v=2.1"></script>
     <script src="filipino-movies.js?v=1.3"></script>
     <script src="kdramas.js?v=1.0"></script>
-  <script src="app.js?v=160.4"></script>
-  <script src="episodes.js?v=1.6"></script>
+  <script src="app.js?v=160.7"></script>
+  <script src="episodes.js?v=1.7"></script>
   <script src="kdrama-episode.js?v=1.0"></script>
   <script>
     function destroyAllPlayers() {
@@ -4468,8 +4475,11 @@
       if (!isRestart && existingProgress && existingProgress.progress < 95) {
         directPlayer.currentTime = existingProgress.currentTime;
       }
-      // Reset _episodeId when video loads so next episode starts fresh
-      delete currentMovie._episodeId;
+      // NOTE: _episodeId is intentionally KEPT here. Wiping it made the next
+      // save fall back to the series id, resurrecting stale entries under the
+      // plain key and breaking the Continue-Watching series card deep-link
+      // (?s=&ep=). Episode switches go through playEpisodeSource(), which
+      // re-stamps a fresh _episodeId for every episode.
 
       // Auto-load subtitles from the /subtitles folder (English first).
       // One automatic attempt per movie/episode load — ad recovery must not re-run it
@@ -6031,20 +6041,18 @@
       }
 
       // ── BROWSER STRATEGY — split by provider cleanliness ──
-      // VidLink (the default) is audited ad-free (zero ad networks in its
-      // page, verified 2026-09-26), so the hijack risk that once forced the
-      // new-tab flow is gone — it now plays IN-PAGE in browsers too, with
-      // autoplay (muted-start per browser policy, tap to unmute), the poster
-      // backdrop and our back chip, exactly like the app.
-      // The ad-carrying providers (autoembed, vidsrc*, superembed, 2embed —
-      // or any explicit @pin) keep the new-tab strategy: an unsandboxed
-      // cross-origin embed from THEM can top-navigate the page (ads), and a
-      // browser cannot intercept that — a redirect then trashes only their
-      // own tab, not our site. In the APP the native firewall blocks those
-      // domains, so every provider stays in-page there.
+      // CLEAN (vidlink): in-page + sandboxed — popunders/hijacks physically
+      // impossible (except iOS, where the sandbox is skipped for provider
+      // compatibility; the tripwire protects it instead).
+      // DIRTY (autoembed, vidsrc*, superembed, 2embed, @pins): new-tab
+      // isolation stays the FIRST choice — an unsandboxed frame from THEM can
+      // top-navigate, so they only ever get their own disposable tab.
+      // In the APP every provider plays in-page behind the native firewall.
       const inApp = !!(window.DFX_IS_APP
         || (window.DeymflixApp && typeof window.DeymflixApp.playOnline === 'function')
         || /DeymflixApp/i.test(navigator.userAgent || '')); // belt & suspenders if app.js hiccups
+      var _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '')
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const cosClean = (order[0] === 'vidlink');
       // _forceInPage: set by the hijack tripwire when it fails over — the
       // replacement provider mounts in-page (under tripwire watch) instead of
@@ -6131,6 +6139,37 @@
           _dlBtn.addEventListener('click', function () {
             if (!window._cosActive) return; // normal download path
             try { window.DeymflixApp.requestEmbedDownload(); } catch (e) {}
+            // ── CAPTURE BADGE: live 2:00 countdown while the window is armed ──
+            try {
+              var old = document.getElementById('cos-capture-badge');
+              if (old) old.remove();
+              var badge = document.createElement('div');
+              badge.id = 'cos-capture-badge';
+              badge.style.cssText = 'position:absolute;top:52px;right:14px;z-index:2147483000;display:flex;align-items:center;gap:8px;' +
+                'padding:8px 14px;border-radius:20px;background:rgba(10,10,11,0.88);color:#fff;' +
+                'font:700 13px -apple-system,Segoe UI,Roboto,sans-serif;pointer-events:none;' +
+                'border:1px solid rgba(229,9,20,0.5);';
+              badge.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#E50914;display:inline-block;animation:dfxPulse 1s infinite;"></span><span id="cos-capture-secs">2:00</span>';
+              playerContainer.appendChild(badge);
+              var left = 120;
+              var t = setInterval(function () {
+                left--;
+                var el = document.getElementById('cos-capture-secs');
+                if (!el) { clearInterval(t); return; }
+                if (left <= 0) { clearInterval(t); badge.remove(); return; }
+                el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+              }, 1000);
+              // the app replaces the badge text the instant the stream locks on
+              window._dfxCaptureLocked = function () {
+                clearInterval(t);
+                var b = document.getElementById('cos-capture-badge');
+                if (b) {
+                  b.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span> Stream captured — saving…';
+                  setTimeout(function () { try { b.remove(); } catch (e3) {} }, 4000);
+                }
+                try { if (typeof showToast === 'function') showToast('Stream captured! Check My Downloads'); } catch (e4) {}
+              };
+            } catch (eB) {}
           }, true);
         }
       }
@@ -6181,7 +6220,13 @@
         // our top page and CANNOT window.open — popunders/hijacks become
         // physically impossible, with zero dialogs. Fullscreen still works
         // via the allow/allowfullscreen attributes; postMessage flows out.
-        if (!window.DFX_IS_APP && order[0] === 'vidlink') {
+        // iOS EXCEPTION (iPhone/iPad Safari): the provider's player detects
+        // the sandbox there and shows "Please Disable Sandbox" — so iOS
+        // skips the sandbox attribute and plays unsandboxed (the tripwire +
+        // no-referrer + credentialless layers still protect it).
+        var _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '')
+          || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS 13+ reports as Mac
+        if (!window.DFX_IS_APP && !_isIOS && order[0] === 'vidlink') {
           try { cosIfr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation'); } catch (e) {}
         }
       }
@@ -6347,11 +6392,19 @@
           if (w) {
             try { w.opener = null; } catch (e) {}
             showToast('Playing in a new tab — switch back when done');
+            exitCosMode();
+            forceBackToHome();
           } else {
-            showToast('Popup blocked — allow popups for this site');
+            // Popup blocked even with a gesture: instead of dead-ending the
+            // user, FAIL OVER to the clean provider in-page (sandboxed).
+            if (window._cosHijackGuard && window._cosHijackGuard.src) {
+              try { window._cosHijackGuard.handleTrip(); } catch (e2) {}
+            } else {
+              showToast('Popup blocked — allow popups for this site');
+              exitCosMode();
+              forceBackToHome();
+            }
           }
-          exitCosMode();
-          forceBackToHome();
         };
         playerContainer.appendChild(gate);
       } catch (e) {
@@ -7103,6 +7156,28 @@
         await new Promise(function (r) { setTimeout(r, 250); });
       }
     }
+
+    // ── DEEP LINK from a Continue-Watching series card (?id=<series>&s=2&ep=3) ──
+    // Stamp the episode metadata BEFORE loadEmbed() so the player opens THAT
+    // episode directly (with its own saved position) instead of episode 1.
+    // The episodes grid then highlights it (initSeriesEpisodes reads these).
+    (function applyCwDeepLink() {
+      try {
+        const s = parseInt(urlParams.get('s') || '0', 10) || 0;
+        const ep = parseInt(urlParams.get('ep') || '0', 10) || 0;
+        if (!ep || !currentMovie) return;
+        currentMovie._episodeNum = ep;
+        currentMovie._episodeSeason = s || 1;
+        // Season-aware resume key — same format the episodes grid writes
+        currentMovie._episodeId = (currentMovie.id || movieId) + '-s' + (s || 1) + '-ep' + ep;
+        // Best-effort episode label; the real title (if any) is applied by the
+        // episodes grid when it finds the exact episode.
+        if (!currentMovie._episodeTitle) {
+          currentMovie._episodeTitle = currentMovie.title + ' - Episode ' + ep;
+        }
+        window.__dfxCwAutoOpen = { season: s || 1, episode: ep };
+      } catch (e) {}
+    })();
 
     // Start the video loader regardless of ?mode value.
     // The only supported special mode is 'trailer', which loadEmbed() handles.
