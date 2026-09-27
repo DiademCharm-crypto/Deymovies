@@ -1,6 +1,16 @@
 // ==========================================
 // DEYMFLIX - TV Series & Episodes Handler
 // (Filipino/English series. K-Drama series → kdrama-episode.js)
+//
+// MANUAL DOWNLOAD LINKS (optional, per series or per episode):
+//   Add to any series object:     manualDownload: "https://…/file.mp4",
+//                                 manualDownloadSub: "https://…/subs.srt"
+//   …or to a single episode:      manualDownload: "…", manualDownloadSub: "…"
+// The Download button prefers the episode link, then the series link,
+// then the direct CDN file, then embed stream capture. Titles with NO
+// link anywhere show a polite "cannot be downloaded" dialog.
+// Google Drive share links are also fine — the app converts them to
+// direct downloads automatically.
  // ==========================================
 
 const seriesData = [
@@ -602,6 +612,369 @@ const seriesData = [
           }
         ]
       },
+      {
+        seasonNumber: 5,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/5/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/5/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/5/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/5/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/5/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/5/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/5/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/5/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/5/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/5/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/5/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/5/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/5/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/5/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/5/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/5/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/5/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/5/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/5/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/5/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/5/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/5/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/5/23"
+          }
+      
+        ]
+      },
+      {
+        seasonNumber: 6,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/6/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/6/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/6/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/6/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/6/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/6/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/6/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/6/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/6/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/6/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/6/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/6/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/6/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/6/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/6/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/6/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/6/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/6/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/6/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/6/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/6/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/6/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/6/23"
+          }
+      
+        ]
+      },
+      {
+        seasonNumber: 7,
+        episodes: [
+          {
+            episodeNumber: 1,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/7/1"
+          },
+          {
+            episodeNumber: 2,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/7/2"
+          },
+          {
+            episodeNumber: 3,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/7/3"
+          },
+          {
+            episodeNumber: 4,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/7/4"
+          },
+          {
+            episodeNumber: 5,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/7/5"
+          },
+          {
+            episodeNumber: 6,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/7/6"
+          },
+          {
+            episodeNumber: 7,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/7/7"
+          },
+          {
+            episodeNumber: 8,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/7/8"
+          },
+          {
+            episodeNumber: 9,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/7/9"
+          },
+          {
+            episodeNumber: 10,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/7/10"
+          },
+          {
+            episodeNumber: 11,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/7/11"
+          },
+          {
+            episodeNumber: 12,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/7/12"
+          },
+          {
+            episodeNumber: 13,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/7/13"
+          },
+          {
+            episodeNumber: 14,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/7/14"
+          },
+          {
+            episodeNumber: 15,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/7/15"
+          },
+          {
+            episodeNumber: 16,
+            title: "Episode 8 - O Coxswain, My Coxswain",
+            embedUrl: "cos:tv/5920/7/16"
+          },
+          {
+            episodeNumber: 17,
+            title: "Episode 1 - The Catch",
+            embedUrl: "cos:tv/5920/7/17"
+          },
+          {
+            episodeNumber: 18,
+            title: "Episode 2 - The Hateful Eight",
+            embedUrl: "cos:tv/5920/7/18"
+          },
+          {
+            episodeNumber: 19,
+            title: "Episode 3 - Flight Crew",
+            embedUrl: "cos:tv/5920/7/19"
+          },
+          {
+            episodeNumber: 20,
+            title: "Episode 4 - True Rowmance",
+            embedUrl: "cos:tv/5920/7/20"
+          },
+          {
+            episodeNumber: 21,
+            title: "Episode 5 - Anatomy of a Fall Formal",
+            embedUrl: "cos:tv/5920/7/21"
+          },
+          {
+            episodeNumber: 22,
+            title: "Episode 6 - Bad Break",
+            embedUrl: "cos:tv/5920/7/22"
+          },
+          {
+            episodeNumber: 23,
+            title: "Episode 7 - Under Pressure",
+            embedUrl: "cos:tv/5920/7/23"
+          }
+      
+        ]
+      },
     ]
   },
 
@@ -871,6 +1244,11 @@ function playEpisodeSource(episode, season) {
     currentMovie._episodeNum = episode.episodeNumber || 1;
     currentMovie._episodeName = episode.title || '';
     currentMovie._subtitleUrl = episode.subtitleUrl || '';
+    // MANUAL DOWNLOAD LINK for this episode (falls back to the series-level
+    // link). Read by the Download button in app.js: manual link > direct
+    // file > embed capture > "cannot be downloaded" dialog.
+    currentMovie.manualDownload = episode.manualDownload || currentMovie.manualDownload || '';
+    currentMovie.manualDownloadSub = episode.manualDownloadSub || currentMovie.manualDownloadSub || '';
   }
 
   // Load a manually assigned subtitle file for this episode, if provided
