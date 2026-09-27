@@ -2193,30 +2193,89 @@ try {
     return url;
   }
 
+  // MANUAL DOWNLOAD LINKS (per movie/episode, optional):
+  //   1) window.__dfxDownloadLink / window.__dfxDownloadSub  — set by the
+  //      player for the CURRENT episode (manualDownload / manualDownloadSub
+  //      on the episode object) — most specific, wins first.
+  //   2) cm.manualDownload / cm.manualDownloadSub — on the movie object
+  //      (or per-episode before episode stamping overwrote it).
+  // Movies/series WITHOUT any manual link fall back to the embed stream
+  // capture, and if that is impossible the user gets a clear
+  // "cannot be downloaded" dialog.
+  function getCurrentManualDownload() {
+    const cm = window.__dfxCurrentMovie || null;
+    let url = (typeof window.__dfxDownloadLink === 'string' && window.__dfxDownloadLink) ||
+              (cm && cm.manualDownload) || '';
+    let sub = (typeof window.__dfxDownloadSub === 'string' && window.__dfxDownloadSub) ||
+              (cm && cm.manualDownloadSub) || '';
+    if (!url || !/^https?:/i.test(url)) return null;
+    return { url: url, sub: sub && /^https?:/i.test(sub) ? sub : '' };
+  }
+
   window.requestMovieDownload = function () {
-    const url = getCurrentDirectVideoUrl();
-    if (!url) { showToast('This title cannot be downloaded.'); return; }
     const titleEl = document.getElementById('current-title');
     let title = (titleEl && titleEl.textContent || 'Video').trim();
     // Episode downloads must match their subtitle file ("Series ep3")
     const cm0 = window.__dfxCurrentMovie || null;
     if (cm0 && cm0._episodeNum) title += ' ep' + cm0._episodeNum;
-    const qm = url.match(/(\d{3,4})p/);
-    const quality = qm ? qm[1] + 'p' : '';
+
+    // 1) MANUAL LINK — always beats everything (works in episodes AND movies)
+    const manual = getCurrentManualDownload();
+    if (manual) {
+      const qm2 = manual.url.match(/(\d{3,4})p/);
+      const quality2 = qm2 ? qm2[1] + 'p' : '';
+      try {
+        if (window.DeymflixApp && typeof window.DeymflixApp.requestDownload === 'function') {
+          window.DeymflixApp.requestDownload(manual.url, title, quality2, (cm0 && cm0.poster) || '');
+          return;
+        }
+      } catch (e) { /* fall through to link fallback */ }
+      const a2 = document.createElement('a');
+      a2.href = manual.url;
+      a2.rel = 'noopener';
+      document.body.appendChild(a2);
+      a2.click();
+      a2.remove();
+      return;
+    }
+
+    // 2) DIRECT FILE currently playing (CDN mp4/mkv episodes, movies)
+    const url = getCurrentDirectVideoUrl();
+    if (url) {
+      const qm = url.match(/(\d{3,4})p/);
+      const quality = qm ? qm[1] + 'p' : '';
+      try {
+        if (window.DeymflixApp && typeof window.DeymflixApp.requestDownload === 'function') {
+          window.DeymflixApp.requestDownload(url, title, quality, (cm0 && cm0.poster) || '');
+          return;
+        }
+      } catch (e) { /* fall through to link fallback */ }
+      // Fallback: a plain navigable link -- the app's DownloadListener catches it
+      const a = document.createElement('a');
+      a.href = url;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return;
+    }
+
+    // 3) EMBED playing — IDM-style stream capture (native engine).
+    // The player.html capture-phase hook already armed it + showed the
+    // badge when _cosActive; only call the bridge ourselves if that hook
+    // is somehow missing (avoids double "waiting for stream" toasts).
     try {
-      if (window.DeymflixApp && typeof window.DeymflixApp.requestDownload === 'function') {
-        const cm = window.__dfxCurrentMovie || null;
-        window.DeymflixApp.requestDownload(url, title, quality, (cm && cm.poster) || '');
+      if (window._cosActive && window.DeymflixApp &&
+          typeof window.DeymflixApp.requestEmbedDownload === 'function') {
+        const _dlb = document.getElementById('download-btn');
+        if (!_dlb || !_dlb._cosHooked) window.DeymflixApp.requestEmbedDownload();
         return;
       }
-    } catch (e) { /* fall through to link fallback */ }
-    // Fallback: a plain navigable link -- the app's DownloadListener catches it
-    const a = document.createElement('a');
-    a.href = url;
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    } catch (e) { /* fall through */ }
+
+    // 4) Nothing downloadable — clear branded dialog instead of a silent no
+    if (typeof dfxShowNoDownloadDialog === 'function') { dfxShowNoDownloadDialog(title); return; }
+    showToast('This title cannot be downloaded.');
   };
 
   function addDownloadButton() {
