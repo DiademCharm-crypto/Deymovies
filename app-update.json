@@ -1,13 +1,13 @@
 {
   "version": "1.6",
-  "code": 3,
+  "code": 4,
   "released": "2026-09-27",
-  "url": "apk/Deymflix-v1.6-r2.apk",
+  "url": "apk/Deymflix-v1.6-r3.apk",
   "notes": [
-    "IMPORTANT: if install fails, uninstall the old version first (one time only)",
-    "Built-in ad & tracker firewall — no more ad redirects",
-    "Splash & offline screen fixes — no more white flash",
-    "CinemaOS & VidLink embed playback",
-    "Download management improvements"
+    "Improved embed downloader — catches more stream types (CinemaOS, VidLink and others)",
+    "Faster stream lock-on when you tap Download during an episode",
+    "Report tab in the player — tell us about broken videos or missing downloads",
+    "Manual download links & subtitles supported per movie and per episode",
+    "Built-in ad & tracker firewall, splash and offline fixes"
   ]
 }
