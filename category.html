@@ -122,12 +122,12 @@
 
   <script src="config.js?v=2.0"></script>
   <script src="security.js?v=2.1"></script>
-  <script src="reels-data.js?v=151.0"></script>
-    <script src="filipino-movies.js?v=1.1"></script>
-    <script src="kdramas.js?v=1.0"></script>
+  <script src="reels-data.js?v=151.3"></script>
+    <script src="filipino-movies.js?v=1.7"></script>
+    <script src="kdramas.js?v=1.1"></script>
     <script src="episodes.js?v=1.8"></script>
     <script src="kdrama-episode.js?v=1.0"></script>
-  <script src="app.js?v=160.9"></script>
+  <script src="app.js?v=160.13"></script>
   <script>
     let currentPage = 1;
     const itemsPerPage = 18;
@@ -177,7 +177,10 @@
         if (historyBtn) historyBtn.style.display = 'none';
       } else {
         titleElement.textContent = 'All Movies';
-        itemsList = typeof movies !== 'undefined' ? movies : [];
+        // Newest-first: the All Movies listing runs from the latest release down to the oldest.
+        itemsList = typeof movies !== 'undefined'
+          ? (typeof dfxSortByNewest === 'function' ? dfxSortByNewest(movies) : movies)
+          : [];
         const historyBtn = document.getElementById('btn-reel-history');
         if (historyBtn) historyBtn.style.display = 'none';
       }

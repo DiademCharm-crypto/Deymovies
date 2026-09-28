@@ -2447,6 +2447,21 @@
 
     <div id="player-poster-blur" class="player-poster-blur"></div>
 
+    <!-- COS "LOADING STREAM" OVERLAY: shown while a CinemaOS embed boots.
+         Closes ONLY when the provider reports playback (play/time postMessage)
+         — or after the same 20s belt-and-braces the poster backdrop uses, so
+         providers that never postMessage can't trap the user here. -->
+    <div id="cos-load-overlay">
+      <div class="cl-stage">
+        <div class="cl-ring"></div>
+        <img class="cl-logo" src="favicon.svg" alt="DEYMFLIX">
+      </div>
+      <div class="cl-brand">DEYM<em>FLIX</em></div>
+      <div class="cl-label" id="cos-load-label">Loading Stream</div>
+      <div class="cl-hint" id="cos-load-hint">Contacting provider…</div>
+      <div class="cl-bar"><div class="cl-bar-fill" id="cos-load-bar"></div></div>
+    </div>
+
     <style>
       .player-poster-blur {
         position: absolute;
@@ -2469,6 +2484,91 @@
          taps pass straight through to the embed. */
       body.cos-mode .player-poster-blur {
         z-index: 1200 !important;
+      }
+
+      /* ── COS "Loading Stream" overlay ──
+         Branded boot screen for CinemaOS embeds: animated logo (float +
+         orbiting ring, same as app.html), DEYMFLIX wordmark, Loading Stream
+         label and a signal-driven progress bar. Sits ABOVE the provider
+         iframe (z 1000) and poster backdrop (z 1200) but BELOW the back
+         button (2147483000) so the user can always bail out. */
+      #cos-load-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2147482990;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8, 8, 10, 0.93);
+        pointer-events: auto;
+        opacity: 1;
+        transition: opacity 0.45s ease;
+      }
+      #cos-load-overlay.active { display: flex; }
+      #cos-load-overlay.fading { opacity: 0; }
+      #cos-load-overlay .cl-stage { position: relative; width: 132px; height: 132px; }
+      #cos-load-overlay .cl-ring {
+        position: absolute; inset: -12px;
+        border: 1px solid rgba(229, 9, 20, 0.35);
+        border-radius: 22px;
+        animation: cl-spin 8s linear infinite;
+      }
+      #cos-load-overlay .cl-ring::before {
+        content: ""; position: absolute; top: -4px; left: 50%;
+        width: 8px; height: 8px; background: #e50914; border-radius: 50%;
+        box-shadow: 0 0 12px #ff4d55;
+      }
+      #cos-load-overlay .cl-logo {
+        width: 100%; height: 100%; border-radius: 26px;
+        box-shadow: 0 24px 70px rgba(229, 9, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+        animation: cl-float 5s ease-in-out infinite;
+      }
+      @keyframes cl-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+      @keyframes cl-spin { to { transform: rotate(360deg); } }
+      #cos-load-overlay .cl-brand {
+        margin-top: 18px;
+        font: 800 1.35rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
+        letter-spacing: 0.5px; color: #fff;
+      }
+      #cos-load-overlay .cl-brand em { color: #e50914; font-style: normal; }
+      #cos-load-overlay .cl-label {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.8);
+        font: 600 0.95rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
+        letter-spacing: 0.3px;
+        animation: cl-pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes cl-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+      #cos-load-overlay .cl-hint {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.45);
+        font: 500 0.74rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      #cos-load-overlay .cl-bar {
+        margin-top: 22px;
+        width: min(64%, 260px); height: 4px;
+        border-radius: 99px; background: rgba(255, 255, 255, 0.14);
+        overflow: hidden;
+      }
+      #cos-load-overlay .cl-bar-fill {
+        height: 100%; width: 0%; border-radius: 99px;
+        background: linear-gradient(90deg, #e50914, #ff4d55);
+        transition: width 0.5s ease;
+        position: relative;
+      }
+      #cos-load-overlay .cl-bar-fill::after {
+        content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 36px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5));
+        animation: cl-shimmer 1.4s linear infinite;
+      }
+      @keyframes cl-shimmer { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+
+      /* Ad overlay in COS mode must sit ABOVE the provider iframe (z 1000),
+         the poster backdrop (z 1200) and the Loading Stream overlay —
+         otherwise ads play "nowhere" while the embed covers them. */
+      body.cos-mode #vast-ad-overlay.active {
+        z-index: 2147483600;
       }
 
       /* ── Codec unsupported screen ── */
@@ -3017,9 +3117,9 @@
   </script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
 <script src="security.js?v=2.1"></script>
-    <script src="filipino-movies.js?v=1.3"></script>
-    <script src="kdramas.js?v=1.0"></script>
-  <script src="app.js?v=160.9"></script>
+    <script src="filipino-movies.js?v=1.7"></script>
+    <script src="kdramas.js?v=1.1"></script>
+  <script src="app.js?v=160.13"></script>
   <script src="episodes.js?v=1.8"></script>
   <script src="kdrama-episode.js?v=1.0"></script>
   <script>
@@ -3091,27 +3191,47 @@
     const safeMoviesList = (typeof movies !== 'undefined' && Array.isArray(movies)) ? movies : [];
     const safeFeaturedList = (typeof featuredMovies !== 'undefined' && Array.isArray(featuredMovies)) ? featuredMovies : [];
     // IDs can drift between dash and space variants ("Crew-Girl" vs "Crew Girl"),
-    // so an exact-id miss falls back to a normalized match before giving up —
-    // otherwise a stale link silently shows movies[0]'s data.
+    // so an exact-id miss falls back to a normalized match. When nothing
+    // matches at all the page must NOT quietly show another title (movies[0]
+    // used to be substituted here, so a dead link played a random movie).
     const normIdKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const wantedKey = normIdKey(movieId);
-    const currentMovie = safeMoviesList.find(m => m.id === movieId) || 
-                         safeFeaturedList.find(m => m.id === movieId) || 
-                         (wantedKey ? (
-                           safeMoviesList.find(m => normIdKey(m.id) === wantedKey) ||
-                           safeFeaturedList.find(m => normIdKey(m.id) === wantedKey) ||
-                           safeMoviesList.find(m => normIdKey(m.title) === wantedKey)
-                         ) : null) ||
-                         safeMoviesList[0] || 
-                         { 
-                           id: movieId || 'fallback', 
-                           title: 'The Runner', 
-                           imdbId: 'tt634649', 
-                           synopsis: '', 
+    // History entries for series carry an episode suffix ("Crew-Girl-ep3").
+    const baseIdKey = normIdKey(String(movieId || '').replace(/-ep\d+$/i, ''));
+    const matchByKey = (key) => key
+      ? (safeMoviesList.find(m => normIdKey(m.id) === key) || safeFeaturedList.find(m => normIdKey(m.id) === key))
+      : null;
+    const matchedMovie = safeMoviesList.find(m => m.id === movieId) ||
+                         safeFeaturedList.find(m => m.id === movieId) ||
+                         matchByKey(wantedKey) ||
+                         (baseIdKey !== wantedKey ? matchByKey(baseIdKey) : null) ||
+                         (wantedKey ? safeMoviesList.find(m => normIdKey(m.title) === wantedKey) : null);
+    const movieMissing = !matchedMovie;
+    const currentMovie = matchedMovie || {
+                           id: movieId || 'missing',
+                           title: 'Title not found',
+                           imdbId: '',
+                           synopsis: '',
                            poster: 'https://via.placeholder.com/300x450?text=DEYMFLIX',
                            manualEmbed: '',
-                           trailerEmbed: ''
+                           trailerEmbed: '',
+                           __missing: true
                          };
+
+    if (movieMissing) {
+      try {
+        const box = document.getElementById('video-info-box') || document.body;
+        const notice = document.createElement('div');
+        notice.id = 'dfx-title-missing';
+        notice.style.cssText = 'margin:16px auto;max-width:520px;padding:16px 18px;border:1px solid #e50914;border-radius:12px;background:#1b1b1b;color:#fff;font-size:14px;line-height:1.6;text-align:center';
+        notice.innerHTML = 'That title isn\u2019t in the catalog any more.' +
+          (movieId ? ' <span style="opacity:.7">(' + String(movieId).slice(0, 60).replace(/[<>&]/g, '') + ')</span>' : '') +
+          '<br><a href="index.html" style="color:#e50914;font-weight:700">Browse the catalog \u276F</a>';
+        if (box.parentNode) box.parentNode.insertBefore(notice, box); else document.body.appendChild(notice);
+        if (typeof showToast === 'function') showToast('Title not found');
+      } catch (e) {}
+      setTimeout(() => { window.location.replace('index.html'); }, 4000);
+    }
 
     document.getElementById('current-title').textContent = currentMovie.title;
     document.getElementById('overlay-movie-title').textContent = currentMovie.title;
@@ -3363,25 +3483,41 @@
     }
 
     function getMovieYear(movie) {
+      if (!movie) return '';
+      // The catalog's own release date is authoritative — it is what the
+      // rating/date row shows. The stream/trailer filenames are only a
+      // fallback (series streams rarely carry a year at all).
+      const fromDate = String(movie.releaseDate || '').match(/(19|20)\d{2}/);
+      if (fromDate) return fromDate[0];
       let hay = ((movie.manualEmbed || '') + ' ' + (movie.trailerEmbed || ''));
       try { hay = decodeURIComponent(hay); } catch (e) {}
       const m = hay.match(/(19|20)\d{2}/);
       return m ? m[0] : '';
     }
 
-    function synopsisCacheGet(movieId) {
+    // v2: entries written while a title's year was unknown could belong to a
+    // different film with a similar name, so the key was bumped and each entry
+    // now records the year it was fetched with.
+    const SYNOPSIS_CACHE_KEY = 'deymflix_synopsis_cache_v2';
+
+    function synopsisCacheGet(movieId, year) {
       try {
-        const cache = JSON.parse(localStorage.getItem('deymflix_synopsis_cache') || '{}');
-        if (cache[movieId] && cache[movieId].text) return cache[movieId].text;
+        const cache = JSON.parse(localStorage.getItem(SYNOPSIS_CACHE_KEY) || '{}');
+        const hit = cache[movieId];
+        if (!hit || !hit.text) return '';
+        // Cached without a year, or against a different year? Refetch — it may
+        // be another film's plot that merely shared a word in the title.
+        if ((hit.year || '') !== (year || '')) return '';
+        return hit.text;
       } catch (e) {}
       return '';
     }
 
-    function synopsisCacheSet(movieId, text) {
+    function synopsisCacheSet(movieId, text, year) {
       try {
-        const cache = JSON.parse(localStorage.getItem('deymflix_synopsis_cache') || '{}');
-        cache[movieId] = { text: text, ts: Date.now() };
-        localStorage.setItem('deymflix_synopsis_cache', JSON.stringify(cache));
+        const cache = JSON.parse(localStorage.getItem(SYNOPSIS_CACHE_KEY) || '{}');
+        cache[movieId] = { text: text, ts: Date.now(), year: year || '' };
+        localStorage.setItem(SYNOPSIS_CACHE_KEY, JSON.stringify(cache));
       } catch (e) {}
     }
 
@@ -3409,11 +3545,19 @@
 
     function wikipediaSearchMatches(resultTitle, movieTitle) {
       const stop = new Set(['the', 'a', 'an', 'and', 'of', 'in', 'on', 'to', 'for', 'with', 'vs', 'versus', 'live', 'action']);
-      const tokens = movieTitle.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
-        .filter(t => t.length >= 4 && !stop.has(t));
+      const words = (s) => String(s || '').replace(/\([^)]*\)/g, ' ').toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+      const titleWords = words(movieTitle);
+      const tokens = titleWords.filter(t => t.length >= 4 && !stop.has(t));
       if (tokens.length === 0) return true;
-      const lowerResult = resultTitle.toLowerCase();
-      return tokens.some(t => lowerResult.indexOf(t) !== -1);
+      const resultWords = words(resultTitle).filter(w => w.length >= 4 && !stop.has(w));
+      if (resultWords.length === 0) return false;
+      // Reject a page that adds words the film's own title never had: searching
+      // "The Scandal" must not accept "Notes on a Scandal" just because both
+      // contain "scandal".
+      const titleSet = new Set(titleWords);
+      if (!resultWords.every(w => titleSet.has(w))) return false;
+      return tokens.some(t => words(resultTitle).indexOf(t) !== -1);
     }
 
     let lastWikipediaExtract = '';
@@ -3471,7 +3615,8 @@
         return;
       }
 
-      const cached = synopsisCacheGet(currentMovie.id);
+      const movieYear = getMovieYear(currentMovie);
+      const cached = synopsisCacheGet(currentMovie.id, movieYear);
       if (cached) {
         descElement.textContent = cached;
         checkSynopsisLength();
@@ -3501,7 +3646,7 @@
 
       if (synopsis) {
         descElement.textContent = synopsis;
-        synopsisCacheSet(currentMovie.id, synopsis);
+        synopsisCacheSet(currentMovie.id, synopsis, movieYear);
         checkSynopsisLength();
         return;
       }
@@ -3715,7 +3860,10 @@
     function updateTrailerTab() {
       const tab = document.getElementById('pc-tab-trailer');
       if (!tab) return;
-      const show = hasOwnVideoFile() && hasTrailerSource();
+      // Any title with a trailer gets the tab. (It used to also require the
+      // movie to have its own video file -- which hid trailers for catalog
+      // entries whose playback link is added later.)
+      const show = hasTrailerSource();
       tab.style.display = show ? '' : 'none';
       if (!show) pcUnmountTrailer();
     }
@@ -3821,6 +3969,37 @@
       btn.disabled = false;
     };
 
+    /* Bundled metadata first (release date + IMDb rating shipped with the
+       catalog entry). Details from the lookup API then enrich the box; when
+       that backend is unreachable (static hosting has no /api), these values
+       are all the user sees — so the info box never looks empty. */
+    function pcApplyStaticMeta() {
+      try {
+        if (!currentMovie) return;
+        const releaseEl = document.getElementById('pc-release');
+        const metaRow = document.getElementById('pc-meta-row');
+        if (releaseEl && currentMovie.releaseDate && !String(releaseEl.textContent || '').trim()) {
+          releaseEl.textContent = pcDateLabel(currentMovie.releaseDate) || currentMovie.releaseDate;
+          if (metaRow) metaRow.classList.add('is-ready');
+        }
+        const score = Math.round(Number(currentMovie.rating || 0) * 10) / 10;
+        const ratingRow = document.getElementById('pc-rating-row');
+        if (ratingRow && score > 0 && !ratingRow.classList.contains('is-ready')) {
+          const scoreEl = document.getElementById('pc-score');
+          const starsEl = document.getElementById('pc-stars');
+          // The markup ships a placeholder "0" inside #pc-score, so an
+          // emptiness test would never fire and the row would show 0 for every
+          // title on hosts without the metadata API. Treat the placeholder as
+          // empty and only keep a real value that is already there.
+          const shown = scoreEl ? String(scoreEl.textContent || '').trim() : '';
+          if (scoreEl && (shown === '' || shown === '0')) scoreEl.textContent = String(score);
+          if (starsEl && !String(starsEl.innerHTML || '').trim()) starsEl.innerHTML = pcStars(score);
+          const railScore = pcGetRailScore();
+          if (!(railScore > 0 && pcIsDesktop())) ratingRow.classList.add('is-ready');
+        }
+      } catch (e) { }
+    }
+
     function pcApplyDetails(d) {
       const box = document.getElementById('video-info-box');
 
@@ -3839,8 +4018,9 @@
       const metaRow = document.getElementById('pc-meta-row');
       const releaseEl = document.getElementById('pc-release');
       const runtimeEl = document.getElementById('pc-runtime');
-      const releaseText = pcDateLabel(d.releaseDate) ||
-        pcDateLabel(currentMovie && currentMovie.releaseDate);
+      // bundled date first (exact), lookup date as the fallback
+      const releaseText = pcDateLabel(currentMovie && currentMovie.releaseDate) ||
+        pcDateLabel(d.releaseDate);
       const runtimeMinutes = d.runtime ||
         (typeof cachedDuration === 'number' && cachedDuration ? Math.round(cachedDuration / 60) : 0);
       const runtimeText = pcRuntimeLabel(runtimeMinutes);
@@ -3858,12 +4038,20 @@
       // movie (otherwise it would appear twice); always shown on mobile.
       const railScore = pcGetRailScore();
       const ratingRow = document.getElementById('pc-rating-row');
-      if (ratingRow && Number(d.score) > 0) {
+      // Score source: the metadata lookup first, then the bundled rating on
+      // the movie object itself (catalog entries ship their IMDb score, so
+      // the rating still shows when the lookup backend is unavailable --
+      // e.g. on static hosting where /api does not exist).
+      // Bundled rating wins when the entry ships one (catalog entries carry
+      // their TMDB/IMDb score); the lookup score covers everything else.
+      const staticScore = Number((currentMovie && currentMovie.rating) || 0);
+      const useScore = staticScore > 0 ? staticScore : (Number(d.score) > 0 ? Number(d.score) : 0);
+      if (ratingRow && useScore > 0) {
         const scoreEl = document.getElementById('pc-score');
         const starsEl = document.getElementById('pc-stars');
         const votesEl = document.getElementById('pc-votes');
-        if (scoreEl) scoreEl.textContent = String(Math.round(Number(d.score) * 10) / 10);
-        if (starsEl) starsEl.innerHTML = pcStars(d.score);
+        if (scoreEl) scoreEl.textContent = String(Math.round(useScore * 10) / 10);
+        if (starsEl) starsEl.innerHTML = pcStars(useScore);
         if (votesEl) {
           votesEl.textContent = Number(d.votes) > 0
             ? Number(d.votes).toLocaleString() + (Number(d.votes) === 1 ? ' vote' : ' votes')
@@ -4276,6 +4464,9 @@
         if (pcIsDesktop()) loadPcDetails();
       }, 400);
     });
+
+    // bundled date/rating render immediately — the API lookup only enriches
+    try { pcApplyStaticMeta(); } catch (eS) { }
 
     loadBroadSynopsis().then(() => {
       loadMovieGenre();
@@ -6115,8 +6306,8 @@
     // providers below are ordered English-first, and "@key" pins one.
     // ═══════════════════════════════════════════════════════════════
     const COS_PROVIDERS = {
-      videasy:   (t, id, s, e) => `https://player.videasy.net/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?color=8B0000&autoplay=true&autoplayNextEpisode=false`,
-      vidlink:   (t, id, s, e) => `https://vidlink.pro/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?primaryColor=e50914&secondaryColor=8B0000&iconColor=f5f5f1&icons=default&player=default&title=true&poster=true&autoplay=true&nextbutton=false`,
+      videasy:   (t, id, s, e) => `https://player.videasy.net/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?color=8B0000&autoplay=true&mute=false&autoplayNextEpisode=false`,
+      vidlink:   (t, id, s, e) => `https://vidlink.pro/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?primaryColor=e50914&secondaryColor=8B0000&iconColor=f5f5f1&icons=default&player=default&title=true&poster=true&autoplay=true&mute=false&nextbutton=false`,
       autoembed: (t, id, s, e) => `https://player.autoembed.cc/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoplay=true`,
       vidsrc:    (t, id, s, e) => `https://vidsrc.in/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoplay=true`,
       vidsrccc:  (t, id, s, e) => `https://vidsrc.cc/v3/embed/${t}/${id}${t === 'tv' ? '/' + s + '/' + e : ''}?autoPlay=true`,
@@ -6181,6 +6372,71 @@
         } catch (e) {}
       }
       return null;
+    }
+
+    // ── COS "LOADING STREAM" OVERLAY STATE ──
+    // Shown the instant a CinemaOS embed mounts; closed ONLY when the provider
+    // reports actual playback (play/time postMessage) — or after the same
+    // belt-and-braces timeout the poster backdrop uses, so providers that
+    // never postMessage can't trap the user on the loader forever.
+    var cosLoadBarTimer = null;
+    var cosLoadFailTimer = null;
+    function cosLoadShow() {
+      var ov = document.getElementById('cos-load-overlay');
+      if (!ov) return;
+      window._cosStreamLive = false; // (re)arm: only a real playback signal closes early
+      ov.classList.remove('fading');
+      ov.classList.add('active');
+      var lbl = document.getElementById('cos-load-label');
+      var hint = document.getElementById('cos-load-hint');
+      var bar = document.getElementById('cos-load-bar');
+      if (lbl) lbl.textContent = 'Loading Stream';
+      if (hint) hint.textContent = 'Contacting provider…';
+      if (bar) bar.style.width = '0%';
+      // Signal-shaped progress: provider frames typically resolve sources in
+      // 2–8s; the bar moves in that shape and then creeps — it is cosmetic
+      // only, the REAL close condition is the playback signal below.
+      if (cosLoadBarTimer) clearInterval(cosLoadBarTimer);
+      var p = 0;
+      cosLoadBarTimer = setInterval(function () {
+        p = p < 55 ? p + 5 : p < 80 ? p + 2 : p < 92 ? p + 1 : p;
+        if (bar) bar.style.width = Math.min(p, 92) + '%';
+      }, 400);
+      // Ladder of honest hints — mirrors the real handshake stages.
+      var hints = ['Contacting provider…', 'Resolving stream sources…', 'Selecting best quality…', 'Buffering video…', 'Almost ready…'];
+      var hi = 0;
+      if (cosLoadHintTimer) clearInterval(cosLoadHintTimer);
+      cosLoadHintTimer = setInterval(function () {
+        hi = Math.min(hi + 1, hints.length - 1);
+        if (hint) hint.textContent = hints[hi];
+      }, 5000);
+    }
+    var cosLoadHintTimer = null;
+    function cosLoadHide(instant) {
+      var ov = document.getElementById('cos-load-overlay');
+      if (cosLoadBarTimer) { clearInterval(cosLoadBarTimer); cosLoadBarTimer = null; }
+      if (cosLoadHintTimer) { clearInterval(cosLoadHintTimer); cosLoadHintTimer = null; }
+      if (cosLoadFailTimer) { clearTimeout(cosLoadFailTimer); cosLoadFailTimer = null; }
+      if (!ov || !ov.classList.contains('active')) return; // already hidden: pure no-op
+      window._cosStreamLive = true;
+      var bar = document.getElementById('cos-load-bar');
+      if (bar) bar.style.width = '100%';
+      var finish = function () {
+        ov.classList.remove('active', 'fading');
+      };
+      if (instant) { finish(); return; }
+      ov.classList.add('fading');
+      setTimeout(finish, 460);
+    }
+    function cosLoadArmFailSafe() {
+      // Same 20s the poster backdrop uses. If NO playback signal arrived by
+      // then (some providers never postMessage), stop pretending — drop the
+      // loader, the provider UI/poster backdrop takes over from there.
+      if (cosLoadFailTimer) clearTimeout(cosLoadFailTimer);
+      cosLoadFailTimer = setTimeout(function () {
+        cosLoadFailTimer = null;
+        if (!window._cosStreamLive) cosLoadHide(); // works for direct files AND embeds
+      }, 20000);
     }
 
     function mountCosEmbed(src) {
@@ -6281,6 +6537,10 @@
 
       hidePlayerPosterBlur();
       hideLoadingSpinner();
+      // Loading Stream overlay: from this instant until the stream plays.
+      window._cosStreamLive = false;
+      cosLoadShow();
+      cosLoadArmFailSafe();
 
       // One class hides ALL our chrome (bars, sliders, badges, panels) via CSS,
       // so nothing can re-show an individual control afterwards.
@@ -6387,6 +6647,14 @@
           var raw = typeof ev.data === 'string' ? ev.data : JSON.stringify(ev.data || '');
           if (/play|time/i.test(raw)) hidePlayerPosterBlur();      // every VidLink PLAYER_EVENT is another chance to unmute
           if (raw.indexOf('PLAYER_EVENT') !== -1) { try { cosPumpUnmute(); } catch (e) {} }
+          // STREAM IS LIVE: the provider confirms actual playback. This is
+          // the ONLY condition that closes the Loading Stream overlay early
+          // (plus the 20s failsafe for providers that never postMessage).
+          if (!window._cosStreamLive && /(playing|timeupdate|video_started|"time"|start_?play)/i.test(raw)) {
+            window._cosStreamLive = true;
+            cosLoadHide();
+            try { if (window._cosShowSoundChip) window._cosShowSoundChip(); } catch (eC) {} // offer sound the moment the stream is live
+          }
         } catch (e) {}
       });
 
@@ -6435,9 +6703,11 @@
         try { win = document.getElementById('main-iframe') && document.getElementById('main-iframe').contentWindow; } catch (e) {}
         if (!win) return;
         var shapes = [
+          { type: 'command', data: { command: 'setMuted', value: false } },
           { type: 'command', data: { command: 'unmute' } },
           { type: 'command', data: { command: 'play' } },
           { type: 'unmute' },
+          { type: 'setMuted', value: false },
           { method: 'setVolume', value: 1 },
           JSON.stringify({ method: 'setVolume', value: 1 }),
           JSON.stringify({ method: 'unmute' }),
@@ -6454,9 +6724,75 @@
       // must outlive the boot phase to re-unmute every episode.
       var cosPumpTimer = setInterval(function () {
         if (!window._cosActive) { clearInterval(cosPumpTimer); window._cosPumpTimer = null; return; }
+        // MUTED-BOOT FALLBACK: unmuted autoplay inside a cross-origin iframe is
+        // denied without user activation (navigation doesn't count), so the
+        // provider can sit on its poster forever. Muted autoplay is allowed —
+        // after a few seconds without a playback signal, send mute→play so the
+        // stream actually starts; the pump below keeps unmuting afterwards.
+        if (!window._cosStreamLive && cosPumpCount === 3) {
+          try {
+            var wb = document.getElementById('main-iframe') && document.getElementById('main-iframe').contentWindow;
+            if (wb) [
+              { type: 'command', data: { command: 'mute' } },
+              { type: 'mute' },
+              JSON.stringify({ method: 'setVolume', value: 0 }),
+              { type: 'command', data: { command: 'play' } },
+              { type: 'play' },
+              'play'
+            ].forEach(function (s) { try { wb.postMessage(s, '*'); } catch (e2) {} });
+          } catch (e) {}
+        }
         if (cosPumpCount <= 30 || cosPumpCount % 5 === 0) cosPumpUnmute();
       }, 2000);
       window._cosPumpTimer = cosPumpTimer;
+
+      // ── TAP-DRIVEN UNMUTE ──
+      // Any tap on the embed is a fresh user activation: providers that booted
+      // muted (their default) can be unmuted on the spot — repost the unmute
+      // command shapes for a couple of seconds right after the tap.
+      try {
+        ['click', 'touchend'].forEach(function (evt) {
+          cosIfr.addEventListener(evt, function () {
+            if (!window._cosActive) return;
+            var n = 0;
+            var t = setInterval(function () {
+              n++;
+              if (n > 3 || !window._cosActive) { clearInterval(t); return; }
+              try { cosPumpUnmute(); } catch (e) {}
+            }, 700);
+          }, true);
+        });
+      } catch (eTap) {}
+
+      // ── SOUND CHIP ──
+      // VidLink's API is one-way (no volume state comes back), but their
+      // players boot muted by default and silent autoplay is what actually
+      // starts. If the stream went live and the user hasn't tapped the embed,
+      // offer a one-tap unmute — the tap is a real activation, so the reposted
+      // unmute commands are allowed to take effect. Auto-dismisses.
+      try {
+        var chip = document.createElement('button');
+        chip.id = 'cos-unmute-chip';
+        chip.innerHTML = '&#128266; Tap for sound';
+        chip.style.cssText = 'position:absolute;bottom:18px;right:18px;z-index:2147483000;display:none;'
+          + 'padding:10px 16px;border:none;border-radius:99px;background:rgba(229,9,20,0.92);color:#fff;'
+          + 'font:700 14px -apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer;pointer-events:auto;'
+          + 'box-shadow:0 4px 18px rgba(0,0,0,0.5);';
+        chip.onclick = function (ev) {
+          ev.stopPropagation();
+          try { cosPumpUnmute(); } catch (e) {}
+          setTimeout(function () { try { cosPumpUnmute(); } catch (e2) {} }, 400);
+          try { chip.remove(); } catch (e3) {}
+        };
+        playerContainer.appendChild(chip);
+        window._cosShowSoundChip = function () {
+          if (!window._cosActive || !chip.parentNode) return;
+          chip.style.display = 'block';
+          setTimeout(function () { try { if (chip.parentNode) chip.remove(); } catch (e) {} }, 20000);
+        };
+        // Fallback for providers that never postMessage: offer the chip anyway.
+        setTimeout(function () { if (window._cosStreamLive && window._cosShowSoundChip) window._cosShowSoundChip(); }, 8000);
+      } catch (eChip) {}
 
       // ── HilltopAds on embeds ──
       // The direct-file VAST trigger listens to OUR <video> timeupdate, which
@@ -6546,6 +6882,7 @@
     // would be blocked), park the COS url behind a poster + big play button.
     // The tap IS the gesture — window.open from its handler succeeds.
     function showCosPlayGate(pendingUrl) {
+      cosLoadHide(true); // the gate is the interactive wait state — loader must not cover it
       try {
         let gate = document.getElementById('cos-play-gate');
         if (gate) { gate.remove(); }
@@ -6606,9 +6943,12 @@
       try { if (window._cosHijackGuard) window._cosHijackGuard.disarm(); } catch (e) {}
       document.body.classList.remove('cos-mode');
       hidePlayerPosterBlur(); // clear the COS loading backdrop
+      cosLoadHide(true); // drop the Loading Stream overlay too
+      window._cosStreamLive = false;
       if (window._cosAdTimer) { clearInterval(window._cosAdTimer); window._cosAdTimer = null; }
       if (window._cosPumpTimer) { clearInterval(window._cosPumpTimer); window._cosPumpTimer = null; }
       try { var _uc = document.getElementById('cos-unmute-chip'); if (_uc) _uc.remove(); } catch (e) {} // harmless if absent
+      window._cosShowSoundChip = null;
       window._cosAdPhase = 0;
       window._cosWatchSecs = 0;
       const back = document.getElementById('cos-back-btn');
@@ -6818,8 +7158,16 @@
     directPlayer.addEventListener('error', function() {
       if (directPlayer.src && directPlayer.style.display !== 'none') {
         hideLoadingSpinner();
+        cosLoadHide(true); // never leave the Loading Stream overlay up on a dead file
         showToast('Video failed to load. The file may be unavailable or in an unsupported format.');
       }
+    });
+
+    // REAL PLAYBACK closes the Loading Stream overlay for direct files —
+    // 'playing' means frames are actually rendering (not just canplay).
+    // No-op when the overlay isn't up (quality switches, ad resumes, etc.).
+    directPlayer.addEventListener('playing', function () {
+      if (!window._cosActive) cosLoadHide();
     });
 
     // ── Runtime black-screen detector ──
@@ -7033,6 +7381,11 @@
 
         if (!hlsActive) directPlayer.src = targetUrl;
         startBlackScreenWatch(targetUrl);
+
+        // Loading Stream overlay: covers the boot of every direct file
+        // (movie or series episode, mp4 or HLS) until real playback fires.
+        cosLoadShow();
+        cosLoadArmFailSafe();
 
         attemptAutoUnmute();
         showControls();
@@ -7450,6 +7803,89 @@
     let vastLoadGuard = null;
     let vastCountdown = null;
     let vastTimeLeft = 7;
+
+    // ── FULLSCREEN-SAFE AD PLACEMENT ──
+    // The ad overlay lives inside #playerContainer. If fullscreen is held by
+    // anything OUTSIDE that subtree — most importantly the COS provider iframe
+    // fullscreened via ITS OWN button — the overlay can never paint: the ad
+    // runs invisibly under the top layer while the movie keeps playing, and
+    // the user only sees it after manually exiting fullscreen. Fix:
+    //   · fullscreen held by OUR subtree → re-parent the overlay INTO the
+    //     fullscreen element so it paints in the top layer;
+    //   · fullscreen held by a FOREIGN element (provider iframe) → auto-exit
+    //     fullscreen for the ad (pause the embed), then restore fullscreen on
+    //     that same element when the ad is skipped/finished.
+    const vastAdHome = playerContainer;
+    let vastPreFsEl = null;
+    let vastPreFsReturn = false;
+    function vastFsHost() {
+      return document.fullscreenElement || document.webkitFullscreenElement
+        || document.mozFullScreenElement || document.msFullscreenElement || null;
+    }
+    function vastAdReparent() {
+      try {
+        const host = vastFsHost();
+        // Only playerContainer itself can host the overlay in fullscreen —
+        // descendants of an <iframe>/<video> fullscreen element never render
+        // (their children are fallback content), so those go the foreign route.
+        if (host === playerContainer) {
+          if (vastOverlay.parentElement !== playerContainer) playerContainer.appendChild(vastOverlay);
+        } else if (!host && vastOverlay.parentElement !== vastAdHome) {
+          vastAdHome.appendChild(vastOverlay);
+        }
+      } catch (e) {}
+    }
+    function vastAdRestore() {
+      try { if (vastOverlay.parentElement !== vastAdHome) vastAdHome.appendChild(vastOverlay); } catch (e) {}
+    }
+    function vastAdFsPrepare() {
+      const host = vastFsHost();
+      if (!host || host === playerContainer) { vastAdReparent(); return; }
+      // Foreign fullscreen (provider iframe via its own button, or our <video>
+      // element-fullscreen): the overlay can't paint there — exit fullscreen so
+      // the ad is visible, then restore fullscreen on the SAME element after.
+      vastPreFsEl = host;
+      vastPreFsReturn = true;
+      try {
+        (document.exitFullscreen || document.webkitExitFullscreen
+          || document.mozCancelFullScreen || document.msExitFullscreen || function () {}).call(document);
+      } catch (e) {}
+      // Pause the embed while the ad is on screen (best-effort: VidLink-style
+      // command shapes; other providers simply ignore them).
+      try {
+        var w = document.getElementById('main-iframe') && document.getElementById('main-iframe').contentWindow;
+        if (w) [{ type: 'command', data: { command: 'pause' } }, { type: 'pause' }, 'pause'].forEach(function (s) { try { w.postMessage(s, '*'); } catch (e2) {} });
+      } catch (e) {}
+    }
+    function vastAdRestoreFs() {
+      if (!vastPreFsReturn) return;
+      vastPreFsReturn = false;
+      const el = vastPreFsEl; vastPreFsEl = null;
+      // Resume the embed (best-effort play + our unmute pump picks it up).
+      try {
+        var w = document.getElementById('main-iframe') && document.getElementById('main-iframe').contentWindow;
+        if (w) [{ type: 'command', data: { command: 'play' } }, { type: 'play' }, 'play'].forEach(function (s) { try { w.postMessage(s, '*'); } catch (e2) {} });
+      } catch (e) {}
+      if (!el || !el.isConnected) return;
+      var tried = false;
+      var request = function () {
+        if (tried) return; tried = true;
+        try {
+          var rq = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (rq) { var p = rq.call(el); if (p && p.catch) p.catch(function () {}); }
+        } catch (e) {}
+      };
+      request(); // works when skip was a real user tap (gesture present)
+      // Natural ad end has no gesture — retry on the very next tap anywhere.
+      document.addEventListener('pointerdown', function retryFs() {
+        document.removeEventListener('pointerdown', retryFs);
+        if (window._cosActive) request();
+      });
+    }
+    // Keep the overlay inside the fullscreen subtree if the user toggles
+    // fullscreen while an ad is on screen.
+    document.addEventListener('fullscreenchange', function () { if (vastAdPlaying) vastAdReparent(); });
+    document.addEventListener('webkitfullscreenchange', function () { if (vastAdPlaying) vastAdReparent(); });
     // VAST URL is server-side in proxy-server.js
 
     // ── VAST tracking pixels ──
@@ -7614,6 +8050,8 @@
 
       // Show overlay with loading state
       vastOverlay.classList.add('active');
+      vastAdFsPrepare();
+      vastAdReparent();
       vastTimer.textContent = 'Loading ad...';
       vastSkipBtn.classList.remove('visible');
       vastProgress.style.width = '0%';
@@ -7743,6 +8181,8 @@
     // Skip / close VAST ad
     function skipVastAd() {
       vastOverlay.classList.remove('active');
+      vastAdRestore();
+      vastAdRestoreFs();
       vastVideo.oncanplay = null; // detach: no stale handler for the next ad
       vastVideo.pause();
       vastVideo.removeAttribute('src');

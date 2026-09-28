@@ -557,19 +557,20 @@ public class MainScreen85 {
                             EMBED_RECENT_M3U8.add(u0.toString());
                             while (EMBED_RECENT_M3U8.size() > 12) EMBED_RECENT_M3U8.poll();
                         } catch (Exception eQ) { }
-                        if (embedCaptureArmed && embedCapturedM3u8 == null) {
-                            embedCapturedM3u8 = u0.toString();
-                            embedCaptureArmed = false;
-                            embedCaptureEnqueued = true;
-                            startEmbedHlsDownload(u0.toString());
-                            // page badge: "Stream captured — saving…" (see player.html)
-                            try {
-                                WebView wvL = findWebView(act);
-                                if (wvL != null) wvL.post(new Runnable() { @Override public void run() {
-                                    try { wvL.evaluateJavascript("if(window._dfxCaptureLocked){window._dfxCaptureLocked();}", null); } catch (Exception eL) { }
-                                }});
-                            } catch (Exception eN) { }
-                        }
+                        tryEmbedLock(u0.toString());
+                    }
+                    // BROADER NET: some providers serve plain .mp4 / .ts video
+                    // segments instead of (or alongside) HLS playlists. IDM-style
+                    // downloaders catch those too -- so while the capture window
+                    // is armed, any big video-segment request locks the capture
+                    // ("direct:" prefix = single-file download, not an HLS job).
+                    if (embedCaptureArmed && embedCapturedM3u8 == null && host != null) {
+                        String lowUrl = u0.toString().toLowerCase();
+                        String path = u0.getPath();
+                        boolean looksVideo = (path != null && (path.toLowerCase().contains(".ts") || path.toLowerCase().contains(".mp4")))
+                                || lowUrl.contains(".ts?") || lowUrl.contains(".mp4?")
+                                || lowUrl.endsWith(".ts") || lowUrl.endsWith(".mp4");
+                        if (looksVideo) tryEmbedLock("direct:" + u0.toString());
                     }
                     // provider document: stream it through with the unmute patch
                     if (host != null && INJECT_HOSTS.contains(host)) {
@@ -1385,21 +1386,47 @@ public class MainScreen85 {
     private void tryEmbedCaptureFromRecent() {
         try {
             String u = EMBED_RECENT_M3U8.peek();
-            if (u != null && embedCaptureArmed && embedCapturedM3u8 == null) {
-                embedCapturedM3u8 = u;
-                embedCaptureArmed = false;
-                startEmbedHlsDownload(u);
-                embedCaptureEnqueued = true;
-            }
+            if (u != null) tryEmbedLock(u);
         } catch (Exception e) { }
     }
 
     private void startEmbedHlsDownload(final String playlistUrl) {
         try {
+            // "direct:" prefix (set by the broader capture net) = the embed
+            // served a plain video file: download it as a single file instead
+            // of running the HLS segment engine.
+            if (playlistUrl != null && playlistUrl.startsWith("direct:")) {
+                boolean ok = DlSpeed85.startQuiet(act, playlistUrl.substring(7),
+                        embedCaptureTitle, embedCapturePoster, "", "");
+                if (!ok) {
+                    try { enqueueDownload(android.net.Uri.parse(playlistUrl.substring(7)),
+                            embedCaptureTitle, "", embedCapturePoster, ""); } catch (Exception e2) { }
+                }
+                return;
+            }
             DlSpeed85.startEmbedHls(act, playlistUrl, embedCaptureTitle, embedCapturePoster, "");
         } catch (Exception e) {
             Toast.makeText(act.getApplicationContext(), "Embed download failed to start", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // One shared lock-on path for every capture source (playlist request,
+    // direct video segment, recent-request log). Idempotent: first caller
+    // wins, everyone else is a no-op.
+    private void tryEmbedLock(final String url) {
+        if (!embedCaptureArmed || embedCapturedM3u8 != null || embedCaptureEnqueued) return;
+        if (url == null || url.length() == 0) return;
+        embedCapturedM3u8 = url;
+        embedCaptureArmed = false;
+        embedCaptureEnqueued = true;
+        startEmbedHlsDownload(url);
+        // page badge: "Stream captured — saving…" (see player.html)
+        try {
+            WebView wvL = findWebView(act);
+            if (wvL != null) wvL.post(new Runnable() { @Override public void run() {
+                try { wvL.evaluateJavascript("if(window._dfxCaptureLocked){window._dfxCaptureLocked();}", null); } catch (Exception eL) { }
+            }});
+        } catch (Exception eN) { }
     }
 
     // The Downloads screen is launched by NAME so this jar never needs a
