@@ -8,6 +8,7 @@ const SHELL = [
   'index.html',
   'player.html',
   'style.css',
+  'theme-v2.css',
   'app.js',
   'episodes.js',
   'manifest.json',
