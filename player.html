@@ -2491,7 +2491,16 @@
          orbiting ring, same as app.html), DEYMFLIX wordmark, Loading Stream
          label and a signal-driven progress bar. Sits ABOVE the provider
          iframe (z 1000) and poster backdrop (z 1200) but BELOW the back
-         button (2147483000) so the user can always bail out. */
+         button (2147483000) so the user can always bail out.
+
+         SIZING: everything is derived from ONE unit, --cl-s, measured
+         against the PLAYER, never the viewport. On a phone the container is
+         only 16:9 of a narrow screen (~210px tall), so the old fixed 132px
+         logo pushed the wordmark and progress bar clean out of the video
+         box. --cl-s tracks the player's height (40cqh) with a cap at the
+         original 132px, so desktop looks exactly as before while a phone
+         gets a proportionally smaller boot screen. The plain declaration
+         first is the fallback for browsers without container-query units. */
       #cos-load-overlay {
         position: absolute;
         inset: 0;
@@ -2504,50 +2513,79 @@
         pointer-events: auto;
         opacity: 1;
         transition: opacity 0.45s ease;
+        box-sizing: border-box;
+        padding: 8px 16px;
+        container-type: size;
+        --cl-s: min(24vmin, 132px);
+      }
+      /* Container-query units: 40% of the player height, never wider than 30%
+         of the player width (tall/narrow screens), never above 132px. The
+         40% (not more) leaves room for the spinning ring: it is a rounded
+         SQUARE, so at 45° its corners reach s*0.334 past the stage on every
+         side — sizing for the stack alone would clip them at the player edge. */
+      @supports (width: 1cqh) {
+        #cos-load-overlay { --cl-s: min(40cqh, 30cqw, 132px); }
       }
       #cos-load-overlay.active { display: flex; }
       #cos-load-overlay.fading { opacity: 0; }
-      #cos-load-overlay .cl-stage { position: relative; width: 132px; height: 132px; }
+      /* flex-shrink:0 — otherwise the (contentless) progress bar is squashed
+         to zero height as soon as the stack gets taller than the player. */
+      #cos-load-overlay > * { flex: 0 0 auto; }
+      #cos-load-overlay .cl-stage {
+        position: relative;
+        width: var(--cl-s); height: var(--cl-s);
+      }
       #cos-load-overlay .cl-ring {
-        position: absolute; inset: -12px;
+        position: absolute; inset: calc(var(--cl-s) * -0.09);
         border: 1px solid rgba(229, 9, 20, 0.35);
-        border-radius: 22px;
+        border-radius: calc(var(--cl-s) * 0.17);
         animation: cl-spin 8s linear infinite;
       }
       #cos-load-overlay .cl-ring::before {
-        content: ""; position: absolute; top: -4px; left: 50%;
-        width: 8px; height: 8px; background: #e50914; border-radius: 50%;
+        content: ""; position: absolute; top: calc(var(--cl-s) * -0.03); left: 50%;
+        width: calc(var(--cl-s) * 0.06); height: calc(var(--cl-s) * 0.06);
+        background: #e50914; border-radius: 50%;
         box-shadow: 0 0 12px #ff4d55;
       }
       #cos-load-overlay .cl-logo {
-        width: 100%; height: 100%; border-radius: 26px;
-        box-shadow: 0 24px 70px rgba(229, 9, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+        display: block;
+        width: 100%; height: 100%;
+        border-radius: calc(var(--cl-s) * 0.2);
+        box-shadow: 0 18px 50px rgba(229, 9, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
         animation: cl-float 5s ease-in-out infinite;
       }
-      @keyframes cl-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+      /* percentage translate so the bob scales with the logo (was -12px) */
+      @keyframes cl-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9%); } }
       @keyframes cl-spin { to { transform: rotate(360deg); } }
       #cos-load-overlay .cl-brand {
-        margin-top: 18px;
-        font: 800 1.35rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
-        letter-spacing: 0.5px; color: #fff;
+        margin-top: calc(var(--cl-s) * 0.136);
+        font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 800; line-height: 1; letter-spacing: 0.5px; color: #fff;
+        font-size: max(14px, calc(var(--cl-s) * 0.164));
       }
       #cos-load-overlay .cl-brand em { color: #e50914; font-style: normal; }
       #cos-load-overlay .cl-label {
-        margin-top: 10px;
+        margin-top: calc(var(--cl-s) * 0.076);
         color: rgba(255, 255, 255, 0.8);
-        font: 600 0.95rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
-        letter-spacing: 0.3px;
+        font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 600; line-height: 1; letter-spacing: 0.3px;
+        font-size: max(10px, calc(var(--cl-s) * 0.115));
+        text-align: center;
         animation: cl-pulse 1.6s ease-in-out infinite;
       }
       @keyframes cl-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
       #cos-load-overlay .cl-hint {
-        margin-top: 6px;
+        margin-top: calc(var(--cl-s) * 0.045);
         color: rgba(255, 255, 255, 0.45);
-        font: 500 0.74rem/1 -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 500; line-height: 1;
+        font-size: max(9px, calc(var(--cl-s) * 0.09));
+        text-align: center; max-width: 92%;
       }
       #cos-load-overlay .cl-bar {
-        margin-top: 22px;
-        width: min(64%, 260px); height: 4px;
+        margin-top: calc(var(--cl-s) * 0.167);
+        width: min(64%, 260px);
+        height: max(3px, calc(var(--cl-s) * 0.03));
         border-radius: 99px; background: rgba(255, 255, 255, 0.14);
         overflow: hidden;
       }
