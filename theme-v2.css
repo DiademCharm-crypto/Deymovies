@@ -1,0 +1,420 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DEYMFLIX — THEME v2 "NOIR GLASS"
+   ══════════════════════════════════════════════════════════════════════════
+   A purely ADDITIVE visual layer. It loads after style.css and restyles the
+   existing markup — nothing here changes a class name, a DOM node or any JS,
+   so the whole redesign can be undone by deleting this file (see the
+   <link> line in each page) and restoring the snapshot:
+
+       node _tools/_backup.cjs restore before-redesign --apply
+
+   DIRECTION
+     · deeper, cooler-black base with ambient red light instead of flat #0f0f0f
+     · glass surfaces (nav, search, chips, badges) with real depth
+     · posters that lift and glow on hover, titles on a proper bottom scrim
+     · red as an accent, never as a flood
+     · motion that is fast, subtle and disabled under prefers-reduced-motion
+
+   RULES FOR EDITING THIS FILE
+     1. Never use `!important` unless style.css does (it mostly doesn't).
+     2. Never change a layout box: no width/height/position/display changes on
+        anything style.css sized, or pages start jumping.
+     3. Animate with `opacity` + the independent `translate` property so it can
+        never fight the `transform` used by the existing :hover rules.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TOKENS ──────────────────────────────────────────────────────────── */
+:root {
+  /* base goes cooler and deeper so red pops harder */
+  --bg-dark: #07080b;
+  --card-bg: #10131a;
+  --border-color: rgba(255, 255, 255, 0.07);
+
+  --primary-red: #e50914;
+  --primary-red-hover: #ff1f2b;
+  --text-main: #ffffff;
+  --text-muted: #9aa0a6;
+
+  /* new tokens this theme introduces */
+  --dfx-glass: rgba(16, 19, 26, 0.72);
+  --dfx-glass-line: rgba(255, 255, 255, 0.09);
+  --dfx-hairline: rgba(255, 255, 255, 0.06);
+  --dfx-red-soft: rgba(229, 9, 20, 0.16);
+  --dfx-red-ring: rgba(229, 9, 20, 0.55);
+  --dfx-radius: 14px;
+  --dfx-radius-lg: 20px;
+  --dfx-shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 8px 24px rgba(0, 0, 0, 0.55);
+  --dfx-shadow-lift: 0 0 0 1px var(--dfx-red-ring), 0 18px 44px rgba(0, 0, 0, 0.7), 0 0 30px rgba(229, 9, 20, 0.22);
+  --dfx-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ── 2. AMBIENT BACKGROUND ───────────────────────────────────────────────
+   Two red light sources at the top plus a faint centre wash. Sized in vh so a
+   very long page doesn't smear them across the whole document. */
+body {
+  background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(1100px 620px at 12% -8%, rgba(229, 9, 20, 0.16), transparent 62%),
+    radial-gradient(900px 560px at 92% -4%, rgba(120, 8, 18, 0.20), transparent 60%),
+    radial-gradient(1400px 900px at 50% 0%, rgba(255, 255, 255, 0.035), transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+/* ── 3. TOP NAV — glass, with a hairline that reads over any hero ───────── */
+.top-nav {
+  background: linear-gradient(180deg, rgba(7, 8, 11, 0.94) 0%, rgba(7, 8, 11, 0.72) 62%, transparent 100%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.brand-logo-img {
+  filter: drop-shadow(0 3px 10px rgba(229, 9, 20, 0.55)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+}
+
+.brand-title-text {
+  letter-spacing: 1.6px;
+  text-shadow: 0 0 22px rgba(229, 9, 20, 0.28), 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.search-input-wrapper {
+  background: var(--dfx-glass);
+  border: 1px solid var(--dfx-glass-line);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 26px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.22s var(--dfx-ease), box-shadow 0.22s var(--dfx-ease);
+}
+.search-input-wrapper:focus-within {
+  border-color: var(--dfx-red-ring);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.16), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.online-count-badge {
+  background: var(--dfx-glass);
+  border-color: var(--dfx-glass-line);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+/* ── 4. HERO BILLBOARD ───────────────────────────────────────────────────
+   A deeper vignette so the artwork keeps its mood but the type always wins,
+   plus a soft red floor under the slide. */
+.hero-fade-overlay {
+  /* Left-to-right so the copy always wins, and a gentler vertical fade so the
+     artwork does not collapse into a black band above the first row. */
+  background:
+    linear-gradient(90deg, rgba(7, 8, 11, 0.74) 0%, rgba(7, 8, 11, 0.26) 50%, rgba(7, 8, 11, 0) 76%),
+    linear-gradient(180deg, rgba(7, 8, 11, 0.18) 0%, rgba(7, 8, 11, 0.34) 52%,
+                    rgba(7, 8, 11, 0.66) 82%, var(--bg-dark) 100%);
+}
+
+.hero-wrapper::after {
+  /* whisper of red light along the bottom edge of the billboard */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.4) 50%, transparent);
+  pointer-events: none;
+}
+
+.hero-kicker {
+  background: rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--dfx-glass-line);
+  border-radius: 99px;
+  padding: 4px 12px 4px 10px;
+  width: fit-content;
+}
+
+.hero-n-badge { text-shadow: 0 0 16px rgba(229, 9, 20, 0.6); }
+
+.hero-top10 {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.hero-title-text {
+  letter-spacing: -0.8px;
+  line-height: 1.04;
+  text-shadow: 0 4px 26px rgba(0, 0, 0, 0.92), 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.hero-action-btn {
+  background: linear-gradient(135deg, #ff2430 0%, var(--primary-red) 55%, #b00710 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 10px 26px rgba(229, 9, 20, 0.42);
+  transition: transform 0.2s var(--dfx-ease), box-shadow 0.2s var(--dfx-ease), filter 0.2s var(--dfx-ease);
+}
+.hero-action-btn:hover {
+  background: linear-gradient(135deg, #ff3b46 0%, var(--primary-red-hover) 55%, #c40812 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.32) inset, 0 14px 34px rgba(229, 9, 20, 0.55);
+}
+
+.hero-info-btn {
+  background: rgba(255, 255, 255, 0.10);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: background 0.2s var(--dfx-ease), transform 0.2s var(--dfx-ease);
+}
+.hero-info-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.hero-dot {
+  background: rgba(255, 255, 255, 0.28);
+  transition: background 0.25s var(--dfx-ease), transform 0.25s var(--dfx-ease), width 0.25s var(--dfx-ease);
+}
+.hero-dot.active {
+  background: var(--primary-red);
+  transform: scale(1.25);
+  box-shadow: 0 0 12px rgba(229, 9, 20, 0.85);
+}
+
+/* ── 5. SECTION HEADERS ──────────────────────────────────────────────────
+   A red tick, tighter tracking, and a "View All" that slides its arrow. */
+.section-header-title {
+  position: relative;
+  padding-left: 13px;
+  font-size: 1.24rem;
+  font-weight: 900;
+  letter-spacing: -0.35px;
+}
+.section-header-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.05em;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #ff3b46, var(--primary-red) 55%, #7a0409);
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.55);
+}
+
+.see-all-link {
+  background: var(--dfx-glass);
+  border: 1px solid var(--dfx-glass-line);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background 0.2s var(--dfx-ease), border-color 0.2s var(--dfx-ease),
+              color 0.2s var(--dfx-ease), box-shadow 0.2s var(--dfx-ease), transform 0.2s var(--dfx-ease);
+}
+.see-all-link:hover {
+  background: var(--dfx-red-soft);
+  border-color: var(--dfx-red-ring);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.28);
+}
+
+/* ── 6. SCROLL ROWS — soft fade at the edges instead of a hard cut ──────── */
+.top-picks-scroll,
+.horizontal-scroll,
+.reels-horizontal-scroll {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 34px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 34px), transparent 100%);
+  scroll-padding-left: 4px;
+}
+
+/* ── 7. POSTER CARDS ─────────────────────────────────────────────────────
+   Depth, a real bottom scrim so titles are readable, and a lift + red rim on
+   hover. `translate`/`opacity` animate the entrance so they can't fight the
+   `transform` used by :hover. */
+.poster-card,
+.reel-thumb-card {
+  border-radius: var(--dfx-radius);
+  border: 1px solid var(--dfx-hairline);
+  background: var(--card-bg);
+  box-shadow: var(--dfx-shadow-card);
+  transition: transform 0.28s var(--dfx-ease), box-shadow 0.28s var(--dfx-ease),
+              border-color 0.28s var(--dfx-ease);
+  animation: dfx-rise 0.5s var(--dfx-ease) backwards;
+}
+
+.poster-card:hover,
+.reel-thumb-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: transparent;
+  box-shadow: var(--dfx-shadow-lift);
+  z-index: 3;
+}
+
+.poster-card:active,
+.reel-thumb-card:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+/* title scrim */
+.poster-card-overlay,
+.reel-overlay-info {
+  background: linear-gradient(180deg,
+    rgba(0, 0, 0, 0) 42%,
+    rgba(0, 0, 0, 0.55) 72%,
+    rgba(0, 0, 0, 0.88) 100%);
+}
+
+.poster-card-title,
+.reel-thumb-title { letter-spacing: 0.1px; }
+
+/* badge chips get the glass treatment */
+.rank-badge-box,
+.tag-badge-top-right,
+.reel-badge-tag,
+.mylist-progress-badge {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+}
+
+.remove-continue-btn {
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-color: rgba(255, 255, 255, 0.28);
+  opacity: 0.85;
+}
+.remove-continue-btn:hover { opacity: 1; }
+
+/* the red watch-progress bar gets a glow so it reads as "live" */
+.mylist-progress {
+  box-shadow: 0 0 12px rgba(229, 9, 20, 0.75);
+}
+
+/* stagger the entrance across the first few cards of every row */
+.horizontal-scroll > *,
+.top-picks-scroll > *,
+.reels-horizontal-scroll > * { animation: dfx-rise 0.5s var(--dfx-ease) backwards; }
+.horizontal-scroll > *:nth-child(2),
+.top-picks-scroll > *:nth-child(2),
+.reels-horizontal-scroll > *:nth-child(2) { animation-delay: 0.04s; }
+.horizontal-scroll > *:nth-child(3),
+.top-picks-scroll > *:nth-child(3),
+.reels-horizontal-scroll > *:nth-child(3) { animation-delay: 0.08s; }
+.horizontal-scroll > *:nth-child(4),
+.top-picks-scroll > *:nth-child(4),
+.reels-horizontal-scroll > *:nth-child(4) { animation-delay: 0.12s; }
+.horizontal-scroll > *:nth-child(5),
+.top-picks-scroll > *:nth-child(5),
+.reels-horizontal-scroll > *:nth-child(5) { animation-delay: 0.16s; }
+.horizontal-scroll > *:nth-child(n + 6),
+.top-picks-scroll > *:nth-child(n + 6),
+.reels-horizontal-scroll > *:nth-child(n + 6) { animation-delay: 0.2s; }
+
+@keyframes dfx-rise {
+  from { opacity: 0; translate: 0 16px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+/* ── 8. BROKEN REEL THUMBNAILS ───────────────────────────────────────────
+   Some reel thumbs have no working image, and the browser was painting the
+   `alt` text as a giant broken-looking sentence over a black box. Hide the
+   text and make the empty box look like a deliberate placeholder instead. */
+.reel-thumb-card img,
+.reel-thumb-img {
+  color: transparent;
+  font-size: 0;
+  background-image: linear-gradient(135deg, #1b1f28 0%, #0d0f14 55%, #17080c 100%);
+}
+.reel-thumb-card img::after { content: ""; }
+
+/* ── 9. BOTTOM NAV — floating glass pill ─────────────────────────────── */
+.bottom-nav {
+  background: rgba(14, 16, 22, 0.72);
+  border: 1px solid var(--dfx-glass-line);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.62), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+}
+
+.bottom-nav-item { transition: color 0.22s var(--dfx-ease), background 0.22s var(--dfx-ease); }
+
+.bottom-nav-item.active {
+  color: var(--primary-red);
+  background: radial-gradient(120% 90% at 50% 120%, var(--dfx-red-soft), transparent 70%);
+}
+
+.bottom-nav-item.active::after {
+  width: 26px;
+  background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+  box-shadow: 0 0 12px rgba(229, 9, 20, 0.9);
+}
+
+.bottom-nav-item.active .bottom-nav-icon {
+  filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.55));
+}
+
+/* ── 10. FOOTER ─────────────────────────────────────────────────────────── */
+.site-footer {
+  background: linear-gradient(180deg, rgba(16, 19, 26, 0.6) 0%, rgba(5, 6, 8, 0.95) 100%),
+              radial-gradient(700px 300px at 50% 0%, rgba(229, 9, 20, 0.10), transparent 70%);
+  border-top: 1px solid var(--dfx-hairline);
+  background-repeat: no-repeat;
+}
+
+.footer-logo {
+  letter-spacing: 2.5px;
+  text-shadow: 0 0 24px rgba(229, 9, 20, 0.3);
+}
+
+.dev-info-btn {
+  background: var(--dfx-glass);
+  border-color: var(--dfx-glass-line);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+/* ── 11. POLISH — selection, focus, scrollbars ─────────────────────────── */
+::selection {
+  background: rgba(229, 9, 20, 0.38);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-red);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Rows must stay scrollbar-free. NOTE: style.css only hides these with the
+   legacy ::-webkit-scrollbar pseudo-element, and in current Chromium the
+   standard `scrollbar-width` property WINS over that pseudo-element — so
+   styling these rows with `thin`/`scrollbar-color` visibly grew a red bar
+   under every row. Re-hide with the standard property too. */
+.horizontal-scroll,
+.top-picks-scroll,
+.reels-horizontal-scroll {
+  scrollbar-width: none;
+}
+
+/* the page itself gets a slim, dark scrollbar on desktop */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+/* ── 12. REDUCED MOTION / LOW-POWER ─────────────────────────────────────
+   Everything above is decoration; none of it may cost a user motion
+   they didn't ask for. */
+@media (prefers-reduced-motion: reduce) {
+  .poster-card,
+  .reel-thumb-card,
+  .horizontal-scroll > *,
+  .top-picks-scroll > *,
+  .reels-horizontal-scroll > *,
+  .hero-action-btn,
+  .hero-info-btn,
+  .see-all-link {
+    animation: none !important;
+    transition: none !important;
+  }
+  .poster-card:hover,
+  .reel-thumb-card:hover { transform: none !important; }
+}
+
+/* Mobile: keep the blur cost down on low-end phones, keep the look */
+@media (max-width: 768px) {
+  .top-nav { -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
+  .bottom-nav { -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); }
+}
