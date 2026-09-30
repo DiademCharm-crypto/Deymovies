@@ -17,8 +17,10 @@
 
    RULES FOR EDITING THIS FILE
      1. Never use `!important` unless style.css does (it mostly doesn't).
-     2. Never change a layout box: no width/height/position/display changes on
-        anything style.css sized, or pages start jumping.
+     2. Never change a layout box — with ONE exception: section 13 (Poster
+        Scale), which exists only to do that. Elsewhere: no width/height/
+        position/display changes on anything style.css sized, or pages start
+        jumping.
      3. Animate with `opacity` + the independent `translate` property so it can
         never fight the `transform` used by the existing :hover rules.
    ══════════════════════════════════════════════════════════════════════════ */
@@ -417,4 +419,220 @@ html {
 @media (max-width: 768px) {
   .top-nav { -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
   .bottom-nav { -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); }
+}
+
+/* ── 13. POSTER SCALE ────────────────────────────────────────────────────
+   Posters were reading large on both desktop and phone, so this section
+   shrinks them. It is the one place allowed to touch a layout box (see rule 2
+   at the top) — delete this section and every poster returns to style.css
+   sizing, so the whole adjustment travels with the rest of the theme.
+
+   These are the only knobs; nothing else in the theme sizes a poster:
+     --dfx-row-w / --dfx-row-h  home-row card   (style.css: 140×210 / 190×285)
+     --dfx-reel-w               reels row width (style.css: 130 / 175)
+     --dfx-grid-h               phone browse grid card height (was 160)
+     --dfx-grid-min             desktop grid column floor    (was 185)
+     --dfx-grid-h-lg            desktop browse grid height   (was 300)
+   Explore and Liked/History size themselves in their own <style>, which loads
+   after this file, so they get their own three floors (card height follows
+   from the 2:3 shape, exactly like the browse grid):
+     --dfx-list-min-sm / md / lg   phone / tablet / desktop column floor
+   The reels row keeps --dfx-row-h so every row on a page is the same height,
+   and the 2:3 ratio is preserved, so nothing is cropped differently. */
+:root {
+  --dfx-row-w: 120px;
+  --dfx-row-h: 180px;
+  --dfx-reel-w: 112px;
+  --dfx-grid-h: 150px;
+  --dfx-grid-min: 158px;
+  --dfx-grid-h-lg: 240px;
+  --dfx-list-min-sm: 104px;
+  --dfx-list-min-md: 124px;
+  --dfx-list-min-lg: 148px;
+}
+
+/* home rows — K-Drama, Tagalog PH, Top Picks, All Movies */
+.top-picks-scroll .poster-card,
+.horizontal-scroll .poster-card,
+.poster-card {
+  flex: 0 0 var(--dfx-row-w) !important;
+  width: var(--dfx-row-w) !important;
+  height: var(--dfx-row-h) !important;
+}
+
+/* reels row — same height as the poster rows so the home page stays level */
+.reels-horizontal-scroll .reel-thumb-card {
+  flex: 0 0 var(--dfx-reel-w) !important;
+  width: var(--dfx-reel-w) !important;
+  height: var(--dfx-row-h) !important;
+}
+
+/* category / browse grid (phone: 3 columns, only the height changes) */
+.category-grid .poster-card,
+.category-grid .reel-thumb-card {
+  height: var(--dfx-grid-h) !important;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --dfx-row-w: 158px;
+    --dfx-row-h: 237px;
+    --dfx-reel-w: 148px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--dfx-grid-min), 1fr)) !important;
+    gap: 18px !important;
+  }
+
+  .category-grid .poster-card,
+  .category-grid.reels-grid-mode .reel-thumb-card { height: var(--dfx-grid-h-lg) !important; }
+}
+
+/* explore + liked/history grids — floor is tighter here because those pages
+   have more usable width than the browse grid's padded column, so the same
+   visual density needs a smaller number to hold the same card size */
+.explore-grid,
+.mylist-grid {
+  grid-template-columns: repeat(auto-fill, minmax(var(--dfx-list-min-sm), 1fr)) !important;
+  gap: 10px !important;
+}
+
+@media (min-width: 768px) {
+  .explore-grid,
+  .mylist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--dfx-list-min-md), 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .explore-grid,
+  .mylist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--dfx-list-min-lg), 1fr)) !important;
+    gap: 18px !important;
+  }
+}
+
+/* ── 14. POSTER SKELETONS ───────────────────────────────────────────────────
+   Posters used to pop in raw as each TMDB image arrived. Now every card sits
+   on a shimmering tile until its artwork is in, then the image fades over it.
+   app.js adds .is-ready on load AND on error, so a broken poster is revealed
+   too — nothing can be left invisible. Paint-layer only: no box is resized,
+   so this obeys rule 2 at the top of the file. */
+@keyframes dfx-shimmer {
+  from { background-position: 180% 0; }
+  to   { background-position: -80% 0; }
+}
+
+.poster-card,
+.reel-thumb-card,
+.explore-card,
+.mylist-item {
+  background-color: rgba(255, 255, 255, 0.045);
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 32%, rgba(255, 255, 255, 0.075) 50%, rgba(255, 255, 255, 0) 68%);
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: dfx-shimmer 1.5s linear infinite;
+}
+
+/* once the artwork is on screen the shimmer has nothing left to say */
+.poster-card:has(img.is-ready),
+.reel-thumb-card:has(img.is-ready),
+.explore-card:has(img.is-ready),
+.mylist-item:has(img.is-ready) {
+  animation: none;
+  background-image: none;
+}
+
+/* Keep this selector list identical to the one app.js wires up, or an image
+   could be hidden with nothing to reveal it. */
+.poster-card img,
+.reel-thumb-card img,
+.explore-card img,
+.mylist-item img,
+.top-picks-scroll img,
+.horizontal-scroll img {
+  opacity: 0;
+  transition: opacity 0.36s ease;
+}
+
+.poster-card img.is-ready,
+.reel-thumb-card img.is-ready,
+.explore-card img.is-ready,
+.mylist-item img.is-ready,
+.top-picks-scroll img.is-ready,
+.horizontal-scroll img.is-ready {
+  opacity: 1;
+}
+
+/* ── 15. INSTALL BANNER (Android) ───────────────────────────────────────────
+   Shown by app.js when Chrome offers the PWA install. Fixed positioning, so
+   it takes no space in the layout. */
+#dfx-install-banner {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: 16px;
+  background: var(--dfx-glass);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid var(--dfx-glass-line);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.62);
+  transform: translateY(140%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.34s var(--dfx-ease), opacity 0.34s var(--dfx-ease);
+}
+
+#dfx-install-banner.show { transform: none; opacity: 1; pointer-events: auto; }
+#dfx-install-banner img { flex: 0 0 auto; border-radius: 9px; }
+.dfx-ib-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dfx-ib-text strong { font-size: 0.86rem; color: #fff; }
+.dfx-ib-text span { font-size: 0.72rem; color: #a9a9b2; line-height: 1.25; }
+.dfx-ib-go {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 16px;
+  background: #e50914;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.dfx-ib-x {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #8b8b94;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  #dfx-install-banner { left: auto; right: 20px; bottom: 20px; max-width: 380px; }
+}
+
+/* Respect reduced-motion: no shimmer, no fade — just show the poster. */
+@media (prefers-reduced-motion: reduce) {
+  .poster-card,
+  .reel-thumb-card,
+  .explore-card,
+  .mylist-item { animation: none !important; }
+  .poster-card img,
+  .reel-thumb-card img,
+  .explore-card img,
+  .mylist-item img,
+  .top-picks-scroll img,
+  .horizontal-scroll img { transition: none !important; opacity: 1 !important; }
+  #dfx-install-banner { transition: none !important; }
 }
