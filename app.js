@@ -11135,6 +11135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderKdramas();
       requestIdleCallback(() => {
         renderAllMoviesGrid();
+        renderBecauseYouWatched();
       });
     });
   }, { timeout: 500 });
@@ -11297,6 +11298,10 @@ function renderContinueWatching() {
 
     container.appendChild(card);
   });
+
+  // The recommendation row is derived from this history, so it re-renders
+  // whenever the history changes (including the X button removing a card).
+  renderBecauseYouWatched();
 }
 
 // Remove every episode entry of one series (card X button on the series card)
@@ -11524,7 +11529,9 @@ function renderKdramas() {
   const section = container.closest('.content-section');
   if (section) section.style.display = '';
 
-  kdramas.slice(0, 10).forEach(movie => {
+  // Newest releases first so freshly added titles surface in the row
+  // (dfxSortByNewest is hoisted below and keeps catalog order for undated entries).
+  dfxSortByNewest(kdramas).slice(0, 10).forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }
@@ -12075,4 +12082,195 @@ try {
       try { screen.orientation.unlock(); } catch (e) {}
     }
   });
+})();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HOME POLISH — "Because you watched", poster fade-in, Android install banner
+   One self-contained block: delete it and the app behaves exactly as before.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// ── Recommendation row: "Because you watched <title>" ─────────────────────
+// Built purely from the watch history already stored on the device: the most
+// recent title decides the genre, then the row offers same-genre titles the
+// viewer has NOT already started. No API call, no account, nothing leaves the
+// device — and it disappears the moment there is no history to learn from.
+
+// The catalog carries no genre field at all (checked: 0 of 992 entries have
+// one), so taste is read from the shelves that DO exist — K-drama, Tagalog PH,
+// everything else — combined with rating, which nearly every entry has. That
+// keeps the row working with zero network calls, so it still shows up offline
+// and inside the Android app.
+function dfxShelfOf(movie) {
+  if (!movie) return 'movies';
+  if (movie.isKdrama) return 'kdrama';
+  if (movie.isFilipino) return 'filipino';
+  return 'movies';
+}
+function dfxShelfCategoryUrl(shelf) {
+  return 'category.html?type=' + (shelf === 'kdrama' ? 'kdrama' : shelf === 'filipino' ? 'tagalog' : 'all');
+}
+
+function dfxWatchedIds() {
+  const ids = new Set();
+  try {
+    const saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}');
+    Object.keys(saved).forEach(k => {
+      ids.add(String(k).replace(/-s\d+-ep\d+$/, '').replace(/-ep\d+$/, ''));
+      if (saved[k] && saved[k].id) ids.add(String(saved[k].id));
+    });
+  } catch (e) {}
+  return ids;
+}
+
+function renderBecauseYouWatched() {
+  const wrapper = document.getElementById('home-sections-wrapper');
+  const anchor = document.getElementById('continue-watching-section');
+  if (!wrapper || !anchor) return;   // not the home page
+
+  const sectionId = 'because-you-watched-section';
+  const kill = () => { const s = document.getElementById(sectionId); if (s) s.remove(); };
+
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}'); } catch (e) { return kill(); }
+  const history = Object.keys(saved)
+    .map(k => ({ key: k, item: saved[k] }))
+    .filter(e => e.item && e.item.title)
+    .sort((a, b) => (b.item.updatedAt || 0) - (a.item.updatedAt || 0));
+  if (!history.length || typeof movies === 'undefined') return kill();
+
+  // The most recently watched title is the seed.
+  const baseId = String(history[0].key).replace(/-s\d+-ep\d+$/, '').replace(/-ep\d+$/, '');
+  const seed = movies.find(m => m.id === baseId)
+    || movies.find(m => m.id === history[0].item.id)
+    || movies.find(m => m.title === history[0].item.title);
+  if (!seed) return kill();
+  // Same shelf as the seed, best rated first (tie-break: newest), minus
+  // anything already started and minus anything without artwork.
+  const shelf = dfxShelfOf(seed);
+  const watched = dfxWatchedIds();
+  const picks = movies
+    .filter(m => m && m.id !== seed.id && !watched.has(String(m.id)) && m.poster
+      && Number(m.rating) > 0 && dfxShelfOf(m) === shelf)
+    .sort((a, b) => (Number(b.rating) - Number(a.rating)) || (dfxReleaseTimestamp(b) - dfxReleaseTimestamp(a)))
+    .slice(0, 12);
+  if (picks.length < 4) return kill();   // too few to look like a real row
+
+  let section = document.getElementById(sectionId);
+  if (!section) {
+    section = document.createElement('section');
+    section.className = 'content-section';
+    section.id = sectionId;
+    anchor.insertAdjacentElement('afterend', section);
+  }
+  // textContent for the title: the movie name is user data, never HTML
+  const moreUrl = dfxShelfCategoryUrl(shelf);
+  section.innerHTML =
+    '<div class="section-header-flex"><h2 class="section-header-title"></h2>' +
+    '<a class="see-all-link" href="' + moreUrl + '">View All ❯</a></div>' +
+    '<div class="horizontal-scroll" id="because-you-watched-container"></div>';
+  section.querySelector('.section-header-title').textContent = 'Because you watched ' + seed.title;
+
+  const container = document.getElementById('because-you-watched-container');
+  container.innerHTML = '';
+  picks.forEach(movie => container.appendChild(createMovieCard(movie)));
+  if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.refresh) {
+    setTimeout(() => HOVER_PREVIEW.refresh(), 120);
+  }
+}
+
+// ── Poster fade-in ────────────────────────────────────────────────────────
+// Cards shimmer (theme-v2.css §14) until their artwork arrives, then the image
+// fades in over the shimmer. One observer covers every grid on every page, so
+// nothing needs to be wired up per renderer. A failed image is revealed too —
+// a poster must never stay invisible.
+(function dfxPosterFadeIn() {
+  const SEL = '.poster-card img, .reel-thumb-card img, .explore-card img, .mylist-item img, .top-picks-scroll img, .horizontal-scroll img';
+  const ready = (img) => { try { img.classList.add('is-ready'); } catch (e) {} };
+  function wire(img) {
+    if (!img || img.tagName !== 'IMG' || img._dfxWired) return;
+    img._dfxWired = true;
+    if (img.complete && img.naturalWidth) return ready(img);   // already cached
+    img.addEventListener('load', () => ready(img), { once: true });
+    img.addEventListener('error', () => ready(img), { once: true });
+  }
+  function scan(node) {
+    if (!node || node.nodeType !== 1) return;
+    if (node.tagName === 'IMG' && node.matches && node.matches(SEL)) wire(node);
+    if (node.querySelectorAll) node.querySelectorAll(SEL).forEach(wire);
+  }
+  try {
+    new MutationObserver((muts) => {
+      for (const m of muts) for (const n of m.addedNodes) scan(n);
+    }).observe(document.documentElement, { childList: true, subtree: true });
+    const boot = () => scan(document.body);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+    // Safety net: a cached image inserted mid-render can finish before its
+    // listener exists. Sweep for anything wired but not yet revealed, and stop
+    // after a minute — a poster must never be able to stay hidden.
+    let sweeps = 0;
+    const sweep = setInterval(() => {
+      document.querySelectorAll('img').forEach((img) => {
+        if (img._dfxWired && !img.classList.contains('is-ready') && img.complete && img.naturalWidth) ready(img);
+      });
+      if (++sweeps > 30) clearInterval(sweep);
+    }, 2000);
+  } catch (e) {}
+})();
+
+// ── Android install banner ────────────────────────────────────────────────
+// The site has been installable for a while (manifest + service worker) but the
+// browser's own prompt was never surfaced. This shows a small brand bar when
+// Chrome offers the install, and steps aside everywhere it does not belong:
+// inside the native app (its WebView appends "DeymflixApp" to the user agent),
+// once the app is already installed, and after the user dismisses it.
+(function dfxInstallBanner() {
+  const KEY = 'dfx_install_dismissed';
+  const inApp = /DeymflixApp/i.test(navigator.userAgent) || !!window.DeymflixApp;
+  const standalone = (function () {
+    try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; }
+  })();
+  const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (inApp || standalone || window.top !== window.self) return;
+  try { if (localStorage.getItem(KEY) === '1') return; } catch (e) {}
+
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferred = e;
+    show();
+  });
+
+  let built = false;
+  function show() {
+    if (built || !document.body) return;
+    built = true;
+    const bar = document.createElement('div');
+    bar.id = 'dfx-install-banner';
+    bar.innerHTML =
+      '<img src="icons/icon-192.png" alt="" width="38" height="38">' +
+      '<div class="dfx-ib-text"><strong>Install DEYMFLIX</strong>' +
+      '<span>' + (deferred ? 'Full screen, faster, works offline.' : 'Tap Share, then \u201cAdd to Home Screen\u201d.') + '</span></div>' +
+      '<button class="dfx-ib-go" type="button">' + (deferred ? 'Install' : 'Got it') + '</button>' +
+      '<button class="dfx-ib-x" type="button" aria-label="Dismiss">&times;</button>';
+    document.body.appendChild(bar);
+    bar.querySelector('.dfx-ib-go').addEventListener('click', async () => {
+      if (deferred && deferred.prompt) {
+        try { deferred.prompt(); await deferred.userChoice; } catch (e) {}
+        deferred = null;
+      }
+      close(bar);
+    });
+    bar.querySelector('.dfx-ib-x').addEventListener('click', () => {
+      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      close(bar);
+    });
+    requestAnimationFrame(() => bar.classList.add('show'));
+  }
+  function close(bar) {
+    bar.classList.remove('show');
+    setTimeout(() => { try { bar.remove(); } catch (e) {} }, 260);
+  }
+  // iOS never fires beforeinstallprompt, so offer the manual route there.
+  window.addEventListener('load', () => { if (isiOS) setTimeout(show, 5000); });
 })();
