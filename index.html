@@ -263,7 +263,15 @@
     }
     const db = firebase.database();
     const onlineRef = db.ref('online');
-    const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // One stable id per TAB SESSION (sessionStorage survives refreshes but dies
+    // with the tab). Refreshing re-uses the same entry, so reloading the page
+    // no longer inflates the count — the old code minted a fresh id per load
+    // and left the previous entry to rot for 2.5 minutes.
+    let myId = sessionStorage.getItem('dfx_online_id');
+    if (!myId) {
+      myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('dfx_online_id', myId);
+    }
     const myRef = onlineRef.child(myId);
 
     // Use SERVER time so a wrong device clock can never expire live users
@@ -276,14 +284,10 @@
     const HEARTBEAT_MS = 25000; // refresh presence every 25s
     // Browsers throttle background tabs to roughly one timer per minute, so the
     // tolerance must be comfortably above that or open tabs flicker offline.
-    const STALE_MS = 150000;    // only treat as offline after 2.5 min of silence
+    const STALE_MS = 90000;     // backstop: treat as offline after 1.5 min of silence
     let beat = null;
 
     function heartbeat() {
-      // Only refresh lastSeen. We deliberately do NOT remove on disconnect: a
-      // brief socket drop (backgrounded tab, phone locked, wifi blip) must not
-      // mark a visitor offline while their tab is still open. Anyone who really
-      // left is cleaned up by the stale sweep below.
       myRef.set({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
     }
     function startHeartbeat() {
@@ -299,6 +303,11 @@
     const connRef = db.ref('.info/connected');
     connRef.on('value', function(snap) {
       if (snap.val() === true) {
+        // Re-arm on every (re)connect: when the socket dies — tab closed, wifi
+        // dropped, phone locked — Firebase's SERVER removes this entry within
+        // seconds. That is what makes the count genuinely realtime: closing the
+        // tab drops the count immediately instead of after a sweep.
+        myRef.onDisconnect().remove();
         startHeartbeat();
       } else if (beat) {
         clearInterval(beat);
@@ -346,6 +355,7 @@
       });
     }
     setInterval(sweep, 30000);
+    sweep(); // clean out pre-fix garbage the moment we load, not 30s later
   })();
   </script>
 </body>
