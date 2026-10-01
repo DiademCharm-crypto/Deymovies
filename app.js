@@ -81,28 +81,28 @@ const featuredMovies = [
     "isSeries": false
   },
   {
-    "id": "Snoopy Presents: There's No Place Like Home Snoopy",
-    "imdbId": "tt42839367",
-    "title": "Snoopy Presents: There's No Place Like Home Snoopy",
-    "releaseDate": "2026-07-30",
-    "rating": 8.5,
-    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
-    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
-    "manualEmbed": "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES/Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES.mkv",
-    "trailerEmbed": "https://www.youtube.com/watch?v=A-NQmpNsZIc",
-    "isSeries": false
+    "id": "The+Ordinary+Jackpot",
+    "imdbId": "tt44072314",
+    "title": "The Ordinary Jackpot",
+    "releaseDate": "2026-09-10",
+    "rating": 10,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/3jLoiPorNssIfLlEuw8Om7ujca6.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/3jLoiPorNssIfLlEuw8Om7ujca6.jpg",
+    "manualEmbed": "https://deymflix-media.b-cdn.net/K-DRAMA/The+Ordinary+Jackpot+720p/Watch+The+Ordinary+Jackpot+-+S1-E1+Free.mp4",
+    "trailerEmbed": "https://www.youtube.com/watch?v=vAtzkLX_8no",
+    "isSeries": true
   },
   {
-    "id": "Toy Story 5",
-    "imdbId": "tt29355505",
-    "title": "Toy Story 5",
-    "releaseDate": "2026-06-17",
-    "rating": 8.3,
-    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    "manualEmbed": "https://deymflix-r2-1.b-cdn.net/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
-    "trailerEmbed": "https://www.youtube.com/watch?v=c51ND9Hdbw0",
-    "isSeries": false
+    "id": "Teach+You+a+Lesson",
+    "imdbId": "tt34809853",
+    "title": "Teach You a Lesson",
+    "releaseDate": "2026-06-05",
+    "rating": 9.4,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/fMECSPrTmRClSViMsXFYmiYIcWP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vyG93jhmPL7tBIhRtCLa5mdBKob.jpg",
+    "manualEmbed": "cos:tv/276161/1/1",
+    "trailerEmbed": "https://www.youtube.com/watch?v=LdezlX84py0",
+    "isSeries": true
   }
 ];
 
@@ -11396,7 +11396,7 @@ function setupHeroBanner() {
       `).join('')}
     </div>
     <div class="hero-dots" id="hero-dots">
-      ${featuredMovies.map((_, i) => `<button class="hero-dot${i === 0 ? ' active' : ''}" data-dot-idx="${i}" aria-label="Featured ${i + 1}"></button>`)}
+      ${featuredMovies.map((_, i) => `<button class="hero-dot${i === 0 ? ' active' : ''}" data-dot-idx="${i}" aria-label="Featured ${i + 1}"></button>`).join('')}
     </div>
   `;
 
