@@ -12033,15 +12033,17 @@ try {
       return;
     }
 
-    // 3) EMBED playing — IDM-style stream capture (native engine).
-    // The player.html capture-phase hook already armed it + showed the
-    // badge when _cosActive; only call the bridge ourselves if that hook
-    // is somehow missing (avoids double "waiting for stream" toasts).
+    // 3) EMBED playing (CinemaOS) — STREAMING-ONLY in the app: show the
+    // streaming-only dialog. The player.html hook shows the same card;
+    // this path covers a missing hook (older cached player.html).
     try {
-      if (window._cosActive && window.DeymflixApp &&
-          typeof window.DeymflixApp.requestEmbedDownload === 'function') {
+      if (window._cosActive) {
+        if (typeof dfxShowStreamOnlyDialog === 'function') { dfxShowStreamOnlyDialog(); return; }
         const _dlb = document.getElementById('download-btn');
-        if (!_dlb || !_dlb._cosHooked) window.DeymflixApp.requestEmbedDownload();
+        if ((!_dlb || !_dlb._cosHooked) && window.DeymflixApp &&
+            typeof window.DeymflixApp.requestEmbedDownload === 'function') {
+          window.DeymflixApp.requestEmbedDownload(); // native dialog on new builds
+        }
         return;
       }
     } catch (e) { /* fall through */ }
