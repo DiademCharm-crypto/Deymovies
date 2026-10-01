@@ -690,6 +690,8 @@ public class MainScreen85 {
                     // anything weird (ftp:, data:, javascript:) is dropped.
                     String u = url == null ? "" : url.trim().toLowerCase();
                     if (!u.startsWith("https://") && !u.startsWith("http://")) return;
+                    // STREAMING-ONLY GATE (same rule as the JS bridge)
+                    if (!isOwnMediaHost(url)) { showStreamOnlyDialog(guessTitleFromUrl(url)); return; }
                     confirmAndDownload(url, guessTitleFromUrl(url), "", "");
                 }});
             }
@@ -1283,6 +1285,10 @@ public class MainScreen85 {
             @android.webkit.JavascriptInterface
             public void requestDownload(final String url, final String title, final String quality, final String poster) {
                 act.runOnUiThread(new Runnable() { @Override public void run() {
+                    // STREAMING-ONLY GATE: downloads come from our own upload
+                    // hosts only; CinemaOS and other providers stream but
+                    // never download.
+                    if (!isOwnMediaHost(url)) { showStreamOnlyDialog(title); return; }
                     confirmAndDownload(url, title, quality, poster);
                 }});
             }
@@ -1330,13 +1336,14 @@ public class MainScreen85 {
                     launchNativePlayer(use, title);
                 }});
             }
-            // ── EMBED DOWNLOAD (IDM-style) ── the player calls this when the
-            // user taps Download while watching an embed; arms the capture
-            // window the request firewall needs to lock onto the stream.
+            // ── EMBED DOWNLOAD (IDM-style) ── RETIRED: embeds (CinemaOS and
+            // other providers) are streaming-only now. The player calls this
+            // when the user taps Download on an embed; we answer with the
+            // streaming-only dialog instead of arming the capture window.
             @android.webkit.JavascriptInterface
             public void requestEmbedDownload() {
                 act.runOnUiThread(new Runnable() { @Override public void run() {
-                    armEmbedCaptureWindow();
+                    showStreamOnlyDialog(null);
                 }});
             }
             @android.webkit.JavascriptInterface
@@ -1601,6 +1608,46 @@ public class MainScreen85 {
     // =======================================================================
     //  THEMED CONFIRM DIALOG
     // =======================================================================
+    // ─────────────────────────────────────────────────────────────────────
+    //  STREAMING-ONLY GATE
+    //  Downloads may only come from our own upload hosts (the DEYMFLIX
+    //  Bunny CDN zones fronting Backblaze/Cloudflare). Everything else --
+    //  CinemaOS embeds and any third-party provider -- streams but never
+    //  downloads, and the app says so.
+    // ─────────────────────────────────────────────────────────────────────
+    private static boolean isOwnMediaHost(String u) {
+        if (u == null) return false;
+        try {
+            String h = android.net.Uri.parse(u.trim()).getHost();
+            if (h == null) return false;
+            h = h.toLowerCase();
+            return h.endsWith(".b-cdn.net") && h.contains("deymflix");
+        } catch (Exception e) { return false; }
+    }
+
+    // "Download unavailable -- only available for streaming" dialog. The
+    // title carries the " ep<N>" suffix app.js appends for episodes, which
+    // picks the right movie/episode wording.
+    private void showStreamOnlyDialog(final String title) {
+        String t = title == null ? "" : title.trim();
+        boolean isEpisode = t.matches("(?s).*\\sep\\d+\\s*$");
+        String name = t.replaceAll("\\sep\\d+\\s*$", "").trim();
+        String what = isEpisode ? "episode" : (name.length() == 0 ? "title" : "movie");
+        showStreamOnlyNamed(name, what);
+    }
+
+    private void showStreamOnlyNamed(final String name, final String what) {
+        String n = name == null ? "" : name.trim();
+        String msg = (n.length() == 0)
+                ? ("This " + what + " is only available for streaming, so it can't be downloaded.")
+                : ("\u201C" + n + "\u201D \u2014 this " + what + " is only available for streaming, so it can't be downloaded.");
+        android.app.AlertDialog.Builder ab = new android.app.AlertDialog.Builder(act);
+        ab.setTitle("Download unavailable");
+        ab.setMessage(msg);
+        ab.setPositiveButton("OK", null);
+        ab.show();
+    }
+
     private void confirmAndDownload(final String url, final String title, final String quality, final String poster) {
         if (url == null) {
             Toast.makeText(act.getApplicationContext(), "This title cannot be downloaded.", Toast.LENGTH_SHORT).show();
@@ -1969,9 +2016,13 @@ public class MainScreen85 {
                 d.dismiss();
                 int picked = 0;
                 int skipped = 0;
+                int streaming = 0;
                 for (int i = 0; i < boxes.size(); i++) {
                     if (!boxes.get(i).isChecked()) continue;
                     Ep85 e = items.get(i);
+                    // STREAMING-ONLY GATE: episodes whose file is not on our
+                    // own upload hosts cannot be downloaded.
+                    if (!isOwnMediaHost(e.url)) { streaming++; continue; }
                     String epTitle = seriesTitle + " ep" + String.valueOf(e.num);
                     // clean episode sub-title: "Episode 3 - Testing Her Faith"
                     // -> "Testing Her Faith"
@@ -1995,8 +2046,14 @@ public class MainScreen85 {
                         } catch (Exception eE) { }
                     }
                 }
+                if (picked == 0) {
+                    // everything the user picked turned out to be stream-only
+                    if (streaming > 0) showStreamOnlyNamed(seriesTitle, "episode");
+                    return;
+                }
                 Toast.makeText(act.getApplicationContext(),
                         "Downloading " + String.valueOf(picked) + " episode" + (picked == 1 ? "" : "s")
+                                + (streaming > 0 ? (" -- " + String.valueOf(streaming) + " streaming-only (skipped)") : "")
                                 + (skipped > 0 ? (" -- " + String.valueOf(skipped) + " already downloaded") : "")
                                 + " -- track it on My Downloads",
                         Toast.LENGTH_LONG).show();
