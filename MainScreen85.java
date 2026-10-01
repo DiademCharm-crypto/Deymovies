@@ -1165,16 +1165,23 @@ public class MainScreen85 {
                     ox + 15.5f * k, oy + 15.5f * k, ox + 184.5f * k, oy + 184.5f * k);
             canvas.drawRoundRect(rr, 38f * k, 38f * k, rimStroke);
 
-            // 2) the open D bowl: dark under-stroke for depth, then brand red
-            bowlUnder.setStrokeWidth(30f * k);
+            // 2) the open D bowl: dark under-stroke for depth, then brand red.
+            // The paths are built in the 200-viewBox, so draw them through the
+            // same k/ox/oy mapping the circles use. Canvas scale also scales
+            // stroke widths, so widths here are set in view units.
             canvas.save();
-            canvas.translate(0f, 2.5f * k);
+            canvas.translate(ox, oy);
+            canvas.scale(k, k);
+            bowlUnder.setStrokeWidth(30f);
+            canvas.save();
+            canvas.translate(0f, 2.5f);
             canvas.drawPath(bowlPath, bowlUnder);
             canvas.restore();
-            bowlRed.setStrokeWidth(26f * k);
+            bowlRed.setStrokeWidth(26f);
             canvas.drawPath(bowlPath, bowlRed);
-            hlPaint.setStrokeWidth(3f * k);
+            hlPaint.setStrokeWidth(3f);
             canvas.drawPath(hlPath, hlPaint);
+            canvas.restore();
 
             // 3) the film reel -- floats dead-centre, touches nothing
             float rx = ox + 100f * k, ry = oy + 100f * k, reel = 28f * k;
@@ -1202,9 +1209,13 @@ public class MainScreen85 {
             badgeGlow.setStrokeWidth(3f * k);
             canvas.drawCircle(bx, by, 33f * k, badgeGlow);
             canvas.drawCircle(bx, by, br, badgeFill);
+            canvas.save();
+            canvas.translate(ox, oy);
+            canvas.scale(k, k);
             canvas.drawPath(triPath, triPaint);
-            arcPaint.setStrokeWidth(5f * k);
+            arcPaint.setStrokeWidth(5f);
             canvas.drawPath(arcPath, arcPaint);
+            canvas.restore();
         }
     }
 
