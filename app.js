@@ -12301,3 +12301,57 @@ function renderBecauseYouWatched() {
   // iOS never fires beforeinstallprompt, so offer the manual route there.
   window.addEventListener('load', () => { if (isiOS) setTimeout(show, 5000); });
 })();
+
+// ══ WHAT'S NEW — one-time popup after each app update ═════════════════════
+// The Sketchware shell appends "DeymflixApp/<versionCode>" to the WebView
+// user-agent (MainScreen85). Key this popup to the INSTALLED build code: when
+// it changes (i.e. the user just updated the app), show the notes from the
+// live app-update.json exactly once per build. Never shows on PC browsers.
+(function () {
+  'use strict';
+  try {
+    var m85 = /DeymflixApp\/(\d+)/.exec(navigator.userAgent || '');
+    if (!m85) return;
+    var appCode = parseInt(m85[1], 10) || 0;
+    if (!appCode) return;
+    var KEY = 'dfx_whatsnew_seen';
+    var seen = 0;
+    try { seen = parseInt(localStorage.getItem(KEY) || '0', 10) || 0; } catch (e) {}
+    if (seen === appCode) return;
+    fetch('app-update.json?t=' + Date.now())
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (mf) {
+        if (!mf || !mf.notes || !mf.notes.length) {
+          try { localStorage.setItem(KEY, String(appCode)); } catch (e) {}
+          return;
+        }
+        var mc = parseInt(mf.code, 10) || 0;
+        if (mc && mc > appCode) return; // an update is pending — the updater dialog owns this moment
+        var esc = function (s) { return String(s).replace(/[<>&]/g, function (c) { return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]; }); };
+        var items = mf.notes.map(function (n) {
+          return '<li style="margin:7px 0;line-height:1.45;color:#cfd0d6;">' + esc(n) + '</li>';
+        }).join('');
+        var el = document.createElement('div');
+        el.id = 'dfx-whatsnew';
+        el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(5,5,8,.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit;';
+        var card = document.createElement('div');
+        card.style.cssText = 'width:min(430px,94vw);max-height:86vh;overflow:auto;background:#141419;border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:22px 22px 18px;color:#fff;box-shadow:0 24px 70px rgba(229,9,20,.25);';
+        card.innerHTML =
+          '<div style="display:flex;align-items:center;gap:11px;margin-bottom:6px;">' +
+          '<img src="favicon.svg?v=2" alt="" width="42" height="42" style="border-radius:11px;" onerror="this.style.display=\'none\'">' +
+          '<div><div style="font-weight:800;font-size:17px;">What\u2019s New</div>' +
+          '<div style="font-size:12px;color:#9a9aa5;">DEYMFLIX app v' + esc(mf.version || '1.6') + (mf.released ? ' \u00b7 ' + esc(mf.released) : '') + '</div></div></div>' +
+          '<ul style="list-style:none;margin:14px 0 4px;padding:0;font-size:13.5px;">' + items + '</ul>' +
+          '<button id="dfx-wn-ok" style="margin-top:14px;width:100%;padding:12px 0;border:0;border-radius:11px;background:#e50914;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;">Continue watching</button>';
+        el.appendChild(card);
+        var close = function () { try { el.remove(); } catch (e) {} };
+        card.querySelector('#dfx-wn-ok').addEventListener('click', close);
+        el.addEventListener('click', function (e) { if (e.target === el) close(); });
+        document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', k); } });
+        document.body.appendChild(el);
+        try { card.querySelector('#dfx-wn-ok').focus(); } catch (e) {}
+        try { localStorage.setItem(KEY, String(appCode)); } catch (e) {}
+      })
+      .catch(function () {}); // offline or manifest missing: retry on the next launch
+  } catch (e) {}
+})();
