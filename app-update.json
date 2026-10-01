@@ -1,13 +1,15 @@
 {
   "version": "1.6",
-  "code": 4,
-  "released": "2026-09-27",
-  "url": "apk/Deymflix-v1.6-r3.apk",
+  "code": 6,
+  "released": "2026-10-01",
+  "url": "apk/Deymflix-v1.6-r4.apk",
   "notes": [
-    "Improved embed downloader — catches more stream types (CinemaOS, VidLink and others)",
-    "Faster stream lock-on when you tap Download during an episode",
-    "Report tab in the player — tell us about broken videos or missing downloads",
-    "Manual download links & subtitles supported per movie and per episode",
-    "Built-in ad & tracker firewall, splash and offline fixes"
+    "New app icon — the DEYMFLIX film-reel mark, in every mode",
+    "All 51 K-dramas now included in the app (was 8)",
+    "Featured row now shows 5 top-rated titles: 3 movies + 2 K-dramas",
+    "Hero carousel: spaced pill dots (comma separator removed)",
+    "TV mode: navigate with your remote's D-pad on smart TVs",
+    "Realtime online counter fixed — refreshes no longer inflate it",
+    "Google sign-in (coming to the app in the next release)"
   ]
 }
