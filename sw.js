@@ -3,7 +3,9 @@
 //   * app shell (index/player/style/app js): network-first, fall back to cache
 //   * posters/images: cache-first (they never change per versioned URL)
 //   * everything else (APIs, streams): network only — never cache video
-const CACHE = 'deymflix-v1';
+// v2: force every visitor's old cache to be deleted on activate — the cache-first
+// icon/svg strategy was serving the OLD logo (favicon.svg never changes URL).
+const CACHE = 'deymflix-v2';
 const SHELL = [
   'index.html',
   'player.html',
@@ -11,8 +13,14 @@ const SHELL = [
   'theme-v2.css',
   'app.js',
   'episodes.js',
+  'kdrama-episode.js',
+  'tv.js',
   'manifest.json',
   'favicon.svg',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/apple-touch-icon.png',
+  'icons/deymflix-logo.svg',
   'offline.html'
 ];
 
