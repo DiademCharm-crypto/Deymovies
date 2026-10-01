@@ -165,12 +165,19 @@ body {
 }
 
 .hero-dot {
+  /* pill-bars, not dots — 5 slides read as a clean dash row instead of
+     comma-like specks huddling in the corner */
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
   background: rgba(255, 255, 255, 0.28);
-  transition: background 0.25s var(--dfx-ease), transform 0.25s var(--dfx-ease), width 0.25s var(--dfx-ease);
+  transform: none;
+  transition: background 0.25s var(--dfx-ease), width 0.25s var(--dfx-ease);
 }
 .hero-dot.active {
+  width: 34px;
   background: var(--primary-red);
-  transform: scale(1.25);
+  transform: none;
   box-shadow: 0 0 12px rgba(229, 9, 20, 0.85);
 }
 
