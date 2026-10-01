@@ -12275,7 +12275,7 @@ function renderBecauseYouWatched() {
     const bar = document.createElement('div');
     bar.id = 'dfx-install-banner';
     bar.innerHTML =
-      '<img src="icons/icon-192.png" alt="" width="38" height="38">' +
+      '<img src="icons/icon-192.png?v=2" alt="" width="38" height="38">' +
       '<div class="dfx-ib-text"><strong>Install DEYMFLIX</strong>' +
       '<span>' + (deferred ? 'Full screen, faster, works offline.' : 'Tap Share, then \u201cAdd to Home Screen\u201d.') + '</span></div>' +
       '<button class="dfx-ib-go" type="button">' + (deferred ? 'Install' : 'Got it') + '</button>' +
