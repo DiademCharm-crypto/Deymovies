@@ -1,0 +1,3090 @@
+1
+00:00:32,365 --> 00:00:39,372
+<font color="white">FOUR HANDS, TWO SONATAS</font><font color="white"></font>
+
+2
+00:00:47,213 --> 00:00:49,215
+<font color="white">Pi-o, let's make a promise.</font><font color="white"></font>
+
+3
+00:00:49,799 --> 00:00:53,720
+<font color="white">Let's play some more four hands</font><font color="white">
+<font color="white">even after the competition.</font><font color="white"></font></font>
+
+4
+00:00:53,803 --> 00:00:54,637
+<font color="white">Okay.</font><font color="white"></font>
+
+5
+00:01:07,609 --> 00:01:10,320
+<font color="white"><i>He left in the middle of the event,</i></font><font color="white">
+<font color="white"><i>went to a practice room,</i></font></font><font color="white"></font>
+
+6
+00:01:10,403 --> 00:01:12,322
+<font color="white"><i>and stared out the window</i></font><font color="white">
+<font color="white"><i>through the curtains.</i></font></font><font color="white"></font>
+
+7
+00:01:18,119 --> 00:01:19,746
+<font color="white"><i>He seemed very flustered when I walked in.</i></font><font color="white"></font>
+
+8
+00:01:19,829 --> 00:01:20,663
+<font color="white"><i>Could it be</i></font><font color="white"></font>
+
+9
+00:01:21,956 --> 00:01:23,374
+<font color="white"><i>that his memory is back?</i></font><font color="white"></font>
+
+10
+00:01:33,635 --> 00:01:36,012
+<font color="white"><i>Promise you won't sulk</i></font><font color="white">
+<font color="white"><i>if I win first place.</i></font></font><font color="white"></font>
+
+11
+00:01:36,095 --> 00:01:37,472
+<font color="white"><i>Let's still have fun when we hang out.</i></font><font color="white"></font>
+
+12
+00:01:37,555 --> 00:01:39,140
+<font color="white"><i>But I'm going to win first place.</i></font><font color="white"></font>
+
+13
+00:01:39,724 --> 00:01:40,600
+<font color="white"><i>Don't get sulky yourself.</i></font><font color="white"></font>
+
+14
+00:01:54,280 --> 00:01:58,159
+<font color="white">FOUR HANDS, TWO SONATAS</font><font color="white"></font>
+
+15
+00:01:59,410 --> 00:02:01,162
+{\an8}<font color="white">EPISODE 10</font><font color="white"></font>
+
+16
+00:02:44,205 --> 00:02:45,248
+<font color="white">Can I come in?</font><font color="white"></font>
+
+17
+00:02:53,882 --> 00:02:56,175
+<font color="white">What brings you here at this hour?</font><font color="white"></font>
+
+18
+00:02:58,887 --> 00:02:59,721
+<font color="white">What is it?</font><font color="white"></font>
+
+19
+00:03:00,430 --> 00:03:02,223
+<font color="white">Do you have a question about the piece?</font><font color="white"></font>
+
+20
+00:03:03,391 --> 00:03:04,225
+<font color="white">Yeah.</font><font color="white"></font>
+
+21
+00:03:05,226 --> 00:03:06,102
+<font color="white">What is it?</font><font color="white"></font>
+
+22
+00:03:07,437 --> 00:03:09,063
+<font color="white">Still struggling with the tempo?</font><font color="white"></font>
+
+23
+00:03:09,606 --> 00:03:10,940
+<font color="white">That piece.</font><font color="white"></font>
+
+24
+00:03:11,774 --> 00:03:13,735
+<font color="white">You said you started writing it</font><font color="white">
+<font color="white">five years ago, right?</font><font color="white"></font></font>
+
+25
+00:03:14,861 --> 00:03:16,529
+<font color="white">It took me five years to finish.</font><font color="white"></font>
+
+26
+00:03:16,613 --> 00:03:17,655
+<font color="white">Mr. Kang.</font><font color="white"></font>
+
+27
+00:03:18,239 --> 00:03:20,199
+<font color="white">Please be the first to play this.</font><font color="white"></font>
+
+28
+00:03:22,368 --> 00:03:23,286
+<font color="white">And your memory?</font><font color="white"></font>
+
+29
+00:03:24,829 --> 00:03:26,873
+<font color="white">You don't remember anything</font><font color="white">
+<font color="white">after the accident?</font><font color="white"></font></font>
+
+30
+00:03:27,957 --> 00:03:28,791
+<font color="white">That's right.</font><font color="white"></font>
+
+31
+00:03:29,792 --> 00:03:30,877
+<font color="white">Why do you ask?</font><font color="white"></font>
+
+32
+00:03:32,003 --> 00:03:33,087
+<font color="white">Is there a problem?</font><font color="white"></font>
+
+33
+00:03:35,256 --> 00:03:37,842
+<font color="white">What did you mean</font><font color="white">
+<font color="white">that I haven't changed at all?</font><font color="white"></font></font>
+
+34
+00:03:39,427 --> 00:03:42,805
+<font color="white">Why haven't you changed at all, Mr. Kang?</font><font color="white"></font>
+
+35
+00:03:42,889 --> 00:03:44,933
+<font color="white">Haven't changed since when?</font><font color="white"></font>
+
+36
+00:03:45,475 --> 00:03:46,559
+<font color="white">Since high school?</font><font color="white"></font>
+
+37
+00:03:47,602 --> 00:03:48,686
+<font color="white">Or since Prague?</font><font color="white"></font>
+
+38
+00:03:50,230 --> 00:03:51,564
+<font color="white">What are you trying to say?</font><font color="white"></font>
+
+39
+00:03:51,648 --> 00:03:54,400
+<font color="white">I'm asking how long you're planning</font><font color="white">
+<font color="white">to keep up the amnesia act.</font><font color="white"></font></font>
+
+40
+00:03:55,485 --> 00:03:58,404
+<font color="white">I don't understand what you're saying.</font><font color="white"></font>
+
+41
+00:04:00,949 --> 00:04:02,367
+<font color="white">Then what about this?</font><font color="white"></font>
+
+42
+00:04:03,451 --> 00:04:05,495
+<font color="white">When I was in your dorm</font><font color="white">
+<font color="white">back in high school,</font><font color="white"></font></font>
+
+43
+00:04:06,120 --> 00:04:07,830
+<font color="white">I saw a sketch you were working on.</font><font color="white"></font>
+
+44
+00:04:07,914 --> 00:04:08,790
+<font color="white"><i>But its subject</i></font><font color="white"></font>
+
+45
+00:04:09,791 --> 00:04:11,876
+<font color="white">was the same as </font><font color="white"><font color="white"><i>Nemesis</i></font></font><font color="white"><font color="white">.</font><font color="white"></font></font>
+
+46
+00:04:13,378 --> 00:04:14,212
+<font color="white">Really?</font><font color="white"></font>
+
+47
+00:04:14,796 --> 00:04:17,465
+<font color="white">I composed something like that</font><font color="white">
+<font color="white">in high school?</font><font color="white"></font></font>
+
+48
+00:04:19,008 --> 00:04:20,218
+<font color="white">I guess</font><font color="white"></font>
+
+49
+00:04:20,301 --> 00:04:23,221
+<font color="white">some mental images remain</font><font color="white">
+<font color="white">even when you lose your memory.</font><font color="white"></font></font>
+
+50
+00:04:25,431 --> 00:04:26,266
+<font color="white">Then…</font><font color="white"></font>
+
+51
+00:04:28,226 --> 00:04:30,603
+<font color="white">how do you remember the practice room</font><font color="white">
+<font color="white">where we first met?</font><font color="white"></font></font>
+
+52
+00:04:32,063 --> 00:04:32,981
+<font color="white">Tell me.</font><font color="white"></font>
+
+53
+00:04:34,148 --> 00:04:35,275
+<font color="white">Is that a coincidence as well?</font><font color="white"></font>
+
+54
+00:04:39,696 --> 00:04:42,115
+<font color="white">Stop pretending, Choi Jeong-yo.</font><font color="white"></font>
+
+55
+00:04:45,285 --> 00:04:46,494
+<font color="white">I know you remember everything.</font><font color="white"></font>
+
+56
+00:04:51,708 --> 00:04:52,709
+<font color="white">Fine.</font><font color="white"></font>
+
+57
+00:04:57,672 --> 00:04:58,673
+<font color="white">To be honest…</font><font color="white"></font>
+
+58
+00:05:00,842 --> 00:05:02,677
+<font color="white">I've always wanted to visit</font><font color="white"></font>
+
+59
+00:05:03,553 --> 00:05:05,680
+<font color="white"><i>the practice room where we first met.</i></font><font color="white"></font>
+
+60
+00:05:07,515 --> 00:05:08,766
+<font color="white"><i>We played </i></font><font color="white"><font color="white">Hungarian Dances…</font><font color="white"></font></font>
+
+61
+00:05:10,393 --> 00:05:11,394
+<font color="white"><i>and </i></font><font color="white"><font color="white">Danse Macabre.</font><font color="white"></font></font>
+
+62
+00:05:12,603 --> 00:05:13,938
+<font color="white"><i>And then the noise in the hallway.</i></font><font color="white"></font>
+
+63
+00:05:15,064 --> 00:05:16,858
+<font color="white">CHOI JEONG-YO WILL WIN 1ST PLACE</font><font color="white">
+<font color="white">NOT TRUE, KANG PI-O WILL!</font><font color="white"></font></font>
+
+64
+00:05:16,941 --> 00:05:18,943
+<font color="white">I've never once forgotten any of it.</font><font color="white"></font>
+
+65
+00:05:20,361 --> 00:05:21,279
+<font color="white">Why did you do it?</font><font color="white"></font>
+
+66
+00:05:24,198 --> 00:05:26,117
+<font color="white">Why did you tell such a lie?</font><font color="white"></font>
+
+67
+00:05:26,200 --> 00:05:27,160
+<font color="white">You know why.</font><font color="white"></font>
+
+68
+00:05:29,329 --> 00:05:30,913
+<font color="white">If I told you I remembered,</font><font color="white"></font>
+
+69
+00:05:31,998 --> 00:05:34,042
+<font color="white">you would've tried to kill me again.</font><font color="white"></font>
+
+70
+00:05:37,879 --> 00:05:39,088
+<font color="white">What are you talking about?</font><font color="white"></font>
+
+71
+00:05:40,298 --> 00:05:41,966
+<font color="white">I would've tried to kill you again?</font><font color="white"></font>
+
+72
+00:05:42,050 --> 00:05:43,468
+<font color="white">Don't play dumb.</font><font color="white"></font>
+
+73
+00:05:44,427 --> 00:05:45,595
+<font color="white">I know you're the one</font><font color="white"></font>
+
+74
+00:05:46,512 --> 00:05:48,765
+<font color="white">who ordered my abduction</font><font color="white">
+<font color="white">at the competition nine years ago.</font><font color="white"></font></font>
+
+75
+00:05:49,640 --> 00:05:51,017
+<font color="white">Don't even try to trick me.</font><font color="white"></font>
+
+76
+00:05:52,727 --> 00:05:55,897
+<font color="white">I saw you meeting</font><font color="white">
+<font color="white">one of my abductors with my own eyes.</font><font color="white"></font></font>
+
+77
+00:05:57,356 --> 00:05:59,067
+<font color="white">I couldn't believe it at first.</font><font color="white"></font>
+
+78
+00:06:03,071 --> 00:06:05,823
+<font color="white"><i>You were the friend I trusted</i></font><font color="white">
+<font color="white"><i>and depended on the most.</i></font></font><font color="white"></font>
+
+79
+00:06:06,866 --> 00:06:09,368
+<font color="white"><i>I never imagined you'd stoop so low.</i></font><font color="white"></font>
+
+80
+00:06:13,790 --> 00:06:14,916
+<font color="white">Kang Pi-o.</font><font color="white"></font>
+
+81
+00:06:14,999 --> 00:06:16,250
+<font color="white">He gave the order.</font><font color="white"></font>
+
+82
+00:06:16,751 --> 00:06:17,585
+<font color="white"><i>But then</i></font><font color="white"></font>
+
+83
+00:06:18,086 --> 00:06:20,922
+<font color="white"><i>I heard my abductor say your name.</i></font><font color="white"></font>
+
+84
+00:06:22,548 --> 00:06:25,051
+<font color="white">Where's the nearest international bank?</font><font color="white"></font>
+
+85
+00:06:25,593 --> 00:06:27,845
+<font color="white">What? You want to come back here?</font><font color="white"></font>
+
+86
+00:06:31,641 --> 00:06:34,435
+<font color="white"><i>Then I saw you hand over money</i></font><font color="white">
+<font color="white"><i>to another one.</i></font></font><font color="white"></font>
+
+87
+00:06:35,311 --> 00:06:37,480
+<font color="white">I even went to your performances</font><font color="white">
+<font color="white">several times.</font><font color="white"></font></font>
+
+88
+00:06:37,563 --> 00:06:38,648
+<font color="white">But you…</font><font color="white"></font>
+
+89
+00:06:39,899 --> 00:06:42,276
+<font color="white"><i>You completely forgot I ever existed</i></font><font color="white"><font color="white">…</font><font color="white"></font></font>
+
+90
+00:06:44,904 --> 00:06:47,281
+<font color="white"><i>and kept performing</i></font><font color="white">
+<font color="white"><i>like nothing ever happened.</i></font></font><font color="white"></font>
+
+91
+00:06:51,452 --> 00:06:53,246
+<font color="white">So, how has it been?</font><font color="white"></font>
+
+92
+00:06:55,123 --> 00:06:57,750
+<font color="white">Did life feel easier</font><font color="white">
+<font color="white">with me out of the picture?</font><font color="white"></font></font>
+
+93
+00:06:58,876 --> 00:07:00,795
+<font color="white">Did it feel good to perform</font><font color="white"></font>
+
+94
+00:07:01,379 --> 00:07:02,338
+<font color="white">as the winner?</font><font color="white"></font>
+
+95
+00:07:15,268 --> 00:07:16,352
+<font color="white">Why did you do that to me?</font><font color="white"></font>
+
+96
+00:07:18,771 --> 00:07:21,023
+<font color="white">No, I won't go!</font><font color="white"></font>
+
+97
+00:07:21,107 --> 00:07:22,400
+<font color="white">I'd rather die</font><font color="white"></font>
+
+98
+00:07:22,900 --> 00:07:24,735
+<font color="white">than let anyone know about this.</font><font color="white"></font>
+
+99
+00:07:24,819 --> 00:07:27,864
+<font color="white">Are you willing to let me die like this?</font><font color="white"></font>
+
+100
+00:07:42,628 --> 00:07:43,463
+<font color="white">I'm sorry.</font><font color="white"></font>
+
+101
+00:07:46,841 --> 00:07:47,717
+<font color="white">You're right.</font><font color="white"></font>
+
+102
+00:07:49,886 --> 00:07:51,095
+<font color="white">It was me.</font><font color="white"></font>
+
+103
+00:07:56,142 --> 00:07:58,519
+<font color="white">It was the finals, and I hurt my finger.</font><font color="white"></font>
+
+104
+00:07:58,603 --> 00:07:59,896
+<font color="white">I couldn't think straight.</font><font color="white"></font>
+
+105
+00:08:00,396 --> 00:08:02,607
+<font color="white">I'd worked so hard to win the competition,</font><font color="white"></font>
+
+106
+00:08:03,232 --> 00:08:05,193
+<font color="white">but I was afraid I couldn't win</font><font color="white">
+<font color="white">because of you.</font><font color="white"></font></font>
+
+107
+00:08:06,194 --> 00:08:07,737
+<font color="white">I'll turn myself in for what I did</font><font color="white"></font>
+
+108
+00:08:08,905 --> 00:08:10,698
+<font color="white">and face the consequences.</font><font color="white"></font>
+
+109
+00:08:12,074 --> 00:08:13,367
+<font color="white">I'll take responsibility</font><font color="white"></font>
+
+110
+00:08:14,494 --> 00:08:15,828
+<font color="white">for everything.</font><font color="white"></font>
+
+111
+00:08:16,412 --> 00:08:17,705
+<font color="white">"Responsibility"?</font><font color="white"></font>
+
+112
+00:08:18,873 --> 00:08:21,292
+<font color="white">You completely ruined my life.</font><font color="white"></font>
+
+113
+00:08:21,918 --> 00:08:24,128
+<font color="white">And you think</font><font color="white">
+<font color="white">sitting pretty in a cell will cut it?</font><font color="white"></font></font>
+
+114
+00:08:26,005 --> 00:08:29,175
+<font color="white">I didn't struggle to come back alive</font><font color="white">
+<font color="white">just to give you a free pass.</font><font color="white"></font></font>
+
+115
+00:08:29,842 --> 00:08:31,052
+<font color="white">Listen.</font><font color="white"></font>
+
+116
+00:08:33,262 --> 00:08:34,972
+<font color="white">I'm the only one who gets to judge you.</font><font color="white"></font>
+
+117
+00:08:36,182 --> 00:08:37,934
+<font color="white">And I'm the only one who gets to kill you.</font><font color="white"></font>
+
+118
+00:08:38,935 --> 00:08:40,645
+<font color="white">If I just die, will this all end?</font><font color="white"></font>
+
+119
+00:08:41,229 --> 00:08:42,063
+<font color="white">No.</font><font color="white"></font>
+
+120
+00:08:43,648 --> 00:08:45,358
+<font color="white">I won't let it end that easily.</font><font color="white"></font>
+
+121
+00:08:48,486 --> 00:08:50,738
+<font color="white">The second you take the easy way out,</font><font color="white"></font>
+
+122
+00:08:50,821 --> 00:08:53,324
+<font color="white">the whole world will know what you did.</font><font color="white"></font>
+
+123
+00:08:53,407 --> 00:08:55,618
+<font color="white">The same goes</font><font color="white">
+<font color="white">for your accomplice of a mother.</font><font color="white"></font></font>
+
+124
+00:08:58,412 --> 00:08:59,455
+<font color="white">Just wait.</font><font color="white"></font>
+
+125
+00:08:59,539 --> 00:09:01,082
+<font color="white">I'll show you what hell looks like.</font><font color="white"></font>
+
+126
+00:09:03,584 --> 00:09:06,337
+<font color="white">It'll be more than</font><font color="white">
+<font color="white">you can possibly imagine.</font><font color="white"></font></font>
+
+127
+00:09:16,931 --> 00:09:19,433
+<font color="white">MUSICAL INSTRUMENT ARCADE</font><font color="white">
+<font color="white">TRADITIONAL MARKET</font><font color="white"></font></font>
+
+128
+00:09:29,944 --> 00:09:31,320
+<font color="white">Hello.</font><font color="white"></font>
+
+129
+00:09:31,404 --> 00:09:34,156
+<font color="white">Can I ask you a question?</font><font color="white"></font>
+
+130
+00:09:34,240 --> 00:09:35,408
+<font color="white">By any chance,</font><font color="white"></font>
+
+131
+00:09:36,200 --> 00:09:37,910
+<font color="white">do you know who this is?</font><font color="white"></font>
+
+132
+00:09:37,994 --> 00:09:40,329
+<font color="white">He's Conductor Choi Jeong-yo,</font><font color="white">
+<font color="white">and I hear he grew up here.</font><font color="white"></font></font>
+
+133
+00:09:40,413 --> 00:09:42,999
+<font color="white">I think I've heard of him.</font><font color="white"></font>
+
+134
+00:09:43,082 --> 00:09:46,961
+<font color="white">Then do you know</font><font color="white">
+<font color="white">where Jeong-yo's father is?</font><font color="white"></font></font>
+
+135
+00:09:48,004 --> 00:09:48,838
+<font color="white">I'm not sure.</font><font color="white"></font>
+
+136
+00:09:50,881 --> 00:09:51,841
+<font color="white">Thank you anyway.</font><font color="white"></font>
+
+137
+00:10:10,067 --> 00:10:11,068
+<font color="white">Excuse me.</font><font color="white"></font>
+
+138
+00:10:11,944 --> 00:10:13,863
+<font color="white">Have you heard of Conductor Choi Jeong-yo?</font><font color="white"></font>
+
+139
+00:10:15,031 --> 00:10:18,075
+<font color="white">I heard his father</font><font color="white">
+<font color="white">used to work around here.</font><font color="white"></font></font>
+
+140
+00:10:19,952 --> 00:10:20,953
+<font color="white">It's hard to say.</font><font color="white"></font>
+
+141
+00:10:22,079 --> 00:10:24,248
+<font color="white">He does look familiar,</font><font color="white"></font>
+
+142
+00:10:25,625 --> 00:10:28,085
+<font color="white">but I could be wrong. I'm not sure.</font><font color="white"></font>
+
+143
+00:10:29,587 --> 00:10:30,546
+<font color="white">I don't know.</font><font color="white"></font>
+
+144
+00:10:38,554 --> 00:10:39,430
+<font color="white">Excuse me.</font><font color="white"></font>
+
+145
+00:10:42,350 --> 00:10:43,643
+<font color="white">Are you looking for Choi Gi-taek?</font><font color="white"></font>
+
+146
+00:10:53,319 --> 00:10:54,153
+<font color="white">Well…</font><font color="white"></font>
+
+147
+00:10:54,779 --> 00:10:55,613
+<font color="white">May I ask your name?</font><font color="white"></font>
+
+148
+00:10:55,696 --> 00:10:57,406
+<font color="white">Just call me Kim.</font><font color="white"></font>
+
+149
+00:10:58,491 --> 00:10:59,325
+<font color="white">And you?</font><font color="white"></font>
+
+150
+00:11:00,868 --> 00:11:01,744
+<font color="white">Well,</font><font color="white"></font>
+
+151
+00:11:02,662 --> 00:11:04,288
+<font color="white">I'm Jeong-yo's friend's mother.</font><font color="white"></font>
+
+152
+00:11:04,789 --> 00:11:06,457
+<font color="white">I don't know if you've seen the news,</font><font color="white"></font>
+
+153
+00:11:06,540 --> 00:11:08,459
+<font color="white">but Jeong-yo lost his memory.</font><font color="white"></font>
+
+154
+00:11:09,210 --> 00:11:12,713
+<font color="white">I'm looking for his family,</font><font color="white">
+<font color="white">hoping it might help him.</font><font color="white"></font></font>
+
+155
+00:11:12,797 --> 00:11:13,839
+<font color="white">I see.</font><font color="white"></font>
+
+156
+00:11:14,840 --> 00:11:16,258
+<font color="white">So you're trying to help?</font><font color="white"></font>
+
+157
+00:11:18,469 --> 00:11:19,595
+<font color="white">So…</font><font color="white"></font>
+
+158
+00:11:21,222 --> 00:11:22,890
+<font color="white">how do you know Jeong-yo?</font><font color="white"></font>
+
+159
+00:11:23,516 --> 00:11:25,017
+<font color="white">I'm a close friend of his.</font><font color="white"></font>
+
+160
+00:11:26,102 --> 00:11:27,019
+<font color="white">Right.</font><font color="white"></font>
+
+161
+00:11:27,728 --> 00:11:29,438
+<font color="white">I see.</font><font color="white"></font>
+
+162
+00:11:30,064 --> 00:11:31,273
+<font color="white">Then do you know</font><font color="white"></font>
+
+163
+00:11:32,066 --> 00:11:33,943
+<font color="white">where Jeong-yo's father is?</font><font color="white"></font>
+
+164
+00:11:34,693 --> 00:11:36,153
+<font color="white">The bastard who took off with my money?</font><font color="white"></font>
+
+165
+00:11:36,904 --> 00:11:38,697
+<font color="white">I guess I could find him if I wanted to,</font><font color="white"></font>
+
+166
+00:11:38,781 --> 00:11:40,950
+<font color="white">but he's probably</font><font color="white">
+<font color="white">passed out drunk somewhere.</font><font color="white"></font></font>
+
+167
+00:11:48,457 --> 00:11:51,961
+<font color="white">ALCOHOL REHAB CENTER</font><font color="white"></font>
+
+168
+00:11:55,673 --> 00:11:56,632
+<font color="white">Oh, I…</font><font color="white"></font>
+
+169
+00:11:58,217 --> 00:12:01,554
+<font color="white">I guess you don't know where he is either.</font><font color="white"></font>
+
+170
+00:12:02,304 --> 00:12:04,098
+<font color="white">Thank you for your time.</font><font color="white"></font>
+
+171
+00:12:04,682 --> 00:12:05,808
+<font color="white">If you'll excuse me.</font><font color="white"></font>
+
+172
+00:12:18,988 --> 00:12:20,990
+<font color="white">You're Pianist Kang Pi-o's mother, right?</font><font color="white"></font>
+
+173
+00:12:21,824 --> 00:12:22,992
+<font color="white">I saw the news then.</font><font color="white"></font>
+
+174
+00:12:24,452 --> 00:12:27,329
+<font color="white">Jeong-yo went missing,</font><font color="white">
+<font color="white">and Kang Pi-o won first place.</font><font color="white"></font></font>
+
+175
+00:12:28,414 --> 00:12:29,331
+<font color="white">But you know,</font><font color="white"></font>
+
+176
+00:12:29,832 --> 00:12:32,084
+<font color="white">word will get out</font><font color="white">
+<font color="white">if you poke around like this.</font><font color="white"></font></font>
+
+177
+00:12:38,007 --> 00:12:39,508
+<font color="white">Call me if you need any help.</font><font color="white"></font>
+
+178
+00:12:53,147 --> 00:12:54,231
+<font color="white">Please pick up.</font><font color="white"></font>
+
+179
+00:12:56,901 --> 00:12:57,860
+<font color="white">Pi-o.</font><font color="white"></font>
+
+180
+00:12:57,943 --> 00:12:58,777
+<font color="white"><i>Yes?</i></font><font color="white"></font>
+
+181
+00:12:59,278 --> 00:13:00,279
+<font color="white">What are we going to do?</font><font color="white"></font>
+
+182
+00:13:01,947 --> 00:13:02,823
+<font color="white">Choi Jeong-yo</font><font color="white"></font>
+
+183
+00:13:04,116 --> 00:13:05,784
+<font color="white">doesn't have amnesia.</font><font color="white"></font>
+
+184
+00:13:06,744 --> 00:13:08,829
+<font color="white"><i>His father is an alcoholic.</i></font><font color="white"></font>
+
+185
+00:13:08,913 --> 00:13:10,956
+<font color="white"><i>He was at that alcohol rehab center.</i></font><font color="white"></font>
+
+186
+00:13:12,041 --> 00:13:12,875
+<font color="white">He…</font><font color="white"></font>
+
+187
+00:13:13,834 --> 00:13:16,504
+<font color="white">He's trying to get revenge on us.</font><font color="white">
+<font color="white">What should we do?</font><font color="white"></font></font>
+
+188
+00:13:17,588 --> 00:13:19,173
+<font color="white">He'll expose us if we do nothing.</font><font color="white"></font>
+
+189
+00:13:20,591 --> 00:13:22,551
+<font color="white"><i>We need to stop him somehow.</i></font><font color="white"></font>
+
+190
+00:13:22,635 --> 00:13:24,428
+<font color="white">We have to, no matter what!</font><font color="white"></font>
+
+191
+00:13:24,929 --> 00:13:25,971
+<font color="white"><i>How would we do that?</i></font><font color="white"></font>
+
+192
+00:13:26,889 --> 00:13:28,057
+<font color="white">We committed a crime,</font><font color="white"></font>
+
+193
+00:13:28,974 --> 00:13:30,643
+<font color="white">and he'd only be telling the truth.</font><font color="white"></font>
+
+194
+00:13:31,268 --> 00:13:33,687
+<font color="white">We need to get rid of him</font><font color="white">
+<font color="white">so he can't talk.</font><font color="white"></font></font>
+
+195
+00:13:33,771 --> 00:13:35,189
+<font color="white">What are you saying?</font><font color="white"></font>
+
+196
+00:13:35,272 --> 00:13:37,316
+<font color="white">We have no choice if we want to survive!</font><font color="white"></font>
+
+197
+00:13:37,399 --> 00:13:38,901
+<font color="white">Just stop it!</font><font color="white"></font>
+
+198
+00:13:39,944 --> 00:13:41,987
+<font color="white">If you go after Jeong-yo again…</font><font color="white"></font>
+
+199
+00:13:43,989 --> 00:13:45,866
+<font color="white">I swear I won't just stand by.</font><font color="white"></font>
+
+200
+00:13:45,950 --> 00:13:46,909
+<font color="white"><i>Have you lost your mind?</i></font><font color="white"></font>
+
+201
+00:13:47,660 --> 00:13:49,119
+<font color="white">Don't you understand?</font><font color="white"></font>
+
+202
+00:13:49,912 --> 00:13:52,998
+<font color="white">He came back to get revenge on us!</font><font color="white"></font>
+
+203
+00:13:53,082 --> 00:13:54,583
+<font color="white">Then I'll let him…</font><font color="white"></font>
+
+204
+00:13:56,085 --> 00:13:57,378
+<font color="white">take out his revenge on me.</font><font color="white"></font>
+
+205
+00:13:57,461 --> 00:13:58,295
+<font color="white"><i>Pi-o!</i></font><font color="white"></font>
+
+206
+00:14:04,510 --> 00:14:08,180
+<font color="white">This contract contains</font><font color="white">
+<font color="white">too many toxic clauses for our soloist.</font><font color="white"></font></font>
+
+207
+00:14:08,764 --> 00:14:10,599
+<font color="white">Under these terms,</font><font color="white"></font>
+
+208
+00:14:10,683 --> 00:14:13,644
+<font color="white">he will have to take on too much risk</font><font color="white">
+<font color="white">if the project falls through.</font><font color="white"></font></font>
+
+209
+00:14:14,228 --> 00:14:17,606
+<font color="white">We're also taking a risk</font><font color="white">
+<font color="white">by signing this contract.</font><font color="white"></font></font>
+
+210
+00:14:17,690 --> 00:14:21,527
+<font color="white">Recording a world premiere is different</font><font color="white">
+<font color="white">from recording standard repertoire.</font><font color="white"></font></font>
+
+211
+00:14:22,152 --> 00:14:24,905
+<font color="white">Still, this is too much.</font><font color="white"></font>
+
+212
+00:14:26,031 --> 00:14:28,033
+<font color="white">This soloist replacement clause is--</font><font color="white"></font>
+
+213
+00:14:28,117 --> 00:14:29,410
+<font color="white">I'm sure you know</font><font color="white"></font>
+
+214
+00:14:29,493 --> 00:14:32,872
+<font color="white">that's just a safeguard</font><font color="white">
+<font color="white">against a worst-case scenario.</font><font color="white"></font></font>
+
+215
+00:14:32,955 --> 00:14:35,291
+<font color="white">If the recording gets delayed</font><font color="white">
+<font color="white">because of the soloist,</font><font color="white"></font></font>
+
+216
+00:14:35,833 --> 00:14:37,543
+<font color="white">it will disrupt the schedules</font><font color="white"></font>
+
+217
+00:14:37,626 --> 00:14:39,753
+<font color="white">for the orchestra and the engineers.</font><font color="white"></font>
+
+218
+00:14:39,837 --> 00:14:41,297
+<font color="white">We're just trying to minimize the damage.</font><font color="white"></font>
+
+219
+00:14:42,131 --> 00:14:43,132
+<font color="white">To be honest,</font><font color="white"></font>
+
+220
+00:14:44,049 --> 00:14:45,926
+<font color="white">our partners overseas</font><font color="white"></font>
+
+221
+00:14:46,010 --> 00:14:49,263
+<font color="white">have expressed their concerns</font><font color="white">
+<font color="white">about Mr. Kang…</font><font color="white"></font></font>
+
+222
+00:14:51,557 --> 00:14:53,684
+<font color="white">We understand your position.</font><font color="white"></font>
+
+223
+00:14:53,767 --> 00:14:56,645
+<font color="white">We'll discuss this further internally.</font><font color="white"></font>
+
+224
+00:15:11,535 --> 00:15:12,828
+<font color="white">Why did you do that?</font><font color="white"></font>
+
+225
+00:15:13,495 --> 00:15:15,581
+<font color="white">You should've had them</font><font color="white">
+<font color="white">remove the toxic clauses first.</font><font color="white"></font></font>
+
+226
+00:15:15,664 --> 00:15:16,540
+<font color="white">What's the rush?</font><font color="white"></font>
+
+227
+00:15:18,250 --> 00:15:21,170
+<font color="white">Don't worry.</font><font color="white">
+<font color="white">It'll be fine if I just play well.</font><font color="white"></font></font>
+
+228
+00:15:21,837 --> 00:15:23,255
+<font color="white">There's no time.</font><font color="white"></font>
+
+229
+00:15:25,591 --> 00:15:27,009
+<font color="white">Once the schedule is set,</font><font color="white"></font>
+
+230
+00:15:27,092 --> 00:15:29,261
+<font color="white">I'll send you a list of </font><font color="white"><font color="white"><i>tonmeisters</i></font></font><font color="white"><font color="white">.</font><font color="white"></font></font>
+
+231
+00:15:29,887 --> 00:15:33,223
+<font color="white">We definitely plan to book Dominic</font><font color="white">
+<font color="white">since he's the best in the industry,</font><font color="white"></font></font>
+
+232
+00:15:33,307 --> 00:15:34,975
+<font color="white">but in case he's unavailable,</font><font color="white"></font>
+
+233
+00:15:35,601 --> 00:15:38,729
+<font color="white">I'll have a backup list ready.</font><font color="white"></font>
+
+234
+00:15:39,563 --> 00:15:40,773
+<font color="white">Well done.</font><font color="white"></font>
+
+235
+00:15:41,899 --> 00:15:44,985
+<font color="white">Now that the contract is signed,</font><font color="white">
+<font color="white">I'm feeling nervous.</font><font color="white"></font></font>
+
+236
+00:15:45,861 --> 00:15:48,405
+<font color="white">On that note, let's increase</font><font color="white">
+<font color="white">your individual practice time.</font><font color="white"></font></font>
+
+237
+00:15:49,281 --> 00:15:51,784
+<font color="white">The orchestra is coming together,</font><font color="white"></font>
+
+238
+00:15:52,534 --> 00:15:54,662
+<font color="white">but I'm worried about the solo part.</font><font color="white"></font>
+
+239
+00:15:56,622 --> 00:15:57,581
+<font color="white">What do you say?</font><font color="white"></font>
+
+240
+00:15:58,832 --> 00:16:00,000
+<font color="white">Can you make some time?</font><font color="white"></font>
+
+241
+00:16:00,918 --> 00:16:02,044
+<font color="white">I will.</font><font color="white"></font>
+
+242
+00:16:02,670 --> 00:16:05,005
+<font color="white">We need to work on the details,</font><font color="white"></font>
+
+243
+00:16:05,673 --> 00:16:07,549
+<font color="white">so come alone without the accompanist.</font><font color="white"></font>
+
+244
+00:16:10,302 --> 00:16:11,220
+<font color="white">I'm counting on you.</font><font color="white"></font>
+
+245
+00:16:28,070 --> 00:16:29,029
+<font color="white">So…</font><font color="white"></font>
+
+246
+00:16:30,364 --> 00:16:31,657
+<font color="white">what's going to happen to us?</font><font color="white"></font>
+
+247
+00:16:34,368 --> 00:16:37,246
+<font color="white">Do we just wait until our lives are over?</font><font color="white"></font>
+
+248
+00:16:37,830 --> 00:16:39,456
+<font color="white">I'll do whatever I can,</font><font color="white"></font>
+
+249
+00:16:41,583 --> 00:16:42,793
+<font color="white">so don't worry.</font><font color="white"></font>
+
+250
+00:17:05,190 --> 00:17:06,025
+<font color="white">Come in.</font><font color="white"></font>
+
+251
+00:17:26,003 --> 00:17:27,171
+<font color="white">Wait.</font><font color="white"></font>
+
+252
+00:17:29,131 --> 00:17:30,340
+<font color="white">At this tempo.</font><font color="white"></font>
+
+253
+00:17:30,966 --> 00:17:32,009
+<font color="white">But why?</font><font color="white"></font>
+
+254
+00:17:33,052 --> 00:17:36,263
+<font color="white">The opening should focus on</font><font color="white">
+<font color="white">evoking an emotional response,</font><font color="white"></font></font>
+
+255
+00:17:36,847 --> 00:17:38,557
+<font color="white">not the speed.</font><font color="white"></font>
+
+256
+00:17:40,517 --> 00:17:42,686
+<font color="white">You think your opinion matters right now?</font><font color="white"></font>
+
+257
+00:17:43,687 --> 00:17:46,940
+<font color="white">I have a specific sound and tempo in mind.</font><font color="white"></font>
+
+258
+00:17:47,566 --> 00:17:50,152
+<font color="white">But you completely lack the power</font><font color="white">
+<font color="white">to express that.</font><font color="white"></font></font>
+
+259
+00:17:50,235 --> 00:17:51,320
+<font color="white">I want this piece</font><font color="white"></font>
+
+260
+00:17:51,987 --> 00:17:54,573
+<font color="white">to erupt with explosive cohesion.</font><font color="white"></font>
+
+261
+00:17:55,532 --> 00:17:58,118
+<font color="white">I don't want a weak and limp delivery.</font><font color="white"></font>
+
+262
+00:17:58,202 --> 00:17:59,036
+<font color="white">Understand?</font><font color="white"></font>
+
+263
+00:18:51,380 --> 00:18:52,339
+<font color="white">Again.</font><font color="white"></font>
+
+264
+00:18:53,465 --> 00:18:54,883
+<font color="white">Play the cadenza at this tempo.</font><font color="white"></font>
+
+265
+00:18:55,634 --> 00:18:57,386
+<font color="white">What are you trying to pull here?</font><font color="white"></font>
+
+266
+00:18:58,095 --> 00:18:58,929
+<font color="white">What is it?</font><font color="white"></font>
+
+267
+00:18:59,012 --> 00:19:01,181
+<font color="white">Trying to ruin my tendons</font><font color="white">
+<font color="white">so I can't play anymore?</font><font color="white"></font></font>
+
+268
+00:19:01,849 --> 00:19:03,725
+<font color="white">Is this the revenge</font><font color="white">
+<font color="white">you told me to wait for?</font><font color="white"></font></font>
+
+269
+00:19:03,809 --> 00:19:05,686
+<font color="white">Do you still not get it?</font><font color="white"></font>
+
+270
+00:19:09,022 --> 00:19:11,692
+<font color="white">You've got this all wrong.</font><font color="white"></font>
+
+271
+00:19:14,319 --> 00:19:16,280
+<font color="white">I didn't give you my precious music</font><font color="white"></font>
+
+272
+00:19:16,363 --> 00:19:18,574
+<font color="white">to waste on some petty scheme.</font><font color="white"></font>
+
+273
+00:19:23,954 --> 00:19:26,248
+<font color="white">I had a gun aimed at my head.</font><font color="white"></font>
+
+274
+00:19:31,628 --> 00:19:34,381
+<font color="white"><i>The car drove deep into a forest.</i></font><font color="white"></font>
+
+275
+00:19:34,464 --> 00:19:36,341
+<font color="white"><i>It was obvious what they were up to.</i></font><font color="white"></font>
+
+276
+00:19:36,425 --> 00:19:40,262
+<font color="white"><i>To take me somewhere isolated</i></font><font color="white">
+<font color="white"><i>and kill me without anyone knowing.</i></font></font><font color="white"></font>
+
+277
+00:19:40,345 --> 00:19:43,307
+<font color="white">Watch it before you drive us into a grave.</font><font color="white"></font>
+
+278
+00:19:43,390 --> 00:19:44,308
+<font color="white">No, you watch it.</font><font color="white"></font>
+
+279
+00:19:44,391 --> 00:19:46,185
+<font color="white">Don't get blood splatter in the car.</font><font color="white"></font>
+
+280
+00:19:46,977 --> 00:19:50,063
+<font color="white"><i>Then I saw an opening to get out alive.</i></font><font color="white"></font>
+
+281
+00:19:50,147 --> 00:19:52,107
+<font color="white"><i>They started fighting.</i></font><font color="white"></font>
+
+282
+00:19:52,608 --> 00:19:55,777
+<font color="white"><i>I saw that as my chance</i></font><font color="white">
+<font color="white"><i>and fought for my life to get away.</i></font></font><font color="white"></font>
+
+283
+00:19:58,155 --> 00:19:58,989
+<font color="white"><i>I thought I'd made it.</i></font><font color="white"></font>
+
+284
+00:19:59,990 --> 00:20:00,991
+<font color="white"><i>I thought I was free.</i></font><font color="white"></font>
+
+285
+00:20:01,658 --> 00:20:02,868
+<font color="white"><i>But I was wrong.</i></font><font color="white"></font>
+
+286
+00:20:03,535 --> 00:20:04,536
+<font color="white"><i>Just then,</i></font><font color="white"></font>
+
+287
+00:20:06,163 --> 00:20:09,708
+<font color="white"><i>I heard a bullet</i></font><font color="white">
+<font color="white"><i>rip through my right shoulder.</i></font></font><font color="white"></font>
+
+288
+00:20:16,924 --> 00:20:18,050
+<font color="white">The shock of it…</font><font color="white"></font>
+
+289
+00:20:20,219 --> 00:20:21,803
+<font color="white">left me with no memory for five years…</font><font color="white"></font>
+
+290
+00:20:23,555 --> 00:20:24,806
+<font color="white">until I saw you again.</font><font color="white"></font>
+
+291
+00:20:26,642 --> 00:20:27,851
+<font color="white">That very moment.</font><font color="white"></font>
+
+292
+00:20:29,603 --> 00:20:32,397
+<font color="white">I wrote that hellish moment</font><font color="white">
+<font color="white">into the cadenza.</font><font color="white"></font></font>
+
+293
+00:20:33,523 --> 00:20:34,733
+<font color="white">So do you really think</font><font color="white"></font>
+
+294
+00:20:35,984 --> 00:20:39,196
+<font color="white">you're delivering that overwhelming fear</font><font color="white">
+<font color="white">in your performance?</font><font color="white"></font></font>
+
+295
+00:20:41,281 --> 00:20:42,699
+<font color="white">Don't kid yourself.</font><font color="white"></font>
+
+296
+00:20:44,034 --> 00:20:45,953
+<font color="white">I'm not doing this to screw you over.</font><font color="white"></font>
+
+297
+00:20:46,620 --> 00:20:49,081
+<font color="white">Making </font><font color="white"><font color="white"><i>Nemesis</i></font></font><font color="white"><font color="white"> into a masterpiece</font><font color="white"></font></font>
+
+298
+00:20:49,164 --> 00:20:50,916
+<font color="white">matters more to me than to you.</font><font color="white"></font>
+
+299
+00:20:50,999 --> 00:20:52,000
+<font color="white">So…</font><font color="white"></font>
+
+300
+00:20:53,794 --> 00:20:56,171
+<font color="white">instead of worrying about</font><font color="white">
+<font color="white">pulling a stupid tendon…</font><font color="white"></font></font>
+
+301
+00:20:58,548 --> 00:21:02,302
+<font color="white">think about whether you're capturing</font><font color="white">
+<font color="white">the vision of the composer.</font><font color="white"></font></font>
+
+302
+00:21:03,679 --> 00:21:07,099
+<font color="white">You expect me to forgive you</font><font color="white">
+<font color="white">with that kind of complacent attitude?</font><font color="white"></font></font>
+
+303
+00:21:28,996 --> 00:21:30,205
+<font color="white">Fourth and fifth fingers are weak.</font><font color="white"></font>
+
+304
+00:21:32,332 --> 00:21:33,917
+<font color="white">With more clarity!</font><font color="white"></font>
+
+305
+00:22:52,579 --> 00:22:54,331
+<font color="white">I have to keep going.</font><font color="white"></font>
+
+306
+00:23:19,564 --> 00:23:21,733
+<font color="white"><i>You failed to satisfy me today.</i></font><font color="white"></font>
+
+307
+00:23:22,943 --> 00:23:25,987
+<font color="white"><i>The cadenza isn't as murderous</i></font><font color="white">
+<font color="white"><i>and hostile as it should be.</i></font></font><font color="white"></font>
+
+308
+00:23:50,762 --> 00:23:53,765
+<font color="white">How is the schedule for the concert hall?</font><font color="white"></font>
+
+309
+00:23:54,683 --> 00:23:57,978
+<font color="white">I checked,</font><font color="white">
+<font color="white">and the venue was fully booked,</font><font color="white"></font></font>
+
+310
+00:23:58,061 --> 00:23:59,521
+<font color="white">but I managed to secure a day.</font><font color="white"></font>
+
+311
+00:24:00,272 --> 00:24:02,023
+<font color="white">Will a day be enough?</font><font color="white"></font>
+
+312
+00:24:02,107 --> 00:24:04,484
+<font color="white">I'm afraid the schedule will be too tight.</font><font color="white"></font>
+
+313
+00:24:04,568 --> 00:24:08,989
+<font color="white">Jeong-yo is working tirelessly with Pi-o</font><font color="white">
+<font color="white">and the orchestra in separate rehearsals,</font><font color="white"></font></font>
+
+314
+00:24:09,072 --> 00:24:11,491
+<font color="white">so doing it all in one day</font><font color="white">
+<font color="white">shouldn't be a problem.</font><font color="white"></font></font>
+
+315
+00:24:11,575 --> 00:24:13,451
+<font color="white">We can record the movements</font><font color="white">
+<font color="white">separately that day,</font><font color="white"></font></font>
+
+316
+00:24:13,535 --> 00:24:14,995
+<font color="white">so it should be fine.</font><font color="white"></font>
+
+317
+00:24:15,579 --> 00:24:16,621
+<font color="white">Separate rehearsals?</font><font color="white"></font>
+
+318
+00:24:16,705 --> 00:24:17,706
+<font color="white">Yes.</font><font color="white"></font>
+
+319
+00:24:18,290 --> 00:24:20,333
+<font color="white">But why separate rehearsals?</font><font color="white"></font>
+
+320
+00:24:20,417 --> 00:24:21,251
+<font color="white">I don't know.</font><font color="white"></font>
+
+321
+00:24:22,586 --> 00:24:24,880
+<font color="white">Jeong-yo says it's too early</font><font color="white">
+<font color="white">to bring them together.</font><font color="white"></font></font>
+
+322
+00:24:25,505 --> 00:24:26,923
+<font color="white">He's been fine-tuning them separately.</font><font color="white"></font>
+
+323
+00:24:27,966 --> 00:24:30,177
+<font color="white"><i>I'm sure the composer knows</i></font><font color="white">
+<font color="white"><i>what he's doing.</i></font></font><font color="white"></font>
+
+324
+00:24:33,513 --> 00:24:36,183
+<font color="white">Why are you letting mere finger pain</font><font color="white">
+<font color="white">dull your playing?</font><font color="white"></font></font>
+
+325
+00:24:43,023 --> 00:24:45,150
+<font color="white">Don't make a fuss and focus until the end!</font><font color="white"></font>
+
+326
+00:24:49,988 --> 00:24:51,239
+<font color="white">What the hell, Choi Jeong-yo?</font><font color="white"></font>
+
+327
+00:24:53,116 --> 00:24:55,118
+<font color="white">How can you talk to an artist like that?</font><font color="white"></font>
+
+328
+00:24:55,202 --> 00:24:56,203
+<font color="white">Jae-in.</font><font color="white"></font>
+
+329
+00:24:58,079 --> 00:24:58,955
+<font color="white">What are you doing?</font><font color="white"></font>
+
+330
+00:24:59,039 --> 00:25:00,248
+<font color="white">What's with the tempo?</font><font color="white"></font>
+
+331
+00:25:00,832 --> 00:25:02,209
+<font color="white">Why is he playing so fast?</font><font color="white"></font>
+
+332
+00:25:02,292 --> 00:25:04,252
+<font color="white">You know that will ruin his fingers.</font><font color="white"></font>
+
+333
+00:25:05,045 --> 00:25:06,129
+<font color="white">What's wrong with you?</font><font color="white"></font>
+
+334
+00:25:06,213 --> 00:25:08,006
+<font color="white">Come on, let's talk outside.</font><font color="white"></font>
+
+335
+00:25:11,301 --> 00:25:12,427
+<font color="white">Pi-o.</font><font color="white"></font>
+
+336
+00:25:12,510 --> 00:25:13,678
+<font color="white">What's wrong with your hands?</font><font color="white"></font>
+
+337
+00:25:20,310 --> 00:25:21,269
+<font color="white">Hey, Choi Jeong-yo.</font><font color="white"></font>
+
+338
+00:25:22,270 --> 00:25:23,647
+<font color="white">What do you think you're doing?</font><font color="white"></font>
+
+339
+00:25:24,397 --> 00:25:27,400
+<font color="white">If his hands were that bad,</font><font color="white">
+<font color="white">you should've told him to rest!</font><font color="white"></font></font>
+
+340
+00:25:27,901 --> 00:25:29,861
+<font color="white">What if he can't play the piano anymore?</font><font color="white"></font>
+
+341
+00:25:29,945 --> 00:25:31,238
+<font color="white">Will you take responsibility?</font><font color="white"></font>
+
+342
+00:25:32,739 --> 00:25:34,532
+<font color="white">Follow me out right now.</font><font color="white"></font>
+
+343
+00:25:34,616 --> 00:25:35,575
+<font color="white">Let go of me.</font><font color="white"></font>
+
+344
+00:25:35,659 --> 00:25:36,868
+<font color="white">I said let go!</font><font color="white"></font>
+
+345
+00:25:44,584 --> 00:25:45,835
+<font color="white">Tell me.</font><font color="white"></font>
+
+346
+00:25:47,045 --> 00:25:49,923
+<font color="white">What's his problem with you?</font><font color="white"></font>
+
+347
+00:25:50,006 --> 00:25:52,133
+<font color="white">And why are you just sitting back?</font><font color="white"></font>
+
+348
+00:25:52,217 --> 00:25:53,927
+<font color="white">Did you do something wrong?</font><font color="white"></font>
+
+349
+00:25:54,552 --> 00:25:56,638
+<font color="white">Whether I ruin my fingers</font><font color="white">
+<font color="white">or the performance,</font><font color="white"></font></font>
+
+350
+00:25:57,555 --> 00:25:58,598
+<font color="white">that's my problem.</font><font color="white"></font>
+
+351
+00:25:58,682 --> 00:26:00,809
+<font color="white">So stay out of my business.</font><font color="white"></font>
+
+352
+00:26:00,892 --> 00:26:02,060
+<font color="white">Listen, Kang Pi-o.</font><font color="white"></font>
+
+353
+00:26:03,687 --> 00:26:06,731
+<font color="white">My job comes before our relationship.</font><font color="white"></font>
+
+354
+00:26:07,941 --> 00:26:11,403
+<font color="white">You're in no state to record or perform.</font><font color="white"></font>
+
+355
+00:26:11,486 --> 00:26:12,946
+<font color="white">So I can't stay out of it.</font><font color="white"></font>
+
+356
+00:26:13,446 --> 00:26:14,489
+<font color="white">This won't do.</font><font color="white"></font>
+
+357
+00:26:15,448 --> 00:26:18,076
+<font color="white">You need to push back the recording.</font><font color="white"></font>
+
+358
+00:26:18,660 --> 00:26:21,579
+<font color="white">Actually, just don't do</font><font color="white">
+<font color="white">the performance at all.</font><font color="white"></font></font>
+
+359
+00:26:22,664 --> 00:26:24,082
+<font color="white">The company will pay the penalty fee,</font><font color="white"></font>
+
+360
+00:26:24,958 --> 00:26:25,959
+<font color="white">so cancel the contract.</font><font color="white"></font>
+
+361
+00:26:27,085 --> 00:26:31,589
+<font color="white">I can't get past how controlling</font><font color="white">
+<font color="white">Choi Jeong-yo has been with you</font><font color="white"></font></font>
+
+362
+00:26:32,424 --> 00:26:34,134
+<font color="white">and how strange his training methods are.</font><font color="white"></font>
+
+363
+00:26:34,217 --> 00:26:36,928
+<font color="white">I don't know what his musical vision is,</font><font color="white"></font>
+
+364
+00:26:37,679 --> 00:26:39,055
+<font color="white">and he's nitpicking for no reason.</font><font color="white"></font>
+
+365
+00:26:40,098 --> 00:26:42,183
+<font color="white">He may be the composer, but what the hell?</font><font color="white"></font>
+
+366
+00:26:43,143 --> 00:26:44,144
+<font color="white">At this rate,</font><font color="white"></font>
+
+367
+00:26:44,769 --> 00:26:46,479
+<font color="white">both of you will go down.</font><font color="white"></font>
+
+368
+00:26:46,563 --> 00:26:47,605
+<font color="white">You'll both go down, so--</font><font color="white"></font>
+
+369
+00:26:47,689 --> 00:26:48,898
+<font color="white">That's enough!</font><font color="white"></font>
+
+370
+00:26:50,066 --> 00:26:52,986
+<font color="white">Why do you keep crossing the line</font><font color="white">
+<font color="white">when I said I'd take care of it?</font><font color="white"></font></font>
+
+371
+00:27:02,996 --> 00:27:04,372
+<font color="white">Look, I'm sorry.</font><font color="white"></font>
+
+372
+00:27:05,874 --> 00:27:08,251
+<font color="white">But I have to do this performance</font><font color="white">
+<font color="white">no matter what.</font><font color="white"></font></font>
+
+373
+00:27:09,961 --> 00:27:11,296
+<font color="white">So stay out of it.</font><font color="white"></font>
+
+374
+00:27:12,714 --> 00:27:14,758
+<font color="white">If there's a problem</font><font color="white">
+<font color="white">or I ruin the performance,</font><font color="white"></font></font>
+
+375
+00:27:15,967 --> 00:27:17,385
+<font color="white">I'll take full responsibility.</font><font color="white"></font>
+
+376
+00:27:18,595 --> 00:27:19,804
+<font color="white">Okay?</font><font color="white"></font>
+
+377
+00:27:31,983 --> 00:27:33,818
+<font color="white"><i>I'm the only one who gets to judge you.</i></font><font color="white"></font>
+
+378
+00:27:36,196 --> 00:27:37,822
+<font color="white"><i>And I'm the only one who gets to kill you.</i></font><font color="white"></font>
+
+379
+00:27:38,656 --> 00:27:39,783
+<font color="white"><i>Just wait.</i></font><font color="white"></font>
+
+380
+00:27:39,866 --> 00:27:41,326
+<font color="white"><i>I'll show you what hell looks like.</i></font><font color="white"></font>
+
+381
+00:27:46,956 --> 00:27:49,125
+<font color="white"><i>Jae-in, let's meet up tomorrow.</i></font><font color="white"></font>
+
+382
+00:27:49,209 --> 00:27:50,418
+<font color="white"><i>I need to tell you something.</i></font><font color="white"></font>
+
+383
+00:27:51,586 --> 00:27:52,837
+<font color="white"><i>I'll go to your neighborhood.</i></font><font color="white"></font>
+
+384
+00:27:53,338 --> 00:27:55,298
+<font color="white">JAE-IN, LET'S MEET UP TOMORROW.</font><font color="white"></font>
+
+385
+00:27:57,592 --> 00:28:00,095
+<font color="white">I NEED TO TELL YOU SOMETHING.</font><font color="white">
+<font color="white">I'LL GO TO YOUR NEIGHBORHOOD.</font><font color="white"></font></font>
+
+386
+00:28:10,772 --> 00:28:12,774
+<font color="white">So? What do you need to tell me?</font><font color="white"></font>
+
+387
+00:28:16,486 --> 00:28:17,362
+<font color="white">What is it?</font><font color="white"></font>
+
+388
+00:28:19,447 --> 00:28:20,573
+<font color="white">Are you here to apologize?</font><font color="white"></font>
+
+389
+00:28:22,200 --> 00:28:24,869
+<font color="white">Is that why you can't even look at me?</font><font color="white"></font>
+
+390
+00:28:27,497 --> 00:28:28,498
+<font color="white">It's okay.</font><font color="white"></font>
+
+391
+00:28:28,581 --> 00:28:29,999
+<font color="white">I understand.</font><font color="white"></font>
+
+392
+00:28:31,918 --> 00:28:35,130
+<font color="white">I know you get on edge</font><font color="white">
+<font color="white">before a performance.</font><font color="white"></font></font>
+
+393
+00:28:36,881 --> 00:28:40,927
+<font color="white">But it hurt when you said</font><font color="white">
+<font color="white">I crossed the line.</font><font color="white"></font></font>
+
+394
+00:28:48,059 --> 00:28:50,019
+<font color="white">How are your hands?</font><font color="white"></font>
+
+395
+00:28:51,771 --> 00:28:56,401
+<font color="white">Why are you so obsessed</font><font color="white">
+<font color="white">with Jeong-yo's piece?</font><font color="white"></font></font>
+
+396
+00:28:57,152 --> 00:28:58,570
+<font color="white">Why push yourself so hard?</font><font color="white"></font>
+
+397
+00:28:59,571 --> 00:29:01,489
+<font color="white">Did something happen between you two?</font><font color="white"></font>
+
+398
+00:29:02,532 --> 00:29:03,366
+<font color="white">Jae-in.</font><font color="white"></font>
+
+399
+00:29:06,828 --> 00:29:08,455
+<font color="white">I asked to see you today because…</font><font color="white"></font>
+
+400
+00:29:13,793 --> 00:29:15,086
+<font color="white">I think we should break up.</font><font color="white"></font>
+
+401
+00:29:19,507 --> 00:29:22,385
+<font color="white">I want to focus on music,</font><font color="white">
+<font color="white">but you keep getting in the way.</font><font color="white"></font></font>
+
+402
+00:29:23,470 --> 00:29:25,013
+<font color="white">And when I ask myself</font><font color="white"></font>
+
+403
+00:29:25,597 --> 00:29:28,016
+<font color="white">whether we started dating</font><font color="white">
+<font color="white">because I really liked you…</font><font color="white"></font></font>
+
+404
+00:29:30,310 --> 00:29:31,603
+<font color="white">I don't think that's the case.</font><font color="white"></font>
+
+405
+00:29:34,814 --> 00:29:36,858
+<font color="white">You're always trying to control me…</font><font color="white"></font>
+
+406
+00:29:39,110 --> 00:29:40,069
+<font color="white">and it's suffocating.</font><font color="white"></font>
+
+407
+00:29:42,906 --> 00:29:45,074
+<font color="white">I know it sounds irresponsible of me,</font><font color="white"></font>
+
+408
+00:29:46,493 --> 00:29:48,703
+<font color="white">but I felt you deserved my honesty.</font><font color="white"></font>
+
+409
+00:29:51,581 --> 00:29:52,457
+<font color="white">I'm sorry…</font><font color="white"></font>
+
+410
+00:29:54,793 --> 00:29:56,085
+<font color="white">for hurting you like this.</font><font color="white"></font>
+
+411
+00:29:59,798 --> 00:30:00,799
+<font color="white">I'll get going.</font><font color="white"></font>
+
+412
+00:30:18,566 --> 00:30:19,567
+<font color="white">What's wrong with you?</font><font color="white"></font>
+
+413
+00:30:21,528 --> 00:30:22,737
+<font color="white">So this is it?</font><font color="white"></font>
+
+414
+00:30:24,155 --> 00:30:25,698
+<font color="white">You just say your piece, and it's over?</font><font color="white"></font>
+
+415
+00:30:28,701 --> 00:30:29,577
+<font color="white">You're right.</font><font color="white"></font>
+
+416
+00:30:30,286 --> 00:30:32,288
+<font color="white">We're dating,</font><font color="white">
+<font color="white">but our feelings weren't mutual.</font><font color="white"></font></font>
+
+417
+00:30:32,997 --> 00:30:33,915
+<font color="white">I admit it.</font><font color="white"></font>
+
+418
+00:30:34,791 --> 00:30:38,670
+<font color="white">But you've treated me</font><font color="white">
+<font color="white">like someone special since childhood.</font><font color="white"></font></font>
+
+419
+00:30:39,671 --> 00:30:41,047
+<font color="white">No, I just…</font><font color="white"></font>
+
+420
+00:30:42,715 --> 00:30:44,759
+<font color="white">I just needed someone to support me.</font><font color="white"></font>
+
+421
+00:30:46,219 --> 00:30:47,136
+<font color="white">Fine.</font><font color="white"></font>
+
+422
+00:30:49,180 --> 00:30:50,265
+<font color="white">Just tell me this.</font><font color="white"></font>
+
+423
+00:30:53,810 --> 00:30:54,686
+<font color="white">Did you…</font><font color="white"></font>
+
+424
+00:30:57,939 --> 00:30:59,232
+<font color="white">even for a single moment…</font><font color="white"></font>
+
+425
+00:31:00,316 --> 00:31:01,776
+<font color="white">ever love me?</font><font color="white"></font>
+
+426
+00:31:03,570 --> 00:31:04,445
+<font color="white">No.</font><font color="white"></font>
+
+427
+00:31:04,946 --> 00:31:05,780
+<font color="white">Never.</font><font color="white"></font>
+
+428
+00:31:14,539 --> 00:31:15,582
+<font color="white">Not even once?</font><font color="white"></font>
+
+429
+00:31:23,840 --> 00:31:24,924
+<font color="white">I'm sorry.</font><font color="white"></font>
+
+430
+00:32:05,590 --> 00:32:07,592
+<font color="white">EUGENE ART CENTER</font><font color="white"></font>
+
+431
+00:33:37,724 --> 00:33:39,600
+<font color="white">Okay, let's begin recording.</font><font color="white"></font>
+
+432
+00:33:40,351 --> 00:33:41,310
+<font color="white">Take one.</font><font color="white"></font>
+
+433
+00:34:54,675 --> 00:34:55,676
+<font color="white">Take two.</font><font color="white"></font>
+
+434
+00:35:41,973 --> 00:35:43,349
+<font color="white">What's the issue this time?</font><font color="white"></font>
+
+435
+00:35:43,850 --> 00:35:46,144
+<font color="white">I don't think there was any issue.</font><font color="white"></font>
+
+436
+00:35:46,769 --> 00:35:48,312
+<font color="white">No, there was an issue.</font><font color="white"></font>
+
+437
+00:35:50,189 --> 00:35:53,401
+<font color="white">Others might not have felt it,</font><font color="white">
+<font color="white">but I felt it clearly.</font><font color="white"></font></font>
+
+438
+00:35:54,152 --> 00:35:56,445
+<font color="white">A hint of your unease.</font><font color="white"></font>
+
+439
+00:36:01,576 --> 00:36:02,451
+<font color="white">Understood.</font><font color="white"></font>
+
+440
+00:36:03,035 --> 00:36:04,912
+<font color="white">You probably feel rushed and anxious,</font><font color="white"></font>
+
+441
+00:36:04,996 --> 00:36:07,290
+<font color="white">but try to relax and play comfortably.</font><font color="white"></font>
+
+442
+00:36:08,040 --> 00:36:11,836
+<font color="white">After all, if you can't pull this off,</font><font color="white">
+<font color="white">none of us are going home.</font><font color="white"></font></font>
+
+443
+00:36:14,046 --> 00:36:15,173
+<font color="white">Let's go home, okay?</font><font color="white"></font>
+
+444
+00:36:21,345 --> 00:36:22,346
+<font color="white">Take three.</font><font color="white"></font>
+
+445
+00:37:07,308 --> 00:37:08,267
+<font color="white">This isn't it.</font><font color="white"></font>
+
+446
+00:37:09,143 --> 00:37:11,520
+<font color="white">The tension needs to peak right here,</font><font color="white"></font>
+
+447
+00:37:12,104 --> 00:37:12,980
+<font color="white">but it's too loose.</font><font color="white"></font>
+
+448
+00:37:13,064 --> 00:37:16,567
+<font color="white">I played with as much intensity</font><font color="white">
+<font color="white">as I could!</font><font color="white"></font></font>
+
+449
+00:37:18,152 --> 00:37:18,986
+<font color="white">No.</font><font color="white"></font>
+
+450
+00:37:19,820 --> 00:37:23,032
+<font color="white">You only moved your fingers</font><font color="white">
+<font color="white">as quickly as you could.</font><font color="white"></font></font>
+
+451
+00:37:23,616 --> 00:37:26,452
+<font color="white">The emotional intensity</font><font color="white">
+<font color="white">never once hit its peak.</font><font color="white"></font></font>
+
+452
+00:37:29,830 --> 00:37:30,665
+<font color="white">Look here.</font><font color="white"></font>
+
+453
+00:37:31,249 --> 00:37:33,042
+<font color="white">What do you think is my intention here?</font><font color="white"></font>
+
+454
+00:37:33,125 --> 00:37:35,461
+<font color="white">I expressed the mounting terror</font><font color="white">
+<font color="white">of death closing in</font><font color="white"></font></font>
+
+455
+00:37:35,544 --> 00:37:38,089
+<font color="white">through eighth notes,</font><font color="white">
+<font color="white">sixteenth notes, and triplets.</font><font color="white"></font></font>
+
+456
+00:37:38,589 --> 00:37:39,590
+<font color="white">And here!</font><font color="white"></font>
+
+457
+00:37:42,093 --> 00:37:45,554
+<font color="white">This is written in marcato to convey</font><font color="white">
+<font color="white">a sense of betrayal and vengeance.</font><font color="white"></font></font>
+
+458
+00:37:45,638 --> 00:37:46,555
+<font color="white">So…</font><font color="white"></font>
+
+459
+00:37:47,598 --> 00:37:51,269
+<font color="white">Do you really think</font><font color="white">
+<font color="white">you're capturing any of these emotions?</font><font color="white"></font></font>
+
+460
+00:37:51,352 --> 00:37:52,853
+<font color="white">No, you're not!</font><font color="white"></font>
+
+461
+00:37:55,815 --> 00:37:59,944
+<font color="white">Do you want to run off</font><font color="white">
+<font color="white">from the weight of these emotions?</font><font color="white"></font></font>
+
+462
+00:38:00,820 --> 00:38:01,862
+<font color="white">I told you, didn't I?</font><font color="white"></font>
+
+463
+00:38:02,363 --> 00:38:04,156
+<font color="white">To capture and express</font><font color="white">
+<font color="white">the scenery I saw</font><font color="white"></font></font>
+
+464
+00:38:04,240 --> 00:38:07,576
+<font color="white">and the emotions I felt with precision.</font><font color="white"></font>
+
+465
+00:38:08,577 --> 00:38:11,956
+<font color="white">Right now,</font><font color="white">
+<font color="white">all you're doing is running away.</font><font color="white"></font></font>
+
+466
+00:38:13,374 --> 00:38:15,835
+<font color="white">Stop avoiding it and face it!</font><font color="white"></font>
+
+467
+00:38:18,629 --> 00:38:21,299
+<font color="white">Stop being a burden to everyone here</font><font color="white"></font>
+
+468
+00:38:22,758 --> 00:38:24,635
+<font color="white">and attack it head-on.</font><font color="white"></font>
+
+469
+00:38:25,594 --> 00:38:27,805
+<font color="white">I truly hope you'll pull it off this time.</font><font color="white"></font>
+
+470
+00:38:27,888 --> 00:38:29,432
+<font color="white">Stop running away.</font><font color="white"></font>
+
+471
+00:38:33,978 --> 00:38:35,563
+<font color="white">Take 27.</font><font color="white"></font>
+
+472
+00:38:52,496 --> 00:38:53,998
+<font color="white"><i>I just wanted the best for you.</i></font><font color="white"></font>
+
+473
+00:38:55,082 --> 00:38:56,959
+<font color="white">It was for you.</font><font color="white"></font>
+
+474
+00:38:57,043 --> 00:38:59,045
+<font color="white">Stop talking nonsense!</font><font color="white"></font>
+
+475
+00:39:15,311 --> 00:39:16,145
+<font color="white"><i>You know.</i></font><font color="white"></font>
+
+476
+00:39:16,228 --> 00:39:19,732
+<font color="white"><i>I'm talking about</i></font><font color="white">
+<font color="white"><i>that nasty rumor about you</i></font></font><font color="white"></font>
+
+477
+00:39:19,815 --> 00:39:21,650
+<font color="white"><i>being involved in Jeong-yo's abduction.</i></font><font color="white"></font>
+
+478
+00:39:22,777 --> 00:39:24,779
+<font color="white"><i>By the way,</i></font><font color="white">
+<font color="white"><i>about that Choi Jeong-yo rumor…</i></font></font><font color="white"></font>
+
+479
+00:39:24,862 --> 00:39:26,280
+<font color="white"><i>What's the deal with that?</i></font><font color="white"></font>
+
+480
+00:39:26,864 --> 00:39:28,324
+<font color="white"><i>People say you were behind it.</i></font><font color="white"></font>
+
+481
+00:39:58,187 --> 00:39:59,105
+<font color="white">What is it?</font><font color="white"></font>
+
+482
+00:40:01,607 --> 00:40:03,317
+<font color="white">Have your fingers given out?</font><font color="white"></font>
+
+483
+00:40:05,486 --> 00:40:06,529
+<font color="white">They just…</font><font color="white"></font>
+
+484
+00:40:07,029 --> 00:40:08,531
+<font color="white">I did worry this might happen, but…</font><font color="white"></font>
+
+485
+00:40:10,366 --> 00:40:13,202
+<font color="white">It's my fault</font><font color="white">
+<font color="white">for overestimating your competence.</font><font color="white"></font></font>
+
+486
+00:40:14,161 --> 00:40:16,580
+<font color="white">And it was my mistake</font><font color="white">
+<font color="white">for giving you this piece.</font><font color="white"></font></font>
+
+487
+00:40:17,456 --> 00:40:19,166
+<font color="white">As of today, you're out.</font><font color="white"></font>
+
+488
+00:40:21,710 --> 00:40:23,129
+<font color="white">Everyone.</font><font color="white"></font>
+
+489
+00:40:24,213 --> 00:40:25,339
+<font color="white">I'm very sorry.</font><font color="white"></font>
+
+490
+00:40:25,923 --> 00:40:27,174
+<font color="white">Today's recording is canceled.</font><font color="white"></font>
+
+491
+00:40:39,520 --> 00:40:42,773
+<font color="white">I'm sorry. We'll take a short break.</font><font color="white"></font>
+
+492
+00:40:58,497 --> 00:40:59,540
+<font color="white">Hey.</font><font color="white"></font>
+
+493
+00:41:00,791 --> 00:41:02,626
+<font color="white">This was your plan all along, wasn't it?</font><font color="white"></font>
+
+494
+00:41:02,710 --> 00:41:05,796
+<font color="white">Go ahead and expose me</font><font color="white">
+<font color="white">instead of toying with me like this.</font><font color="white"></font></font>
+
+495
+00:41:06,464 --> 00:41:08,591
+<font color="white">I'll take whatever punishment</font><font color="white">
+<font color="white">and get out of your sight.</font><font color="white"></font></font>
+
+496
+00:41:08,674 --> 00:41:11,051
+<font color="white">So just expose me, you bastard!</font><font color="white"></font>
+
+497
+00:41:12,595 --> 00:41:15,097
+<font color="white">You didn't know I'd do this?</font><font color="white"></font>
+
+498
+00:41:15,806 --> 00:41:17,183
+<font color="white">I told you.</font><font color="white"></font>
+
+499
+00:41:17,766 --> 00:41:20,227
+<font color="white">I'm going to make you feel</font><font color="white">
+<font color="white">every bit of pain, rage, and betrayal</font><font color="white"></font></font>
+
+500
+00:41:21,312 --> 00:41:22,855
+<font color="white">that I went through.</font><font color="white"></font>
+
+501
+00:41:28,360 --> 00:41:29,195
+<font color="white">But you know,</font><font color="white"></font>
+
+502
+00:41:29,945 --> 00:41:32,740
+<font color="white">I'm a little disappointed in you,</font><font color="white">
+<font color="white">Kang Pi-o.</font><font color="white"></font></font>
+
+503
+00:41:33,949 --> 00:41:37,369
+<font color="white">I was curious to see</font><font color="white">
+<font color="white">if you could push past this limit.</font><font color="white"></font></font>
+
+504
+00:41:38,579 --> 00:41:39,413
+<font color="white">And to be honest…</font><font color="white"></font>
+
+505
+00:41:40,831 --> 00:41:42,124
+<font color="white">I was hoping you would.</font><font color="white"></font>
+
+506
+00:41:48,088 --> 00:41:49,006
+<font color="white">This just proves</font><font color="white"></font>
+
+507
+00:41:49,840 --> 00:41:52,384
+<font color="white">you're nothing but a pathetic loser</font><font color="white"></font>
+
+508
+00:41:52,468 --> 00:41:55,262
+<font color="white">who should've never pursued music</font><font color="white">
+<font color="white">in the first place.</font><font color="white"></font></font>
+
+509
+00:41:56,138 --> 00:41:59,892
+<font color="white">Jealous bastards like you</font><font color="white">
+<font color="white">destroy real geniuses.</font><font color="white"></font></font>
+
+510
+00:42:06,315 --> 00:42:08,025
+<font color="white">How dare a mediocre pianist like you</font><font color="white"></font>
+
+511
+00:42:09,109 --> 00:42:12,404
+<font color="white">try to cheat your way to the top</font><font color="white">
+<font color="white">by killing me?</font><font color="white"></font></font>
+
+512
+00:42:14,782 --> 00:42:15,699
+<font color="white">Hey.</font><font color="white"></font>
+
+513
+00:42:21,080 --> 00:42:22,581
+<font color="white">You'll never beat me.</font><font color="white"></font>
+
+514
+00:42:33,008 --> 00:42:33,842
+<font color="white">Pi-o.</font><font color="white"></font>
+
+515
+00:42:34,593 --> 00:42:35,553
+<font color="white">Pi-o.</font><font color="white"></font>
+
+516
+00:42:36,512 --> 00:42:39,181
+<font color="white">Give me the key right now.</font><font color="white"></font>
+
+517
+00:42:39,265 --> 00:42:40,266
+<font color="white">Hurry!</font><font color="white"></font>
+
+518
+00:42:50,442 --> 00:42:51,402
+<font color="white">Pi-o.</font><font color="white"></font>
+
+519
+00:43:05,332 --> 00:43:07,501
+<font color="white">Why didn't you listen to me?</font><font color="white"></font>
+
+520
+00:43:11,714 --> 00:43:12,965
+<font color="white">Look at your hands.</font><font color="white"></font>
+
+521
+00:43:16,719 --> 00:43:18,262
+<font color="white">I'm sorry.</font><font color="white"></font>
+
+522
+00:43:18,345 --> 00:43:22,016
+<font color="white">I tried to communicate my vision</font><font color="white">
+<font color="white">as the composer to Pianist Kang Pi-o,</font><font color="white"></font></font>
+
+523
+00:43:22,099 --> 00:43:23,183
+<font color="white">but it proved rather difficult.</font><font color="white"></font>
+
+524
+00:43:23,684 --> 00:43:26,228
+<font color="white">I should've altered course earlier, but…</font><font color="white"></font>
+
+525
+00:43:27,187 --> 00:43:28,439
+<font color="white">This is all on me.</font><font color="white"></font>
+
+526
+00:43:28,522 --> 00:43:29,440
+<font color="white">I'm not sure.</font><font color="white"></font>
+
+527
+00:43:30,649 --> 00:43:31,775
+<font color="white">Was Kang Pi-o</font><font color="white"></font>
+
+528
+00:43:32,401 --> 00:43:34,528
+<font color="white">the real problem here?</font><font color="white"></font>
+
+529
+00:43:34,612 --> 00:43:35,654
+<font color="white">The way I see it,</font><font color="white"></font>
+
+530
+00:43:36,322 --> 00:43:40,826
+<font color="white">the issue was your poor communication</font><font color="white">
+<font color="white">rattling the soloist.</font><font color="white"></font></font>
+
+531
+00:43:41,910 --> 00:43:45,122
+<font color="white">The rehearsals were unnecessarily brutal,</font><font color="white">
+<font color="white">and you put him through verbal abuse.</font><font color="white"></font></font>
+
+532
+00:43:45,623 --> 00:43:47,541
+<font color="white">That's why he lost his nerve</font><font color="white"></font>
+
+533
+00:43:47,625 --> 00:43:49,126
+<font color="white">and broke down.</font><font color="white"></font>
+
+534
+00:43:49,209 --> 00:43:50,794
+<font color="white">Hong Jae-in, stop right now.</font><font color="white"></font>
+
+535
+00:43:52,880 --> 00:43:55,007
+<font color="white">The soloist just wasn't strong enough</font><font color="white">
+<font color="white">to master the piece.</font><font color="white"></font></font>
+
+536
+00:43:55,090 --> 00:43:56,967
+<font color="white">Don't blame the composer.</font><font color="white"></font>
+
+537
+00:43:57,051 --> 00:43:57,968
+<font color="white">Ms. Han.</font><font color="white"></font>
+
+538
+00:43:59,887 --> 00:44:03,307
+<font color="white">This means Pi-o</font><font color="white">
+<font color="white">didn't fully get over his slump.</font><font color="white"></font></font>
+
+539
+00:44:04,558 --> 00:44:06,977
+<font color="white">We were too caught up</font><font color="white">
+<font color="white">in our recent success,</font><font color="white"></font></font>
+
+540
+00:44:07,061 --> 00:44:08,896
+<font color="white">so we failed to see that.</font><font color="white"></font>
+
+541
+00:44:09,396 --> 00:44:10,481
+<font color="white">That's not true.</font><font color="white"></font>
+
+542
+00:44:11,398 --> 00:44:13,734
+<font color="white">He played really well from where I stood.</font><font color="white"></font>
+
+543
+00:44:15,527 --> 00:44:16,737
+<font color="white">Whatever the case,</font><font color="white"></font>
+
+544
+00:44:18,113 --> 00:44:19,156
+<font color="white">Pi-o is the one</font><font color="white"></font>
+
+545
+00:44:19,948 --> 00:44:23,452
+<font color="white">who ruined an expensive recording session.</font><font color="white"></font>
+
+546
+00:44:24,620 --> 00:44:27,539
+<font color="white">No matter how well he plays offstage,</font><font color="white">
+<font color="white">if he can't stay composed on stage,</font><font color="white"></font></font>
+
+547
+00:44:27,623 --> 00:44:29,124
+<font color="white">that alone</font><font color="white"></font>
+
+548
+00:44:30,000 --> 00:44:30,959
+<font color="white">means he's not qualified.</font><font color="white"></font>
+
+549
+00:44:32,461 --> 00:44:35,798
+<font color="white">The 80th anniversary concert</font><font color="white">
+<font color="white">is right around the corner.</font><font color="white"></font></font>
+
+550
+00:44:35,881 --> 00:44:37,174
+<font color="white">Never mind the album.</font><font color="white"></font>
+
+551
+00:44:37,675 --> 00:44:39,343
+<font color="white">What will you do about the performance?</font><font color="white"></font>
+
+552
+00:44:39,426 --> 00:44:42,137
+<font color="white">I thought something like this</font><font color="white">
+<font color="white">might happen,</font><font color="white"></font></font>
+
+553
+00:44:42,680 --> 00:44:44,890
+<font color="white">so I kept someone in mind as a backup.</font><font color="white"></font>
+
+554
+00:44:46,183 --> 00:44:48,310
+<font color="white">How do you feel about</font><font color="white">
+<font color="white">Pianist Lee Min-sung?</font><font color="white"></font></font>
+
+555
+00:44:49,269 --> 00:44:50,521
+<font color="white">Lee Min-sung…</font><font color="white"></font>
+
+556
+00:44:52,231 --> 00:44:54,650
+<font color="white">Lee Min-sung…</font><font color="white"></font>
+
+557
+00:44:58,654 --> 00:45:00,239
+<font color="white">JAE-IN</font><font color="white"></font>
+
+558
+00:45:04,368 --> 00:45:06,078
+<font color="white">KANG PI-O REPLACED BY PIANIST LEE MIN-SUNG</font><font color="white"></font>
+
+559
+00:45:13,085 --> 00:45:14,253
+<font color="white">KANG PI-O REPLACED BY PIANIST LEE MIN-SUNG</font><font color="white"></font>
+
+560
+00:45:14,336 --> 00:45:15,671
+<font color="white">KANG HAD DIFFICULTY DURING REHEARSAL…</font><font color="white"></font>
+
+561
+00:45:25,389 --> 00:45:27,015
+<font color="white">I'm sorry, Mr. Kang.</font><font color="white"></font>
+
+562
+00:45:27,099 --> 00:45:31,186
+<font color="white">As you warned me, Pianist Kang Pi-o</font><font color="white">
+<font color="white">wasn't the right fit for this piece.</font><font color="white"></font></font>
+
+563
+00:45:31,687 --> 00:45:33,564
+<font color="white">But I was being stubborn.</font><font color="white"></font>
+
+564
+00:45:33,647 --> 00:45:35,482
+<font color="white">I apologize for the worry I've caused.</font><font color="white"></font>
+
+565
+00:45:37,359 --> 00:45:39,862
+<font color="white">If that's what the composer says,</font><font color="white">
+<font color="white">I guess that's how it is.</font><font color="white"></font></font>
+
+566
+00:45:40,696 --> 00:45:41,613
+<font color="white">However,</font><font color="white"></font>
+
+567
+00:45:42,197 --> 00:45:45,534
+<font color="white">do you remember</font><font color="white">
+<font color="white">what I said about that piece?</font><font color="white"></font></font>
+
+568
+00:45:46,869 --> 00:45:51,415
+<font color="white">I hoped it would be performed</font><font color="white">
+<font color="white">as music that speaks to everyone.</font><font color="white"></font></font>
+
+569
+00:45:52,458 --> 00:45:54,293
+<font color="white">Did you try to make that happen?</font><font color="white"></font>
+
+570
+00:45:56,170 --> 00:45:57,337
+<font color="white">You see,</font><font color="white"></font>
+
+571
+00:45:58,088 --> 00:46:01,967
+<font color="white">I get the sense</font><font color="white">
+<font color="white">that your intentions weren't so pure.</font><font color="white"></font></font>
+
+572
+00:46:02,551 --> 00:46:03,886
+<font color="white">Why is that?</font><font color="white"></font>
+
+573
+00:46:03,969 --> 00:46:04,970
+<font color="white">I'm not sure.</font><font color="white"></font>
+
+574
+00:46:07,639 --> 00:46:10,476
+<font color="white">I only wrote the best piece I could.</font><font color="white"></font>
+
+575
+00:46:18,650 --> 00:46:19,651
+<font color="white">Here.</font><font color="white"></font>
+
+576
+00:46:22,446 --> 00:46:25,616
+<font color="white">I'm sorry for dropping by unannounced.</font><font color="white"></font>
+
+577
+00:46:28,702 --> 00:46:31,788
+<font color="white">But I'm just so frustrated.</font><font color="white"></font>
+
+578
+00:46:32,706 --> 00:46:34,333
+<font color="white">And I have no one to talk to.</font><font color="white"></font>
+
+579
+00:46:35,459 --> 00:46:37,419
+<font color="white">Don't worry about it. It's okay.</font><font color="white"></font>
+
+580
+00:46:37,503 --> 00:46:39,296
+<font color="white">Go ahead and tell me everything.</font><font color="white"></font>
+
+581
+00:46:41,507 --> 00:46:42,424
+<font color="white">I'm sure</font><font color="white"></font>
+
+582
+00:46:43,550 --> 00:46:45,469
+<font color="white">something happened between them.</font><font color="white"></font>
+
+583
+00:46:46,386 --> 00:46:47,262
+<font color="white">I saw Jeong-yo</font><font color="white"></font>
+
+584
+00:46:47,971 --> 00:46:50,390
+<font color="white">deliberately being brutal to Pi-o</font><font color="white"></font>
+
+585
+00:46:51,433 --> 00:46:53,352
+<font color="white">with my own eyes.</font><font color="white"></font>
+
+586
+00:46:54,186 --> 00:46:56,730
+<font color="white">And Pi-o is keeping his mouth shut</font><font color="white"></font>
+
+587
+00:46:57,314 --> 00:46:58,649
+<font color="white">for whatever reason.</font><font color="white"></font>
+
+588
+00:46:59,233 --> 00:47:02,236
+<font color="white">Since Jeong-yo is the conductor</font><font color="white">
+<font color="white">and the composer,</font><font color="white"></font></font>
+
+589
+00:47:02,319 --> 00:47:07,241
+<font color="white">-it's natural for him to get ambitious--</font><font color="white">
+<font color="white">-I understand that much.</font><font color="white"></font></font>
+
+590
+00:47:08,492 --> 00:47:11,119
+<font color="white">But it all feels very personal.</font><font color="white"></font>
+
+591
+00:47:14,456 --> 00:47:15,332
+<font color="white">It's like…</font><font color="white"></font>
+
+592
+00:47:17,793 --> 00:47:20,170
+<font color="white">he's determined to bring Pi-o down.</font><font color="white"></font>
+
+593
+00:47:24,466 --> 00:47:26,301
+<font color="white">Please save Pi-o.</font><font color="white"></font>
+
+594
+00:47:28,053 --> 00:47:30,806
+<font color="white">Please get Choi Jeong-yo away from Pi-o.</font><font color="white"></font>
+
+595
+00:47:30,889 --> 00:47:32,307
+<font color="white">I'm so scared.</font><font color="white"></font>
+
+596
+00:47:33,642 --> 00:47:35,352
+<font color="white">I'm scared to death.</font><font color="white"></font>
+
+597
+00:47:44,486 --> 00:47:46,029
+<font color="white">Call me if you need any help.</font><font color="white"></font>
+
+598
+00:47:52,119 --> 00:47:54,454
+<font color="white">PERSONAL CONSULTING SERVICES</font><font color="white">
+<font color="white">KIM SE-JIN</font><font color="white"></font></font>
+
+599
+00:47:56,915 --> 00:47:58,375
+<font color="white">HYUN-SOO</font><font color="white"></font>
+
+600
+00:48:03,797 --> 00:48:04,840
+<font color="white">Hello?</font><font color="white"></font>
+
+601
+00:48:04,923 --> 00:48:06,883
+<font color="white"><i>Where are you right now? Let's talk.</i></font><font color="white"></font>
+
+602
+00:48:06,967 --> 00:48:08,385
+<font color="white">I'm busy. Can we do this later--</font><font color="white"></font>
+
+603
+00:48:08,468 --> 00:48:10,470
+<font color="white"><i>This concerns Pi-o. We need to talk.</i></font><font color="white"></font>
+
+604
+00:48:20,272 --> 00:48:21,273
+<font color="white">What's this about?</font><font color="white"></font>
+
+605
+00:48:22,441 --> 00:48:24,735
+<font color="white">Is it about Pi-o being removed</font><font color="white">
+<font color="white">from the concerto?</font><font color="white"></font></font>
+
+606
+00:48:25,861 --> 00:48:27,779
+<font color="white">Choi Jeong-yo was playing games with him.</font><font color="white"></font>
+
+607
+00:48:28,572 --> 00:48:30,073
+<font color="white">And Pi-o fell for it.</font><font color="white"></font>
+
+608
+00:48:31,033 --> 00:48:31,867
+<font color="white">Why?</font><font color="white"></font>
+
+609
+00:48:35,162 --> 00:48:37,539
+<font color="white">Why would Jeong-yo play games with Pi-o?</font><font color="white"></font>
+
+610
+00:48:39,082 --> 00:48:39,958
+<font color="white">I don't know.</font><font color="white"></font>
+
+611
+00:48:41,460 --> 00:48:45,339
+<font color="white">He probably thought Pi-o's life</font><font color="white">
+<font color="white">was all roses while he was missing.</font><font color="white"></font></font>
+
+612
+00:48:45,422 --> 00:48:49,468
+<font color="white">Jealousy of sorts, perhaps?</font><font color="white"></font>
+
+613
+00:48:49,551 --> 00:48:51,762
+<font color="white">You know that's not what it is, Ji-hye.</font><font color="white"></font>
+
+614
+00:48:51,845 --> 00:48:54,139
+<font color="white">Come on, you know it's not!</font><font color="white"></font>
+
+615
+00:48:56,850 --> 00:49:00,979
+<font color="white">Please just tell me the truth</font><font color="white">
+<font color="white">about what happened back then.</font><font color="white"></font></font>
+
+616
+00:49:01,063 --> 00:49:03,482
+<font color="white">That nasty rumor that went around.</font><font color="white"></font>
+
+617
+00:49:03,565 --> 00:49:06,735
+<font color="white">The one about Pi-o being involved</font><font color="white">
+<font color="white">in Jeong-yo's disappearance.</font><font color="white"></font></font>
+
+618
+00:49:06,818 --> 00:49:08,528
+<font color="white">Was that actually true?</font><font color="white"></font>
+
+619
+00:49:09,696 --> 00:49:10,739
+<font color="white">How could you say that?</font><font color="white"></font>
+
+620
+00:49:13,408 --> 00:49:14,242
+<font color="white">It's not true.</font><font color="white"></font>
+
+621
+00:49:18,080 --> 00:49:20,332
+<font color="white">How could you believe</font><font color="white">
+<font color="white">a ridiculous rumor like that?</font><font color="white"></font></font>
+
+622
+00:49:23,043 --> 00:49:24,086
+<font color="white">I'm leaving.</font><font color="white"></font>
+
+623
+00:49:25,671 --> 00:49:27,589
+<font color="white">Then what did you mean before?</font><font color="white"></font>
+
+624
+00:49:28,548 --> 00:49:31,385
+<font color="white">You asked me</font><font color="white">
+<font color="white">to get Jeong-yo away from Pi-o!</font><font color="white"></font></font>
+
+625
+00:49:31,968 --> 00:49:33,553
+<font color="white">You said you were scared to death!</font><font color="white"></font>
+
+626
+00:49:33,637 --> 00:49:35,555
+<font color="white">What the hell did you mean by that?</font><font color="white"></font>
+
+627
+00:49:44,272 --> 00:49:45,190
+<font color="white"><i>This just proves</i></font><font color="white"></font>
+
+628
+00:49:45,941 --> 00:49:47,984
+<font color="white"><i>you're nothing but a pathetic loser</i></font><font color="white"></font>
+
+629
+00:49:48,652 --> 00:49:51,363
+<font color="white"><i>who should've never pursued music</i></font><font color="white">
+<font color="white"><i>in the first place.</i></font></font><font color="white"></font>
+
+630
+00:49:52,906 --> 00:49:56,451
+<font color="white"><i>Jealous bastards like you</i></font><font color="white">
+<font color="white"><i>destroy real geniuses.</i></font></font><font color="white"></font>
+
+631
+00:50:04,167 --> 00:50:05,001
+<font color="white">No.</font><font color="white"></font>
+
+632
+00:50:07,879 --> 00:50:09,798
+<font color="white">Pi-o didn't do anything.</font><font color="white"></font>
+
+633
+00:50:09,881 --> 00:50:10,716
+<font color="white">Pi-o…</font><font color="white"></font>
+
+634
+00:50:12,426 --> 00:50:13,552
+<font color="white">He's innocent.</font><font color="white"></font>
+
+635
+00:50:14,594 --> 00:50:15,512
+<font color="white">It was all me…</font><font color="white"></font>
+
+636
+00:50:17,556 --> 00:50:18,515
+<font color="white">It was me.</font><font color="white"></font>
+
+637
+00:50:20,559 --> 00:50:21,768
+<font color="white">I did it.</font><font color="white"></font>
+
+638
+00:50:24,521 --> 00:50:25,564
+<font color="white">I…</font><font color="white"></font>
+
+639
+00:50:27,899 --> 00:50:29,276
+<font color="white">I did it.</font><font color="white"></font>
+
+640
+00:52:14,089 --> 00:52:15,298
+<font color="white">Grandfather.</font><font color="white"></font>
+
+641
+00:52:16,591 --> 00:52:17,801
+<font color="white">Is it agonizing?</font><font color="white"></font>
+
+642
+00:52:29,938 --> 00:52:32,023
+<font color="white">That's the nature of art.</font><font color="white"></font>
+
+643
+00:52:35,318 --> 00:52:37,737
+<font color="white">It'd be easier to reach for the stars.</font><font color="white"></font>
+
+644
+00:52:39,322 --> 00:52:41,283
+<font color="white">Art is like a mirage.</font><font color="white"></font>
+
+645
+00:52:42,033 --> 00:52:44,828
+<font color="white">You chase it down,</font><font color="white">
+<font color="white">only for it to move farther away.</font><font color="white"></font></font>
+
+646
+00:52:44,911 --> 00:52:47,747
+<font color="white">When you pursue it again,</font><font color="white">
+<font color="white">it moves even farther.</font><font color="white"></font></font>
+
+647
+00:52:52,335 --> 00:52:55,380
+<font color="white">Do you still want to</font><font color="white">
+<font color="white">go down this thorny road?</font><font color="white"></font></font>
+
+648
+00:52:58,008 --> 00:53:01,219
+<font color="white">If you had less than a month to live,</font><font color="white"></font>
+
+649
+00:53:01,720 --> 00:53:04,180
+<font color="white">would you still want to play the piano?</font><font color="white"></font>
+
+650
+00:53:16,651 --> 00:53:17,485
+<font color="white">Yes.</font><font color="white"></font>
+
+651
+00:53:18,153 --> 00:53:19,321
+<font color="white">I would.</font><font color="white"></font>
+
+652
+00:53:20,739 --> 00:53:22,574
+<font color="white">I know I don't have what it takes…</font><font color="white"></font>
+
+653
+00:53:24,993 --> 00:53:26,828
+<font color="white">but I'm only happy when I play the piano.</font><font color="white"></font>
+
+654
+00:53:28,204 --> 00:53:29,122
+<font color="white">Even if…</font><font color="white"></font>
+
+655
+00:53:30,624 --> 00:53:32,375
+<font color="white"><i>Even if I only had one day left to live,</i></font><font color="white"></font>
+
+656
+00:53:33,919 --> 00:53:35,462
+<font color="white"><i>I'd still want to play the piano.</i></font><font color="white"></font>
+
+657
+00:54:28,974 --> 00:54:30,517
+<font color="white">Break the mold, Pi-o.</font><font color="white"></font>
+
+658
+00:54:31,267 --> 00:54:33,812
+<font color="white">Stop relying on that chunk of metal,</font><font color="white"></font>
+
+659
+00:54:33,895 --> 00:54:36,439
+<font color="white">and find your own inner rhythm.</font><font color="white"></font>
+
+660
+00:54:41,111 --> 00:54:44,447
+<font color="white">For a soloist,</font><font color="white">
+<font color="white">confidence is half the battle.</font><font color="white"></font></font>
+
+661
+00:54:45,281 --> 00:54:47,659
+<font color="white">Command the stage with your energy.</font><font color="white"></font>
+
+662
+00:54:47,742 --> 00:54:48,994
+<font color="white">If your energy is strong enough,</font><font color="white"></font>
+
+663
+00:54:49,786 --> 00:54:54,332
+<font color="white">you can pull the conductor</font><font color="white">
+<font color="white">and the orchestra into your orbit.</font><font color="white"></font></font>
+
+664
+00:54:59,671 --> 00:55:00,755
+<font color="white">Looking back,</font><font color="white"></font>
+
+665
+00:55:01,548 --> 00:55:04,551
+<font color="white">I've realized that music</font><font color="white">
+<font color="white">that moves people's hearts</font><font color="white"></font></font>
+
+666
+00:55:04,634 --> 00:55:07,345
+<font color="white">is one that carries a lifetime within it.</font><font color="white"></font>
+
+667
+00:55:08,722 --> 00:55:09,889
+<font color="white">So…</font><font color="white"></font>
+
+668
+00:55:10,473 --> 00:55:13,143
+<font color="white">you said you wanted to play</font><font color="white">
+<font color="white">even if you only had one day to live.</font><font color="white"></font></font>
+
+669
+00:55:13,226 --> 00:55:15,061
+<font color="white">Pour that resolve and your life</font><font color="white"></font>
+
+670
+00:55:17,355 --> 00:55:18,815
+<font color="white">into your music.</font><font color="white"></font>
+
+671
+00:55:32,162 --> 00:55:33,246
+<font color="white">Do you understand?</font><font color="white"></font>
+
+672
+00:55:52,307 --> 00:55:53,183
+<font color="white">Mr. Choi.</font><font color="white"></font>
+
+673
+00:55:54,017 --> 00:55:55,310
+<font color="white">Please say hello.</font><font color="white"></font>
+
+674
+00:55:55,393 --> 00:55:59,064
+<font color="white">We managed to get Pianist Lee Min-sung</font><font color="white">
+<font color="white">for your premiere piece.</font><font color="white"></font></font>
+
+675
+00:55:59,647 --> 00:56:00,899
+<font color="white">Hello.</font><font color="white"></font>
+
+676
+00:56:00,982 --> 00:56:02,609
+<font color="white">It's an honor to meet you.</font><font color="white"></font>
+
+677
+00:56:02,692 --> 00:56:03,818
+<font color="white">The honor is mine.</font><font color="white"></font>
+
+678
+00:56:03,902 --> 00:56:05,945
+<font color="white">Thank you for agreeing</font><font color="white">
+<font color="white">to play the concerto.</font><font color="white"></font></font>
+
+679
+00:56:06,029 --> 00:56:06,905
+<font color="white">Please, sit.</font><font color="white"></font>
+
+680
+00:56:10,033 --> 00:56:12,786
+<font color="white">There wasn't much time,</font><font color="white">
+<font color="white">so I could only practice a little.</font><font color="white"></font></font>
+
+681
+00:56:13,411 --> 00:56:15,371
+<font color="white">Shall I go ahead and play?</font><font color="white"></font>
+
+682
+00:56:15,455 --> 00:56:16,331
+<font color="white">Yes, please.</font><font color="white"></font>
+
+683
+00:56:17,499 --> 00:56:18,666
+<font color="white">It's all right.</font><font color="white"></font>
+
+684
+00:57:24,023 --> 00:57:25,567
+<font color="white">This is that woman's photo.</font><font color="white"></font>
+
+685
+00:57:26,734 --> 00:57:27,569
+<font color="white">And this…</font><font color="white"></font>
+
+686
+00:57:28,945 --> 00:57:29,821
+<font color="white"><i>I'm sorry.</i></font><font color="white"></font>
+
+687
+00:57:31,489 --> 00:57:32,407
+<font color="white"><i>You're right.</i></font><font color="white"></font>
+
+688
+00:57:33,741 --> 00:57:34,742
+<font color="white"><i>It was me.</i></font><font color="white"></font>
+
+689
+00:57:35,326 --> 00:57:37,704
+<font color="white"><i>It was the finals, and I hurt my finger.</i></font><font color="white"></font>
+
+690
+00:57:37,787 --> 00:57:39,080
+<font color="white"><i>I couldn't think straight.</i></font><font color="white"></font>
+
+691
+00:57:39,914 --> 00:57:42,083
+<font color="white"><i>I'd worked so hard to win the competition,</i></font><font color="white"></font>
+
+692
+00:57:42,167 --> 00:57:44,377
+<font color="white"><i>but I was afraid I couldn't win</i></font><font color="white">
+<font color="white"><i>because of you.</i></font></font><font color="white"></font>
+
+693
+00:57:49,716 --> 00:57:50,717
+<font color="white">COPYING FILES</font><font color="white"></font>
+
+694
+00:57:50,800 --> 00:57:53,178
+<font color="white">KANG PI-O</font><font color="white">
+<font color="white">KANG JI-HYE</font><font color="white"></font></font>
+
+695
+00:57:53,761 --> 00:57:56,764
+<font color="white">Now we have the files we need</font><font color="white">
+<font color="white">to bury the two.</font><font color="white"></font></font>
+
+696
+00:57:58,057 --> 00:57:58,933
+<font color="white">So?</font><font color="white"></font>
+
+697
+00:57:59,017 --> 00:58:00,602
+<font color="white">You already broke him mentally,</font><font color="white"></font>
+
+698
+00:58:00,685 --> 00:58:02,228
+<font color="white">so we just release it all at once, right?</font><font color="white"></font>
+
+699
+00:58:03,062 --> 00:58:03,897
+<font color="white">Right?</font><font color="white"></font>
+
+700
+00:58:06,941 --> 00:58:08,526
+<font color="white">Sure, let's do that.</font><font color="white"></font>
+
+701
+00:58:10,195 --> 00:58:11,696
+<font color="white">I'll call you when it's time.</font><font color="white"></font>
+
+702
+00:58:13,531 --> 00:58:15,241
+<font color="white">Okay then.</font><font color="white"></font>
+
+703
+00:58:15,950 --> 00:58:17,452
+<font color="white">You're heading home now, right?</font><font color="white"></font>
+
+704
+00:58:32,133 --> 00:58:32,967
+<font color="white">Good night!</font><font color="white"></font>
+
+705
+00:58:33,051 --> 00:58:34,302
+<font color="white">Good night.</font><font color="white"></font>
+
+706
+00:59:01,037 --> 00:59:02,163
+<font color="white">What are you doing here?</font><font color="white"></font>
+
+707
+00:59:08,836 --> 00:59:09,671
+<font color="white">Choi Jeong-yo.</font><font color="white"></font>
+
+708
+00:59:13,341 --> 00:59:14,676
+<font color="white">Give me another chance.</font><font color="white"></font>
+
+709
+00:59:18,012 --> 00:59:18,930
+<font color="white">The performance…</font><font color="white"></font>
+
+710
+00:59:20,848 --> 00:59:22,100
+<font color="white">Let me do it.</font><font color="white"></font>
+
+711
+00:59:26,938 --> 00:59:28,189
+<font color="white">Don't be ridiculous.</font><font color="white"></font>
+
+712
+00:59:31,776 --> 00:59:32,735
+<font color="white">That piece.</font><font color="white"></font>
+
+713
+00:59:33,945 --> 00:59:35,738
+<font color="white">You wrote it out of pure hatred for me.</font><font color="white"></font>
+
+714
+00:59:36,864 --> 00:59:37,824
+<font color="white">Do you really think</font><font color="white"></font>
+
+715
+00:59:38,491 --> 00:59:40,451
+<font color="white">anyone else can actually play it right?</font><font color="white"></font>
+
+716
+00:59:45,748 --> 00:59:47,166
+<font color="white">Thanks, Jeong-yo.</font><font color="white"></font>
+
+717
+00:59:48,167 --> 00:59:50,003
+<font color="white">This experience made me realize my limits.</font><font color="white"></font>
+
+718
+00:59:50,086 --> 00:59:50,962
+<font color="white">However,</font><font color="white"></font>
+
+719
+00:59:51,671 --> 00:59:53,047
+<font color="white">when it comes to </font><font color="white"><font color="white"><i>Nemesis</i></font></font><font color="white"><font color="white">,</font><font color="white"></font></font>
+
+720
+00:59:54,549 --> 00:59:57,051
+<font color="white">I know no one else</font><font color="white">
+<font color="white">can do that piece justice.</font><font color="white"></font></font>
+
+721
+01:00:00,305 --> 01:00:01,598
+<font color="white">Will you throw this chance away</font><font color="white"></font>
+
+722
+01:00:02,849 --> 01:00:04,309
+<font color="white">just for revenge?</font><font color="white"></font>
+
+723
+01:00:35,673 --> 01:00:37,800
+<font color="white">FOUR HANDS, TWO SONATAS</font><font color="white"></font>
+
+724
+01:00:37,884 --> 01:00:42,096
+{\an8}<font color="white"><i>Do you believe flawed artists</i></font><font color="white">
+<font color="white"><i>don't deserve to make art?</i></font></font><font color="white"></font>
+
+725
+01:00:42,180 --> 01:00:46,225
+{\an8}<font color="white">Or do you believe in</font><font color="white">
+<font color="white">separating the art from the artist?</font><font color="white"></font></font>
+
+726
+01:00:46,309 --> 01:00:49,062
+{\an8}<font color="white">Are you trying to play judge,</font><font color="white"></font>
+
+727
+01:00:49,145 --> 01:00:50,772
+{\an8}<font color="white"><i>or are you trying to be a musician?</i></font><font color="white"></font>
+
+728
+01:00:50,855 --> 01:00:54,692
+{\an8}<font color="white">If only you had acknowledged him,</font><font color="white">
+<font color="white">I wouldn't have done something this crazy!</font><font color="white"></font></font>
+
+729
+01:00:54,776 --> 01:00:55,610
+{\an8}<font color="white">How could you do that?</font><font color="white"></font>
+
+730
+01:00:55,693 --> 01:00:58,154
+{\an8}<font color="white"><i>Why aren't you answering?</i></font><font color="white">
+<font color="white"><i>When do I release this?</i></font></font><font color="white"></font>
+
+731
+01:00:58,237 --> 01:00:59,822
+{\an8}<font color="white"><i>Only I get to mess with him.</i></font><font color="white"></font>
+
+732
+01:00:59,906 --> 01:01:01,616
+{\an8}<font color="white"><i>Just admit it.</i></font><font color="white"></font>
+
+733
+01:01:01,699 --> 01:01:04,035
+{\an8}<font color="white"><i>The only person</i></font><font color="white">
+<font color="white"><i>who can do this piece justice</i></font></font><font color="white"></font>
+
+734
+01:01:04,118 --> 01:01:05,328
+{\an8}<font color="white">is me.</font><font color="white"></font>
+
+735
+01:01:06,329 --> 01:01:11,334
+{\an8}<font color="white">Subtitle translation by: Jenny Kim</font><font color="white"></font>
