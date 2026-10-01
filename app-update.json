@@ -1,13 +1,11 @@
 {
   "version": "1.6",
-  "code": 10,
+  "code": 11,
   "released": "2026-10-01",
-  "url": "apk/Deymflix-v1.6-r5.apk",
+  "url": "apk/Deymflix-v1.6-r6.apk",
   "notes": [
-    "New splash screen — the DEYMFLIX film-reel mark now greets you at launch",
+    "Fixed the splash screen logo — it now matches the DEYMFLIX icon exactly",
     "What's New: after every update, the app shows these release notes once",
-    "Subtitle support for all 51 K-dramas — turn CC on in the player",
-    "In-app updates now compare properly, so future releases bump cleanly",
-    "Under-the-hood headroom for many more updates to come"
+    "Subtitle support for all 51 K-dramas — turn CC on in the player"
   ]
 }
