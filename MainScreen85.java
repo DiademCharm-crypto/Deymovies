@@ -351,9 +351,18 @@ public class MainScreen85 {
         wv.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
 
         // -- 2) APP-MODE: mark the WebView so the site enables app-only features --
+        // The site parses "DeymflixApp/<versionCode>" out of this token, so
+        // per-build features (the What's New popup) key to the INSTALLED build
+        // instead of a number someone has to remember to bump by hand.
         String baseUa = wv.getSettings().getUserAgentString();
         if (baseUa != null && !baseUa.contains("DeymflixApp")) {
-            wv.getSettings().setUserAgentString(baseUa + " DeymflixApp/1.4");
+            String uaCode85 = "1";
+            try {
+                android.content.pm.PackageInfo pi85 = act.getPackageManager()
+                        .getPackageInfo(act.getPackageName(), 0);
+                uaCode85 = String.valueOf(pi85.versionCode);
+            } catch (Exception e85) { }
+            wv.getSettings().setUserAgentString(baseUa + " DeymflixApp/" + uaCode85);
         }
 
         // -- 3) SPLASH --
@@ -1038,75 +1047,91 @@ public class MainScreen85 {
         }, SPLASH_MAX_MS);
     }
 
-    // The DEYMFLIX splash exactly like the app.html hero: a rounded dark
-    // tile (floating up and down), the red hexagon + play arrow on it, and
-    // an invisible ring SPINNING around the tile carrying one glowing red
-    // dot. The old static/pulse version looked broken next to the site.
+    // The DEYMFLIX splash: the C2 film-reel mark, drawn with Canvas from the
+    // brand generator's exact geometry (viewBox 0 0 200 200) so the splash can
+    // never drift from the favicon / app icon again. The tile floats gently;
+    // the wordmark below is unchanged. (Replaces the old hexagon mark.)
     public static class HexagonLogoView extends View {
-        private final android.graphics.Paint tilePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint hexFill = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint hexStroke = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint redArrow = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint whiteArrow = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint ringPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint dotPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final android.graphics.Paint dotGlow = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        private final Path hexPath = new Path();
-        private final Path redPath = new Path();
-        private final Path whitePath = new Path();
-        private float spin = 0f;      // 0..1 around the ring
+        private final android.graphics.Paint tileFill = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint rimStroke = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint bowlUnder = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint bowlRed = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint hlPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint facePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint reelRim = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint ellPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint hubRing = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint badgeGlow = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint badgeFill = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint triPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint arcPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final Path bowlPath = new Path();
+        private final Path hlPath = new Path();
+        private final Path triPath = new Path();
+        private final Path arcPath = new Path();
         private float floatT = 0f;    // 0..1 float bob
         private android.animation.ValueAnimator animator;
+        // the 5 reel windows (cx, cy) in the 200-viewBox
+        private static final float[] ELL = {
+                100f, 84.3f, 114.9f, 95.2f, 109.2f, 112.7f, 90.8f, 112.7f, 85.1f, 95.2f };
 
         HexagonLogoView(Context c) {
             super(c);
-            tilePaint.setStyle(android.graphics.Paint.Style.FILL);
-            tilePaint.setColor(Color.parseColor("#141414"));
-            hexFill.setStyle(android.graphics.Paint.Style.FILL);
-            hexFill.setColor(Color.parseColor("#1A1A1A"));
-            hexStroke.setStyle(android.graphics.Paint.Style.STROKE);
-            hexStroke.setColor(Color.parseColor("#FF1E27"));
-            hexStroke.setStrokeWidth(3f);
-            hexStroke.setStrokeJoin(android.graphics.Paint.Join.ROUND);
-            redArrow.setStyle(android.graphics.Paint.Style.FILL);
-            redArrow.setColor(Color.parseColor("#FF1E27"));
-            whiteArrow.setStyle(android.graphics.Paint.Style.FILL);
-            whiteArrow.setColor(Color.WHITE);
-            whiteArrow.setAlpha(230);
-            ringPaint.setStyle(android.graphics.Paint.Style.STROKE);
-            ringPaint.setColor(Color.parseColor("#59E50914"));  // rgba(229,9,20,.35)
-            ringPaint.setStrokeWidth(1.5f);
-            dotPaint.setStyle(android.graphics.Paint.Style.FILL);
-            dotPaint.setColor(Color.parseColor("#FF1E27"));
-            dotGlow.setStyle(android.graphics.Paint.Style.FILL);
-            dotGlow.setColor(Color.parseColor("#88FF1E27"));
-            // geometry copied from favicon.svg (viewBox 0 0 64 64)
-            hexPath.moveTo(32f, 6f);
-            hexPath.lineTo(56f, 18f);
-            hexPath.lineTo(56f, 46f);
-            hexPath.lineTo(32f, 58f);
-            hexPath.lineTo(8f, 46f);
-            hexPath.lineTo(8f, 18f);
-            hexPath.close();
-            redPath.moveTo(25f, 20f);
-            redPath.lineTo(46f, 32f);
-            redPath.lineTo(25f, 44f);
-            redPath.close();
-            whitePath.moveTo(30f, 24f);
-            whitePath.lineTo(49f, 32f);
-            whitePath.lineTo(30f, 40f);
-            whitePath.close();
-            // one animator drives both: 14s ring spin (site timing) and a
-            // 5s float loop (site .app-icon float keyframes)
+            tileFill.setColor(Color.parseColor("#17171b"));
+            rimStroke.setStyle(android.graphics.Paint.Style.STROKE);
+            rimStroke.setColor(Color.WHITE);
+            rimStroke.setAlpha(20);
+            bowlUnder.setStyle(android.graphics.Paint.Style.STROKE);
+            bowlUnder.setColor(Color.parseColor("#6e030a"));
+            bowlUnder.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            bowlUnder.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+            bowlRed.setStyle(android.graphics.Paint.Style.STROKE);
+            bowlRed.setColor(Color.parseColor("#e50914"));
+            bowlRed.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            bowlRed.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+            hlPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            hlPaint.setColor(Color.parseColor("#ff9aa0"));
+            hlPaint.setAlpha(128);
+            hlPaint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            facePaint.setColor(Color.parseColor("#0c0c10"));
+            reelRim.setStyle(android.graphics.Paint.Style.STROKE);
+            reelRim.setColor(Color.parseColor("#d9d9e0"));
+            reelRim.setAlpha(235);
+            ellPaint.setColor(Color.parseColor("#e3e3ea"));
+            hubRing.setStyle(android.graphics.Paint.Style.STROKE);
+            hubRing.setColor(Color.parseColor("#e50914"));
+            badgeGlow.setStyle(android.graphics.Paint.Style.STROKE);
+            badgeGlow.setColor(Color.parseColor("#e50914"));
+            badgeGlow.setAlpha(77);
+            badgeFill.setColor(Color.parseColor("#e50914"));
+            triPaint.setColor(Color.parseColor("#0d0d12"));
+            arcPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            arcPaint.setColor(Color.parseColor("#ff3b45"));
+            arcPaint.setAlpha(191);
+            arcPaint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            // bowl: M70 42 L104 42 C148 42 160 70 160 100 C160 130 148 158 104 158 L70 158
+            bowlPath.moveTo(70f, 42f);
+            bowlPath.lineTo(104f, 42f);
+            bowlPath.cubicTo(148f, 42f, 160f, 70f, 160f, 100f);
+            bowlPath.cubicTo(160f, 130f, 148f, 158f, 104f, 158f);
+            bowlPath.lineTo(70f, 158f);
+            hlPath.moveTo(74f, 38.5f);
+            hlPath.lineTo(122f, 42.5f);
+            triPath.moveTo(137.8f, 138f);
+            triPath.lineTo(137.8f, 162f);
+            triPath.lineTo(158.5f, 150f);
+            triPath.close();
+            arcPath.moveTo(172f, 124f);
+            arcPath.cubicTo(177.5f, 128f, 183f, 138f, 183f, 150f);
+            // one animator drives the gentle float bob (site .app-icon timing)
             animator = android.animation.ValueAnimator.ofFloat(0f, 1f);
-            animator.setDuration(16667);
+            animator.setDuration(5000);
             animator.setRepeatCount(android.animation.ValueAnimator.INFINITE);
             animator.setInterpolator(new android.view.animation.LinearInterpolator());
             animator.addUpdateListener(new android.animation.ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(android.animation.ValueAnimator a) {
                     long t = a.getCurrentPlayTime();
-                    spin = (t % 14000L) / 14000f;
                     float phase = (t % 5000L) / 5000f;
                     floatT = (float) Math.sin(phase * Math.PI * 2);  // -1..1
                     invalidate();
@@ -1127,47 +1152,62 @@ public class MainScreen85 {
             int h = getHeight();
             if (w == 0) return;
             float cx = w / 2f;
-            float cy = h / 2f + floatT * h * 0.02f;   // gentle float bob (reduced)
-            // FIT MATH (the "cut edges" bug): the ring is a rotating SQUARE --
-            // its corners reach half * 1.4142, and the float bob adds excursion
-            // on top. The old 0.40 half pushed corners to 0.57 of the half-width:
-            // outside the view = clipped edges. Cap ring+tile so the corner
-            // radius plus bob can NEVER exceed the half-width.
-            float avail = Math.min(w, h) / 2f;
-            float half = avail * 0.94f / 1.4142f;     // ring half-side, corner-safe
-            float tile = half * 2f * 0.88f;           // tile hugs the ring, like the site
+            float cy = h / 2f + floatT * h * 0.02f;   // gentle float bob
+            float tile = Math.min(w, h) * 0.88f;      // the mark IS the tile now
+            float k = tile / 200f;                    // 200-viewBox -> pixels
+            float ox = cx - 100f * k, oy = cy - 100f * k;
 
-            // 1) the spinning ring (square, like the site's .ring) + red dot
-            canvas.save();
-            canvas.translate(cx, cy);
-            canvas.rotate(spin * 360f);
-            canvas.drawRect(-half, -half, half, half, ringPaint);
-            // the dot rides the top edge midpoint (site: .ring::before)
-            float dotR = Math.max(3f, tile * 0.05f);
-            canvas.drawCircle(0f, -half, dotR * 2.2f, dotGlow);
-            canvas.drawCircle(0f, -half, dotR, dotPaint);
-            canvas.restore();
-
-            // 2) the dark rounded tile
+            // 1) dark tile (r=42) + hairline rim (r=38, white 8%)
             android.graphics.RectF tr = new android.graphics.RectF(
-                    cx - tile / 2f, cy - tile / 2f, cx + tile / 2f, cy + tile / 2f);
-            canvas.drawRoundRect(tr, tile * 0.22f, tile * 0.22f, tilePaint);
+                    ox + 10f * k, oy + 10f * k, ox + 190f * k, oy + 190f * k);
+            canvas.drawRoundRect(tr, 42f * k, 42f * k, tileFill);
+            android.graphics.RectF rr = new android.graphics.RectF(
+                    ox + 15.5f * k, oy + 15.5f * k, ox + 184.5f * k, oy + 184.5f * k);
+            canvas.drawRoundRect(rr, 38f * k, 38f * k, rimStroke);
 
-            // 3) hexagon + arrows (favicon geometry, centered in the tile)
+            // 2) the open D bowl: dark under-stroke for depth, then brand red
+            bowlUnder.setStrokeWidth(30f * k);
             canvas.save();
-            canvas.translate(cx, cy);
-            float scale = tile / 64f * 0.82f;
-            canvas.scale(scale, scale);
-            // the artwork spans 0..64 -- re-center it or it lands offset
-            // to the bottom-right of the tile (the "broken logo" bug)
-            canvas.translate(-32f, -32f);
-            canvas.drawPath(hexPath, hexFill);
-            canvas.drawPath(hexPath, hexStroke);
-            canvas.drawPath(redPath, redArrow);
-            canvas.drawPath(whitePath, whiteArrow);
+            canvas.translate(0f, 2.5f * k);
+            canvas.drawPath(bowlPath, bowlUnder);
             canvas.restore();
+            bowlRed.setStrokeWidth(26f * k);
+            canvas.drawPath(bowlPath, bowlRed);
+            hlPaint.setStrokeWidth(3f * k);
+            canvas.drawPath(hlPath, hlPaint);
+
+            // 3) the film reel -- floats dead-centre, touches nothing
+            float rx = ox + 100f * k, ry = oy + 100f * k, reel = 28f * k;
+            facePaint.setColor(Color.BLACK);
+            facePaint.setAlpha(115);
+            canvas.drawCircle(rx + 3f * k, ry + 4f * k, reel * 1.02f, facePaint);
+            facePaint.setColor(Color.parseColor("#0c0c10"));
+            facePaint.setAlpha(255);
+            reelRim.setStrokeWidth(2.5f * k);
+            canvas.drawCircle(rx, ry, reel * 1.06f, reelRim);
+            canvas.drawCircle(rx, ry, reel, facePaint);
+            for (int i = 0; i < 5; i++) {
+                float ex = ox + ELL[i * 2] * k, ey = oy + ELL[i * 2 + 1] * k;
+                canvas.drawOval(new android.graphics.RectF(
+                        ex - 6.2f * k, ey - 6.9f * k, ex + 6.2f * k, ey + 6.9f * k), ellPaint);
+            }
+            canvas.drawCircle(rx, ry, 3.4f * k, ellPaint);
+            hubRing.setStrokeWidth(2.2f * k);
+            canvas.drawCircle(rx, ry, 6.7f * k, hubRing);
+            canvas.drawCircle(rx, ry, 4.5f * k, facePaint);
+            canvas.drawCircle(rx, ry, 2.5f * k, badgeFill);
+
+            // 4) play badge docked lower-right + signal arc
+            float bx = ox + 146f * k, by = oy + 150f * k, br = 24f * k;
+            badgeGlow.setStrokeWidth(3f * k);
+            canvas.drawCircle(bx, by, 33f * k, badgeGlow);
+            canvas.drawCircle(bx, by, br, badgeFill);
+            canvas.drawPath(triPath, triPaint);
+            arcPaint.setStrokeWidth(5f * k);
+            canvas.drawPath(arcPath, arcPaint);
         }
     }
+
 
     private void hideSplash() {
         if (splashLayout == null) return;
