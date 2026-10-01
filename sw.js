@@ -5,7 +5,10 @@
 //   * everything else (APIs, streams): network only — never cache video
 // v2: force every visitor's old cache to be deleted on activate — the cache-first
 // icon/svg strategy was serving the OLD logo (favicon.svg never changes URL).
-const CACHE = 'deymflix-v2';
+// v3: precache with {cache:'reload'} so the browser HTTP cache can never feed
+// stale logo/icon bytes into the install, and pages now reference the logo with
+// ?v=2 so even a stale HTTP/favicons cache gets bypassed on every device.
+const CACHE = 'deymflix-v3';
 const SHELL = [
   'index.html',
   'player.html',
@@ -17,15 +20,18 @@ const SHELL = [
   'tv.js',
   'manifest.json',
   'favicon.svg',
+  'favicon.svg?v=2',
   'icons/icon-192.png',
+  'icons/icon-192.png?v=2',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
+  'icons/apple-touch-icon.png?v=2',
   'icons/deymflix-logo.svg',
   'offline.html'
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => {})));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' }))).catch(() => {})));
   self.skipWaiting();
 });
 
