@@ -3181,7 +3181,7 @@
 <script src="security.js?v=2.1"></script>
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
-  <script src="app.js?v=160.18"></script>
+  <script src="app.js?v=160.19"></script>
   <script src="episodes.js?v=1.8"></script>
   <script src="kdrama-episode.js?v=1.1"></script>
   <script>
@@ -3984,6 +3984,50 @@
         });
       } catch (e) {
         if (typeof showToast === 'function') showToast('This title cannot be downloaded.');
+      }
+    };
+
+    /* ── STREAMING-ONLY (CinemaOS): tapping Download on an embed title
+       explains instead of capturing. Reuses the no-download card style.
+       _dfxTs dedups the double-fire (app.js path 3 + the hook below). ── */
+    window.dfxShowStreamOnlyDialog = function () {
+      try {
+        var prev = document.getElementById('dfx-streamonly-overlay');
+        if (prev && prev._dfxTs && (Date.now() - prev._dfxTs) < 900) return;
+        if (prev) prev.remove();
+        var cm = window.__dfxCurrentMovie || null;
+        var isEp = !!(cm && (cm._episodeNum || cm.isSeries));
+        var what = isEp ? 'episode' : 'movie';
+        var tEl = document.getElementById('current-title');
+        var name = String((cm && cm.title) || (tEl && tEl.textContent) || '').replace(/[<>&]/g, '').trim();
+        var ov = document.createElement('div');
+        ov.id = 'dfx-streamonly-overlay';
+        ov._dfxTs = Date.now();
+        ov.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(8,8,10,0.78);' +
+          'display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);';
+        var card = document.createElement('div');
+        card.style.cssText = 'background:#141418;border:1px solid rgba(255,255,255,0.12);border-radius:18px;' +
+          'max-width:420px;width:100%;padding:26px 24px 22px;text-align:center;color:#fff;' +
+          'font-family:-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 18px 60px rgba(0,0,0,0.6);';
+        card.innerHTML =
+          '<div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(229,9,20,0.14);' +
+            'display:flex;align-items:center;justify-content:center;font-size:26px;">📺</div>' +
+          '<div style="font-size:1.05rem;font-weight:800;margin-bottom:8px;">Streaming only</div>' +
+          '<div style="font-size:0.88rem;line-height:1.5;color:rgba(255,255,255,0.62);margin-bottom:18px;">' +
+            '<b style="color:#fff;">' + (name || ('This ' + what)) + '</b>' +
+            (name ? (' — this ' + what + ' is only available for streaming, so it can&#39;t be downloaded.')
+                  : (' is only available for streaming, so it can&#39;t be downloaded.')) + '</div>' +
+          '<div style="display:flex;justify-content:center;">' +
+            '<button id="dfx-so-ok" style="background:#e50914;color:#fff;border:0;border-radius:22px;' +
+              'padding:10px 30px;font:700 0.9rem -apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer;">OK</button>' +
+          '</div>';
+        ov.appendChild(card);
+        document.body.appendChild(ov);
+        var close = function () { try { ov.remove(); } catch (eX) { } };
+        ov.addEventListener('click', function (ev) { if (ev.target === ov) close(); });
+        card.querySelector('#dfx-so-ok').addEventListener('click', close);
+      } catch (e) {
+        try { if (window.DeymflixApp && typeof window.DeymflixApp.requestEmbedDownload === 'function') window.DeymflixApp.requestEmbedDownload(); } catch (e2) { }
       }
     };
 
@@ -6681,38 +6725,9 @@
               var manU = (cmM && cmM.manualDownload) || '';
               if (manU && /^https?:/i.test(String(manU))) return;
             } catch (eM2) { }
-            try { window.DeymflixApp.requestEmbedDownload(); } catch (e) {}
-            // ── CAPTURE BADGE: live 2:00 countdown while the window is armed ──
-            try {
-              var old = document.getElementById('cos-capture-badge');
-              if (old) old.remove();
-              var badge = document.createElement('div');
-              badge.id = 'cos-capture-badge';
-              badge.style.cssText = 'position:absolute;top:52px;right:14px;z-index:2147483000;display:flex;align-items:center;gap:8px;' +
-                'padding:8px 14px;border-radius:20px;background:rgba(10,10,11,0.88);color:#fff;' +
-                'font:700 13px -apple-system,Segoe UI,Roboto,sans-serif;pointer-events:none;' +
-                'border:1px solid rgba(229,9,20,0.5);';
-              badge.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#E50914;display:inline-block;animation:dfxPulse 1s infinite;"></span><span id="cos-capture-secs">2:00</span>';
-              playerContainer.appendChild(badge);
-              var left = 120;
-              var t = setInterval(function () {
-                left--;
-                var el = document.getElementById('cos-capture-secs');
-                if (!el) { clearInterval(t); return; }
-                if (left <= 0) { clearInterval(t); badge.remove(); return; }
-                el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
-              }, 1000);
-              // the app replaces the badge text the instant the stream locks on
-              window._dfxCaptureLocked = function () {
-                clearInterval(t);
-                var b = document.getElementById('cos-capture-badge');
-                if (b) {
-                  b.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span> Stream captured — saving…';
-                  setTimeout(function () { try { b.remove(); } catch (e3) {} }, 4000);
-                }
-                try { if (typeof showToast === 'function') showToast('Stream captured! Check My Downloads'); } catch (e4) {}
-              };
-            } catch (eB) {}
+            // STREAMING-ONLY: CinemaOS embeds cannot be downloaded in the
+            // app — explain it instead of arming the stream capture.
+            if (typeof dfxShowStreamOnlyDialog === 'function') dfxShowStreamOnlyDialog();
           }, true);
         }
       }
