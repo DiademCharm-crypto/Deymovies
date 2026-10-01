@@ -40,42 +40,69 @@ function cleanDriveLink(url) {
   return url;
 }
 
+// ── HERO FEATURED (auto-picked: top-rated 2026 titles we actually host) ──
+// Regenerate with _tools/_pick_featured.cjs-style query: 2026 + manualEmbed,
+// sorted by rating. 5 slides — edit freely, this is just the starting set.
 const featuredMovies = [
-  { 
-    id: "Moana: Live Action", 
-    imdbId: "tt27419466", 
-    title: "Moana: Live Action",
-    releaseDate: "2026-07-08",
-    rating: 7.4,
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/zKVgiv5qHCvCLT4A2ymJi5QeXDH.jpg",
-    manualEmbed: "https://deymflix-r2-2.b-cdn.net/Moana.2026.1080p.WEBRip.x264.AAC5.1-YTS.GG.-.YTS.BZ.mp4",
-    trailerEmbed: "",
-    isSeries: false
+  {
+    "id": "Batman: Knightfall Part 1: Knightfall",
+    "imdbId": "tt32333324",
+    "title": "Batman: Knightfall Part 1: Knightfall",
+    "releaseDate": "2026-06-23",
+    "rating": 9.2,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg",
+    "manualEmbed": "https://deymflix-r2-1.b-cdn.net/Batman.Knightfall.Part.1.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    "trailerEmbed": "https://www.youtube.com/watch?v=90HAqMk7qv0",
+    "isSeries": false
   },
-  { 
-    id: "Toy Story 5", 
-    imdbId: "tt29355505", 
-    title: "Toy Story 5", 
-    releaseDate: "2026-06-17",
-    rating: 8.3,
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg", 
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
-    manualEmbed: "https://deymflix-r2-1.b-cdn.net/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
-    trailerEmbed: "",
-    isSeries: false
+  {
+    "id": "Hadestown: The Musical",
+    "imdbId": "tt36307021",
+    "title": "Hadestown: The Musical",
+    "releaseDate": "2026-07-23",
+    "rating": 9,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/iJNVygzkuOSCOdCPNI1nLSeF7sz.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/iJNVygzkuOSCOdCPNI1nLSeF7sz.jpg",
+    "manualEmbed": "https://deymflix-r2-2.b-cdn.net/Hadestown%20The%20Musical%20(2026)%20%5B1080p%5D%20%5BWEBRip%5D%20%5B5.1%5D%20%5BYTS.GG%20-%20YTS.BZ%5D/Hadestown.The.Musical.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    "trailerEmbed": "https://www.youtube.com/watch?v=Xvuvun5sVbY",
+    "isSeries": false
   },
-  { 
-    id: "The Runner", 
-    imdbId: "tt34564059", 
-    title: "The Runner", 
-    releaseDate: "2026-09-03",
-    rating: 6.8,
-    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg", 
-    backdrop: "https://media.themoviedb.org/t/p/w600_and_h900_face/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
-    manualEmbed: "https://deymflix-r2-1.b-cdn.net/The.Runner.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
-    trailerEmbed: "",
-    isSeries: false
+  {
+    "id": "Facing El Chapo",
+    "imdbId": "tt39390497",
+    "title": "Facing El Chapo",
+    "releaseDate": "2026-08-21",
+    "rating": 8.8,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
+    "manualEmbed": "https://deymflix-media.b-cdn.net/movie+1/Facing.El.Chapo.2026.1080p.NF.WEB-DL.Multi.AAC5.1.AV1-4kHdHub.Com.mkv",
+    "trailerEmbed": "https://www.youtube.com/watch?v=cCBC4HX4XqE",
+    "isSeries": false
+  },
+  {
+    "id": "Snoopy Presents: There's No Place Like Home Snoopy",
+    "imdbId": "tt42839367",
+    "title": "Snoopy Presents: There's No Place Like Home Snoopy",
+    "releaseDate": "2026-07-30",
+    "rating": 8.5,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/YbC4SlzE030BgxWdKDdlatMh5W.jpg",
+    "manualEmbed": "https://deymflix-r2-2.b-cdn.net/www.UIndex.org%20%20%20%20-%20%20%20%20Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES/Snoopy.Presents.Theres.No.Place.Like.Home.Snoopy.2026.1080p.WEB.h264-DOLORES.mkv",
+    "trailerEmbed": "https://www.youtube.com/watch?v=A-NQmpNsZIc",
+    "isSeries": false
+  },
+  {
+    "id": "Toy Story 5",
+    "imdbId": "tt29355505",
+    "title": "Toy Story 5",
+    "releaseDate": "2026-06-17",
+    "rating": 8.3,
+    "poster": "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
+    "backdrop": "https://media.themoviedb.org/t/p/w600_and_h900_face/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
+    "manualEmbed": "https://deymflix-r2-1.b-cdn.net/Toy.Story.5.2026.1080p.WEBRip.x264.AAC5.1-%5BYTS.GG%20-%20YTS.BZ%5D.mp4",
+    "trailerEmbed": "https://www.youtube.com/watch?v=c51ND9Hdbw0",
+    "isSeries": false
   }
 ];
 
