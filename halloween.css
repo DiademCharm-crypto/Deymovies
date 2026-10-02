@@ -48,7 +48,10 @@ html.halloween {
   --border: #2c1f40;
   --muted: #b3a3c9;
 
-  /* halloween-only tokens */
+  /* halloween-only tokens.
+     --brand-red is deliberately NOT seasonal: the wordmark's FLIX and the mark
+     itself stay brand red all year, and only the page accents go pumpkin. */
+  --brand-red: #e50914;
   --hw-orange: #ff7518;
   --hw-orange-2: #ffb25c;
   --hw-purple: #7a3cff;
@@ -84,28 +87,34 @@ html.halloween .top-nav {
 }
 
 html.halloween .brand-logo-img {
-  filter: drop-shadow(0 0 8px rgba(255, 117, 24, 0.45));
+  /* red first (it owns the mark and the wordmark), pumpkin as the outer halo
+     so the logo still sits inside the season's light */
+  filter: drop-shadow(0 0 7px rgba(229, 9, 20, 0.50)) drop-shadow(0 0 18px rgba(255, 117, 24, 0.22));
 }
 
-/* text logos (app.html / downloads.html): DEYM in bone, FLIX in pumpkin */
+/* text logos (app.html / downloads.html): DEYM in bone, FLIX in brand red */
 html.halloween .logo {
   color: #f2ece0 !important;
-  text-shadow: 0 0 14px rgba(255, 117, 24, 0.25);
-}
-
-html.halloween .logo span {
-  color: var(--hw-orange) !important;
-  text-shadow: 0 0 12px var(--hw-glow);
+  text-shadow: 0 0 14px rgba(255, 117, 24, 0.22);
 }
 
 html.halloween .brand-title-text,
 html.halloween .footer-logo {
   color: #f2ece0 !important;
-  text-shadow: 0 0 14px rgba(255, 117, 24, 0.25);
+  text-shadow: 0 0 14px rgba(255, 117, 24, 0.22);
 }
 
 html.halloween .brand-title-text .highlight-red,
 html.halloween .footer-logo em,
+html.halloween .logo span {
+  /* the wordmark stays brand red through the season. The dark purple night is
+     about as dark as the normal near-black page, so the brand red reads the
+     same — it gets a red halo for pop and a faint pumpkin outer glow so it
+     still belongs to the themed page instead of fighting it. */
+  color: var(--brand-red) !important;
+  text-shadow: 0 0 9px rgba(229, 9, 20, 0.60), 0 0 20px rgba(255, 117, 24, 0.22);
+}
+
 html.halloween .hero-match {
   color: var(--hw-orange) !important;
   text-shadow: 0 0 12px var(--hw-glow);
