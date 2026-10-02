@@ -8,12 +8,20 @@
 // v3: precache with {cache:'reload'} so the browser HTTP cache can never feed
 // stale logo/icon bytes into the install, and pages now reference the logo with
 // ?v=2 so even a stale HTTP/favicons cache gets bypassed on every device.
-const CACHE = 'deymflix-v3';
+// v4: halloween theme (halloween.css + halloween.js + the jack-o'-lantern
+// logo/favicon) added to the shell so offline still looks like the season.
+const CACHE = 'deymflix-v4';
 const SHELL = [
   'index.html',
   'player.html',
   'style.css',
   'theme-v2.css',
+  'halloween.css',
+  'halloween.js',
+  'favicon-halloween.svg',
+  'icons/deymflix-logo-halloween.svg',
+  'icons/apple-touch-icon-halloween.png',
+  'icons/share-card-halloween.png',
   'app.js',
   'episodes.js',
   'kdrama-episode.js',
