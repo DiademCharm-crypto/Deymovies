@@ -1154,15 +1154,18 @@ function injectEpisodesUI(series) {
     renderEpisodesGrid(series.seasons[activeSeasonIndex]);
   });
 
-  // ── DEEP LINK (?s=N&ep=M from a Continue-Watching series card) ──
-  // Open the grid on that season, highlight that episode, apply its real
-  // title. The player already stamped _episodeId (?s&ep) before loadEmbed(),
-  // so the saved position for THIS episode rules the resume.
+  // ── CURRENT EPISODE (?s=N&ep=M deep link, or the player's resume pick) ──
+  // Open the grid on that season and highlight the episode the player is
+  // ACTUALLY loading. The episode itself comes from the player's single
+  // resolver (currentMovie._episodeSeason/_episodeNum) — re-reading the URL
+  // here was how the bar could end up on one episode while the video played
+  // another after a reload.
   try {
+    const m = (typeof currentMovie !== 'undefined' && currentMovie) ? currentMovie : null;
     const qp = new URLSearchParams(window.location.search);
-    const dlEp = parseInt(qp.get('ep') || '0', 10) || 0;
-    const dlS = parseInt(qp.get('s') || '0', 10) || 0;
-    if (dlEp && typeof currentMovie !== 'undefined' && currentMovie) {
+    const dlEp = (m && m._episodeNum) || parseInt(qp.get('ep') || '0', 10) || 0;
+    const dlS = (m && m._episodeSeason) || parseInt(qp.get('s') || '0', 10) || 0;
+    if (dlEp && m) {
       let si = series.seasons.findIndex(x => Number(x.seasonNumber) === dlS);
       if (si < 0) si = 0;
       activeSeasonIndex = si;
@@ -1170,7 +1173,7 @@ function injectEpisodesUI(series) {
       renderEpisodesGrid(series.seasons[si], dlEp);
       const target = (series.seasons[si].episodes || []).find(x => Number(x.episodeNumber) === dlEp);
       if (target) {
-        // the deep-link label was best-effort; apply the REAL episode title
+        // keep the label identical to what the resolver stamped (real title)
         currentMovie._episodeTitle = currentMovie.title + ' - ' + (target.title || 'Episode ' + dlEp);
         currentMovie._episodeName = target.title || '';
         if (typeof updateEpisodeTitleOverlay === 'function') {
@@ -1179,7 +1182,7 @@ function injectEpisodesUI(series) {
       }
       const btn = document.querySelector('.episode-square-btn.active');
       if (btn) { try { btn.scrollIntoView({ block: 'nearest' }); } catch (e3) {} }
-      return; // deep-link render is final — skip the default render below
+      return; // this render is final — skip the default render below
     }
   } catch (e) {}
 
@@ -1192,10 +1195,15 @@ function renderEpisodesGrid(season, highlightEp) {
 
   episodesList.innerHTML = '';
 
+  // Highlight the requested episode; if it doesn't exist in this season (a
+  // stale link), fall back to the first button so the bar ALWAYS shows which
+  // episode is playing instead of showing none.
+  const hasHighlight = highlightEp !== undefined && highlightEp !== null && Number(highlightEp) > 0
+    && (season.episodes || []).some(ep => Number(ep.episodeNumber) === Number(highlightEp));
+
   season.episodes.forEach((ep, idx) => {
     const btn = document.createElement('button');
-    // highlight the deep-linked episode when present, else the first one
-    const isActive = highlightEp
+    const isActive = hasHighlight
       ? (Number(ep.episodeNumber) === Number(highlightEp))
       : (idx === 0);
     btn.className = `episode-square-btn ${isActive ? 'active' : ''}`;
@@ -1210,6 +1218,27 @@ function renderEpisodesGrid(season, highlightEp) {
     episodesList.appendChild(btn);
   });
 }
+
+// Keep the VISIBLE episode bar in step with what is playing. The grid can be
+// showing another season (the flat Episodes panel switches across seasons),
+// so after every switch we re-render it for the episode's own season — the
+// active square always means the episode you are watching.
+function refreshEpisodesUI() {
+  try {
+    if (typeof currentMovie === 'undefined' || !currentMovie) return;
+    if (!document.getElementById('episodes-list')) return;   // no grid on this page
+    const normId = v => String(v || '').toLowerCase().replace(/[\s\+]+/g, '-');
+    const series = seriesData.find(s => s.id === currentMovie.id || normId(s.id) === normId(currentMovie.id));
+    if (!series || !series.seasons || !series.seasons.length) return;
+    let si = series.seasons.findIndex(s => Number(s.seasonNumber) === Number(currentMovie._episodeSeason || 1));
+    if (si < 0) si = 0;
+    activeSeasonIndex = si;
+    const sel = document.getElementById('season-selector');
+    if (sel) sel.value = String(si);
+    renderEpisodesGrid(series.seasons[si], currentMovie._episodeNum);
+  } catch (e) {}
+}
+window.__dfxRefreshEpisodesUI = refreshEpisodesUI;
 
 function playEpisodeSource(episode, season) {
   if (!episode || !episode.embedUrl) return;
@@ -1226,29 +1255,36 @@ function playEpisodeSource(episode, season) {
   } catch(e) {}
 
   if (typeof currentMovie !== 'undefined') {
-    currentMovie.manualEmbed = episode.embedUrl;
-    if (episode.hlsUrl) {
-      currentMovie._episodeHlsUrl = episode.hlsUrl;
-    } else {
-      delete currentMovie._episodeHlsUrl;
-    }
-    currentMovie.manualEmbed = episode.embedUrl;
-    // Season-aware resume key: without the season, S1E3 and S2E3 share one
-    // Continue-Watching slot (timestamp leaked across seasons — fixed).
-    // Old keys ("<id>-ep3") still resolve; new keys are "<id>-s2-ep3".
+    // Episode metadata for episode-aware subtitle matching + the season-aware
+    // Continue-Watching key: "<id>-s2-ep3" (old "<id>-ep3" keys still
+    // resolve). ONE resolver does this for every entry path — the player's
+    // dfxStampEpisode(); the inline block below is the fallback for an older
+    // player build.
     var _sn = (season && season.seasonNumber) || currentMovie._episodeSeason || 1;
-    currentMovie._episodeId = currentMovie.id + '-s' + _sn + '-ep' + (episode.episodeNumber || '');
-    currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + episode.episodeNumber);
-    // Episode metadata for episode-aware subtitle search (OpenSubtitles)
-    currentMovie._episodeSeason = (season && season.seasonNumber) || 1;
-    currentMovie._episodeNum = episode.episodeNumber || 1;
-    currentMovie._episodeName = episode.title || '';
-    currentMovie._subtitleUrl = episode.subtitleUrl || '';
-    // MANUAL DOWNLOAD LINK for this episode (falls back to the series-level
-    // link). Read by the Download button in app.js: manual link > direct
-    // file > embed capture > "cannot be downloaded" dialog.
-    currentMovie.manualDownload = episode.manualDownload || currentMovie.manualDownload || '';
-    currentMovie.manualDownloadSub = episode.manualDownloadSub || currentMovie.manualDownloadSub || '';
+    var _ep = episode.episodeNumber || 1;
+    var stamped = (typeof window.dfxStampEpisode === 'function') ? window.dfxStampEpisode(_sn, _ep) : null;
+    if (!stamped) {
+      currentMovie.manualEmbed = episode.embedUrl;
+      currentMovie._episodeId = currentMovie.id + '-s' + _sn + '-ep' + _ep;
+      currentMovie._episodeTitle = currentMovie.title + ' - ' + (episode.title || 'Episode ' + _ep);
+      currentMovie._episodeSeason = _sn;
+      currentMovie._episodeNum = _ep;
+      currentMovie._episodeName = episode.title || '';
+      currentMovie._subtitleUrl = episode.subtitleUrl || '';
+      // MANUAL DOWNLOAD LINK for this episode (falls back to the series-level
+      // link). Read by the Download button in app.js: manual link > direct
+      // file > embed capture > "cannot be downloaded" dialog.
+      currentMovie.manualDownload = episode.manualDownload || currentMovie.manualDownload || '';
+      currentMovie.manualDownloadSub = episode.manualDownloadSub || currentMovie.manualDownloadSub || '';
+    }
+    // The passed episode's HLS playlist always wins (even when the resolver
+    // stamped an equivalent episode object from seriesData).
+    if (episode.hlsUrl) currentMovie._episodeHlsUrl = episode.hlsUrl;
+    else delete currentMovie._episodeHlsUrl;
+    // Keep the URL honest: reload / share now reopen THIS episode, never ep1.
+    if (typeof window.dfxSyncEpisodeUrl === 'function') {
+      try { window.dfxSyncEpisodeUrl(_sn, _ep); } catch (e) {}
+    }
   }
 
   // Load a manually assigned subtitle file for this episode, if provided
@@ -1274,6 +1310,11 @@ function playEpisodeSource(episode, season) {
       directPlayer.play().catch(() => {});
     }
   }
+
+  // Per-episode UI state (mid-roll ad cycle, next-episode countdown) and the
+  // visible episode bar follow the switch — every entry path lands here.
+  if (typeof window.dfxOnEpisodeSwitch === 'function') { try { window.dfxOnEpisodeSwitch(); } catch (e) {} }
+  refreshEpisodesUI();
 
   if (typeof showToast === 'function') {
     showToast(`Loading Episode ${episode.episodeNumber || ''}...`);
