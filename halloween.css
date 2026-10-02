@@ -1,0 +1,289 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DEYMFLIX — HALLOWEEN THEME (seasonal, additive)
+   ══════════════════════════════════════════════════════════════════════════
+   Loads AFTER style.css / theme-v2.css and only re-colours + decorates the
+   existing markup. Nothing here changes a class name or a layout box, so the
+   season can be turned off by deleting the two <link>/<script> lines in the
+   pages (see the note next to them) and clearing the cache version:
+
+       <link rel="stylesheet" href="halloween.css?v=1.0">
+       <script src="halloween.js?v=1.0" defer></script>
+
+   DIRECTION
+     · candlelit night: deep purple-black base, pumpkin-orange as the accent
+     · red is retired for the season — orange takes its place everywhere the
+       site used --primary-red (buttons, dots, badges, hovers)
+     · a few friendly graphics: cobwebs on the corners, bats drifting across
+       the sky, jack-o'-lanterns at the footer (all from halloween.js, all
+       pointer-events:none, all disabled under prefers-reduced-motion)
+     · the player and reels pages stay clean — video first, theme second
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TOKENS ──────────────────────────────────────────────────────────── */
+:root,
+html.halloween {
+  --primary-red: #ff7518;          /* pumpkin takes over the brand accent */
+  --primary-red-hover: #ff8c32;
+  --bg-dark: #0b0712;
+  --card-bg: #171022;
+  --border-color: #2c1f40;
+  --text-main: #f7f2ff;
+  --text-muted: #b3a3c9;
+
+  /* theme-v2 "noir glass" tokens, re-tinted purple-orange */
+  --dfx-glass: rgba(23, 16, 34, 0.74);
+  --dfx-glass-line: rgba(255, 117, 24, 0.16);
+  --dfx-red-soft: rgba(255, 117, 24, 0.16);
+  --dfx-red-ring: rgba(255, 117, 24, 0.55);
+  --dfx-shadow-lift: 0 0 0 1px var(--dfx-red-ring), 0 18px 44px rgba(0, 0, 0, 0.72),
+    0 0 30px rgba(255, 117, 24, 0.25);
+
+  /* the standalone utility pages (app.html / downloads.html) carry their own
+     token names — recoloured here so they match the rest of the site */
+  --red: #ff7518;
+  --red-hot: #ff8c32;
+  --bg: #0b0712;
+  --card: #171022;
+  --card-2: #1c1230;
+  --border: #2c1f40;
+  --muted: #b3a3c9;
+
+  /* halloween-only tokens */
+  --hw-orange: #ff7518;
+  --hw-orange-2: #ffb25c;
+  --hw-purple: #7a3cff;
+  --hw-toxic: #7ad86b;
+  --hw-glow: rgba(255, 117, 24, 0.42);
+}
+
+/* ── 2. THE NIGHT ───────────────────────────────────────────────────────── */
+html.halloween body {
+  background-color: #0b0712 !important;
+  background-image:
+    radial-gradient(1100px 520px at 12% -8%, rgba(122, 60, 255, 0.20), transparent 62%),
+    radial-gradient(900px 460px at 96% 0%, rgba(255, 117, 24, 0.13), transparent 60%),
+    linear-gradient(180deg, #0b0712 0%, #140d22 42%, #090512 100%) !important;
+  background-repeat: no-repeat !important;
+}
+
+/* faint full-page vignette so posters pop out of the dark */
+html.halloween body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(140% 90% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.45) 100%),
+    radial-gradient(60% 40% at 50% 100%, rgba(122, 60, 255, 0.10), transparent 70%);
+}
+
+/* ── 3. BRAND ───────────────────────────────────────────────────────────── */
+html.halloween .top-nav {
+  border-bottom-color: rgba(122, 60, 255, 0.35) !important;
+}
+
+html.halloween .brand-logo-img {
+  filter: drop-shadow(0 0 8px rgba(255, 117, 24, 0.45));
+}
+
+/* text logos (app.html / downloads.html): DEYM in bone, FLIX in pumpkin */
+html.halloween .logo {
+  color: #f2ece0 !important;
+  text-shadow: 0 0 14px rgba(255, 117, 24, 0.25);
+}
+
+html.halloween .logo span {
+  color: var(--hw-orange) !important;
+  text-shadow: 0 0 12px var(--hw-glow);
+}
+
+html.halloween .brand-title-text,
+html.halloween .footer-logo {
+  color: #f2ece0 !important;
+  text-shadow: 0 0 14px rgba(255, 117, 24, 0.25);
+}
+
+html.halloween .brand-title-text .highlight-red,
+html.halloween .footer-logo em,
+html.halloween .hero-match {
+  color: var(--hw-orange) !important;
+  text-shadow: 0 0 12px var(--hw-glow);
+}
+
+/* ── 4. SECTIONS ────────────────────────────────────────────────────────── */
+html.halloween .section-header-title {
+  position: relative;
+  padding-left: 34px;
+}
+
+/* a small pumpkin keeps every row on-theme without touching the markup */
+html.halloween .section-header-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='58' rx='40' ry='33' fill='%23ff7518'/%3E%3Cellipse cx='50' cy='58' rx='40' ry='33' fill='none' stroke='%23b03e06' stroke-width='3'/%3E%3Cpath d='M43 26h14l-2-14-10 2z' fill='%234a3418'/%3E%3Cpath d='M50 30c6 4 10 10 12 18M50 30c-6 4-10 10-12 18' fill='none' stroke='%23b03e06' stroke-width='2.5' opacity='.8'/%3E%3Cpolygon points='36,52 48,49 44,62' fill='%231a0c06'/%3E%3Cpolygon points='64,52 52,49 56,62' fill='%231a0c06'/%3E%3Cpath d='M34 70l6 6 6-6 6 7 6-7 6 6 6-6-2 12-16 6-16-6z' fill='%231a0c06'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 6px var(--hw-glow));
+}
+
+/* ── 5. SURFACES / CARDS ────────────────────────────────────────────────── */
+html.halloween .movie-card,
+html.halloween .card,
+html.halloween .row-card,
+html.halloween .search-input-wrapper input {
+  border-color: rgba(122, 60, 255, 0.28) !important;
+}
+
+html.halloween .movie-card:hover,
+html.halloween .card:hover,
+html.halloween .row-card:hover {
+  border-color: var(--hw-orange) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 22px var(--hw-glow) !important;
+}
+
+/* ── 6. DECOR LAYER (markup injected by halloween.js) ───────────────────── */
+.hw-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+/* cobwebs: bottom corners, so they never fight the navigation bar */
+.hw-web {
+  position: absolute;
+  bottom: 0;
+  width: 190px;
+  height: 190px;
+  opacity: 0.5;
+}
+
+.hw-web.left { left: 0; transform: scaleY(-1); }
+.hw-web.right { right: 0; transform: rotate(180deg); }
+
+.hw-web svg,
+.hw-bat svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hw-bat {
+  position: absolute;
+  top: var(--hw-top, 14%);
+  left: -14vw;
+  width: var(--hw-size, 46px);
+  height: auto;
+  opacity: 0.55;
+  animation: hw-fly var(--hw-dur, 26s) linear infinite;
+  animation-delay: var(--hw-delay, 0s);
+  will-change: transform;
+}
+
+@keyframes hw-fly {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  25%  { transform: translate3d(28vw, -22px, 0) scale(1.04); }
+  50%  { transform: translate3d(56vw, 14px, 0) scale(0.98); }
+  75%  { transform: translate3d(84vw, -18px, 0) scale(1.03); }
+  100% { transform: translate3d(124vw, 6px, 0) scale(1); }
+}
+
+.hw-ribbon {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-align: center;
+  color: #1a0c06;
+  background: linear-gradient(90deg, #ff7518 0%, #ffb25c 50%, #ff7518 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.hw-ribbon .hw-flicker {
+  display: inline-block;
+  animation: hw-flicker 2.6s ease-in-out infinite;
+}
+
+@keyframes hw-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  45%      { opacity: 0.72; transform: scale(0.94); }
+  60%      { opacity: 1; transform: scale(1.03); }
+}
+
+.hw-ribbon a {
+  color: #1a0c06;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* announcement strip: in flow, sits between the hero and the first row */
+.hw-ribbon {
+  border-radius: 0;
+}
+
+/* pushed clear of the absolutely-positioned header (set by halloween.js) */
+.hw-ribbon.hw-ribbon-pushed {
+  margin-top: 72px;
+}
+
+@media (max-width: 640px) {
+  .hw-ribbon.hw-ribbon-pushed { margin-top: 64px; }
+}
+
+/* footer greeting — a line of its own, never over the legal text */
+.hw-greeting {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 26px auto 10px;
+  padding: 10px 18px;
+  max-width: 560px;
+  border: 1px dashed rgba(255, 117, 24, 0.45);
+  border-radius: 14px;
+  background: rgba(23, 16, 34, 0.6);
+  color: var(--hw-orange-2);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.hw-greeting svg {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 0 6px var(--hw-glow));
+}
+
+/* ── 7. MOTION / SMALL SCREENS ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hw-web { width: 120px; height: 120px; opacity: 0.4; bottom: 76px; }
+  .hw-greeting { font-size: 0.78rem; gap: 8px; }
+  .hw-greeting svg { width: 26px; height: 26px; }
+  .hw-ribbon { font-size: 0.74rem; padding: 7px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-bat { animation: none; opacity: 0.28; left: auto; }
+  .hw-bat:nth-child(odd) { left: 8vw; }
+  .hw-bat:nth-child(even) { left: 58vw; }
+  .hw-ribbon .hw-flicker { animation: none; }
+}
