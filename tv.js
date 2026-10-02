@@ -1,7 +1,7 @@
 // ============================================================================
 // DEYMFLIX — TV mode (remote-friendly D-pad navigation)
 // ============================================================================
-// Include on every browse page:  <script src="tv.js?v=1.0" defer></script>
+// Include on every browse page:  <script src="tv.js?v=1.1" defer></script>
 //
 // What it does
 //   • Arrow keys / remote D-pad move a glowing focus ring between cards,
@@ -9,6 +9,17 @@
 //   • Enter activates the focused element (same as a click/tap).
 //   • Backspace or the Back key on a remote goes back in history.
 //   • Escape leaves TV mode; pressing any arrow key turns it back on.
+//
+// Where it does that (v1.1)
+//   A PC keyboard sends the same arrow keys, but there they mean scroll/seek
+//   (and Backspace must never navigate away). TV mode therefore only takes
+//   over keys on hardware that actually has a D-pad: TV browsers (UA markers)
+//   or coarse-pointer / pointerless screens. Desktops with a mouse are left
+//   completely alone — arrows keep scrolling the page and seeking in the
+//   player, exactly as before.
+//   Force it either way with localStorage.deymflix_tv_mode:
+//     '1' → always on  (HTPC hooked to a TV, keyboard-only media box)
+//     '0' → always off (TV browser where you prefer plain keys)
 //
 // How it works
 //   Candidates are all visible a/button/[tabindex] elements. From the current
@@ -21,6 +32,19 @@
   'use strict';
   if (window.__DFX_TV__) return; // idempotent
   window.__DFX_TV__ = true;
+
+  // ── is this hardware D-pad driven? ──
+  var FORCE = null;
+  try { FORCE = localStorage.getItem('deymflix_tv_mode'); } catch (e) { /* private mode */ }
+  var ua = navigator.userAgent || '';
+  var TV_UA = /(smart[- ]?tv|tizen|web0s|webos|bravia|aft[bmn]|android[ -]tv|google[ -]?tv|chromecast|crkey|hbbtv|netcast|vidaa|roku|large screen)/i;
+  var mq = function (q) { try { return matchMedia(q).matches; } catch (e) { return false; } };
+  // coarse-only = touch devices and TV boxes; a mouse (any-pointer: fine)
+  // anywhere means the keyboard shortcuts on the page win
+  var DPAD = FORCE === '1' ? true
+    : FORCE === '0' ? false
+    : TV_UA.test(ua) || (mq('(any-pointer: coarse)') && !mq('(any-pointer: fine)'));
+  window.__DFX_TV_DPAD__ = DPAD; // diagnostics/tests
 
   var ACTIVE = false;
   var RING = null;            // the focus ring element
@@ -69,7 +93,11 @@
   }
 
   function focusEl(el, scroll) {
-    if (!el) return;
+    if (!el) { // nothing to ring — never leave the ring parked on a stale spot
+      CURRENT = null;
+      if (RING) RING.style.display = 'none';
+      return;
+    }
     CURRENT = el;
     try { el.focus({ preventScroll: true }); } catch (e) { /* older */ }
     if (scroll) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -127,15 +155,18 @@
   });
   document.addEventListener('DOMContentLoaded', function () {
     mo.observe(document.body, { childList: true, subtree: true });
-    // first D-pad press anywhere wakes TV mode
   });
 
   addEventListener('keydown', function (e) {
+    // Browser/OS shortcuts (Ctrl+F, Alt+Left, Cmd+…) are never ours
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
     var k = e.key;
     var dir = k === 'ArrowLeft' ? 'left' : k === 'ArrowRight' ? 'right' : k === 'ArrowUp' ? 'up' : k === 'ArrowDown' ? 'down' : null;
     var inField = /^(input|textarea|select)$/i.test((e.target && e.target.tagName) || '');
 
     if (dir) {
+      // PC: arrow keys belong to the page (scroll, player seek/volume)
+      if (!DPAD && !ACTIVE) return;
       if (inField && (dir === 'left' || dir === 'right')) return; // let text caret move
       e.preventDefault();
       start();
@@ -152,8 +183,9 @@
     }
     if (k === 'Backspace' || k === 'GoBack' || k === 'BrowserBack') {
       if (inField) return;
-      // TV remotes send Back; browsers send Backspace. On TV browsers,
-      // history.back() is what the user expects from the Back button.
+      // PC browsers: Backspace is an editing key, never a navigation command
+      if (!DPAD && !ACTIVE) return;
+      // TV remotes send Back; on TV browsers history.back() is the expected action
       if (history.length > 1) { e.preventDefault(); history.back(); }
       return;
     }
