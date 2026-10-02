@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- DEYMFLIX player build 2026-09-25.4 (compact red Episodes panel, PC fullscreen fixes) -->
+<!-- DEYMFLIX player build 2026-10-02.1 (rich share cards — title + poster) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -16,13 +16,13 @@
   <meta property="og:title" content="Watch on DEYMFLIX">
   <meta property="og:description" content="HD streaming with English and Tagalog subtitles — free on DEYMFLIX.">
   <meta property="og:url" content="https://deymflix.eu.cc/player.html">
-  <meta property="og:image" content="https://deymflix.eu.cc/icons/share-card.png">
+  <meta property="og:image" content="https://deymflix.eu.cc/icons/share-card-halloween.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Watch on DEYMFLIX">
   <meta name="twitter:description" content="HD streaming with English and Tagalog subtitles — free on DEYMFLIX.">
-  <meta name="twitter:image" content="https://deymflix.eu.cc/icons/share-card.png">
+  <meta name="twitter:image" content="https://deymflix.eu.cc/icons/share-card-halloween.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 
   <!-- Favicon Link -->
@@ -40,6 +40,9 @@
   <link rel="dns-prefetch" href="https://vidsrc.cc">
 
   <link rel="stylesheet" href="style.css?v=160.5">
+  <!-- HALLOWEEN THEME (seasonal, colour only — the player is never decorated). -->
+  <link rel="stylesheet" href="halloween.css?v=1.0">
+  <script src="halloween.js?v=1.0" defer></script>
 
   <style>
     @keyframes dfxPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -63,7 +66,6 @@
     body.cos-mode #next-episode-box,
     body.cos-mode #btn-subtitle-off,
     body.cos-mode #quality-menu,
-    body.cos-mode .skip-feature-pill,
     body.cos-mode #speed-menu {
       display: none !important;
     }
@@ -337,64 +339,6 @@
     .player-overlay.active {
       opacity: 1 !important;
       pointer-events: auto !important;
-    }
-
-    /* ── SKIP FEATURE pill (own-host / manual embeds only) ──
-       One tap rewinds the movie/episode to the very start (00:00:00).
-       Lives inside #player-gesture-overlay so it fades with the controls;
-       hidden by default — loadEmbed() adds .show only when the source is one
-       of our own hosts. CinemaOS embeds never see it (cos-mode + JS gate). */
-    .skip-feature-pill {
-      position: absolute !important;
-      left: 24px !important;
-      bottom: 104px !important;
-      display: none;
-      align-items: center !important;
-      gap: 8px !important;
-      padding: 10px 18px !important;
-      border: 1px solid rgba(255, 255, 255, 0.5) !important;
-      border-radius: 999px !important;
-      background: rgba(0, 0, 0, 0.72) !important;
-      color: #ffffff !important;
-      font-family: inherit !important;
-      font-size: 0.85rem !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.3px !important;
-      line-height: 1 !important;
-      cursor: pointer !important;
-      z-index: 480 !important;
-      -webkit-user-select: none !important;
-      user-select: none !important;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease !important;
-    }
-    .skip-feature-pill.show {
-      display: inline-flex !important;
-    }
-    .skip-feature-pill:hover,
-    .skip-feature-pill:focus-visible {
-      background: #e50914 !important;
-      border-color: #e50914 !important;
-    }
-    .skip-feature-pill:active {
-      transform: scale(0.96) !important;
-    }
-    .skip-feature-pill svg {
-      width: 16px !important;
-      height: 16px !important;
-      flex: 0 0 auto !important;
-      display: block !important;
-    }
-    @media (min-width: 769px) {
-      .skip-feature-text-short { display: none !important; }
-    }
-    @media (max-width: 768px) {
-      .skip-feature-pill {
-        left: 12px !important;
-        bottom: 72px !important;
-        padding: 8px 13px !important;
-        font-size: 0.75rem !important;
-      }
-      .skip-feature-text-long { display: none !important; }
     }
 
     /* ── Episode title overlays (PC + series only) ──
@@ -2825,18 +2769,6 @@
       <div id="rewind-badge" class="loklok-seek-badge">-10 <span class="ring-icon">⟲</span></div>
       <div id="forward-badge" class="loklok-seek-badge"><span class="ring-icon">⟳</span> +10</div>
 
-      <!-- SKIP FEATURE: own-host (manual embed) movies/series/episodes only.
-           One tap jumps playback back to the very beginning of the video.
-           CinemaOS embeds never render it (see loadEmbed + cos-mode CSS). -->
-      <button id="btn-skip-feature" class="skip-feature-pill" type="button"
-              title="Skip Feature — restart this video from the very beginning"
-              aria-label="Skip Feature: restart from the very beginning"
-              onclick="skipFeatureToStart(event)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5h2.2v14H6V5zm12.8 0v14L9.4 12 18.8 5z"/></svg>
-        <span class="skip-feature-text-long">Skip Feature</span>
-        <span class="skip-feature-text-short">Skip</span>
-      </button>
-
       <div class="player-bottom-bar">
         <div class="progress-bar-wrapper">
           <input type="range" id="video-seekbar" min="0" max="100" value="0" step="0.1">
@@ -4666,7 +4598,6 @@
     const btnRewind = document.getElementById('btn-rewind-center');
     const btnForward = document.getElementById('btn-forward-center');
     const btnFullscreen = document.getElementById('btn-fullscreen');
-    const btnSkipFeature = document.getElementById('btn-skip-feature');
 
     const seekbar = document.getElementById('video-seekbar');
     const currentTimeText = document.getElementById('current-time-text');
@@ -5302,28 +5233,104 @@
     });
 
     // ── Share button ──
-    // Shares the page the viewer is actually on — the URL carries the movie id
-    // (and the season/episode when one is open), so the recipient opens the
-    // same thing. Browsers without the Web Share API (most desktops) fall back
-    // to copying the link, which is what people do there anyway.
+    // A shared player URL is one static file, so chat apps only ever showed the
+    // generic DEYMFLIX card — no movie title, no poster. Every catalogue title
+    // now has a tiny generated page (share/<slug>.html) whose og:title and
+    // og:image ARE the film's name and artwork; sharing that link makes
+    // WhatsApp / Messenger / Facebook render the real thing. The page forwards
+    // straight to the player (season + episode preserved), so the recipient
+    // still lands on exactly what was shared.
+    //   · generated by _tools/_share_pages.cjs (same slug function here)
+    //   · a missing page (brand-new title) falls back to the plain player URL,
+    //     never a 404 — checked once per URL with a background HEAD request
+    //   · the poster rides along as a share file where the browser allows it
+    // The share pages live next to the player, so use whatever origin this page
+    // was loaded from (keeps the checks honest on localhost too).
+    const SHARE_ORIGIN = (location.origin && /^https?:/.test(location.origin)) ? location.origin : 'https://deymflix.eu.cc';
+
+    function shareSlug(text) {
+      return String(text || '')
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, ' and ')
+        .replace(/['\u2019`]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 70)
+        .replace(/-+$/g, '');
+    }
+
+    function sharePosterUrl() {
+      const m = (typeof currentMovie !== 'undefined' && currentMovie) ? currentMovie : {};
+      return String(m.poster || '')
+        .replace(/\/t\/p\/w\d+(?:_and_h\d+_face)?\//, '/t/p/w500/')
+        .replace(/\/t\/p\/original\//, '/t/p/w500/');
+    }
+
+    const shareProbe = {};
+    function shareUrlForCurrent() {
+      const m = (typeof currentMovie !== 'undefined' && currentMovie) ? currentMovie : {};
+      const slug = shareSlug(m._baseId || m.id || '');
+      if (!slug) return window.location.href;
+      let url = SHARE_ORIGIN + '/share/' + slug + '.html';
+      const s = urlParams.get('s');
+      const ep = urlParams.get('ep');
+      if (s || ep) url += '?s=' + encodeURIComponent(s || '1') + '&ep=' + encodeURIComponent(ep || '1');
+      const base = url.split('?')[0];
+      if (shareProbe[base] === false) return window.location.href; // page absent
+      if (shareProbe[base] === undefined) {
+        shareProbe[base] = true; // optimistic; corrected by the probe below
+        try {
+          fetch(base, { method: 'HEAD' }).then(function (r) {
+            if (!r.ok) shareProbe[base] = false;
+          }).catch(function () {});
+        } catch (e) {}
+      }
+      return url;
+    }
+
     const btnShare = document.getElementById('btn-share');
     if (btnShare) {
+      // warm the existence check now, so the first tap shares without waiting
+      try { shareUrlForCurrent(); } catch (e) {}
+
       btnShare.addEventListener('click', async (e) => {
         e.stopPropagation();
         const m = (typeof currentMovie !== 'undefined' && currentMovie) ? currentMovie : {};
         const label = m._episodeTitle ? (m.title + ' \u2014 ' + m._episodeTitle) : (m.title || document.title);
-        const url = window.location.href;
+        const url = shareUrlForCurrent();
         try {
           if (navigator.share) {
-            await navigator.share({ title: label + ' | DEYMFLIX', text: 'Watch ' + label + ' on DEYMFLIX', url: url });
+            const data = { title: label + ' | DEYMFLIX', text: 'Watch ' + label + ' on DEYMFLIX', url: url };
+            // WhatsApp shows the artwork when the image travels with the share
+            // (Web Share Level 2). Any failure just drops the file, never the
+            // share — and the fetch is capped so a slow poster CDN can't stall
+            // the share sheet (the link preview shows the poster anyway).
+            try {
+              const poster = sharePosterUrl();
+              if (poster && navigator.canShare && typeof File === 'function') {
+                const blobFrom = (async () => {
+                  const res = await fetch(poster);
+                  const blob = await res.blob();
+                  const name = (shareSlug(label).slice(0, 60) || 'deymflix-poster') + '.jpg';
+                  const file = new File([blob], name, { type: blob.type || 'image/jpeg' });
+                  return navigator.canShare({ files: [file] }) ? file : null;
+                })();
+                const file = await Promise.race([blobFrom, new Promise((r) => setTimeout(() => r(null), 1200))]);
+                if (file) data.files = [file];
+              }
+            } catch (err) {}
+            await navigator.share(data);
             return;
           }
         } catch (err) {
           if (err && err.name === 'AbortError') return; // user closed the share sheet
         }
+        // No share sheet: copy title + link, so a paste still carries the name
+        const plain = label + ' — ' + url;
         try {
-          await navigator.clipboard.writeText(url);
-          showToast('Link copied');
+          await navigator.clipboard.writeText(plain);
+          showToast('Copied: ' + label);
         } catch (err) {
           showToast('Copy this link: ' + url);
         }
@@ -6432,67 +6439,6 @@
       }
     }
 
-    // ── SKIP FEATURE (own-host / manual embeds only) ──
-    // Every title we host ourselves plays as a direct file from one of the B2
-    // buckets behind Bunny (deymflix-media / deymflix-r2-1 / deymflix-r2-2 —
-    // all *.b-cdn.net). CinemaOS embeds (cos: links) are excluded on purpose:
-    // there the provider's own player owns the screen.
-    const SKIP_FEATURE_HOSTS = ['deymflix-media.b-cdn.net', 'deymflix-r2-1.b-cdn.net', 'deymflix-r2-2.b-cdn.net'];
-
-    function isOwnHostMediaUrl(url) {
-      try {
-        const host = new URL(url, window.location.href).hostname.toLowerCase();
-        return SKIP_FEATURE_HOSTS.indexOf(host) !== -1 || /(^|\.)b-cdn\.net$/.test(host);
-      } catch (e) { return false; }
-    }
-
-    function setSkipFeatureVisible(on) {
-      if (!btnSkipFeature) return;
-      btnSkipFeature.classList.toggle('show', !!on && !window._cosActive);
-    }
-
-    // One tap = back to 00:00:00. Also forgets the saved resume position for
-    // this movie/episode so the next open starts at the very beginning too
-    // (intro / "previously on" recaps included — nothing to fast-forward).
-    function skipFeatureToStart(ev) {
-      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      if (window._cosActive) return; // CinemaOS: never touch the provider's player
-
-      try {
-        const effId = (currentMovie && (currentMovie._episodeId || currentMovie.id)) || '';
-        if (effId) {
-          const savedData = (window.safeParseCW ? window.safeParseCW() : (function () { try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch (e) { return {}; } })()) || {};
-          if (savedData[effId]) {
-            delete savedData[effId];
-            try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(savedData)); } catch (e) {}
-          }
-        }
-      } catch (e) {}
-
-      try {
-        // readyState 0 = no metadata yet (or a dead/killed source): reload so
-        // the file definitely begins at frame 0. hls.js owns its MediaSource,
-        // so there a plain 0-seek is the safe path.
-        if (!directPlayer.readyState && !hlsActive) {
-          try { directPlayer.load(); } catch (e) {}
-        }
-        directPlayer._lastCWWrite = 0; // let the next timeupdate save the fresh 0 spot
-        directPlayer.currentTime = 0;
-      } catch (e) {
-        try { if (!hlsActive) directPlayer.load(); } catch (e2) {}
-      }
-
-      try {
-        seekbar.value = 0;
-        updateSeekbarBackground(0);
-        currentTimeText.textContent = formatTime(0);
-      } catch (e) {}
-
-      showToast('Skip Feature — back to the very start');
-      try { if (!directPlayer.paused) directPlayer.play().catch(function () {}); } catch (e) {}
-      showControls();
-    }
-
     function triggerRewind() {
       directPlayer.currentTime = Math.max(0, directPlayer.currentTime - 10);
       showSeekBadge(rewindBadge);
@@ -7526,7 +7472,6 @@
       // Cleared at the top of every load; set again in the direct-file branch below.
       window._dfxDownloadUrl = '';
       exitCosMode(); // fresh state every load — CinemaOS mode is opt-in per URL
-      setSkipFeatureVisible(false); // decided again in the direct-file branch below
 
       let rawUrl = '';
       if (playerMode === 'trailer' && currentMovie.trailerEmbed && currentMovie.trailerEmbed.trim() !== '') {
@@ -7572,11 +7517,6 @@
 
         directPlayer.style.display = 'block';
         playerOverlay.style.display = 'flex';
-
-        // SKIP FEATURE: shown for our own manual embeds only (movies, series
-        // episodes, K-dramas, Filipino titles on the B2/Bunny hosts).
-        // Never for trailers, YouTube and CinemaOS embeds.
-        setSkipFeatureVisible(playerMode !== 'trailer' && isOwnHostMediaUrl(targetUrl));
 
         // Codec preflight: avoid silent black screens for HEVC/AV1 files
         // Bunny Stream: prefer the HLS playlist when the title has one
