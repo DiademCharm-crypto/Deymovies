@@ -12,7 +12,8 @@
 // logo/favicon) added to the shell so offline still looks like the season.
 // v5: the halloween mark was redrawn (brand mark + seasonal guests), so the
 // cached copies have to go — bumping the cache name is what evicts them.
-const CACHE = 'deymflix-v5';
+// v6: wordmark back to brand red (FLIX) in the seasonal logo + share card.
+const CACHE = 'deymflix-v6';
 const SHELL = [
   'index.html',
   'player.html',
