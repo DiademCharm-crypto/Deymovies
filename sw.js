@@ -8,9 +8,11 @@
 // v3: precache with {cache:'reload'} so the browser HTTP cache can never feed
 // stale logo/icon bytes into the install, and pages now reference the logo with
 // ?v=2 so even a stale HTTP/favicons cache gets bypassed on every device.
-// v4: halloween theme (halloween.css + halloween.js + the jack-o'-lantern
+// v4: halloween theme (halloween.css + halloween.js + the seasonal
 // logo/favicon) added to the shell so offline still looks like the season.
-const CACHE = 'deymflix-v4';
+// v5: the halloween mark was redrawn (brand mark + seasonal guests), so the
+// cached copies have to go — bumping the cache name is what evicts them.
+const CACHE = 'deymflix-v5';
 const SHELL = [
   'index.html',
   'player.html',
