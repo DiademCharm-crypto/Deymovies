@@ -15,7 +15,9 @@
 // v6: wordmark back to brand red (FLIX) in the seasonal logo + share card.
 // v7: series episode resolver — episodes.js changed (reload reopens the exact
 // episode, the grid can never highlight a different one than the one playing).
-const CACHE = 'deymflix-v7';
+// v8: episode-aware Continue Watching cards (app.js), resume toast + real
+// autoplay next episode (player.html), actionable-toast styling (style.css).
+const CACHE = 'deymflix-v8';
 const SHELL = [
   'index.html',
   'player.html',
