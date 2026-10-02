@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- DEYMFLIX player build 2026-10-02.4 (series episode resolver + resume toast with Start over + real autoplay next episode + ad-safe countdown) -->
+<!-- DEYMFLIX player build 2026-10-02.5 (series episode resolver + resume toast with Start over + real autoplay next episode + ad-safe countdown + PC-safe keyboard) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -3218,7 +3218,7 @@
 
   <!-- SCRIPT INCLUSIONS -->
   <script src="config.js?v=2.0"></script>
-  <script src="tv.js?v=1.0" defer></script>
+  <script src="tv.js?v=1.1" defer></script>
   <script>
     // Backend base: '' = same origin; or full URL of the host running proxy-server.js
     // (set window.__DEYMFLIX_CONFIG__.API_BASE in config.js for static hosting).
@@ -5474,6 +5474,8 @@
     document.addEventListener('keydown', (e) => {
       // Don't capture if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      // Browser/OS shortcuts (Ctrl+F, Ctrl+S, Alt+←, Cmd+R…) are never ours
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       // Trailer mode: the movie is hidden, so only "back to movie" applies here
       if (playerMode === 'trailer') {
