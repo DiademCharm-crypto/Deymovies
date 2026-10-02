@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- DEYMFLIX player build 2026-10-02.3 (series episode resolver + resume toast with Start over + real autoplay next episode) -->
+<!-- DEYMFLIX player build 2026-10-02.4 (series episode resolver + resume toast with Start over + real autoplay next episode + ad-safe countdown) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -8804,6 +8804,15 @@
         nextEpTimer = setInterval(() => {
           count--;
           if (count <= 0) {
+            if (vastAdPlaying) {
+              // A mid-roll ad is on screen (the viewer jumped near the end, so
+              // the 33%/66% ad marks fired late). Hold the advance — switching
+              // episodes mid-ad would yank the ad away from the ad network —
+              // and roll as soon as the ad is done.
+              nextEpCount.textContent = 'after the ad';
+              count = 1;
+              return;
+            }
             hideNextEpisodeButton();
             playNextEpisode();          // real auto-advance (Netflix behaviour)
           } else {
