@@ -716,6 +716,28 @@ body {
   z-index: 9999;
   transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Actionable toast ("Resuming Episode 5 from 12:34" + Start over). The pill
+   itself stays click-through so it never blocks the player controls — only
+   the action button opts back into pointer events. */
+.toast-notification .toast-action {
+  pointer-events: auto;
+  background: var(--primary-red);
+  color: #fff;
+  border: 0;
+  border-radius: 14px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.toast-notification .toast-action:hover {
+  filter: brightness(1.15);
 }
 
 .toast-notification.show {
