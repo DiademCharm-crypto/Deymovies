@@ -17,7 +17,9 @@
 // episode, the grid can never highlight a different one than the one playing).
 // v8: episode-aware Continue Watching cards (app.js), resume toast + real
 // autoplay next episode (player.html), actionable-toast styling (style.css).
-const CACHE = 'deymflix-v8';
+// v9: TV mode (tv.js) only takes over keys on D-pad hardware now — PCs keep
+// arrow scrolling/seeking and Backspace; player shortcuts ignore Ctrl/Alt/Cmd.
+const CACHE = 'deymflix-v9';
 const SHELL = [
   'index.html',
   'player.html',
