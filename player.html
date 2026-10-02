@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- DEYMFLIX player build 2026-10-02.2 (series episode resolver: reload opens the episode you were watching) -->
+<!-- DEYMFLIX player build 2026-10-02.3 (series episode resolver + resume toast with Start over + real autoplay next episode) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -39,7 +39,7 @@
   <link rel="dns-prefetch" href="https://player.videasy.net">
   <link rel="dns-prefetch" href="https://vidsrc.cc">
 
-  <link rel="stylesheet" href="style.css?v=160.5">
+  <link rel="stylesheet" href="style.css?v=160.6">
   <!-- HALLOWEEN THEME (seasonal, colour only — the player is never decorated). -->
   <link rel="stylesheet" href="halloween.css?v=1.2">
   <script src="halloween.js?v=1.2" defer></script>
@@ -1676,6 +1676,37 @@
       min-width: 20px;
       text-align: left;
     }
+    /* Autoplay ON runs a real 10s countdown, so the viewer must be able to
+       stop it without touching the video. */
+    .next-ep-cancel {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(20, 20, 20, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      font-size: 0.95rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .next-ep-cancel:hover {
+      background: rgba(229, 9, 20, 0.95);
+      border-color: #e50914;
+    }
+    /* Autoplay OFF: the box is a plain suggestion — no countdown running */
+    .next-episode-box.manual .next-ep-btn {
+      border-style: dashed;
+    }
+    .next-episode-box.manual .next-ep-count {
+      display: none;
+    }
 
     /* ══════════════════════════════════════════════════════════════════
        PC (desktop) LAYOUT — two columns:
@@ -2702,6 +2733,8 @@
         <span id="next-ep-text">Next Episode</span>
         <span id="next-ep-count" class="next-ep-count"></span>
       </button>
+      <button id="btn-next-episode-cancel" class="next-ep-cancel" type="button"
+              title="Stay on this episode" onclick="cancelNextEpisode()">&times;</button>
     </div>
 
     <video id="direct-video-player" playsinline preload="auto" style="display: none;"></video>
@@ -2880,6 +2913,20 @@
               </div>
               <div id="sub-offset-label" style="font-size:0.55rem;color:#999;text-align:center;line-height:1.2;">0 ms</div>
             </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Autoplay</div>
+          <div id="settings-autoplay-toggle" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+            <span style="font-size:0.75rem;color:#ccc;">Next episode</span>
+            <button id="btn-settings-autoplay-toggle" type="button" title="Autoplay next episode"
+                    style="background:#e50914;border:none;border-radius:20px;width:44px;height:24px;position:relative;cursor:pointer;transition:background 0.2s;">
+              <span id="settings-autoplay-knob" style="position:absolute;top:3px;left:23px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left 0.2s;"></span>
+            </button>
+          </div>
+          <div style="font-size:0.6rem;color:#888;line-height:1.35;">
+            When an episode ends the next one starts automatically after a 10-second countdown. Turn this off to stop at the end of every episode.
           </div>
         </div>
 
@@ -3184,7 +3231,7 @@
 <script src="security.js?v=2.1"></script>
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
-  <script src="app.js?v=160.19"></script>
+  <script src="app.js?v=160.20"></script>
   <script src="episodes.js?v=1.9"></script>
   <script src="kdrama-episode.js?v=1.1"></script>
   <script>
@@ -4900,18 +4947,67 @@
       }, 4000);
     }
 
-    function showToast(message) {
+    // showToast(message) — plain pill. showToast(message, {label, onClick}) —
+    // same pill plus one action button ("Start over" after a resume). The
+    // actionable form lives longer: it must be readable AND tappable.
+    function showToast(message, action) {
       const toast = document.getElementById('loading-toast');
-      if (toast) {
-        toast.textContent = message;
-        toast.classList.add('show');
-
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
+      if (!toast) return;
+      clearTimeout(toastTimeout);
+      toast.textContent = '';
+      const span = document.createElement('span');
+      span.textContent = message;
+      toast.appendChild(span);
+      const actionable = !!(action && action.label && typeof action.onClick === 'function');
+      if (actionable) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'toast-action';
+        btn.textContent = action.label;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearTimeout(toastTimeout);
           toast.classList.remove('show');
-        }, 1500);
+          try { action.onClick(); } catch (err) {}
+        });
+        toast.appendChild(btn);
       }
+      toast.classList.add('show');
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, actionable ? 6000 : 1500);
     }
+
+    // ── "Resuming Episode 5 from 12:34" + a Start-over action ─────────────
+    // Shown when a saved position is actually restored. Under 10 seconds is
+    // noise (the viewer barely watched anything).
+    function showResumeToast(entry) {
+      try {
+        const secs = Number(entry && entry.currentTime) || 0;
+        if (secs < 10) return;
+        const m = currentMovie || {};
+        const epTxt = m._episodeNum ? ('Episode ' + m._episodeNum) : (m.title || 'this title');
+        showToast('Resuming ' + epTxt + ' from ' + formatTime(secs), {
+          label: 'Start over',
+          onClick: () => {
+            try { directPlayer.currentTime = 0; } catch (e) {}
+            // Clear the resume point too, otherwise the next load resumes again
+            try {
+              const key = currentMovie._episodeId || currentMovie.id;
+              const saved = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+              if (key && saved[key]) {
+                saved[key].currentTime = 0;
+                saved[key].progress = 0;
+                saved[key].updatedAt = Date.now();
+                localStorage.setItem('deymflix_continue_watching', JSON.stringify(saved));
+              }
+            } catch (e) {}
+            showToast('Starting from the beginning');
+          }
+        });
+      } catch (e) {}
+    }
+    window.dfxShowResumeToast = showResumeToast;   // audit hook
 
     function formatTime(seconds) {
       if (isNaN(seconds)) return "00:00:00";
@@ -4952,6 +5048,7 @@
       const isRestart = new URLSearchParams(window.location.search).get('restart') === '1';
       if (!isRestart && existingProgress && existingProgress.progress < 95) {
         directPlayer.currentTime = existingProgress.currentTime;
+        showResumeToast(existingProgress);
       }
       // NOTE: _episodeId is intentionally KEPT here. Wiping it made the next
       // save fall back to the series id, resurrecting stale entries under the
@@ -7384,6 +7481,42 @@
     const nextEpCount = document.getElementById('next-ep-count');
     let nextEpTimer = null;
     let nextEpShown = false;
+    let nextEpCancelled = false;   // "Stay on this episode" for the CURRENT episode
+
+    // ── AUTOPLAY NEXT EPISODE (Settings → Autoplay) ────────────────────────
+    // Default ON: the countdown really advances when it hits zero and an
+    // episode that ends rolls straight into the next one. OFF: the same box is
+    // a plain suggestion (no countdown) and an ended episode stays put — the
+    // inline Next button is still there for a manual advance.
+    const AUTOPLAY_KEY = 'deymflix_autoplay_next';
+    function autoplayNextEnabled() {
+      try { return localStorage.getItem(AUTOPLAY_KEY) !== '0'; } catch (e) { return true; }
+    }
+    function updateAutoplayToggleUI() {
+      const btn = document.getElementById('btn-settings-autoplay-toggle');
+      const knob = document.getElementById('settings-autoplay-knob');
+      if (!btn || !knob) return;
+      const on = autoplayNextEnabled();
+      btn.style.background = on ? '#e50914' : '#333';
+      btn.title = on ? 'Autoplay next episode: ON — click to disable' : 'Autoplay next episode: OFF — click to enable';
+      knob.style.left = on ? '23px' : '3px';
+    }
+    function setAutoplayNext(on) {
+      try { localStorage.setItem(AUTOPLAY_KEY, on ? '1' : '0'); } catch (e) {}
+      updateAutoplayToggleUI();
+      // Re-evaluate whatever is on screen with the new setting immediately
+      nextEpShown = false;
+      nextEpCancelled = false;
+      hideNextEpisodeButton();
+      maybeShowNextEpisode();
+    }
+    window.dfxSetAutoplayNext = setAutoplayNext;
+    window.dfxAutoplayNextEnabled = autoplayNextEnabled;
+    (function wireAutoplayToggle() {
+      const btn = document.getElementById('btn-settings-autoplay-toggle');
+      if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); setAutoplayNext(!autoplayNextEnabled()); });
+      updateAutoplayToggleUI();
+    })();
 
     // ── Episode title overlays (PC, series only) ──
     // Top-center: "Episode N" (or "S2 E3" for multi-season). Bottom-center: episode
@@ -8617,6 +8750,7 @@
         vastAdPhase = 0;
         vastTriggered = false;
         nextEpShown = false;
+        nextEpCancelled = false;   // a fresh episode gets a fresh choice
         hideNextEpisodeButton();
       } catch (e) {}
     };
@@ -8635,29 +8769,47 @@
       if (nextEpTimer) { clearInterval(nextEpTimer); nextEpTimer = null; }
     }
 
+    // "Stay on this episode": the countdown stops for THIS episode and the
+    // ended handler will not advance either (a seek back re-arms it).
+    function cancelNextEpisode() {
+      nextEpCancelled = true;
+      nextEpShown = false;
+      hideNextEpisodeButton();
+      showToast('Staying on this episode');
+    }
+    window.cancelNextEpisode = cancelNextEpisode;
+
     function maybeShowNextEpisode() {
       if (!currentMovie || !currentMovie._episodeNum) return;      // movies: never
       if (typeof seriesData === 'undefined') return;
+      if (nextEpCancelled) return;                                  // viewer said no
       if (!getNextEpisodeInfo()) return;                            // no next episode
       if (isNaN(directPlayer.duration) || directPlayer.duration < 60) return;
       const remain = directPlayer.duration - directPlayer.currentTime;
       if (remain <= (directPlayer.duration * 0.08) && remain > 0.5) {
-        if (!nextEpShown) {
-          nextEpShown = true;
-          const nxt = getNextEpisodeInfo();
-          document.getElementById('next-ep-text').textContent = nxt.label;
-          nextEpBox.classList.add('visible');
-          let count = 10;
-          nextEpCount.textContent = count + 's';
-          nextEpTimer = setInterval(() => {
-            count--;
-            if (count <= 0) {
-              hideNextEpisodeButton(); // Netflix behaviour: ignored → hide
-            } else {
-              nextEpCount.textContent = count + 's';
-            }
-          }, 1000);
+        if (nextEpShown) return;
+        nextEpShown = true;
+        const nxt = getNextEpisodeInfo();
+        document.getElementById('next-ep-text').textContent = nxt.label;
+        nextEpBox.classList.add('visible');
+        if (!autoplayNextEnabled()) {
+          // Suggestion only: no countdown, nothing advances on its own
+          nextEpBox.classList.add('manual');
+          nextEpCount.textContent = '';
+          return;
         }
+        nextEpBox.classList.remove('manual');
+        let count = 10;
+        nextEpCount.textContent = count + 's';
+        nextEpTimer = setInterval(() => {
+          count--;
+          if (count <= 0) {
+            hideNextEpisodeButton();
+            playNextEpisode();          // real auto-advance (Netflix behaviour)
+          } else {
+            nextEpCount.textContent = count + 's';
+          }
+        }, 1000);
       }
     }
 
@@ -8682,10 +8834,19 @@
       } catch (e) {}
     });
 
-    directPlayer.addEventListener('seeked', () => { if (directPlayer.currentTime < directPlayer.duration * 0.85) { nextEpShown = false; hideNextEpisodeButton(); } });
-    directPlayer.addEventListener('ended', () => { // series: ALWAYS continue to the next episode
-      if (vastAdPlaying) return; // an ad overlay handling the end — don't stack
-      if (getNextEpisodeInfo()) playNextEpisode();
+    directPlayer.addEventListener('seeked', () => {
+      if (directPlayer.currentTime < directPlayer.duration * 0.85) {
+        nextEpShown = false;
+        nextEpCancelled = false;   // seeked back: the countdown may offer again
+        hideNextEpisodeButton();
+      }
+    });
+    directPlayer.addEventListener('ended', () => { // series: roll into the next episode
+      if (vastAdPlaying) return;      // an ad overlay handling the end — don't stack
+      if (!getNextEpisodeInfo()) return;
+      if (nextEpCancelled) return;    // viewer chose to stay on this episode
+      if (!autoplayNextEnabled()) return;  // Autoplay OFF: stop at the end
+      playNextEpisode();
     });
 
     // ── Inline Next button (left of Settings, series mode only) ──
