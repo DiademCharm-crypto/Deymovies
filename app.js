@@ -11292,14 +11292,25 @@ function renderContinueWatching() {
       }
     };
 
-    const safeTitle = sanitizeHTML(item.title);
     const safePoster = sanitizeHTML(item.poster);
     const safeProgress = Math.min(100, Math.max(0, Number(item.progress) || 0));
 
-    // Netflix-style badge: 'Finished' at 95%+, otherwise the % watched
-    const badgeHTML = safeProgress >= 95
-      ? '<div class="mylist-progress-badge">Finished</div>'
-      : (safeProgress > 0 ? `<div class="mylist-progress-badge">${Math.round(safeProgress)}% watched</div>` : '');
+    // Series card: name the exact episode being resumed — "S1 E5 · 25% watched"
+    // — so tapping the card is never a guess. The player deep-links that same
+    // season+episode, so the label can't drift from what actually plays.
+    // Legacy entries without a season default to season 1 (what the player does).
+    const epLabel = item._isEpisode && item._epNum ? ('S' + (item._season || 1) + ' E' + item._epNum) : '';
+    const pctTxt = Math.round(safeProgress) + '% watched';
+    const badgeTxt = safeProgress >= 95
+      ? 'Finished'
+      : (epLabel ? (safeProgress > 0 ? epLabel + ' · ' + pctTxt : epLabel) : (safeProgress > 0 ? pctTxt : ''));
+    const badgeHTML = badgeTxt ? `<div class="mylist-progress-badge">${badgeTxt}</div>` : '';
+
+    // Episode entries are saved as "Series - Episode 5 - Name". The badge now
+    // carries the episode, so the poster shows just the series name (the full
+    // saved title stays in the hover tooltip).
+    const cardLabel = item._isEpisode ? String(item.title || '').split(' - ')[0] : item.title;
+    const safeTitle = sanitizeHTML(cardLabel);
 
     card.innerHTML = `
       <button class="remove-continue-btn" title="Remove">&times;</button>
@@ -11312,6 +11323,8 @@ function renderContinueWatching() {
         <div style="width: ${safeProgress}%; height: 100%; background: #e50914;"></div>
       </div>
     `;
+
+    if (item._isEpisode && item.title) card.title = String(item.title);
 
     const removeBtn = card.querySelector('.remove-continue-btn');
     if (removeBtn) {
