@@ -22,7 +22,7 @@
 (function () {
   'use strict';
 
-  var V = '1.0';
+  var V = '1.1';   // bump when the halloween art changes (logo, icons, cards)
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var VIDEO_FIRST = ['player.html', 'reels.html', 'offline.html', 'local-player.html', 'install-app-files.html'].indexOf(page) !== -1;
 
