@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- DEYMFLIX player build 2026-10-02.1 (rich share cards — title + poster) -->
+<!-- DEYMFLIX player build 2026-10-02.2 (series episode resolver: reload opens the episode you were watching) -->
 <html lang="en">
 <head>
   <meta name="74a509398cabeaaa6833cd7523c2c195c6e3aabd" content="74a509398cabeaaa6833cd7523c2c195c6e3aabd" />
@@ -3185,7 +3185,7 @@
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
   <script src="app.js?v=160.19"></script>
-  <script src="episodes.js?v=1.8"></script>
+  <script src="episodes.js?v=1.9"></script>
   <script src="kdrama-episode.js?v=1.1"></script>
   <script>
     function destroyAllPlayers() {
@@ -5273,8 +5273,10 @@
       const slug = shareSlug(m._baseId || m.id || '');
       if (!slug) return window.location.href;
       let url = SHARE_ORIGIN + '/share/' + slug + '.html';
-      const s = urlParams.get('s');
-      const ep = urlParams.get('ep');
+      // Prefer the episode the player is actually on (stamped by the resolver)
+      // over the URL params, which can lag behind a same-page episode switch.
+      const s = m._episodeSeason || urlParams.get('s');
+      const ep = m._episodeNum || urlParams.get('ep');
       if (s || ep) url += '?s=' + encodeURIComponent(s || '1') + '&ep=' + encodeURIComponent(ep || '1');
       const base = url.split('?')[0];
       if (shareProbe[base] === false) return window.location.href; // page absent
@@ -7858,25 +7860,118 @@
       }
     }
 
-    // ── DEEP LINK from a Continue-Watching series card (?id=<series>&s=2&ep=3) ──
-    // Stamp the episode metadata BEFORE loadEmbed() so the player opens THAT
-    // episode directly (with its own saved position) instead of episode 1.
-    // The episodes grid then highlights it (initSeriesEpisodes reads these).
+    // ══ SERIES "CURRENT EPISODE" — ONE RESOLVER FOR EVERY ENTRY PATH ══════
+    // A series can be opened four ways: a ?s=/&ep= deep link (share link or
+    // Continue-Watching card), a plain ?id= (Explore, app search), a grid
+    // click, or the next-episode button. All four MUST agree on (a) the loaded
+    // source, (b) the resume key, (c) the title overlay and (d) the grid
+    // highlight. This used to be spelled out inline in several places — which
+    // is exactly how a reload could highlight ep4 while playing ep1.
+    function dfxNormSeriesId(v) { return String(v || '').toLowerCase().replace(/[\s\+]+/g, '-'); }
+    function dfxSeriesMatch() {
+      try {
+        if (typeof seriesData === 'undefined' || !Array.isArray(seriesData) || !currentMovie) return null;
+        const want = currentMovie.id || movieId || '';
+        return seriesData.find(s => s.id === want || dfxNormSeriesId(s.id) === dfxNormSeriesId(want)) || null;
+      } catch (e) { return null; }
+    }
+    function dfxEpisodeOf(series, seasonNum, epNum) {
+      try {
+        const season = ((series && series.seasons) || []).find(s => Number(s.seasonNumber) === (Number(seasonNum) || 1));
+        if (!season) return null;
+        const ep = (season.episodes || []).find(e => Number(e.episodeNumber) === Number(epNum));
+        return ep ? { season: season, episode: ep } : null;
+      } catch (e) { return null; }
+    }
+    // Stamps EVERYTHING that identifies the episode (source, HLS, resume key,
+    // titles, subtitle + download hints). playEpisodeSource() uses this too, so
+    // the grid, the overlay and the video can never point at different episodes.
+    function dfxStampEpisode(seasonNum, epNum) {
+      const series = dfxSeriesMatch();
+      if (!series) return null;
+      const found = dfxEpisodeOf(series, seasonNum, epNum);
+      if (!found) return null;
+      const season = found.season, ep = found.episode;
+      currentMovie.manualEmbed = ep.embedUrl || '';
+      if (ep.hlsUrl) currentMovie._episodeHlsUrl = ep.hlsUrl; else delete currentMovie._episodeHlsUrl;
+      // Season-aware resume key: without the season, S1E3 and S2E3 share one
+      // Continue-Watching slot. Old keys ("<id>-ep3") still resolve.
+      currentMovie._episodeSeason = Number(season.seasonNumber) || 1;
+      currentMovie._episodeNum = Number(ep.episodeNumber) || 1;
+      currentMovie._episodeId = (currentMovie.id || movieId) + '-s' + currentMovie._episodeSeason + '-ep' + currentMovie._episodeNum;
+      currentMovie._episodeName = ep.title || '';
+      currentMovie._episodeTitle = currentMovie.title + ' - ' + (ep.title || ('Episode ' + currentMovie._episodeNum));
+      currentMovie._subtitleUrl = ep.subtitleUrl || '';
+      currentMovie.manualDownload = ep.manualDownload || currentMovie.manualDownload || '';
+      currentMovie.manualDownloadSub = ep.manualDownloadSub || currentMovie.manualDownloadSub || '';
+      return ep;
+    }
+    // The URL is the episode's permanent address: keep it truthful, so a reload
+    // — or a shared link — reopens the very same episode. `keepRestart` is for
+    // the initial deep-link stamp: Watch Again (?restart=1) must keep its flag
+    // until the video resumes, otherwise the resume position would come back.
+    function dfxSyncEpisodeUrl(seasonNum, epNum, keepRestart) {
+      try {
+        const id = currentMovie && (currentMovie.id || movieId);
+        if (!id) return;
+        const u = new URL(window.location.href);
+        if (!/^https?:/.test(u.protocol)) return;   // file:// WebView: replaceState throws
+        u.searchParams.set('id', id);
+        u.searchParams.set('s', String(Number(seasonNum) || 1));
+        u.searchParams.set('ep', String(Number(epNum) || 1));
+        if (!keepRestart) u.searchParams.delete('restart');
+        window.history.replaceState(null, '', u.pathname + u.search + u.hash);
+      } catch (e) {}
+    }
+    window.dfxStampEpisode = dfxStampEpisode;
+    window.dfxSyncEpisodeUrl = dfxSyncEpisodeUrl;
+
+    // Which episode should a PLAIN ?id= open? The newest unfinished episode of
+    // this series from Continue Watching (Netflix behaviour), else ep1. An
+    // explicit ?ep= always wins; ?restart=1 (Watch Again) always means ep1.
+    function dfxResumeEpisodeFor(series) {
+      try {
+        const cw = (window.safeParseCW ? window.safeParseCW() : (function(){ try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch(e){ return {}; } })());
+        const baseKey = dfxNormSeriesId(currentMovie.id || movieId || '');
+        let best = null;
+        Object.keys(cw).forEach(key => {
+          const it = cw[key];
+          if (!it || it.finished || Number(it.progress) >= 95) return;   // finished: not a resume point
+          const m = /^(.*)-s(\d+)-ep(\d+)$/.exec(key) || /^(.*)-ep(\d+)$/.exec(key);
+          if (!m) return;
+          const sNum = m.length === 4 ? (parseInt(m[2], 10) || 1) : 1;
+          const eNum = parseInt(m[m.length - 1], 10) || 0;
+          if (!eNum || dfxNormSeriesId(m[1]) !== baseKey) return;
+          if (!dfxEpisodeOf(series, sNum, eNum)) return;                 // stale entry: episode gone
+          if (!best || (it.updatedAt || 0) > (best.updatedAt || 0)) best = { season: sNum, episode: eNum, updatedAt: it.updatedAt || 0 };
+        });
+        return best;
+      } catch (e) { return null; }
+    }
+
+    // ── OPEN THE RIGHT EPISODE BEFORE THE FIRST LOAD ──────────────────────
+    // (share/CW deep link → that episode; plain open → resume the last one).
+    // The episodes grid (initSeriesEpisodes) then highlights currentMovie's
+    // episode — it no longer re-derives the episode from the URL itself.
     (function applyCwDeepLink() {
       try {
+        if (!currentMovie) return;
+        const series = dfxSeriesMatch();
+        if (!series) return;                    // plain movie: nothing to resolve
         const s = parseInt(urlParams.get('s') || '0', 10) || 0;
         const ep = parseInt(urlParams.get('ep') || '0', 10) || 0;
-        if (!ep || !currentMovie) return;
-        currentMovie._episodeNum = ep;
-        currentMovie._episodeSeason = s || 1;
-        // Season-aware resume key — same format the episodes grid writes
-        currentMovie._episodeId = (currentMovie.id || movieId) + '-s' + (s || 1) + '-ep' + ep;
-        // Best-effort episode label; the real title (if any) is applied by the
-        // episodes grid when it finds the exact episode.
-        if (!currentMovie._episodeTitle) {
-          currentMovie._episodeTitle = currentMovie.title + ' - Episode ' + ep;
+        const isRestart = urlParams.get('restart') === '1';
+        let pick = ep ? { season: s || 1, episode: ep } : null;
+        if (pick && !dfxEpisodeOf(series, pick.season, pick.episode)) pick = null;   // stale/broken ?ep=
+        if (!pick && !ep && !isRestart) {
+          const resume = dfxResumeEpisodeFor(series);
+          if (resume) pick = { season: resume.season, episode: resume.episode };
         }
-        window.__dfxCwAutoOpen = { season: s || 1, episode: ep };
+        if (!pick) pick = { season: 1, episode: 1 };
+        const stamped = dfxStampEpisode(pick.season, pick.episode);
+        if (!stamped) return;                   // no episode data: loadEmbed() falls back
+        dfxSyncEpisodeUrl(currentMovie._episodeSeason, currentMovie._episodeNum, true);
+        window.__dfxCwAutoOpen = { season: currentMovie._episodeSeason, episode: currentMovie._episodeNum };
       } catch (e) {}
     })();
 
@@ -8476,19 +8571,19 @@
       host.innerHTML = '';
       const items = buildEpListItems();
       const cur = currentEpNum();
+      const curSeason = (currentMovie && currentMovie._episodeSeason) || 1;
       items.forEach(it => {
         const b = document.createElement('button');
-        b.className = 'ep-item' + (it.ep.episodeNumber === cur ? ' current' : '');
+        // season-aware marker: in a multi-season series S1E3 and S2E3 both
+        // carry the number 3 — only the one being watched may read as current
+        b.className = 'ep-item' + ((Number(it.ep.episodeNumber) === Number(cur)
+          && Number(it.season.seasonNumber) === Number(curSeason)) ? ' current' : '');
         b.type = 'button';
         b.innerHTML = 'Episode ' + it.num;
         b.onclick = () => {
-          // same switch path as the episodes grid + next-episode button
-          document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
-          document.querySelectorAll('.episode-square-btn').forEach(el => {
-            if (el.textContent.trim() === String(it.ep.episodeNumber)) el.classList.add('active');
-          });
-          if (it.ep && it.ep.hlsUrl) { currentMovie._episodeHlsUrl = it.ep.hlsUrl; }
-          else { delete currentMovie._episodeHlsUrl; }
+          // ONE switch path, identical to the episodes grid + next-episode
+          // button: playEpisodeSource() stamps the episode, syncs the URL and
+          // re-renders the bar. No manual class/HLS juggling here.
           vastAdPhase = 0;
           vastTriggered = false;
           if (typeof playEpisodeSource === 'function') playEpisodeSource(it.ep, it.season);
@@ -8512,24 +8607,26 @@
       panel.classList.toggle('open', open);
     }
 
+    // ── Per-episode UI state, reset by episodes.js on EVERY switch ──
+    // Mid-roll ads + the next-episode countdown belong to one episode only.
+    // playEpisodeSource() calls this, so a switch from the flat Episodes
+    // panel behaves exactly like a grid click (it used to inherit the
+    // previous episode's ad phase).
+    window.dfxOnEpisodeSwitch = function () {
+      try {
+        vastAdPhase = 0;
+        vastTriggered = false;
+        nextEpShown = false;
+        hideNextEpisodeButton();
+      } catch (e) {}
+    };
+
     function playNextEpisode() {
       const nxt = getNextEpisodeInfo();
       hideNextEpisodeButton();
       if (!nxt) return;
-      nextEpShown = false; // the new episode gets its own countdown/box
-      // Reset ad phase so the new episode gets its own ads
-      vastAdPhase = 0;
-      // Mark the correct button active in the episodes grid
-      document.querySelectorAll('.episode-square-btn').forEach(el => el.classList.remove('active'));
-      const btns = document.querySelectorAll('.episode-square-btn');
-      btns.forEach(b => {
-        if (b.textContent.trim() === String(nxt.episode.episodeNumber)) b.classList.add('active');
-      });
-      if (nxt.episode && nxt.episode.hlsUrl) {
-        currentMovie._episodeHlsUrl = nxt.episode.hlsUrl;
-      } else {
-        delete currentMovie._episodeHlsUrl;
-      }
+      // playEpisodeSource() handles the rest: ad cycle reset, HLS swap,
+      // season-aware resume key, URL sync, grid + panel highlight.
       if (typeof playEpisodeSource === 'function') playEpisodeSource(nxt.episode, nxt.season);
     }
 
