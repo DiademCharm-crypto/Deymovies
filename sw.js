@@ -13,7 +13,9 @@
 // v5: the halloween mark was redrawn (brand mark + seasonal guests), so the
 // cached copies have to go — bumping the cache name is what evicts them.
 // v6: wordmark back to brand red (FLIX) in the seasonal logo + share card.
-const CACHE = 'deymflix-v6';
+// v7: series episode resolver — episodes.js changed (reload reopens the exact
+// episode, the grid can never highlight a different one than the one playing).
+const CACHE = 'deymflix-v7';
 const SHELL = [
   'index.html',
   'player.html',
