@@ -92,6 +92,9 @@
     if (err && message) err.textContent = message;
     stopLive();
   }
+  var OPEN_WARNING = 'Rules not locked yet — these counters are readable by anyone. ' +
+    'Follow _tools/_stats_rules.md to make them owner-only; this page will then ask for the token.';
+
   function warn(text) {
     var el = $('stat-warn');
     if (!el) return;
@@ -138,7 +141,16 @@
 
     if (token) {
       readable(analyticsUrl(token)).then(function (ok) {
-        if (ok) { enter(); return; }
+        if (ok) {
+          // The token works — but if the node is ALSO readable anonymously the
+          // rules are not locked yet, and the page has to say so rather than
+          // implying the counters are private just because a token was typed.
+          readable(probeUrl()).then(function (open) {
+            if (open) warn(OPEN_WARNING);
+            enter();
+          });
+          return;
+        }
         // The stored token stopped working (rotated secret / new rules):
         // try an anonymous read to tell "locked" apart from "still open".
         fallbackProbe('That token no longer unlocks the counters. Paste the current one, or re-check _tools/_stats_rules.md.');
@@ -154,8 +166,7 @@
         // Rules are not locked yet: the counters are still public. Show the
         // dashboard (tokenless) but say exactly what that means.
         mode = 'open';
-        warn('Rules not locked yet — these counters are readable by anyone. ' +
-             'Follow _tools/_stats_rules.md to make them owner-only; this page will then ask for the token.');
+        warn(OPEN_WARNING);
         enter();
       } else {
         mode = 'locked';
