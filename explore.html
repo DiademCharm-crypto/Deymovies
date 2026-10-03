@@ -96,8 +96,10 @@
     .explore-tabs::-webkit-scrollbar { display: none; }
 
     .explore-tab {
-      flex: 1;
-      min-width: 0;
+      flex: 1 1 auto;
+      /* labels can never clip — if five tabs outgrow the screen, the row
+         scrolls horizontally instead of squashing the text */
+      min-width: max-content;
       padding: 14px 8px;
       text-align: center;
       font-size: 0.78rem;
@@ -119,6 +121,11 @@
       font-size: 0.65rem;
       opacity: 0.5;
       margin-left: 4px;
+    }
+    /* phones: tighten the five tabs so Movies/Tagalog/K-Drama/Chinese/Reels
+       all breathe on a narrow screen */
+    @media (max-width: 480px) {
+      .explore-tab { padding: 13px 6px; font-size: 0.72rem; }
     }
 
     .explore-content { padding: 16px; }
@@ -184,6 +191,11 @@
     .explore-card-badge.series { background: #1a73e8; }
     .explore-card-badge.trailer { background: #ff9800; }
     .explore-card-badge.reel { background: #9c27b0; }
+    /* the series gained episodes since your last visit */
+    .explore-card-badge.new-ep {
+      background: linear-gradient(135deg, var(--primary-red, #e50914), #7a0409);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
 
     .explore-empty {
       text-align: center;
@@ -222,6 +234,7 @@
     <button class="explore-tab active" data-tab="movies" onclick="switchExploreTab('movies')">🎬 Movies</button>
     <button class="explore-tab" data-tab="tagalog" onclick="switchExploreTab('tagalog')">🇵🇭 Tagalog</button>
     <button class="explore-tab" data-tab="kdrama" onclick="switchExploreTab('kdrama')">🇰🇷 K-Drama</button>
+    <button class="explore-tab" data-tab="chinese" onclick="switchExploreTab('chinese')">🇨🇳 Chinese</button>
     <button class="explore-tab" data-tab="reels" onclick="switchExploreTab('reels')">🎞️ Reels</button>
   </div>
 
@@ -278,7 +291,11 @@
   <script src="reels-data.js?v=151.3"></script>
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
-  <script src="app.js?v=160.21"></script>
+    <script src="chinese-movies.js?v=1.0"></script>
+    <script src="episodes.js?v=1.9"></script>
+    <script src="kdrama-episode.js?v=1.1"></script>
+    <script src="chinese-series.js?v=1.0"></script>
+  <script src="app.js?v=160.22"></script>
   <script>
     let exploreActiveTab = 'movies';
     let exploreSearchQuery = '';
@@ -288,12 +305,13 @@
       const movieList = typeof movies !== 'undefined' ? movies : [];
       const reelsList = typeof aiReelsData !== 'undefined' ? aiReelsData : [];
 
-      const allMovies = movieList.filter(m => !m.isSeries && !m.isFilipino && !m.isKdrama);
+      const allMovies = movieList.filter(m => !m.isSeries && !m.isFilipino && !m.isKdrama && !m.isChinese);
       const tagalogMovies = movieList.filter(m => m.isFilipino);
       const kdramaSeries = movieList.filter(m => m.isKdrama);
+      const chineseTitles = movieList.filter(m => m.isChinese);
       const reels = reelsList;
 
-      return { allMovies, tagalogMovies, kdramaSeries, reels };
+      return { allMovies, tagalogMovies, kdramaSeries, chineseTitles, reels };
     }
 
     // ── SEARCH ──
@@ -333,7 +351,7 @@
     // ── RENDER ──
     function renderExploreContent() {
       const container = document.getElementById('explore-content');
-      const { allMovies, tagalogMovies, kdramaSeries, reels } = getCategorizedContent();
+      const { allMovies, tagalogMovies, kdramaSeries, chineseTitles, reels } = getCategorizedContent();
 
       // When searching, search across ALL categories and show combined results
       if (exploreSearchQuery) {
@@ -341,6 +359,7 @@
           ...allMovies.map(m => ({ ...m, _type: 'movie' })),
           ...tagalogMovies.map(m => ({ ...m, _type: 'tagalog' })),
           ...kdramaSeries.map(m => ({ ...m, _type: 'kdrama' })),
+          ...chineseTitles.map(m => ({ ...m, _type: 'chinese' })),
           ...reels.map(r => ({ ...r, _type: 'reel' }))
         ];
         const results = filterBySearch(allItems, exploreSearchQuery);
@@ -376,6 +395,12 @@
           emptyIcon = '🇰🇷';
           emptyText = 'No K-Dramas yet.<br>Add Korean series to kdramas.js with isKdrama: true.';
           break;
+        case 'chinese':
+          items = chineseTitles;
+          badgeType = '🇨🇳';
+          emptyIcon = '🇨🇳';
+          emptyText = 'No Chinese titles yet.<br>Add Chinese movies/series to chinese-movies.js with isChinese: true.';
+          break;
         case 'reels':
           items = reels;
           badgeType = '';
@@ -389,7 +414,7 @@
         return;
       }
 
-      const type = exploreActiveTab === 'reels' ? 'reel' : (exploreActiveTab === 'tagalog' ? 'tagalog' : (exploreActiveTab === 'kdrama' ? 'kdrama' : 'movie'));
+      const type = exploreActiveTab === 'reels' ? 'reel' : (exploreActiveTab === 'tagalog' ? 'tagalog' : (exploreActiveTab === 'kdrama' ? 'kdrama' : (exploreActiveTab === 'chinese' ? 'chinese' : 'movie')));
       container.innerHTML = `<div class="explore-grid">${items.map(item => renderExploreCard(item, type)).join('')}</div>`;
     }
 
@@ -420,9 +445,16 @@
         href = `player.html?id=${encodeURIComponent(id)}`;
       }
 
+      // NEW EP outranks the status chip: the series gained episodes since the
+      // viewer's last visit (needs episode data on the page — skipped safely
+      // when episodes.js is not loaded).
+      if (typeof dfxIsNewEpisodes === 'function' && dfxIsNewEpisodes(item)) {
+        badge = '<span class="explore-card-badge new-ep">NEW EP</span>';
+      }
+
       return `
         <div class="explore-card" onclick="window.location.href='${href}'">
-          <img src="${sanitizeHTML(poster)}" alt="${sanitizeHTML(title)}" loading="lazy">
+          <img src="${sanitizeHTML(poster)}" srcset="${typeof posterSrcset === 'function' ? posterSrcset(poster) : ''}" sizes="(min-width: 1024px) 190px, 140px" alt="${sanitizeHTML(title)}" loading="lazy" decoding="async">
           ${badge}
           <div class="explore-card-overlay">
             <div class="explore-card-title">${sanitizeHTML(title)}</div>
