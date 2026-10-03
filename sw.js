@@ -27,7 +27,10 @@
 // v13: owner stats dashboard (stats.html + stats.js). Updates now apply
 // immediately: the page asks this worker to skipWaiting on update, and
 // controllerchange reloads once — no manual hard-refresh required.
-const CACHE = 'deymflix-v13';
+// v14: hover-preview trailers play clean (YouTube chrome cropped away), the
+// stats dashboard is owner-gated by the database rules (token) with a realtime
+// stream, and a visible in-app notice announces a downloaded update.
+const CACHE = 'deymflix-v14';
 const SHELL = [
   'index.html',
   'player.html',
