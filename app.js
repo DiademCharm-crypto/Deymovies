@@ -31,6 +31,20 @@ function sanitizeHTML(str) {
   });
 }
 
+// Poster size menu: TMDB serves every poster at several fixed sizes, and a
+// 120-190px card never needs the 600px file. Smaller artwork means less to
+// download and less to decode, which is what keeps poster-heavy pages
+// scrolling smoothly on phones. Anything that is not a TMDB poster (Amazon /
+// MyDramaList art) simply gets no srcset and keeps its plain src.
+function posterSrcset(url) {
+  const m = /^(https:\/\/media\.themoviedb\.org\/t\/p\/)w\d+_and_h\d+_face(\/.+)$/.exec(String(url || ''));
+  if (!m) return '';
+  return m[1] + 'w94_and_h141_face' + m[2] + ' 94w, '
+       + m[1] + 'w220_and_h330_face' + m[2] + ' 220w, '
+       + m[1] + 'w440_and_h660_face' + m[2] + ' 440w, '
+       + m[1] + 'w600_and_h900_face' + m[2] + ' 600w';
+}
+
 // Link Cleaner Utility
 function cleanDriveLink(url) {
   if (!url) return '';
@@ -10733,8 +10747,10 @@ function createMovieCard(movie, rankNumber = null) {
     ${rankHTML}
     <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
     <img src="${safePoster}" 
+         srcset="${posterSrcset(safePoster)}" sizes="(min-width: 1024px) 160px, 140px"
          alt="${safeTitle}" 
          loading="lazy" 
+         decoding="async" 
          onerror="this.onerror=null;this.src='${fallbackUrl}';">
     <div class="poster-card-overlay">
       <div class="poster-card-title">${safeTitle}</div>
@@ -11314,7 +11330,7 @@ function renderContinueWatching() {
 
     card.innerHTML = `
       <button class="remove-continue-btn" title="Remove">&times;</button>
-      <img src="${safePoster}" alt="${safeTitle}" loading="lazy">
+      <img src="${safePoster}" srcset="${posterSrcset(safePoster)}" sizes="(min-width: 1024px) 160px, 140px" alt="${safeTitle}" loading="lazy" decoding="async">
       ${badgeHTML}
       <div class="poster-card-overlay">
         <div class="poster-card-title">${safeTitle}</div>
@@ -11531,7 +11547,7 @@ function renderAiReels() {
     const safePoster = sanitizeHTML(reel.poster || reel.thumbnail);
 
     card.innerHTML = `
-      <img src="${safePoster}" alt="${safeTitle}" class="reel-thumb-img" loading="lazy">
+      <img src="${safePoster}" srcset="${posterSrcset(safePoster)}" sizes="(min-width: 1024px) 160px, 140px" alt="${safeTitle}" class="reel-thumb-img" loading="lazy" decoding="async">
       <div class="reel-overlay-info">
         <span class="reel-badge-tag">AI REEL</span>
         <span class="reel-thumb-title">${safeTitle}</span>
@@ -11683,7 +11699,7 @@ function renderSuggestions(matches) {
     const safePoster = sanitizeHTML(movie.poster);
 
     item.innerHTML = `
-      <img src="${safePoster}" alt="${safeTitle}" loading="lazy">
+      <img src="${safePoster}" srcset="${posterSrcset(safePoster)}" sizes="48px" alt="${safeTitle}" loading="lazy" decoding="async">
       <span class="suggestion-title">${safeTitle}</span>
     `;
     item.onclick = () => {
@@ -11867,7 +11883,7 @@ function renderMyList() {
   }
   body.innerHTML = '<div class="mylist-grid">' + list.map(m => `
     <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(m.id)}'">
-      <img src="${sanitizeHTML(m.poster)}" alt="${sanitizeHTML(m.title)}" loading="lazy">
+      <img src="${sanitizeHTML(m.poster)}" srcset="${posterSrcset(sanitizeHTML(m.poster))}" sizes="(min-width: 1024px) 160px, 140px" alt="${sanitizeHTML(m.title)}" loading="lazy" decoding="async">
       <div class="mylist-item-overlay">
         <div class="mylist-item-title">${sanitizeHTML(m.title)}</div>
       </div>
