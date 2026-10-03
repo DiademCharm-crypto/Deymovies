@@ -24,7 +24,10 @@
 // pick smaller poster sizes (app.js srcset); developer card reworded.
 // v11: Chinese movies & series (chinese-movies.js + chinese-series.js), CW
 // season progress, NEW EP badges, history shows the furthest episode.
-const CACHE = 'deymflix-v12';
+// v13: owner stats dashboard (stats.html + stats.js). Updates now apply
+// immediately: the page asks this worker to skipWaiting on update, and
+// controllerchange reloads once — no manual hard-refresh required.
+const CACHE = 'deymflix-v13';
 const SHELL = [
   'index.html',
   'player.html',
@@ -42,6 +45,8 @@ const SHELL = [
   'kdrama-episode.js',
   'chinese-movies.js',
   'chinese-series.js',
+  'stats.html',
+  'stats.js',
   'tv.js',
   'manifest.json',
   'favicon.svg',
@@ -66,6 +71,13 @@ self.addEventListener('activate', (e) => {
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
+});
+
+// The page posts {type:'SKIP_WAITING'} when it sees a new worker finish
+// installing, so a returning visitor picks up a deploy on the next load
+// instead of waiting for every tab to close.
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (e) => {
