@@ -10827,8 +10827,10 @@ let heroCarouselTimer = null;
 const HOVER_PREVIEW = (function () {
   // index.html + category.html (category pages use the same .poster-card grid).
   // Path+search are tested together so /category.html?type=tagalog matches.
+  // index, category AND explore (explore renders .explore-card, bound below).
   const isIndexPage = /(^|\/)index\.html($|\?|#)/.test(window.location.pathname + window.location.search) ||
                       /(^|\/)category\.html($|\?|#)/.test(window.location.pathname + window.location.search) ||
+                      /(^|\/)explore\.html($|\?|#)/.test(window.location.pathname + window.location.search) ||
                       window.location.pathname === '/' || window.location.pathname === '';
   // Re-evaluated on every use. The old one-shot (hover: hover) and (pointer: fine)
   // check broke on Windows touchscreen laptops — the touchscreen is the PRIMARY
@@ -10924,19 +10926,26 @@ const HOVER_PREVIEW = (function () {
       pv.id = 'hover-preview-panel';
       pv.className = 'hover-preview';
       pv.innerHTML =
-        '<div class="hp-video"><div class="hp-loading">Loading</div></div>' +
+        // No "Loading" text in the video box — the poster fills it until the
+        // trailer swaps in, so the video area is never overlaid with words.
+        '<div class="hp-video"></div>' +
         '<div class="hp-info">' +
           '<div class="hp-title"></div>' +
           '<div class="hp-actions">' +
             '<button class="hp-btn hp-play" title="Play" aria-label="Play">' +
               '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
+              '<span class="hp-play-label">Play</span>' +
+            '</button>' +
+            '<button class="hp-btn hp-bookmark hp-add" title="Add to Bookmarks" aria-label="Add to Bookmarks">' +
+              '<svg class="hp-bm-plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>' +
+              '<svg class="hp-bm-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>' +
             '</button>' +
             '<button class="hp-btn hp-bookmark" title="Add to Bookmarks" aria-label="Add to Bookmarks">' +
               '<svg class="hp-bm-plus" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>' +
               '<svg class="hp-bm-check" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' +
             '</button>' +
           '</div>' +
-          '<div class="hp-meta"><span class="hp-match"></span><span class="hp-year"></span></div>' +
+          '<div class="hp-meta"><span class="hp-rating"></span><span class="hp-match"></span><span class="hp-year"></span><span class="hp-country"></span></div>' +
           '<div class="hp-genres"></div>' +
         '</div>';
       document.body.appendChild(pv);
@@ -11013,9 +11022,15 @@ const HOVER_PREVIEW = (function () {
     const matchEl = pv.querySelector('.hp-match');
     const yearEl = pv.querySelector('.hp-year');
     const genresEl = pv.querySelector('.hp-genres');
+    const ratingEl = pv.querySelector('.hp-rating');
+    const countryEl = pv.querySelector('.hp-country');
     // Graceful fallbacks from local data while/instead of TMDB
     const localYear = (movie.releaseDate || movie.year || '').toString().match(/\d{4}/);
     if (yearEl) yearEl.textContent = localYear ? localYear[0] : '';
+    // Star rating + country come straight from the catalog entry, so the meta
+    // row is populated instantly (no TMDB round-trip needed).
+    if (ratingEl) ratingEl.textContent = Number(movie.rating) > 0 ? '★ ' + movie.rating : '';
+    if (countryEl) countryEl.textContent = movie.country || (movie.isFilipino ? 'Philippines' : (movie.isKdrama || movie.isKorean ? 'South Korea' : (movie.isChinese ? 'China' : '')));
     if (genresEl) genresEl.textContent = (movie.genres && movie.genres.length) ? movie.genres.join(' · ') : '';
     fetchDetailsForPanel(movie).then(function (d) {
       // user may have un-hovered during the fetch
@@ -11069,11 +11084,16 @@ const HOVER_PREVIEW = (function () {
     const vid = pv.querySelector('.hp-video');
     if (!vid) return;
     if (key) {
+      // Clean-video embed: youtube-nocookie (no tracking, no "watch on YouTube"
+      // card), controls=0 + iv_load_policy=3 + rel=0 + fs=0 so the player draws
+      // no title bar, annotations or overlays. The CSS crops the residual top
+      // strip as a belt-and-braces measure (see .hp-video iframe in style.css).
       vid.innerHTML =
-        '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(key) +
+        '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(key) +
         '?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=' +
-        encodeURIComponent(key) + '&rel=0&enablejsapi=1" allow="autoplay; encrypted-media" ' +
-        'title="trailer" tabindex="-1"></iframe>' +
+        encodeURIComponent(key) + '&rel=0&iv_load_policy=3&fs=0&disablekb=1&enablejsapi=1" ' +
+        'allow="autoplay; encrypted-media" title="trailer" tabindex="-1">' +
+        '</iframe>' +
         '<button class="hp-mute-toggle" title="Sound on/off" aria-label="Toggle sound">🔇</button>';
       const iframe = vid.querySelector('iframe');
       const cmd = function (func, args) {
@@ -11180,7 +11200,8 @@ const HOVER_PREVIEW = (function () {
   // Bind to every poster card on index.html — including dynamically rendered ones
   function bindAll() {
     if (!isEnabled()) return;
-    document.querySelectorAll('.poster-card:not([data-hp-bound])').forEach(function (card) {
+    // .poster-card = index/category rows; .explore-card = the explore grid.
+    document.querySelectorAll('.poster-card:not([data-hp-bound]), .explore-card:not([data-hp-bound])').forEach(function (card) {
       const movie = movieByIdForCard(card);
       if (movie) attach(card, movie);
     });
@@ -11188,7 +11209,7 @@ const HOVER_PREVIEW = (function () {
 
   // Cards don't carry the movie object — recover it from the click target URL
   function movieByIdForCard(card) {
-    const img = card.querySelector('img[loading="lazy"]');
+    const img = card.querySelector('img');
     if (!img) return null;
     const onclick = card.getAttribute('onclick') || '';
     const m = onclick.match(/player\.html\?id=([^"']+)/);
@@ -12023,29 +12044,111 @@ try {
     // to activate now and reload ONCE on controllerchange, so a returning
     // visitor sees the new version without a manual hard-refresh. A first-time
     // visitor has no previous controller, so they are never reloaded.
+    //
+    // The update is made VISIBLE: a small pill appears when the new version has
+    // been downloaded ("updating…"), and after the reload a confirmation
+    // ("Updated to the latest version") — so the owner can see with their own
+    // eyes that returning visitors actually pick up a deploy.
+    var SW_UPDATE_FLAG = 'dfx_updated_notice';
     var hadSWController = !!navigator.serviceWorker.controller;
     var swReloading = false;
+
+    // Fixed pill, built with inline styles so it renders even if a stale
+    // stylesheet is cached. Never blocks the page (pointer-events: none).
+    var dfxNotice = function (text, tone) {
+      try {
+        if (!document.body) {
+          document.addEventListener('DOMContentLoaded', function () { dfxNotice(text, tone); });
+          return null;
+        }
+        var el = document.getElementById('dfx-update-notice');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'dfx-update-notice';
+          el.setAttribute('role', 'status');
+          el.setAttribute('aria-live', 'polite');
+          el.style.cssText =
+            'position:fixed;left:50%;transform:translateX(-50%);' +
+            'bottom:calc(20px + env(safe-area-inset-bottom,0px));' +
+            'z-index:2147483000;max-width:88vw;padding:11px 18px;border-radius:999px;' +
+            'font:600 0.86rem/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;' +
+            'color:#fff;background:rgba(18,18,22,.96);' +
+            'border:1px solid rgba(255,255,255,.18);box-shadow:0 10px 30px rgba(0,0,0,.5);' +
+            'text-align:center;pointer-events:none;transition:opacity .3s ease;opacity:0';
+          document.body.appendChild(el);
+        }
+        el.textContent = text;
+        el.style.borderColor = tone === 'ok' ? 'rgba(55,214,122,.6)' : 'rgba(229,9,20,.6)';
+        el.style.display = 'block';
+        // next frame → fade in
+        requestAnimationFrame(function () { el.style.opacity = '1'; });
+        return el;
+      } catch (e) { return null; }
+    };
+    var dfxNoticeHide = function (ms) {
+      var el = document.getElementById('dfx-update-notice');
+      if (!el) return;
+      setTimeout(function () {
+        el.style.opacity = '0';
+        setTimeout(function () { el.style.display = 'none'; }, 350);
+      }, ms);
+    };
+
+    // The reload that follows a successful update leaves this flag behind, so
+    // the fresh page can confirm the update landed.
+    try {
+      if (sessionStorage.getItem(SW_UPDATE_FLAG) === '1') {
+        sessionStorage.removeItem(SW_UPDATE_FLAG);
+        dfxNotice('✓ Updated to the latest version', 'ok');
+        dfxNoticeHide(5000);
+      }
+    } catch (e) {}
+
     navigator.serviceWorker.addEventListener('controllerchange', function () {
       if (!hadSWController || swReloading) return;
       swReloading = true;
-      window.location.reload();
+      try { sessionStorage.setItem(SW_UPDATE_FLAG, '1'); } catch (e) {}
+      dfxNotice('✓ New version ready — reloading…', 'ok');
+      setTimeout(function () { window.location.reload(); }, 600);
     });
     var askSkipWaiting = function (worker) {
       if (worker && navigator.serviceWorker.controller) {
         worker.postMessage({ type: 'SKIP_WAITING' });
       }
     };
+    // Say it out loud the moment a new version has finished downloading.
+    var announceUpdate = function (sw) {
+      if (!navigator.serviceWorker.controller) return; // first install, nothing to replace
+      dfxNotice('⬇ New version downloaded — updating…');
+    };
+    var swReg = null;
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').then(function (reg) {
-        if (reg.waiting) askSkipWaiting(reg.waiting);
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+        swReg = reg;
+        if (reg.waiting) {
+          announceUpdate(reg.waiting);
+          askSkipWaiting(reg.waiting);
+        }
         reg.addEventListener('updatefound', function () {
           var sw = reg.installing;
           if (!sw) return;
           sw.addEventListener('statechange', function () {
-            if (sw.state === 'installed') askSkipWaiting(sw);
+            if (sw.state === 'installed') {
+              announceUpdate(sw);
+              askSkipWaiting(sw);
+            }
           });
         });
       }).catch(function () {});
+    });
+    // Returning to the tab is the moment to look for a deploy that landed while
+    // it was hidden — the notice then appears without waiting for a reload.
+    var lastUpdateCheck = 0;
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState !== 'visible' || !swReg) return;
+      if (Date.now() - lastUpdateCheck < 5 * 60 * 1000) return;
+      lastUpdateCheck = Date.now();
+      try { swReg.update(); } catch (e) {}
     });
   }
 } catch (e) {}
