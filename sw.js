@@ -24,7 +24,7 @@
 // pick smaller poster sizes (app.js srcset); developer card reworded.
 // v11: Chinese movies & series (chinese-movies.js + chinese-series.js), CW
 // season progress, NEW EP badges, history shows the furthest episode.
-const CACHE = 'deymflix-v11';
+const CACHE = 'deymflix-v12';
 const SHELL = [
   'index.html',
   'player.html',
@@ -37,6 +37,7 @@ const SHELL = [
   'icons/apple-touch-icon-halloween.png',
   'icons/share-card-halloween.png',
   'app.js',
+  'analytics.js',
   'episodes.js',
   'kdrama-episode.js',
   'chinese-movies.js',
