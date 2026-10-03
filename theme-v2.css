@@ -521,6 +521,17 @@ html {
   }
 }
 
+/* phones (site and Android app): three columns, so explore / history / liked
+   cards land at roughly the home-row poster size (they used to open into two
+   oversized columns). Matches the 3-column liked-modal grid in style.css. */
+@media (max-width: 767.98px) {
+  .explore-grid,
+  .mylist-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
 /* ── 14. POSTER SKELETONS ───────────────────────────────────────────────────
    Posters used to pop in raw as each TMDB image arrived. Now every card sits
    on a shimmering tile until its artwork is in, then the image fades over it.
