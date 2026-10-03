@@ -1,5 +1,5 @@
 // ===========================================================================
-//  DEYMFLIX -- LocalPlayer85.java     (library class, v1.8 - SITE-TWIN UI)
+//  DEYMFLIX -- LocalPlayer85.java     (library class, v1.9 - SITE-TWIN UI)
 // ===========================================================================
 //  WHAT THIS IS
 //    The offline player with the EXACT look and functions of the website's
@@ -11,6 +11,8 @@
 //      - floating speed badge ("2.0x Speed") on long-press 2x
 //      - bottom bar: red seekbar (e50914, buffered track), bottom play icon,
 //        HH:MM:SS time display, volume icon, settings, CC, fullscreen icon
+//        + the SKIP FEATURE pill (same as player.html): one tap jumps back to
+//        the very start of the movie/episode and drops the saved resume spot
 //      - settings sheet: playback speed pills + subtitle on/off
 //      - left-edge vertical brightness slider, right-edge volume slider
 //      - "Buffering..." spinner overlay, controls auto-hide at 2.5s

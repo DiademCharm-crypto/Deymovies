@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEYMFLIX — open D × real film</title>
+<style>
+  :root { --red:#e50914; --bg:#0b0b0f; --panel:#131318; --line:#26262e; --txt:#f5f5f7; --dim:#8a8a94; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt); font-family:'Segoe UI', Arial, sans-serif; padding:28px 20px 60px; }
+  h1 { text-align:center; font-size:1.5rem; margin-bottom:6px; }
+  p.sub { text-align:center; color:var(--dim); margin-bottom:34px; font-size:.95rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:22px; max-width:1240px; margin:0 auto; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+  .stage { background:radial-gradient(120% 120% at 20% 0%, #1a1a22 0%, #0b0b0f 70%); border:1px solid var(--line); border-radius:10px; padding:22px; display:flex; align-items:center; justify-content:flex-start; min-height:150px; gap:16px; }
+  h2 { font-size:1.05rem; } h2 span { color:var(--red); }
+  .desc { color:var(--dim); font-size:.85rem; line-height:1.45; }
+  .legend { display:flex; gap:14px; color:var(--dim); font-size:.75rem; margin-top:2px; }
+  .legend b { color:var(--txt); font-weight:600; }
+  .footer-note { max-width:1240px; margin:26px auto 0; text-align:center; color:var(--dim); font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>Bar removed — open D holding real film</h1>
+<p class="sub">The stem is gone: the bowl is now an open screen-arc, and inside sits actual film — dark stock, metal flanges, sprocket perforations. 140 / 72 / 36.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="stage" id="f1"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>F1 · Reel + unspooling film <span>(recommended)</span></h2>
+    <p class="desc">A metal-flange reel of dark film stock, with a strip of real film unspooling and sliding out through the open side of the D — the gap where the bar used to be becomes the projector gate.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="f2"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>F2 · Classic reel</h2>
+    <p class="desc">The iconic three-window reel, slightly larger, no trailing strip. The most timeless and the cleanest at favicon size.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="f3"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>F3 · Twin reels</h2>
+    <p class="desc">Two stacked reels joined by film — a projector mid-run. The most cinematic storytelling; check the 36px before committing.</p>
+  </div>
+
+</div>
+<p class="footer-note">Pick F1–F3 and I'll rebuild the full brand set from it: favicon, header, 192/512 app icons, splash, share card.</p>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function defsBase(svg, gid) {
+  const d = el('defs', {}, svg);
+  const g1 = el('linearGradient', { id: gid + 'r', x1: 0, y1: 0, x2: 1, y2: 1 }, d);
+  el('stop', { offset: '0',  'stop-color': '#ff5a62' }, g1);
+  el('stop', { offset: '.45','stop-color': '#e50914' }, g1);
+  el('stop', { offset: '1',  'stop-color': '#9c050d' }, g1);
+  const g2 = el('linearGradient', { id: gid + 'k', x1: 0, y1: 0, x2: 0, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': '#26262e' }, g2);
+  el('stop', { offset: '1', 'stop-color': '#0d0d12' }, g2);
+  const g3 = el('radialGradient', { id: gid + 'b', cx: '.35', cy: '.3', r: '.9' }, d);
+  el('stop', { offset: '0', 'stop-color': '#ff5a62' }, g3);
+  el('stop', { offset: '1', 'stop-color': '#c00711' }, g3);
+  const g4 = el('linearGradient', { id: gid + 's', x1: 0, y1: 0, x2: 0, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': '#f4f4f8' }, g4);
+  el('stop', { offset: '1', 'stop-color': '#a9a9b6' }, g4);
+  return d;
+}
+/* open D — bowl only, stem deleted */
+const BOWL = 'M 70 42 L 104 42 C 148 42 160 70 160 100 C 160 130 148 158 104 158 L 70 158';
+function tileAndGloss(svg, gid) {
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  el('path', { d: 'M 14 96 C 60 60 140 60 186 92 L 186 30 C 186 19 177 10 166 10 L 34 10 C 23 10 14 19 14 30 Z', fill: '#ffffff', opacity: .05 }, svg);
+  el('rect', { x: 15.5, y: 15.5, width: 169, height: 169, rx: 38, fill: 'none', stroke: '#ffffff', opacity: .08, 'stroke-width': 1.5 }, svg);
+}
+function dArc(svg, gid) {
+  el('path', { d: BOWL, stroke: '#6e030a', 'stroke-width': 30, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none', transform: 'translate(0 2)' }, svg);
+  el('path', { d: BOWL, stroke: 'url(#' + gid + 'r)', 'stroke-width': 26, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none' }, svg);
+  el('path', { d: 'M 70 38 L 104 38 C 140 38 154 56 159 82', stroke: '#ff9aa0', 'stroke-width': 3, 'stroke-linecap': 'round', fill: 'none', opacity: .55 }, svg);
+}
+function badge(svg, gid, cx, cy, r) {
+  el('circle', { cx: cx, cy: cy, r: r + 9, fill: 'none', stroke: '#e50914', 'stroke-width': 3, opacity: .35 }, svg);
+  el('circle', { cx: cx, cy: cy, r: r, fill: 'url(#' + gid + 'b)', stroke: '#0d0d12', 'stroke-width': 7 }, svg);
+  el('circle', { cx: cx, cy: cy, r: r - 4, fill: 'none', stroke: '#ffb3b7', 'stroke-width': 1.6, opacity: .7 }, svg);
+  el('polygon', { points: (cx - r*0.34) + ',' + (cy - r*0.5) + ' ' + (cx - r*0.34) + ',' + (cy + r*0.5) + ' ' + (cx + r*0.52) + ',' + cy, fill: '#0d0d12' }, svg);
+}
+function arcSignal(svg, cx, cy) {
+  el('path', { d: 'M ' + (cx + 26) + ' ' + (cy - 26) + ' A 37 37 0 0 1 ' + (cx + 37) + ' ' + cy, stroke: '#ff3b45', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round', opacity: .75 }, svg);
+}
+/* REAL film reel: metal flanges + dark wound stock + windows + hub */
+function realReel(svg, gid, cx, cy, r, detail) {
+  el('circle', { cx: cx, cy: cy, r: r * 0.82, fill: '#17171c' }, svg);                       // wound film pack
+  el('circle', { cx: cx, cy: cy, r: r, fill: 'none', stroke: 'url(#' + gid + 's)', 'stroke-width': r * 0.16 }, svg); // outer flange
+  el('circle', { cx: cx, cy: cy, r: r * 0.40, fill: 'none', stroke: 'url(#' + gid + 's)', 'stroke-width': r * 0.10 }, svg); // inner flange
+  if (detail >= 2) {                                                                          // 3 windows w/ silver rims
+    for (let i = 0; i < 3; i++) {
+      const a = (90 + i * 120) * Math.PI / 180;
+      const wx = cx + r * 0.58 * Math.cos(a), wy = cy + r * 0.58 * Math.sin(a);
+      el('circle', { cx: wx, cy: wy, r: r * 0.20, fill: '#0c0c10', stroke: '#9a9aa6', 'stroke-width': 1 }, svg);
+      if (detail >= 3) el('circle', { cx: wx + r * 0.07, cy: wy - r * 0.07, r: r * 0.045, fill: '#8f8f9c' }, svg);
+    }
+  }
+  el('circle', { cx: cx, cy: cy, r: r * 0.22, fill: 'url(#' + gid + 'r)' }, svg);            // red hub
+  el('circle', { cx: cx, cy: cy, r: r * 0.08, fill: '#0d0d12' }, svg);                        // hub pin
+  if (detail >= 3) el('path', { d: 'M ' + (cx - r*0.75) + ' ' + (cy - r*0.45) + ' A ' + (r*0.88) + ' ' + (r*0.88) + ' 0 0 1 ' + (cx + r*0.3) + ' ' + (cy - r*0.83), stroke: '#ffffff', 'stroke-width': 2, fill: 'none', opacity: .18, 'stroke-linecap': 'round' }, svg);
+}
+/* film strip with real sprocket perforations + frame dividers */
+function filmStrip(svg, gid, x1, y1, x2, y2, w, detail) {
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+  const g = el('g', { transform: 'rotate(' + ang + ' ' + x1 + ' ' + y1 + ')' }, svg);
+  const L = len, halfW = w / 2;
+  el('rect', { x: x1, y: y1 - halfW, width: L, height: w, rx: w * 0.22, fill: '#17171c' }, g);
+  el('rect', { x: x1, y: y1 - halfW, width: L, height: 1.6, fill: '#8f8f9c', opacity: .85 }, g);
+  el('rect', { x: x1, y: y1 + halfW - 1.6, width: L, height: 1.6, fill: '#8f8f9c', opacity: .85 }, g);
+  if (detail >= 2) {
+    for (let px = x1 + w * 0.75; px < x1 + L - w * 0.4; px += w * 0.9) {                      // sprocket holes both edges
+      el('rect', { x: px, y: y1 - halfW + w * 0.16, width: w * 0.24, height: w * 0.24, rx: 1, fill: '#8f8f9c' }, g);
+      el('rect', { x: px, y: y1 + halfW - w * 0.40, width: w * 0.24, height: w * 0.24, rx: 1, fill: '#8f8f9c' }, g);
+    }
+  }
+  if (detail >= 3) {
+    for (let px = x1 + L * 0.3; px < x1 + L; px += L * 0.28)                                   // frame dividers
+      el('rect', { x: px, y: y1 - halfW + 2.4, width: 1.6, height: w - 4.8, fill: '#0c0c10', opacity: .9 }, g);
+  }
+}
+function mount(hostId, inner) {
+  const host = document.getElementById(hostId); if (!host) return;
+  [[140, 3], [72, 2], [36, 1]].forEach(([s, detail]) => {
+    const svg = el('svg', { viewBox: '0 0 200 200', width: s, height: s });
+    const gid = 'g' + hostId + '_' + s;
+    defsBase(svg, gid); tileAndGloss(svg, gid); dArc(svg, gid);
+    inner(svg, gid, detail);
+    arcSignal(svg, 146, 150); badge(svg, gid, 146, 150, 24);
+    host.appendChild(svg);
+  });
+}
+/* F1 — reel + unspooling film out through the D's open side */
+mount('f1', (svg, gid, detail) => {
+  if (detail >= 2) filmStrip(svg, gid, 128, 132, 52, 152, detail === 3 ? 13 : 15, detail);
+  realReel(svg, gid, 114, 98, detail === 3 ? 30 : (detail === 2 ? 32 : 34), detail);
+});
+/* F2 — classic reel, no strip */
+mount('f2', (svg, gid, detail) => {
+  realReel(svg, gid, 114, 98, detail === 3 ? 33 : (detail === 2 ? 35 : 37), detail);
+});
+/* F3 — twin reels joined by film, lower reel feeds the gate */
+mount('f3', (svg, gid, detail) => {
+  if (detail >= 2) filmStrip(svg, gid, 120, 136, 52, 152, detail === 3 ? 11 : 13, detail);
+  realReel(svg, gid, 114, 74, detail === 3 ? 21 : 24, Math.max(2, detail - 1));
+  realReel(svg, gid, 114, 126, detail === 3 ? 21 : 24, Math.max(2, detail - 1));
+  if (detail >= 2) el('rect', { x: 108.5, y: 74, width: 11, height: 52, fill: '#17171c' }, svg),
+    el('rect', { x: 108.5, y: 74, width: 1.6, height: 52, fill: '#8f8f9c', opacity: .8 }, svg),
+    el('rect', { x: 117.9, y: 74, width: 1.6, height: 52, fill: '#8f8f9c', opacity: .8 }, svg);
+});
+</script>
+</body>
+</html>

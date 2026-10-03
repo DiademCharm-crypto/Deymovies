@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEYMFLIX — C evolved · complexity tiers</title>
+<style>
+  :root { --red:#e50914; --bg:#0b0b0f; --panel:#131318; --line:#26262e; --txt:#f5f5f7; --dim:#8a8a94; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt); font-family:'Segoe UI', Arial, sans-serif; padding:28px 20px 60px; }
+  h1 { text-align:center; font-size:1.5rem; margin-bottom:6px; }
+  p.sub { text-align:center; color:var(--dim); margin-bottom:34px; font-size:.95rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:22px; max-width:1240px; margin:0 auto; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+  .stage { background:radial-gradient(120% 120% at 20% 0%, #1a1a22 0%, #0b0b0f 70%); border:1px solid var(--line); border-radius:10px; padding:22px; display:flex; align-items:center; justify-content:flex-start; min-height:150px; gap:16px; }
+  h2 { font-size:1.05rem; } h2 span { color:var(--red); }
+  .desc { color:var(--dim); font-size:.85rem; line-height:1.45; }
+  .legend { display:flex; gap:14px; color:var(--dim); font-size:.75rem; margin-top:2px; }
+  .legend b { color:var(--txt); font-weight:600; }
+  .footer-note { max-width:1240px; margin:26px auto 0; text-align:center; color:var(--dim); font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>Play-badge D — evolved, 3 complexity tiers</h1>
+<p class="sub">Your C pick, upgraded. Shown at app-icon (140), header (72) and favicon (36) sizes — complexity must survive all three.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="stage" id="t1"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>Tier 1 · Chrome D <span>+ glow badge</span></h2>
+    <p class="desc">Ring-D with a 3-stop chrome gradient and dark under-edge for depth; badge gets an outer glow ring and a bright triangle rim. Sprockets live in the stem.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="t2"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>Tier 2 · Broadcast <span>+ gloss</span></h2>
+    <p class="desc">Adds two broadcast arcs radiating from the badge (streaming signal), a gloss sweep across the tile, and an inner hairline border. The "premium app" tier.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="t3"></div>
+    <div class="legend"><span><b>140</b> app icon</span><span><b>72</b> header</span><span><b>36</b> favicon</span></div>
+    <h2>Tier 3 · Full Reel <span>(everything)</span></h2>
+    <p class="desc">All of it: chrome D + sprockets, double-ring badge, broadcast arcs, gloss, scanline texture and a corner shine. Maximum detail — the hero/app-icon tier.</p>
+  </div>
+
+</div>
+<p class="footer-note">Pick a tier (or mix — e.g. "Tier 2 but with Tier 3's badge") and I'll rebuild the whole brand set from it.</p>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function defsBase(svg, gid) {
+  const d = el('defs', {}, svg);
+  // chrome red for the D stroke: bright -> red -> deep
+  const g1 = el('linearGradient', { id: gid + 'r', x1: 0, y1: 0, x2: 1, y2: 1 }, d);
+  el('stop', { offset: '0',  'stop-color': '#ff5a62' }, g1);
+  el('stop', { offset: '.45','stop-color': '#e50914' }, g1);
+  el('stop', { offset: '1',  'stop-color': '#9c050d' }, g1);
+  // tile bg
+  const g2 = el('linearGradient', { id: gid + 'k', x1: 0, y1: 0, x2: 0, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': '#26262e' }, g2);
+  el('stop', { offset: '1', 'stop-color': '#0d0d12' }, g2);
+  // badge disc radial
+  const g3 = el('radialGradient', { id: gid + 'b', cx: '.35', cy: '.3', r: '.9' }, d);
+  el('stop', { offset: '0', 'stop-color': '#ff5a62' }, g3);
+  el('stop', { offset: '1', 'stop-color': '#c00711' }, g3);
+  return d;
+}
+function glossAndTile(svg, gid, opts) {
+  opts = opts || {};
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  if (opts.scan) { // faint horizontal scanlines
+    for (let y = 22; y < 190; y += 8) el('rect', { x: 12, y: y, width: 176, height: 1.4, fill: '#ffffff', opacity: .022 }, svg);
+  }
+  if (opts.border) el('rect', { x: 15.5, y: 15.5, width: 169, height: 169, rx: 38, fill: 'none', stroke: '#ffffff', opacity: .08, 'stroke-width': 1.5 }, svg);
+  if (opts.gloss) el('path', { d: 'M 14 96 C 60 60 140 60 186 92 L 186 30 C 186 19 177 10 166 10 L 34 10 C 23 10 14 19 14 30 Z', fill: '#ffffff', opacity: .05 }, svg);
+  if (opts.shine) el('ellipse', { cx: 58, cy: 34, rx: 46, ry: 16, fill: '#ffffff', opacity: .07, transform: 'rotate(-18 58 34)' }, svg);
+}
+const D_BAR  = 'M 64 44 L 64 156';
+const D_BOWL = 'M 64 44 L 102 44 C 148 44 160 70 160 100 C 160 130 148 156 102 156 L 64 156';
+const SPROCKETS = [78, 100, 122].map(y => ({ x: 55, y: y - 8, w: 18, h: 16 }));
+function dChrome(svg, gid, withSprockets) {
+  // dark under-stroke for depth
+  el('path', { d: D_BAR, stroke: '#6e030a', 'stroke-width': 30, 'stroke-linecap': 'round', fill: 'none', transform: 'translate(0 2)' }, svg);
+  el('path', { d: D_BOWL, stroke: '#6e030a', 'stroke-width': 30, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none', transform: 'translate(0 2)' }, svg);
+  // chrome stroke
+  el('path', { d: D_BAR, stroke: 'url(#' + gid + 'r)', 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none' }, svg);
+  el('path', { d: D_BOWL, stroke: 'url(#' + gid + 'r)', 'stroke-width': 26, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none' }, svg);
+  // top highlight hairline on the bowl
+  el('path', { d: 'M 64 40 L 102 40 C 138 40 152 58 157 82', stroke: '#ff9aa0', 'stroke-width': 3, 'stroke-linecap': 'round', fill: 'none', opacity: .55 }, svg);
+  if (withSprockets) SPROCKETS.forEach(s => el('rect', { x: s.x, y: s.y, width: s.w, height: s.h, rx: 3.5, fill: '#101014', stroke: '#3c3c46', 'stroke-width': 1 }, svg));
+}
+function badge(svg, gid, cx, cy, r, tier) {
+  if (tier >= 2) { // glow halo
+    el('circle', { cx: cx, cy: cy, r: r + 9, fill: 'none', stroke: '#e50914', 'stroke-width': 3, opacity: .35 }, svg);
+  }
+  if (tier >= 3) { // second halo
+    el('circle', { cx: cx, cy: cy, r: r + 16, fill: 'none', stroke: '#e50914', 'stroke-width': 2, opacity: .18 }, svg);
+  }
+  el('circle', { cx: cx, cy: cy, r: r, fill: 'url(#' + gid + 'b)', stroke: '#0d0d12', 'stroke-width': 7 }, svg);
+  if (tier >= 2) el('circle', { cx: cx, cy: cy, r: r - 4, fill: 'none', stroke: '#ffb3b7', 'stroke-width': 1.6, opacity: .7 }, svg);
+  el('polygon', { points: (cx - r*0.34) + ',' + (cy - r*0.5) + ' ' + (cx - r*0.34) + ',' + (cy + r*0.5) + ' ' + (cx + r*0.52) + ',' + cy, fill: '#0d0d12' }, svg);
+  if (tier >= 2) el('polygon', { points: (cx - r*0.34) + ',' + (cy - r*0.5) + ' ' + (cx - r*0.34) + ',' + (cy + r*0.5) + ' ' + (cx + r*0.52) + ',' + cy, fill: 'none', stroke: '#ffd7d9', 'stroke-width': 1.2, opacity: .5 }, svg);
+}
+function arcs(svg, cx, cy) {
+  el('path', { d: 'M ' + (cx + 26) + ' ' + (cy - 26) + ' A 37 37 0 0 1 ' + (cx + 37) + ' ' + cy, stroke: '#ff3b45', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round', opacity: .75 }, svg);
+  el('path', { d: 'M ' + (cx + 34) + ' ' + (cy - 34) + ' A 48 48 0 0 1 ' + (cx + 48) + ' ' + cy, stroke: '#ff3b45', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', opacity: .38 }, svg);
+}
+function mount(hostId, build, size) {
+  const host = document.getElementById(hostId); if (!host) return;
+  [[size || 140, host], [72, host], [36, host]].forEach(([s, h]) => {
+    const svg = el('svg', { viewBox: '0 0 200 200', width: s, height: s });
+    build(svg, 'g' + hostId.replace(/\W/g, '') + s); h.appendChild(svg);
+  });
+}
+
+/* Tier 1 — chrome D + glow badge + sprockets */
+mount('t1', (svg, gid) => {
+  defsBase(svg, gid); glossAndTile(svg, gid, {});
+  dChrome(svg, gid, true);
+  badge(svg, gid, 146, 150, 24, 1);
+});
+
+/* Tier 2 — + broadcast arcs, gloss, hairline border, badge ring */
+mount('t2', (svg, gid) => {
+  defsBase(svg, gid); glossAndTile(svg, gid, { gloss: true, border: true });
+  dChrome(svg, gid, true);
+  arcs(svg, 146, 150);
+  badge(svg, gid, 146, 150, 24, 2);
+});
+
+/* Tier 3 — everything: scanlines, shine, double halo */
+mount('t3', (svg, gid) => {
+  defsBase(svg, gid); glossAndTile(svg, gid, { gloss: true, border: true, scan: true, shine: true });
+  dChrome(svg, gid, true);
+  arcs(svg, 146, 150);
+  badge(svg, gid, 146, 150, 24, 3);
+});
+</script>
+</body>
+</html>

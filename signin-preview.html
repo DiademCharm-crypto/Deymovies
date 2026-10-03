@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEYMFLIX — Sign-in preview (local only)</title>
+<style>
+  body { background:#0b0b0f; color:#f5f5f7; font-family:'Segoe UI', Arial, sans-serif; margin:0; padding:40px 20px; }
+  .fake-header { display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto 40px;
+    background:#16161c; border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px 22px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.2rem; }
+  .brand svg { display:block; }
+  .brand span b { color:#e50914; }
+  h1 { text-align:center; font-size:1.4rem; }
+  p.note { text-align:center; color:#9a9aa4; max-width:640px; margin:8px auto 36px; line-height:1.6; font-size:.92rem; }
+  .steps { max-width:640px; margin:0 auto; background:#131318; border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; padding:22px 26px; line-height:1.9; font-size:.9rem; color:#c9c9d2; }
+  .steps code { background:#0b0b0f; padding:2px 8px; border-radius:6px; color:#ff8a90; font-size:.82rem; }
+  .status { text-align:center; margin-top:30px; color:#9a9aa4; font-size:.85rem; }
+</style>
+</head>
+<body>
+  <div class="fake-header">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 200 200">
+        <rect x="10" y="10" width="180" height="180" rx="42" fill="#17171b"/>
+        <path d="M70 42 L104 42 C148 42 160 70 160 100 C160 130 148 158 104 158 L70 158" fill="none" stroke="#e50914" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="100" cy="100" r="29.7" fill="none" stroke="#d9d9e0" stroke-width="2.5"/>
+        <circle cx="100" cy="100" r="28" fill="#0c0c10"/>
+        <ellipse cx="100" cy="84.3" rx="6.2" ry="6.9" fill="#e3e3ea"/><ellipse cx="114.9" cy="95.2" rx="6.2" ry="6.9" fill="#e3e3ea"/>
+        <ellipse cx="109.2" cy="112.7" rx="6.2" ry="6.9" fill="#e3e3ea"/><ellipse cx="90.8" cy="112.7" rx="6.2" ry="6.9" fill="#e3e3ea"/>
+        <ellipse cx="85.1" cy="95.2" rx="6.2" ry="6.9" fill="#e3e3ea"/>
+        <circle cx="100" cy="100" r="6.7" fill="none" stroke="#e50914" stroke-width="2.2"/>
+        <circle cx="100" cy="100" r="4.5" fill="#0c0c10"/><circle cx="100" cy="100" r="2.5" fill="#e50914"/>
+      </svg>
+      <span>DEYM<b>FLIX</b></span>
+    </div>
+    <span id="dfx-auth-slot"></span>
+  </div>
+
+  <h1>Google sign-in — local preview</h1>
+  <p class="note">This page exists only on your machine. Nothing here is published. Click <b>Sign in</b> and a Google account picker opens; only Gmail addresses are accepted, and your avatar replaces the button when signed in.</p>
+
+  <div class="steps">
+    <b>To go live later (after you're happy with the design):</b><br>
+    1. Firebase console → Authentication → Sign-in method → enable <b>Google</b><br>
+    2. Authentication → Settings → Authorized domains → add <code>deymflix.eu.cc</code><br>
+    3. Add <code>firebase-auth-compat.js</code> + <code>auth.js?v=1.0</code> to each page<br>
+    4. Add <code>&lt;span id="dfx-auth-slot"&gt;&lt;/span&gt;</code> in each header
+  </div>
+
+  <div class="status" id="st">loading…</div>
+
+  <script src="config.js?v=2.0"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="auth.js?v=1.0"></script>
+  <script>
+    DfxAuth.onChange = function (u) {
+      document.getElementById('st').textContent = u
+        ? 'Signed in as ' + u.email + (u.displayName ? ' (' + u.displayName + ')' : '')
+        : 'Not signed in';
+    };
+  </script>
+</body>
+</html>

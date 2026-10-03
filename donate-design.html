@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DEYMFLIX - Support (Design Preview)</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css?v=160.5">
+  <!-- THEME v2 (additive). Delete this one line + restore the snapshot to undo. -->
+  <link rel="stylesheet" href="theme-v2.css?v=1.1">
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       DONATE PAGE — DESIGN PREVIEW ONLY.
+       Uses the real site shell (top-nav / bottom-nav / site-footer from
+       style.css). Every .dn-* rule below is the new design language.
+       NO PERSONAL NAMES appear anywhere on this page, by design.
+       ══════════════════════════════════════════════════════════════ */
+
+    .dn-preview-ribbon {
+      position: relative;
+      z-index: 1100;
+      background: repeating-linear-gradient(45deg, #e50914 0 12px, #b00710 12px 24px);
+      color: #fff;
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px;
+    }
+    /* the ribbon is in flow at the top, so the absolutely-positioned header
+       has to be pushed below it (style.css puts .top-nav at top: 0) */
+    .top-nav { top: var(--dn-ribbon-h, 30px); }
+    .dn-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: calc(var(--dn-ribbon-h, 30px) + 82px) 18px 8px;
+    }
+
+    /* ── hero ── */
+    .dn-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      padding: 30px 22px 28px;
+      text-align: center;
+      background:
+        radial-gradient(120% 150% at 50% -20%, rgba(229, 9, 20, 0.30) 0%, rgba(229, 9, 20, 0) 62%),
+        #141414;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+    }
+    .dn-heart {
+      width: 58px; height: 58px;
+      color: #e50914;
+      filter: drop-shadow(0 6px 18px rgba(229, 9, 20, 0.55));
+      animation: dn-beat 2.4s ease-in-out infinite;
+    }
+    @keyframes dn-beat { 0%, 100% { transform: scale(1); } 8% { transform: scale(1.09); } 16% { transform: scale(1); } }
+    .dn-hero h1 {
+      margin: 12px 0 0;
+      font-size: clamp(1.45rem, 5.2vw, 2.05rem);
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #fff;
+    }
+    .dn-hero p {
+      margin: 10px auto 0;
+      max-width: 560px;
+      color: #a6a6a6;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .dn-cta-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .dn-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 22px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+    }
+    .dn-btn-primary { background: #e50914; color: #fff; box-shadow: 0 8px 24px rgba(229, 9, 20, 0.35); }
+    .dn-btn-primary:hover { background: #ff1f2b; }
+    .dn-btn-ghost { background: rgba(255, 255, 255, 0.05); color: #fff; border-color: rgba(255, 255, 255, 0.18); }
+    .dn-btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* ── section headings ── */
+    .dn-sec { margin-top: 34px; }
+    .dn-sec-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 4px;
+    }
+    .dn-sec-sub { color: #8a8a8a; font-size: 0.8rem; margin: 0 0 14px; }
+
+    /* ── where your ₱ goes ── */
+    .dn-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .dn-card {
+      background: #161616;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .dn-card-ico { font-size: 1.35rem; line-height: 1; }
+    .dn-card h4 { margin: 10px 0 4px; font-size: 0.92rem; font-weight: 800; color: #fff; }
+    .dn-card p { margin: 0; font-size: 0.78rem; color: #8f8f8f; line-height: 1.5; }
+    .dn-meter { height: 5px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); margin-top: 12px; overflow: hidden; }
+    .dn-meter i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #e50914, #ff5560); }
+    .dn-pct { float: right; font-size: 0.74rem; font-weight: 800; color: #e50914; }
+
+    /* ── amount chips ── */
+    /* any-amount entry */
+    .dn-amount {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #101010;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 4px 16px;
+      max-width: 320px;
+      min-height: 62px;
+      box-sizing: border-box;
+    }
+    .dn-amount:focus-within { border-color: #e50914; box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15); }
+    .dn-currency { font-size: 1.5rem; font-weight: 800; color: #e50914; line-height: 1; }
+    .dn-amount-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 0;
+      outline: none;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.75rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      padding: 8px 0;
+    }
+    .dn-amount-input::placeholder { color: #4d4d4d; font-weight: 700; }
+    .dn-amount-hint { margin: 10px 0 0; font-size: 0.76rem; color: #8a8a8a; }
+
+    .dn-chips { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .dn-chip {
+      min-height: 44px;
+      min-width: 84px;
+      padding: 0 18px;
+      border-radius: 99px;
+      background: #171717;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ddd;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.18s ease;
+    }
+    .dn-chip:hover { border-color: rgba(255, 255, 255, 0.3); color: #fff; }
+    .dn-chip.on {
+      background: rgba(229, 9, 20, 0.14);
+      border-color: #e50914;
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(229, 9, 20, 0.35);
+    }
+    .dn-send-amount {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: #9a9a9a;
+    }
+    .dn-send-amount b { color: #fff; font-size: 1.05rem; }
+
+    /* ── pay card ── */
+    .dn-pay {
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      gap: 20px;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    @media (max-width: 720px) {
+      .dn-pay { grid-template-columns: 1fr; gap: 16px; }
+    }
+    .dn-qr-col { text-align: center; }
+    .dn-qr-tile {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      display: inline-block;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .dn-qr-tile img { display: block; width: 176px; height: 176px; border-radius: 6px; }
+    .dn-qr-tile svg { display: block; width: 176px; height: 176px; }
+    .dn-qr-cap {
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: #8f8f8f;
+      line-height: 1.45;
+    }
+    .dn-qr-badge {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #ffb3b8;
+      background: rgba(229, 9, 20, 0.14);
+      border: 1px solid rgba(229, 9, 20, 0.4);
+      border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+    .dn-fields { display: flex; flex-direction: column; gap: 10px; }
+    .dn-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #101010;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-height: 58px;
+      box-sizing: border-box;
+    }
+    .dn-field-k {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #7d7d7d;
+      margin-bottom: 3px;
+    }
+    .dn-field-v { font-size: 0.86rem; font-weight: 700; color: #fff; }
+    .dn-field-v.mono { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 1px; }
+    .dn-copy {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 9px;
+      background: rgba(229, 9, 20, 0.14);
+      border: 1px solid rgba(229, 9, 20, 0.45);
+      color: #ff6b73;
+      font-size: 0.74rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dn-copy:hover { background: #e50914; color: #fff; }
+
+    .dn-toggle { display: flex; gap: 8px; margin: 4px 0 0; }
+    .dn-pill {
+      flex: 1;
+      min-height: 42px;
+      border-radius: 11px;
+      background: #171717;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ddd;
+      font-size: 0.84rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dn-pill.on { background: rgba(229, 9, 20, 0.14); border-color: #e50914; color: #fff; }
+
+    .dn-steps { list-style: none; margin: 12px 0 0; padding: 0; counter-reset: dns; }
+    .dn-steps li {
+      counter-increment: dns;
+      position: relative;
+      padding: 0 0 0 32px;
+      margin-bottom: 9px;
+      font-size: 0.82rem;
+      color: #b9b9b9;
+      line-height: 1.5;
+    }
+    .dn-steps li::before {
+      content: counter(dns);
+      position: absolute;
+      left: 0; top: 0;
+      width: 21px; height: 21px;
+      border-radius: 50%;
+      background: rgba(229, 9, 20, 0.16);
+      border: 1px solid rgba(229, 9, 20, 0.5);
+      color: #ff6b73;
+      font-size: 0.68rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dn-steps li b { color: #fff; }
+    .dn-note {
+      margin-top: 12px;
+      font-size: 0.74rem;
+      line-height: 1.55;
+      color: #8f8f8f;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 2px solid rgba(229, 9, 20, 0.6);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .dn-note b { color: #dcdcdc; }
+
+    /* ── form ── */
+    .dn-form {
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px) { .dn-form { grid-template-columns: 1fr; } }
+    .dn-input, .dn-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0f0f0f;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 11px;
+      color: #fff;
+      font-size: 0.86rem;
+      font-family: inherit;
+      padding: 12px 13px;
+      min-height: 46px;
+    }
+    .dn-input:focus, .dn-textarea:focus { outline: none; border-color: #e50914; }
+    .dn-label { display: block; font-size: 0.7rem; font-weight: 700; color: #9a9a9a; margin-bottom: 6px; }
+    .dn-span2 { grid-column: 1 / -1; }
+    .dn-check { display: flex; gap: 9px; align-items: flex-start; font-size: 0.78rem; color: #9a9a9a; }
+    .dn-check input { width: 18px; height: 18px; accent-color: #e50914; margin: 0; }
+
+    /* ── donor wall ── */
+    .dn-wall { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+    .dn-wall-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .dn-av {
+      flex: 0 0 auto;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e50914, #7a0409);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .dn-av.anon { background: #2a2a2a; color: #999; }
+    .dn-wall-item strong { display: block; font-size: 0.84rem; color: #fff; }
+    .dn-wall-item small { font-size: 0.72rem; color: #8a8a8a; }
+    .dn-wall-amt { margin-left: auto; font-size: 0.82rem; font-weight: 800; color: #e50914; }
+
+    /* ── faq ── */
+    .dn-faq { display: flex; flex-direction: column; gap: 8px; }
+    .dn-faq details {
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 13px 15px;
+    }
+    .dn-faq summary {
+      cursor: pointer;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #fff;
+      list-style: none;
+    }
+    .dn-faq summary::-webkit-details-marker { display: none; }
+    .dn-faq summary::after { content: "＋"; float: right; color: #e50914; font-weight: 800; }
+    .dn-faq details[open] summary::after { content: "－"; }
+    .dn-faq p { margin: 10px 0 0; font-size: 0.8rem; color: #9a9a9a; line-height: 1.6; }
+
+    /* ── toast ── */
+    .dn-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 96px;
+      transform: translateX(-50%) translateY(14px);
+      background: #e50914;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 11px 20px;
+      border-radius: 99px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 10000;
+    }
+    .dn-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dn-heart { animation: none; }
+      .dn-toast { transition: none; }
+    }
+  </style>
+</head>
+<body class="has-bottom-nav">
+
+  <div class="dn-preview-ribbon">Design preview · placeholder payment details</div>
+
+  <!-- Top Navigation Header (real site shell) -->
+  <header class="top-nav">
+    <a href="index.html" class="brand-logo-link">
+      <img src="favicon.svg" alt="DEYMFLIX Icon" class="brand-logo-img">
+      <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
+    </a>
+    <div id="online-count-badge" class="online-count-badge">
+      <span class="online-dot"></span>
+      <span id="online-count-text">0 online</span>
+    </div>
+    <!-- No search bar here: this page is a destination, not a browse surface,
+         so the header stays logo-only. -->
+  </header>
+
+  <div class="dn-wrap">
+
+    <!-- ══ HERO ══ -->
+    <section class="dn-hero">
+      <svg class="dn-heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+      <h1>Keep DEYMFLIX free</h1>
+      <p>No ads in your face, no subscription, no locked titles. If you enjoy the site, a small tip keeps the servers, the CDN and the movie APIs running for everyone.</p>
+      <div class="dn-cta-row">
+        <button class="dn-btn dn-btn-primary" type="button" onclick="document.getElementById('dn-pay').scrollIntoView({behavior:'smooth', block:'center'})">❤ Send a tip</button>
+        <button class="dn-btn dn-btn-ghost" type="button" onclick="dnToast('Share link copied')">Share DEYMFLIX</button>
+      </div>
+    </section>
+
+    <!-- ══ WHERE IT GOES ══ -->
+    <section class="dn-sec">
+      <h2 class="dn-sec-title">Where your ₱ goes</h2>
+      <p class="dn-sec-sub">Roughly how each ₱100 is spent. No salaries, no office, no investors.</p>
+      <div class="dn-cards">
+        <div class="dn-card">
+          <div class="dn-card-ico">🌐</div>
+          <h4>Bandwidth &amp; CDN <span class="dn-pct">55%</span></h4>
+          <p>Streaming minutes and poster delivery are billed per GB. The single biggest bill by far.</p>
+          <div class="dn-meter"><i style="width:55%"></i></div>
+        </div>
+        <div class="dn-card">
+          <div class="dn-card-ico">🔌</div>
+          <h4>APIs &amp; domain <span class="dn-pct">25%</span></h4>
+          <p>Movie metadata, subtitle lookups and the domain name that keeps the site reachable.</p>
+          <div class="dn-meter"><i style="width:25%"></i></div>
+        </div>
+        <div class="dn-card">
+          <div class="dn-card-ico">🛠️</div>
+          <h4>Development <span class="dn-pct">20%</span></h4>
+          <p>Late nights fixing players, subtitles and the app so everything just works.</p>
+          <div class="dn-meter"><i style="width:20%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ AMOUNT + PAY ══ -->
+    <section class="dn-sec">
+      <h2 class="dn-sec-title">Send a tip</h2>
+      <p class="dn-sec-sub">Type any amount you like — then send it from GCash or Maya. Both land in the same wallet.</p>
+
+      <label class="dn-label" for="dn-amount">Amount</label>
+      <div class="dn-amount">
+        <span class="dn-currency" aria-hidden="true">₱</span>
+        <input class="dn-amount-input" id="dn-amount" type="text" inputmode="numeric" autocomplete="off"
+               value="100" placeholder="0" aria-describedby="dn-amount-hint">
+      </div>
+      <div class="dn-chips">
+        <button class="dn-chip" type="button" data-amt="50">₱50</button>
+        <button class="dn-chip on" type="button" data-amt="100">₱100</button>
+        <button class="dn-chip" type="button" data-amt="250">₱250</button>
+        <button class="dn-chip" type="button" data-amt="500">₱500</button>
+      </div>
+      <p class="dn-amount-hint" id="dn-amount-hint">Any amount works — there is no minimum. The chips are just shortcuts; type whatever you want.</p>
+
+      <div class="dn-pay" id="dn-pay" style="margin-top:14px;">
+        <!-- QR side -->
+        <div class="dn-qr-col">
+          <div class="dn-qr-tile">
+            <img class="dn-qr-img" src="icons/donate-qr.png" alt="Scan to send via GCash or Maya" width="176" height="176">
+            <!-- Real QR, cropped from the Coins.ph app's Receive screen so the
+                 registered account name under it is NOT part of the asset.
+                 Never redraw or re-encode a payment QR. -->
+          </div>
+          <div class="dn-qr-badge">QR Ph · InstaPay</div>
+          <p class="dn-qr-cap">Scan with <b style="color:#ddd">GCash</b> or <b style="color:#ddd">Maya</b><br>from another device, then type the amount</p>
+        </div>
+
+        <!-- Details side -->
+        <div class="dn-fields">
+          <div class="dn-field">
+            <div>
+              <div class="dn-field-k">Send to</div>
+              <div class="dn-field-v">Bank / E-wallet transfer</div>
+            </div>
+          </div>
+          <div class="dn-field">
+            <div>
+              <div class="dn-field-k">Institution</div>
+              <div class="dn-field-v">DCPay Philippines, Inc. (Coins.ph)</div>
+            </div>
+          </div>
+          <div class="dn-field">
+            <div>
+              <div class="dn-field-k">Account number</div>
+              <div class="dn-field-v mono">09•• ••• ••••</div>
+            </div>
+            <button class="dn-copy" type="button" onclick="dnToast('Preview only — the live page copies the number')">❤ Copy</button>
+          </div>
+          <div class="dn-field">
+            <div>
+              <div class="dn-field-k">Method</div>
+              <div class="dn-field-v">InstaPay — instant · no receiving fee</div>
+            </div>
+          </div>
+
+          <div class="dn-toggle">
+            <button class="dn-pill on" type="button" data-app="gcash">Pay with GCash</button>
+            <button class="dn-pill" type="button" data-app="maya">Pay with Maya</button>
+          </div>
+
+          <ol class="dn-steps" id="dn-steps-gcash">
+            <li>Open GCash → <b>Transfer</b> → <b>Local</b></li>
+            <li>Choose <b>DCPay Philippines, Inc. (Coins.ph)</b>, or use <b>Scan / Upload Bank QR</b></li>
+            <li>Paste the account number above → enter <b id="dn-amt-gcash">₱100</b> → confirm</li>
+          </ol>
+          <ol class="dn-steps" id="dn-steps-maya" style="display:none">
+            <li>Open Maya → <b>Bank Transfer</b></li>
+            <li>Choose <b>DCPay</b> from the recipient list</li>
+            <li>Enter the number above → <b id="dn-amt-maya">₱100</b> → <b>Send</b></li>
+          </ol>
+
+          <div class="dn-note">
+            <b>Check the number before you confirm.</b> InstaPay transfers are instant and
+            <b>cannot be reversed</b>. Your app shows a registered account name on the
+            confirmation screen — that's the receiving wallet, so match the number exactly
+            before sending. DEYMFLIX will <b>never</b> ask for your MPIN, OTP or card details.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CONFIRM ══ -->
+    <section class="dn-sec">
+      <h2 class="dn-sec-title">Already sent it?</h2>
+      <p class="dn-sec-sub">Paste the reference number from your GCash/Maya receipt so your tip can be confirmed and added to the wall.</p>
+      <form class="dn-form" onsubmit="event.preventDefault(); dnToast('Thanks! (preview only)');">
+        <div>
+          <label class="dn-label" for="dn-ref">Reference number</label>
+          <input class="dn-input" id="dn-ref" inputmode="numeric" placeholder="e.g. 0123 456 789012">
+        </div>
+        <div>
+          <label class="dn-label" for="dn-amt">Amount sent</label>
+          <input class="dn-input" id="dn-amt" inputmode="numeric" placeholder="₱100">
+        </div>
+        <div>
+          <label class="dn-label" for="dn-handle">Name or handle <span style="color:#6f6f6f">(optional)</span></label>
+          <input class="dn-input" id="dn-handle" placeholder="Leave blank to stay anonymous">
+        </div>
+        <div>
+          <label class="dn-label" for="dn-msg">Message <span style="color:#6f6f6f">(optional)</span></label>
+          <input class="dn-input" id="dn-msg" placeholder="Keep up the good work!">
+        </div>
+        <div class="dn-span2 dn-check">
+          <input type="checkbox" id="dn-public">
+          <label for="dn-public">Show my tip on the public wall. Anything you type here is published, so don't include personal details.</label>
+        </div>
+        <div class="dn-span2">
+          <button class="dn-btn dn-btn-primary" type="submit" style="width:100%">Submit for confirmation</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ══ WALL ══ -->
+    <section class="dn-sec">
+      <h2 class="dn-sec-title">Thank you ❤</h2>
+      <p class="dn-sec-sub">Recent supporters. Everyone can choose to stay anonymous.</p>
+      <div class="dn-wall">
+        <div class="dn-wall-item">
+          <div class="dn-av anon">?</div>
+          <div><strong>Anonymous</strong><small>2 hours ago</small></div>
+          <div class="dn-wall-amt">₱100</div>
+        </div>
+        <div class="dn-wall-item">
+          <div class="dn-av">MF</div>
+          <div><strong>movie_fan_92</strong><small>Yesterday</small></div>
+          <div class="dn-wall-amt">₱250</div>
+        </div>
+        <div class="dn-wall-item">
+          <div class="dn-av anon">?</div>
+          <div><strong>Anonymous</strong><small>3 days ago</small></div>
+          <div class="dn-wall-amt">₱50</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ FAQ ══ -->
+    <section class="dn-sec">
+      <h2 class="dn-sec-title">Questions</h2>
+      <div class="dn-faq" style="margin-top:12px">
+        <details open>
+          <summary>Is this a subscription?</summary>
+          <p>No. It's a one-time tip. Nothing renews, nothing is charged automatically, and no account is created.</p>
+        </details>
+        <details>
+          <summary>What do I get for donating?</summary>
+          <p>Nothing extra — and by design. Every title stays free for everyone. Your tip pays for bandwidth and hosting, so the site keeps running.</p>
+        </details>
+        <details>
+          <summary>Why does my app show a different account name?</summary>
+          <p>The wallet is registered under the owner's legal name, which is what any bank or e-wallet is required to display for an account transfer. It isn't a business name, so make sure the <b>number</b> matches the one above before you send.</p>
+        </details>
+        <details>
+          <summary>Will you ever ask for my MPIN or OTP?</summary>
+          <p>Never. A real donation takes one transfer from your own app. Anyone asking for your MPIN, OTP, or card details is impersonating the site — stop and report it.</p>
+        </details>
+        <details>
+          <summary>Can I get a refund?</summary>
+          <p>InstaPay transfers are final and cannot be reversed, so please double-check the number and amount before you confirm.</p>
+        </details>
+      </div>
+    </section>
+
+    <p style="text-align:center;color:#5f5f5f;font-size:0.72rem;margin:26px 0 0">
+      Design preview · payment details are placeholders · no live account is connected
+    </p>
+  </div>
+
+  <!-- SITE FOOTER (real shell; Developer Info button intentionally shows no name here) -->
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">DEYM<em>FLIX</em></span>
+        <p class="footer-tagline">Premium movies &amp; trailers — stream anywhere, anytime.</p>
+      </div>
+      <div class="footer-dev">
+        <button class="dev-info-btn" type="button" title="Developer Info">
+          <img src="developer.png" alt="Developer photo" class="dev-avatar" loading="lazy">
+          <span class="dev-info-text">
+            <strong>Developer Info</strong>
+            <small>Tap to view</small>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <span>© 2026 DEYMFLIX. <strong>All Rights Reserved.</strong></span>
+    </div>
+  </footer>
+
+  <!-- BOTTOM NAVIGATION BAR (real shell) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-items">
+      <li class="bottom-nav-item" onclick="window.location.href='index.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+        <span class="bottom-nav-label">Home</span>
+      </li>
+      <li class="bottom-nav-item" onclick="window.location.href='reels.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span>
+        <span class="bottom-nav-label">Reels</span>
+      </li>
+      <li class="bottom-nav-item center-item" onclick="window.location.href='explore.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <span class="bottom-nav-label">Explore</span>
+      </li>
+      <li class="bottom-nav-item" onclick="window.location.href='history.html'">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+        <span class="bottom-nav-label">History</span>
+      </li>
+      <li class="bottom-nav-item active">
+        <span class="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></span>
+        <span class="bottom-nav-label">Support</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="dn-toast" id="dn-toast">Copied</div>
+
+  <script>
+    (function () {
+      'use strict';
+      var toastEl = document.getElementById('dn-toast');
+      var toastTimer = null;
+      window.dnToast = function (msg) {
+        toastEl.textContent = msg || 'Copied';
+        toastEl.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 2000);
+      };
+
+      // ── amount: a real editable field, any amount ──
+      // Chips are shortcuts that fill the field; typing always wins. The
+      // typed number mirrors into both step lists so the instruction the
+      // donor reads matches what they must enter in GCash/Maya.
+      var amtInput = document.getElementById('dn-amount');
+      var chips = document.querySelectorAll('.dn-chip');
+      var gEl = document.getElementById('dn-amt-gcash');
+      var mEl = document.getElementById('dn-amt-maya');
+      function digitsOnly(v) { return String(v).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '').slice(0, 7); }
+      function applyAmount() {
+        var clean = digitsOnly(amtInput.value);
+        if (amtInput.value !== clean) amtInput.value = clean;
+        var num = parseInt(clean, 10);
+        var text = num > 0 ? '₱' + num.toLocaleString('en-PH') : 'the amount';
+        if (gEl) gEl.textContent = text;
+        if (mEl) mEl.textContent = text;
+        chips.forEach(function (c) { c.classList.toggle('on', Number(c.dataset.amt) === num); });
+      }
+      if (amtInput) {
+        amtInput.addEventListener('input', applyAmount);
+        amtInput.addEventListener('blur', applyAmount);
+        applyAmount();
+      }
+      chips.forEach(function (c) {
+        c.addEventListener('click', function () {
+          amtInput.value = c.dataset.amt;
+          applyAmount();
+        });
+      });
+
+      // GCash / Maya step toggle
+      var pills = document.querySelectorAll('.dn-pill');
+      pills.forEach(function (p) {
+        p.addEventListener('click', function () {
+          pills.forEach(function (o) { o.classList.remove('on'); });
+          p.classList.add('on');
+          var app = p.dataset.app;
+          document.getElementById('dn-steps-gcash').style.display = app === 'gcash' ? '' : 'none';
+          document.getElementById('dn-steps-maya').style.display = app === 'maya' ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

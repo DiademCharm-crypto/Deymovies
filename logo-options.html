@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEYMFLIX — Logo Options</title>
+<style>
+  :root { --red:#e50914; --bg:#0b0b0f; --panel:#131318; --line:#26262e; --txt:#f5f5f7; --dim:#8a8a94; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt); font-family:'Segoe UI', Arial, sans-serif; padding:28px 20px 60px; }
+  h1 { text-align:center; font-size:1.5rem; margin-bottom:6px; }
+  p.sub { text-align:center; color:var(--dim); margin-bottom:34px; font-size:.95rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:22px; max-width:1240px; margin:0 auto; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+  .stage { background:radial-gradient(120% 120% at 20% 0%, #1a1a22 0%, #0b0b0f 70%); border:1px solid var(--line); border-radius:10px; padding:22px; display:flex; align-items:center; justify-content:center; min-height:150px; gap:14px; flex-wrap:wrap; }
+  .stage.small svg { transform:scale(.45); }
+  h2 { font-size:1.05rem; }
+  h2 span { color:var(--red); }
+  .desc { color:var(--dim); font-size:.85rem; line-height:1.45; }
+  .footer-note { max-width:1240px; margin:26px auto 0; text-align:center; color:var(--dim); font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>DEYMFLIX — 5 Logo Concepts</h1>
+<p class="sub">All pure SVG, scalable to any size. Shown large (favicon/app-icon use) and small (header use).</p>
+
+<div class="grid">
+
+  <!-- ══ 1. PLAY HEX ══ -->
+  <div class="card">
+    <div class="stage" id="s1"></div>
+    <div class="stage small" id="s1b"></div>
+    <h2>1 · Play Hex <span>(evolution of current)</span></h2>
+    <p class="desc">Keeps the red hexagon DNA you have live today but sharpens it: hexagon outline, glossy play triangle with a red gradient, subtle scanline shine. Reads instantly as a streaming brand at 16px.</p>
+  </div>
+
+  <!-- ══ 2. D MONOGRAM ══ -->
+  <div class="card">
+    <div class="stage" id="s2"></div>
+    <div class="stage small" id="s2b"></div>
+    <h2>2 · Red D Monogram</h2>
+    <p class="desc">A bold rounded "D" built from a thick red ring with a squared terminal — like Netflix's N, one letter owns the brand. Vertical bar doubles as a "pause" cue. Strongest choice for an app icon.</p>
+  </div>
+
+  <!-- ══ 3. FRAME D ══ -->
+  <div class="card">
+    <div class="stage" id="s3"></div>
+    <div class="stage small" id="s3b"></div>
+    <h2>3 · Cinema Frame D</h2>
+    <p class="desc">The D sits inside a rounded-square "screen" frame with a corner notch — a nod to widescreen cinema. Calmer, more premium, less aggressive than the hex. Ages well if you ever soften the red.</p>
+  </div>
+
+  <!-- ══ 4. TRI-BURST ══ -->
+  <div class="card">
+    <div class="stage" id="s4"></div>
+    <div class="stage small" id="s4b"></div>
+    <h2>4 · Tri-Burst Play</h2>
+    <p class="desc">Three angled strokes snap into a play button, like frames racing to start. Dynamic and young — best match if you want the brand to feel fast and action-forward.</p>
+  </div>
+
+  <!-- ══ 5. WORDMARK DISC ══ -->
+  <div class="card">
+    <div class="stage" id="s5"></div>
+    <div class="stage small" id="s5b"></div>
+    <h2>5 · Wordmark Disc</h2>
+    <p class="desc">"DEYMFLIX" in heavy condensed caps with the FLIX in red and a play-button disc as the dot of a letter — works as a full lockup for the header and share card, plus a compact disc-only icon.</p>
+  </div>
+
+</div>
+<p class="footer-note">Tell me the number you want and I'll wire it everywhere: favicon, header logo, app icon, splash, share card — and regenerate the whole set.</p>
+
+<script>
+/* ── shared helpers ─────────────────────────────────────── */
+const NS = 'http://www.w3.org/2000/svg';
+const RED = '#e50914', RED2 = '#ff3b45', DARK = '#0d0d12', EDGE = '#3a3a44';
+function el(tag, attrs, parent) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function mount(id, build, size) {
+  const host = document.getElementById(id); if (!host) return;
+  const svg = el('svg', { viewBox: '0 0 200 200', width: size || 130, height: size || 130, 'aria-label': id });
+  build(svg); host.appendChild(svg);
+}
+
+/* gradient defs factory (unique ids per svg) */
+function defs(svg, gid) {
+  const d = el('defs', {}, svg);
+  const g1 = el('linearGradient', { id: gid + 'r', x1: 0, y1: 0, x2: 1, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': RED2 }, g1);
+  el('stop', { offset: '1', 'stop-color': RED }, g1);
+  const g2 = el('linearGradient', { id: gid + 'k', x1: 0, y1: 0, x2: 0, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': '#26262e' }, g2);
+  el('stop', { offset: '1', 'stop-color': DARK }, g2);
+  return d;
+}
+
+/* ── 1. PLAY HEX ── */
+mount('s1', (svg) => {
+  defs(svg, 'a');
+  const hex = (r, cx, cy) => Array.from({ length: 6 }, (_, i) => {
+    const a = Math.PI / 3 * i - Math.PI / 6; return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1);
+  }).join(' ');
+  el('polygon', { points: hex(92, 100, 100), fill: 'url(#ak)', stroke: EDGE, 'stroke-width': 3 }, svg);
+  el('polygon', { points: hex(80, 100, 100), fill: 'none', stroke: 'url(#ar)', 'stroke-width': 6 }, svg);
+  el('polygon', { points: '78,62 78,138 142,100', fill: 'url(#ar)', 'stroke-linejoin': 'round', rx: 6 }, svg);
+  el('polygon', { points: '78,62 78,138 142,100', fill: 'none', stroke: '#ffffff', 'stroke-opacity': .25, 'stroke-width': 2 }, svg);
+});
+mount('s1b', (svg) => { svg.setAttribute('viewBox', '0 0 200 200'); defs(svg, 'a'); const hex = (r, cx, cy) => Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 3 * i - Math.PI / 6; return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); }).join(' '); el('polygon', { points: hex(92, 100, 100), fill: 'url(#ak)', stroke: EDGE, 'stroke-width': 3 }, svg); el('polygon', { points: hex(80, 100, 100), fill: 'none', stroke: 'url(#ar)', 'stroke-width': 6 }, svg); el('polygon', { points: '78,62 78,138 142,100', fill: 'url(#ar)', 'stroke-linejoin': 'round' }, svg); }, 58);
+
+/* ── 2. D MONOGRAM ── */
+function buildD(svg, gid) {
+  defs(svg, gid);
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  el('path', { d: 'M 66 44 L 66 156', stroke: 'url(#' + gid + 'r)', 'stroke-width': 26, 'stroke-linecap': 'round' }, svg);
+  el('path', { d: 'M 66 44 L 108 44 C 152 44 164 70 164 100 C 164 130 152 156 108 156 L 66 156', fill: 'none', stroke: 'url(#' + gid + 'r)', 'stroke-width': 26, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
+}
+mount('s2', (svg) => buildD(svg, 'b'));
+mount('s2b', (svg) => buildD(svg, 'b'), 58);
+
+/* ── 3. CINEMA FRAME D ── */
+function buildFrame(svg, gid) {
+  defs(svg, gid);
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  el('path', { d: 'M 44 40 L 44 26 L 70 26', stroke: 'url(#' + gid + 'r)', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' }, svg);
+  el('path', { d: 'M 156 40 L 156 26 L 130 26', stroke: 'url(#' + gid + 'r)', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' }, svg);
+  el('path', { d: 'M 44 160 L 44 174 L 70 174', stroke: 'url(#' + gid + 'r)', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' }, svg);
+  el('path', { d: 'M 156 160 L 156 174 L 130 174', stroke: 'url(#' + gid + 'r)', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' }, svg);
+  el('path', { d: 'M 72 52 L 72 148 L 112 148 C 148 148 158 124 158 100 C 158 76 148 52 112 52 Z', fill: 'url(#' + gid + 'r)' }, svg);
+  el('polygon', { points: '94,78 94,122 128,100', fill: '#0b0b0f' }, svg);
+}
+mount('s3', (svg) => buildFrame(svg, 'c'));
+mount('s3b', (svg) => buildFrame(svg, 'c'), 58);
+
+/* ── 4. TRI-BURST ── */
+function buildBurst(svg, gid) {
+  defs(svg, gid);
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  el('g', { transform: 'rotate(0 100 100)' }, svg);
+  el('path', { d: 'M 58 58 L 108 58 L 78 100 Z', fill: 'url(#' + gid + 'r)', opacity: .95 }, svg);
+  el('path', { d: 'M 118 52 L 152 52 L 92 140 L 76 140 Z', fill: 'url(#' + gid + 'r)', opacity: .8 }, svg);
+  el('path', { d: 'M 58 112 L 92 112 L 74 140 L 58 140 Z', fill: 'url(#' + gid + 'r)', opacity: .6 }, svg);
+  el('circle', { cx: 128, cy: 128, r: 0, fill: 'none' }, svg);
+}
+mount('s4', (svg) => buildBurst(svg, 'd'));
+mount('s4b', (svg) => buildBurst(svg, 'd'), 58);
+
+/* ── 5. WORDMARK DISC ── */
+function buildWord(svg, gid) {
+  defs(svg, gid);
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+  const t = el('text', { x: 100, y: 96, 'text-anchor': 'middle', 'font-family': 'Arial Black, Arial, sans-serif', 'font-weight': 900, 'font-size': 34, fill: '#ffffff', 'letter-spacing': 1 }, svg);
+  t.textContent = 'DEYM';
+  const t2 = el('text', { x: 100, y: 132, 'text-anchor': 'middle', 'font-family': 'Arial Black, Arial, sans-serif', 'font-weight': 900, 'font-size': 34, fill: 'url(#' + gid + 'r)', 'letter-spacing': 1 }, svg);
+  t2.textContent = 'FLIX';
+  el('circle', { cx: 100, cy: 158, r: 13, fill: 'url(#' + gid + 'r)' }, svg);
+  el('polygon', { points: '96,151 96,165 108,158', fill: '#0b0b0f' }, svg);
+}
+mount('s5', (svg) => buildWord(svg, 'e'));
+mount('s5b', (svg) => buildWord(svg, 'e'), 58);
+</script>
+</body>
+</html>

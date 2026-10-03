@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEYMFLIX — D Monogram × Video Context</title>
+<style>
+  :root { --red:#e50914; --bg:#0b0b0f; --panel:#131318; --line:#26262e; --txt:#f5f5f7; --dim:#8a8a94; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt); font-family:'Segoe UI', Arial, sans-serif; padding:28px 20px 60px; }
+  h1 { text-align:center; font-size:1.5rem; margin-bottom:6px; }
+  p.sub { text-align:center; color:var(--dim); margin-bottom:34px; font-size:.95rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:22px; max-width:1240px; margin:0 auto; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+  .stage { background:radial-gradient(120% 120% at 20% 0%, #1a1a22 0%, #0b0b0f 70%); border:1px solid var(--line); border-radius:10px; padding:22px; display:flex; align-items:center; justify-content:center; min-height:150px; gap:14px; flex-wrap:wrap; }
+  .stage.small svg { transform:scale(.45); }
+  h2 { font-size:1.05rem; }
+  h2 span { color:var(--red); }
+  .desc { color:var(--dim); font-size:.85rem; line-height:1.45; }
+  .footer-note { max-width:1240px; margin:26px auto 0; text-align:center; color:var(--dim); font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>Red D Monogram × video context — 4 fusions</h1>
+<p class="sub">Same bold D you picked, each carrying a real video/film cue. Big = app icon size, small = header/favicon size.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="stage" id="vA"></div>
+    <div class="stage small" id="vAb"></div>
+    <h2>A · D-Play <span>(counter = play button)</span></h2>
+    <p class="desc">The hole inside the D <em>is</em> a play triangle. Zero added elements — the cleanest possible fusion. Reads as "D" first, "play" a beat later. My pick for timeless.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="vB"></div>
+    <div class="stage small" id="vBb"></div>
+    <h2>B · Filmstrip D <span>(sprocket spine)</span></h2>
+    <p class="desc">Three film sprocket holes punched down the stem — the D becomes half letter, half strip of film. The most literal "cinema" texture; great detail at large sizes.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="vC"></div>
+    <div class="stage small" id="vCb"></div>
+    <h2>C · D + Play badge</h2>
+    <p class="desc">The original ring-D with a play-button badge docked at its corner — like a "now playing" notification dot. Most energetic of the four; strongest small-size contrast.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage" id="vD"></div>
+    <div class="stage small" id="vDb"></div>
+    <h2>D · The Full Reel <span>(filmstrip + play)</span></h2>
+    <p class="desc">Both at once: sprocket holes in the spine and the play counter in the bowl. Maximum storytelling, busiest composition — check the small render before choosing this one.</p>
+  </div>
+
+</div>
+<p class="footer-note">Pick a letter and I'll rebuild the entire brand set from it: favicon, header logo, 192/512 app icons, splash, share card.</p>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const RED = '#e50914', RED2 = '#ff3b45', DARK = '#0d0d12';
+function el(tag, attrs, parent) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function defs(svg, gid) {
+  const d = el('defs', {}, svg);
+  const g1 = el('linearGradient', { id: gid + 'r', x1: 0, y1: 0, x2: 1, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': RED2 }, g1);
+  el('stop', { offset: '1', 'stop-color': RED }, g1);
+  const g2 = el('linearGradient', { id: gid + 'k', x1: 0, y1: 0, x2: 0, y2: 1 }, d);
+  el('stop', { offset: '0', 'stop-color': '#26262e' }, g2);
+  el('stop', { offset: '1', 'stop-color': DARK }, g2);
+  return d;
+}
+function tile(svg, gid) {
+  el('rect', { x: 10, y: 10, width: 180, height: 180, rx: 42, fill: 'url(#' + gid + 'k)' }, svg);
+}
+function mount(id, build, size) {
+  const host = document.getElementById(id); if (!host) return;
+  const svg = el('svg', { viewBox: '0 0 200 200', width: size || 130, height: size || 130, 'aria-label': id });
+  build(svg); host.appendChild(svg);
+}
+
+/* D outline (filled) + optional knockout subpaths via evenodd */
+const D_FILL = 'M 60 42 L 104 42 C 152 42 167 68 167 100 C 167 132 152 158 104 158 L 60 158 Z';
+const PLAY_HOLE = 'M 92 78 L 92 122 L 126 100 Z';
+const HOLES = 'M 66 62 L 84 62 L 84 80 L 66 80 Z M 66 92 L 84 92 L 84 110 L 66 110 Z M 66 122 L 84 122 L 84 140 L 66 140 Z';
+
+/* A · D-Play — play triangle knocked out of the bowl */
+function buildA(svg) {
+  defs(svg, 'a'); tile(svg, 'a');
+  el('path', { d: D_FILL + ' ' + PLAY_HOLE, 'fill-rule': 'evenodd', fill: 'url(#ar)' }, svg);
+}
+
+/* B · Filmstrip D — sprocket holes down the stem */
+function buildB(svg) {
+  defs(svg, 'b'); tile(svg, 'b');
+  el('path', { d: D_FILL + ' ' + HOLES, 'fill-rule': 'evenodd', fill: 'url(#br)' }, svg);
+}
+
+/* C · ring-D + play badge */
+function buildC(svg) {
+  defs(svg, 'c'); tile(svg, 'c');
+  el('path', { d: 'M 66 44 L 66 156', stroke: 'url(#cr)', 'stroke-width': 26, 'stroke-linecap': 'round', fill: 'none' }, svg);
+  el('path', { d: 'M 66 44 L 104 44 C 148 44 160 70 160 100 C 160 130 148 156 104 156 L 66 156', fill: 'none', stroke: 'url(#cr)', 'stroke-width': 26, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
+  el('circle', { cx: 150, cy: 148, r: 25, fill: 'url(#cr)', stroke: DARK, 'stroke-width': 8 }, svg);
+  el('polygon', { points: '145,137 145,159 162,148', fill: DARK }, svg);
+}
+
+/* D · full reel — sprockets + play counter */
+function buildD2(svg) {
+  defs(svg, 'd'); tile(svg, 'd');
+  el('path', { d: D_FILL + ' ' + PLAY_HOLE + ' ' + HOLES, 'fill-rule': 'evenodd', fill: 'url(#dr)' }, svg);
+}
+
+mount('vA', buildA);  mount('vAb', buildA, 58);
+mount('vB', buildB);  mount('vBb', buildB, 58);
+mount('vC', buildC);  mount('vCb', buildC, 58);
+mount('vD', buildD2); mount('vDb', buildD2, 58);
+</script>
+</body>
+</html>

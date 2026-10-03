@@ -1,0 +1,229 @@
+/* ============================================================================
+   DEYMFLIX — Watch Party (rooms + voice + sync)
+   Panel + always-visible dock. Both are mounted INSIDE #playerContainer so
+   they stay on screen when the movie is fullscreen (our fullscreen host is
+   that container — see the reparenting in watch-party.js).
+   ========================================================================== */
+
+.wp-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Above the player's own chrome (bottom bar z 60), the poster/loading
+     backdrops and the ad overlay (z 500 / 2147483600 in embed mode) — the
+     party dock must stay reachable even while an ad plays in fullscreen. Kept
+     below the app's transient modals + toasts (2147483600+). */
+  z-index: 2147483200;
+  font-family: inherit;
+  /* The party UI sits in its own layer (it has to, to survive fullscreen), so
+     it would otherwise stay on screen after the player hides its controls.
+     This transition mirrors the player's own 0.25s chrome fade. */
+  transition: opacity .25s ease;
+}
+.wp-root > * { pointer-events: auto; }
+
+/* Controls hidden (or idle) → the dock fades away with them and stops
+   swallowing clicks, leaving a completely clean picture. An OPEN panel keeps
+   the whole layer awake: the viewer is actively reading it. */
+.wp-root.wp-faded { opacity: 0; }
+.wp-root.wp-faded > * { pointer-events: none; }
+
+/* ── bottom-bar trigger button (same size language as the other ctrl buttons) ── */
+.ctrl-btn-small.wp-btn { position: relative; }
+.ctrl-btn-small.wp-btn.active { color: #e50914; }
+.ctrl-btn-small.wp-btn .wp-dot {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #37d67a;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .55);
+  display: none;
+}
+.ctrl-btn-small.wp-btn.in-room .wp-dot { display: block; }
+
+/* ── panel ────────────────────────────────────────────────────────────────── */
+.wp-panel {
+  position: absolute;
+  right: 14px;
+  bottom: 78px;
+  width: min(340px, calc(100vw - 28px));
+  background: #0d0d10;
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .65);
+  padding: 14px;
+  color: #fff;
+  display: none;
+  box-sizing: border-box;
+}
+.wp-panel.open { display: block; }
+
+.wp-head { display: flex; align-items: center; gap: 12px; }
+.wp-head-icon {
+  width: 42px; height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, .10);
+  display: flex; align-items: center; justify-content: center;
+}
+.wp-head-icon svg { width: 20px; height: 20px; fill: #fff; }
+.wp-head-text { flex: 1 1 auto; min-width: 0; }
+.wp-title { font-size: 1.02rem; font-weight: 800; letter-spacing: .2px; }
+.wp-sub { font-size: .78rem; color: rgba(255, 255, 255, .55); margin-top: 2px; }
+.wp-close {
+  width: 30px; height: 30px;
+  flex: 0 0 30px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, .7);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.wp-close:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+
+.wp-now {
+  display: flex; align-items: center; gap: 12px;
+  margin: 14px 0 12px;
+  padding: 12px;
+  background: #131316;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 14px;
+}
+.wp-now-icon {
+  width: 34px; height: 34px;
+  flex: 0 0 34px;
+  border-radius: 9px;
+  background: #1e1e23;
+  display: flex; align-items: center; justify-content: center;
+}
+.wp-now-icon svg { width: 15px; height: 15px; fill: #fff; }
+.wp-now-label { font-size: .72rem; color: rgba(255, 255, 255, .5); margin-bottom: 3px; }
+.wp-now-value { font-size: .86rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.wp-btn-primary, .wp-btn-secondary {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 0;
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.wp-btn-primary { background: #fff; color: #0b0b0f; margin-bottom: 10px; }
+.wp-btn-primary:hover { background: #f0f0f0; }
+.wp-btn-primary svg { width: 19px; height: 19px; fill: #0b0b0f; }
+.wp-btn-secondary { background: #17171b; color: #fff; border: 1px solid rgba(255, 255, 255, .10); }
+.wp-btn-secondary:hover { background: #1e1e23; }
+.wp-btn-secondary svg { width: 19px; height: 19px; fill: #fff; }
+.wp-btn-primary:disabled, .wp-btn-secondary:disabled { opacity: .5; cursor: default; }
+
+.wp-join { display: none; margin-top: 4px; }
+.wp-join.open { display: block; }
+.wp-join-row { display: flex; gap: 8px; }
+.wp-code-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 12px;
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: inherit;
+}
+.wp-code-input:focus { outline: none; border-color: #e50914; }
+.wp-hint { font-size: .74rem; color: rgba(255, 255, 255, .5); margin-top: 10px; line-height: 1.45; }
+.wp-err { font-size: .78rem; color: #ff8b90; margin-top: 8px; min-height: 1em; }
+
+/* in-room view */
+.wp-room { display: none; }
+.wp-room.open { display: block; }
+.wp-room-code {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: #131316;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 14px;
+  padding: 12px;
+  margin: 12px 0;
+}
+.wp-room-code-val { font-size: 1.3rem; font-weight: 800; letter-spacing: 5px; }
+.wp-copy {
+  background: rgba(255, 255, 255, .1);
+  border: 0; border-radius: 9px;
+  color: #fff; font-size: .76rem; font-weight: 700;
+  padding: 8px 12px; cursor: pointer; font-family: inherit;
+}
+.wp-copy:hover { background: rgba(255, 255, 255, .18); }
+.wp-people { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.wp-person {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .86rem;
+}
+.wp-person-av {
+  width: 30px; height: 30px; flex: 0 0 30px;
+  border-radius: 50%;
+  background: #26262c;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 800; color: #fff;
+}
+.wp-person-name { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wp-person-mic { font-size: .78rem; color: rgba(255, 255, 255, .55); }
+.wp-person-mic.off { color: #ff8b90; }
+.wp-person-tag { font-size: .68rem; color: rgba(255, 255, 255, .4); }
+
+/* ── dock: mic + room pill (top-RIGHT, clear of the centred episode label) ── */
+.wp-dock {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px 7px 7px;
+  border-radius: 999px;
+  background: rgba(13, 13, 16, .92);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.wp-dock.open { display: flex; }
+.wp-mic {
+  width: 38px; height: 38px;
+  flex: 0 0 38px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+  color: #0b0b0f;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.wp-mic svg { width: 19px; height: 19px; fill: currentColor; }
+.wp-mic.muted { background: #e50914; color: #fff; }
+.wp-mic.connecting { background: #3a3a42; color: #fff; }
+.wp-dock-text { font-size: .78rem; font-weight: 700; letter-spacing: .4px; line-height: 1.2; }
+.wp-dock-sub { font-size: .68rem; font-weight: 500; color: rgba(255, 255, 255, .6); }
+.wp-dock-live {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #37d67a;
+  box-shadow: 0 0 0 3px rgba(55, 214, 122, .18);
+}
+.wp-dock-live.warn { background: #f5a623; box-shadow: 0 0 0 3px rgba(245, 166, 35, .18); }
+.wp-dock-people { font-size: .72rem; color: rgba(255, 255, 255, .7); }
+
+/* Phones: panel docks to the bottom of the player, dock stays small */
+@media (max-width: 560px) {
+  .wp-panel { right: 8px; left: 8px; width: auto; bottom: 66px; }
+  .wp-title { font-size: .95rem; }
+  .wp-dock { top: 8px; right: 8px; padding: 5px 10px 5px 5px; gap: 8px; }
+  .wp-mic { width: 34px; height: 34px; flex-basis: 34px; }
+}
