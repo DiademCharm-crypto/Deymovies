@@ -19,7 +19,10 @@
 // autoplay next episode (player.html), actionable-toast styling (style.css).
 // v9: TV mode (tv.js) only takes over keys on D-pad hardware now — PCs keep
 // arrow scrolling/seeking and Backspace; player shortcuts ignore Ctrl/Alt/Cmd.
-const CACHE = 'deymflix-v9';
+// v10: spider-web corner art removed; touch devices composite the fixed bars
+// instead of live-blurring them (Android scroll fix in theme-v2.css); phones
+// pick smaller poster sizes (app.js srcset); developer card reworded.
+const CACHE = 'deymflix-v10';
 const SHELL = [
   'index.html',
   'player.html',
