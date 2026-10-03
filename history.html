@@ -252,7 +252,8 @@
   <script src="reels-data.js?v=151.3"></script>
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
-  <script src="app.js?v=160.21"></script>
+    <script src="chinese-movies.js?v=1.0"></script>
+  <script src="app.js?v=160.22"></script>
   <script>
     let activeTab = 'movies';
 
@@ -316,6 +317,19 @@
       showToast('Removed from history');
     }
 
+    // The series card stands for the whole show — clearing it wipes EVERY
+    // saved episode, so an older episode can't resurface as the "latest".
+    function removeSeriesHistoryAll(baseId) {
+      let saved;
+      try { saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch (e) { saved = {}; }
+      Object.keys(saved).forEach(k => {
+        if (k === baseId || seriesBaseId(k) === baseId) delete saved[k];
+      });
+      try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(saved)); } catch (e) {}
+      renderTabContent();
+      showToast('Removed from history');
+    }
+
     function removeReelHistoryItem(id) {
       const history = getReelHistory();
       delete history[id];
@@ -370,37 +384,69 @@
     }
 
     // ── SERIES WATCH HISTORY ──
-    function seriesBaseId(id) { return id && id.includes('-ep') ? id.split('-ep')[0] : id; }
+    // ONE card per series, showing the FURTHEST episode reached: finish ep 1
+    // and the card shows ep 1; get to ep 2 and the same card moves to ep 2 —
+    // and so on. Episode keys are "<id>-s<n>-ep<m>" (legacy "<id>-ep<m>"; the
+    // plain "<id>" row written before season support = episode 1).
+    function seriesBaseId(id) {
+      if (!id) return id;
+      return String(id).replace(/-s\d+-ep\d+$/, '').replace(/-ep\d+$/, '');
+    }
+    function episodeRank(key) {
+      let m = /-s(\d+)-ep(\d+)$/.exec(String(key));
+      if (m) return parseInt(m[1], 10) * 1000 + parseInt(m[2], 10);
+      m = /-ep(\d+)$/.exec(String(key));
+      if (m) return 1000 + parseInt(m[1], 10);
+      return 0;
+    }
 
     function renderSeriesHistory(container) {
       let saved;
       try { saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch (e) { saved = {}; }
       const movieList = typeof movies !== 'undefined' ? movies : [];
-      const items = Object.values(saved)
-        .filter(item => {
-          // Episode entries use "seriesId-epN" — strip the suffix to find the series
-          const baseId = item.id.includes('-ep') ? item.id.split('-ep')[0] : item.id;
-          const movie = movieList.find(m => m.id === baseId);
-          return movie && movie.isSeries;
-        })
-        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
-      if (items.length === 0) {
+      // group every saved episode of a series under its base id, keep the one
+      // the viewer got furthest into (ties go to the most recently touched)
+      const byBase = {};
+      Object.keys(saved).forEach(key => {
+        const item = saved[key];
+        if (!item) return;
+        const baseId = seriesBaseId(key);
+        const movie = movieList.find(m => m.id === baseId);
+        if (!movie || !movie.isSeries) return;
+        const sm = /-s(\d+)-ep\d+$/.exec(key);
+        const em = /-ep(\d+)$/.exec(key);
+        const cand = {
+          item, baseId, rank: episodeRank(key),
+          season: sm ? sm[1] : '1',
+          ep: em ? em[1] : '1'
+        };
+        const prev = byBase[baseId];
+        if (!prev || cand.rank > prev.rank || (cand.rank === prev.rank && (cand.item.updatedAt || 0) > (prev.item.updatedAt || 0))) byBase[baseId] = cand;
+      });
+
+      const picks = Object.values(byBase).sort((a, b) => (b.item.updatedAt || 0) - (a.item.updatedAt || 0));
+      if (picks.length === 0) {
         container.innerHTML = '<div class="mylist-empty"><div class="mylist-empty-icon">📺</div><p>No series watch history yet.<br>Start watching a series and it will appear here.</p></div>';
         return;
       }
-      container.innerHTML = '<div class="mylist-grid">' + items.map(item => {
+      container.innerHTML = '<div class="mylist-grid">' + picks.map(pick => {
+        const item = pick.item;
         const pct = Math.min(100, Math.round(item.progress || 0));
-        const baseId = seriesBaseId(item.id);
+        const finished = !!item.finished || pct >= 95;
+        const seriesTitle = String(item.title || '').split(' - ')[0];
+        const epLabel = 'S' + pick.season + ' E' + pick.ep;
+        const badge = epLabel + (finished ? ' · Finished' : (pct > 0 ? ' · ' + pct + '% watched' : ''));
+        const href = 'player.html?id=' + encodeURIComponent(pick.baseId) + '&s=' + pick.season + '&ep=' + pick.ep;
         return `
-        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
-          <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
-          ${(item.finished || pct >= 95) ? '<div class="mylist-progress-badge">Finished</div>' : (pct > 0 ? `<div class="mylist-progress-badge">${pct}% watched</div>` : '')}
+        <div class="mylist-item" onclick="window.location.href='${href}'">
+          <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(seriesTitle)}" loading="lazy">
+          <div class="mylist-progress-badge">${sanitizeHTML(badge)}</div>
           <div class="mylist-progress" style="width: ${pct}%"></div>
           <div class="mylist-item-overlay">
-            <div class="mylist-item-title">${sanitizeHTML(item.title)}</div>
+            <div class="mylist-item-title">${sanitizeHTML(seriesTitle)}</div>
           </div>
-          <button class="mylist-remove-btn" onclick="event.stopPropagation(); removeSeriesHistory('${sanitizeHTML(item.id)}')">✕</button>
+          <button class="mylist-remove-btn" onclick="event.stopPropagation(); removeSeriesHistoryAll('${sanitizeHTML(pick.baseId)}')">✕</button>
         </div>
       `;
       }).join('') + '</div>';
