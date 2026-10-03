@@ -244,14 +244,17 @@
   //   return {};
   // };
 
-  // 13. Disable Service Workers (prevent caching attacks)
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(function (registrations) {
-      registrations.forEach(function (registration) {
-        registration.unregister();
-      });
-    });
-  }
+  // 13. Service workers are ALLOWED here (the site is an installable,
+  // offline-capable PWA). This block used to unregister every registration on
+  // each load, which fought app.js's own sw.js registration and tore down the
+  // offline shell. Offline caching is intentional; keep the worker alive.
+  // if ('serviceWorker' in navigator) {
+  //   navigator.serviceWorker.getRegistrations().then(function (registrations) {
+  //     registrations.forEach(function (registration) {
+  //       registration.unregister();
+  //     });
+  //   });
+  // }
 
   // 14. Prevent Window Resize (anti-fingerprinting)
   const originalResize = window.resizeTo;
