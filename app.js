@@ -12019,8 +12019,33 @@ document.addEventListener('click', (e) => {
 // firewall); Safari/Chrome browsers get the installable, offline-capable site.
 try {
   if ('serviceWorker' in navigator && !/DeymflixApp/i.test(navigator.userAgent || '')) {
+    // Instant updates: when a deploy's new sw.js finishes installing, tell it
+    // to activate now and reload ONCE on controllerchange, so a returning
+    // visitor sees the new version without a manual hard-refresh. A first-time
+    // visitor has no previous controller, so they are never reloaded.
+    var hadSWController = !!navigator.serviceWorker.controller;
+    var swReloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadSWController || swReloading) return;
+      swReloading = true;
+      window.location.reload();
+    });
+    var askSkipWaiting = function (worker) {
+      if (worker && navigator.serviceWorker.controller) {
+        worker.postMessage({ type: 'SKIP_WAITING' });
+      }
+    };
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        if (reg.waiting) askSkipWaiting(reg.waiting);
+        reg.addEventListener('updatefound', function () {
+          var sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', function () {
+            if (sw.state === 'installed') askSkipWaiting(sw);
+          });
+        });
+      }).catch(function () {});
     });
   }
 } catch (e) {}
