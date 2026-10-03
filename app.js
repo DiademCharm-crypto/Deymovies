@@ -10758,6 +10758,8 @@ function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
   card.className = 'poster-card';
   card.onclick = () => {
+    // First-party analytics: interest in a title (no cookies, no personal data).
+    try { if (window.DfxAnalytics) window.DfxAnalytics.titleView(movie); } catch (e) {}
     window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
   };
 
