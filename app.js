@@ -178,6 +178,7 @@ const movies = [
   },
   ...((typeof filipinoMovieData !== "undefined") ? filipinoMovieData : []),
   ...((typeof kdramaData !== "undefined") ? kdramaData : []),
+  ...((typeof chineseMovieData !== "undefined") ? chineseMovieData : []),
   { 
     id: "The Odyssey", 
     imdbId: "tt33764258", 
@@ -10710,6 +10711,49 @@ function getTotalEpisodeCount(seriesId) {
   } catch (e) { return null; }
 }
 
+// ── NEW EPISODE BADGES ───────────────────────────────────────────────────
+// The viewer's last-seen episode count is remembered per series. A card shows
+// the NEW badge only when the series gained episodes since that visit, so a
+// first-time visitor never sees a wall of "NEW" — only real updates do.
+const DFX_SEEN_EPISODES_KEY = 'deymflix_seen_episodes';
+function dfxEpisodeCount(seriesId) {
+  try {
+    if (typeof seriesData === 'undefined' || !Array.isArray(seriesData)) return null;
+    const series = seriesData.find(s => s.id === seriesId);
+    if (!series || !Array.isArray(series.seasons)) return null;
+    let count = 0;
+    series.seasons.forEach(season => { if (Array.isArray(season.episodes)) count += season.episodes.length; });
+    return count > 0 ? count : null;
+  } catch (e) { return null; }
+}
+function dfxSeenEpisodes() {
+  try { return JSON.parse(localStorage.getItem(DFX_SEEN_EPISODES_KEY) || '{}') || {}; } catch (e) { return {}; }
+}
+function dfxIsNewEpisodes(movie) {
+  try {
+    if (!movie || !movie.isSeries || !movie.id) return false;
+    const count = dfxEpisodeCount(movie.id);
+    if (!count) return false;
+    const seen = dfxSeenEpisodes()[movie.id];
+    return typeof seen === 'number' && count > seen;
+  } catch (e) { return false; }
+}
+// Called once the home cards have been painted: the badges just rendered are
+// "since last visit", so remember today's counts as seen.
+function dfxMarkEpisodesSeen() {
+  try {
+    if (typeof movies === 'undefined' || typeof seriesData === 'undefined') return;
+    const seen = dfxSeenEpisodes();
+    let dirty = false;
+    movies.forEach(m => {
+      if (!m || !m.isSeries || !m.id) return;
+      const count = dfxEpisodeCount(m.id);
+      if (count && seen[m.id] !== count) { seen[m.id] = count; dirty = true; }
+    });
+    if (dirty) localStorage.setItem(DFX_SEEN_EPISODES_KEY, JSON.stringify(seen));
+  } catch (e) {}
+}
+
 function createMovieCard(movie, rankNumber = null) {
   const card = document.createElement('div');
   card.className = 'poster-card';
@@ -10726,7 +10770,7 @@ function createMovieCard(movie, rankNumber = null) {
   //   still airing (default)     → "Updated to Ep N" (N = latest episode in seriesData)
   let qualityLabel = hasManualLink ? 'HD' : 'TRAILER';
   let qualityClass = hasManualLink ? 'quality-hd' : 'quality-trailer';
-  if (movie.isKdrama && movie.isSeries) {
+  if (movie.isSeries && (movie.isKdrama || movie.isChinese)) {
     if (movie.completed) {
       // Completed: show the episode count, e.g. "8 Episodes" (Netflix convention).
       // Falls back to "Complete" when no episode data exists yet.
@@ -10738,6 +10782,12 @@ function createMovieCard(movie, rankNumber = null) {
       qualityLabel = latest ? ('Updated to Ep. ' + latest) : 'Ongoing';
       qualityClass = 'quality-updated';
     }
+  }
+  // "NEW EP" outranks the status badge: the series gained episodes since this
+  // viewer's last visit (and only for that one visit — see dfxMarkEpisodesSeen).
+  if (dfxIsNewEpisodes(movie)) {
+    qualityLabel = 'NEW EP';
+    qualityClass = 'quality-new-ep';
   }
 
   const safeTitle = sanitizeHTML(movie.title);
@@ -11175,12 +11225,16 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAiReels();
     requestIdleCallback(() => {
       renderFilipinoMovies();
+      renderChinese();
       renderKdramas();
       requestIdleCallback(() => {
         renderAllMoviesGrid();
         renderBecauseYouWatched();
       });
     });
+    // Remember today's episode counts a beat after the badges painted: they
+    // mark "new since your last visit", not "new since this page loaded".
+    setTimeout(dfxMarkEpisodesSeen, 6000);
   }, { timeout: 500 });
 
   // Continue-watching cards are built inline (not via createMovieCard) —
@@ -11316,10 +11370,35 @@ function renderContinueWatching() {
     // season+episode, so the label can't drift from what actually plays.
     // Legacy entries without a season default to season 1 (what the player does).
     const epLabel = item._isEpisode && item._epNum ? ('S' + (item._season || 1) + ' E' + item._epNum) : '';
+    // Series cards carry the season box instead of a bare percent: how many
+    // episodes of the show are already finished out of the total — the same
+    // "3/12" reading a DVD box gives you. Movies keep the percent.
+    let seasonProgress = '';
+    if (item._isEpisode && item._baseId) {
+      const total = getTotalEpisodeCount(item._baseId);
+      if (total) {
+        let done = 0;
+        Object.keys(savedData).forEach(k => {
+          const e = savedData[k];
+          if (!e) return;
+          const base = k.replace(/-s\d+-ep\d+$/, '').replace(/-ep\d+$/, '');
+          if (base !== item._baseId) return;
+          if (e.finished || Number(e.progress) >= 95) done++;
+        });
+        // "Done" = episodes marked finished in the store, but never fewer than
+        // the ones this viewer must have passed to be sitting on this episode:
+        // watching E5 means E1-E4 already happened (Netflix reads it the same
+        // way). max() keeps both the stored truth and the sequential story.
+        const doneEstimate = Math.max(done, (item._epNum || 1) - 1);
+        seasonProgress = ' · ' + Math.min(doneEstimate, total) + '/' + total + ' eps';
+      }
+    }
     const pctTxt = Math.round(safeProgress) + '% watched';
     const badgeTxt = safeProgress >= 95
       ? 'Finished'
-      : (epLabel ? (safeProgress > 0 ? epLabel + ' · ' + pctTxt : epLabel) : (safeProgress > 0 ? pctTxt : ''));
+      : (epLabel
+          ? (seasonProgress ? epLabel + seasonProgress : (safeProgress > 0 ? epLabel + ' · ' + pctTxt : epLabel))
+          : (safeProgress > 0 ? pctTxt : ''));
     const badgeHTML = badgeTxt ? `<div class="mylist-progress-badge">${badgeTxt}</div>` : '';
 
     // Episode entries are saved as "Series - Episode 5 - Name". The badge now
@@ -11566,6 +11645,26 @@ function renderFilipinoMovies() {
   const displayList = filipinoMovies.slice(0, 10);
 
   displayList.forEach(movie => {
+    container.appendChild(createMovieCard(movie));
+  });
+}
+
+function renderChinese() {
+  const container = document.getElementById('chinese-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const chineseTitles = movies.filter(m => m.isChinese);
+  if (chineseTitles.length === 0) {
+    const section = container.closest('.content-section');
+    if (section) section.style.display = 'none';
+    return;
+  }
+  const section = container.closest('.content-section');
+  if (section) section.style.display = '';
+
+  // Newest releases first — the same ordering rule as the K-Drama row
+  dfxSortByNewest(chineseTitles).slice(0, 10).forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }
