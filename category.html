@@ -150,9 +150,11 @@
   <script src="reels-data.js?v=151.3"></script>
     <script src="filipino-movies.js?v=1.7"></script>
     <script src="kdramas.js?v=1.2"></script>
+    <script src="chinese-movies.js?v=1.0"></script>
     <script src="episodes.js?v=1.9"></script>
     <script src="kdrama-episode.js?v=1.1"></script>
-  <script src="app.js?v=160.21"></script>
+    <script src="chinese-series.js?v=1.0"></script>
+  <script src="app.js?v=160.22"></script>
   <script>
     let currentPage = 1;
     // Set on every render by dfxPageSize() below.
@@ -233,6 +235,12 @@
         // Newest-first, exactly like the All Movies listing below
         const kdramaList = typeof movies !== 'undefined' ? movies.filter(m => m.isKdrama) : [];
         itemsList = typeof dfxSortByNewest === 'function' ? dfxSortByNewest(kdramaList) : kdramaList;
+        const historyBtn = document.getElementById('btn-reel-history');
+        if (historyBtn) historyBtn.style.display = 'none';
+      } else if (categoryType === 'chinese') {
+        titleElement.textContent = 'Chinese Movies & Series';
+        const chineseList = typeof movies !== 'undefined' ? movies.filter(m => m.isChinese) : [];
+        itemsList = typeof dfxSortByNewest === 'function' ? dfxSortByNewest(chineseList) : chineseList;
         const historyBtn = document.getElementById('btn-reel-history');
         if (historyBtn) historyBtn.style.display = 'none';
       } else {
