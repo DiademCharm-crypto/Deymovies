@@ -532,6 +532,17 @@ body {
   border: 1px solid #ff9800;
 }
 
+/* NEW EP — this series gained episodes since the viewer's last visit.
+   Solid brand colour so it reads instantly against the outlined status
+   badges next to it (Complete / Updated to Ep N / HD). */
+.tag-badge-top-right.quality-new-ep {
+  background: linear-gradient(135deg, var(--primary-red), #7a0409);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(229, 9, 20, 0.4);
+}
+
 .tag-badge-top-right.quality-cam {
   background: rgba(0, 0, 0, 0.85);
   color: #ff9800;
