@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>DEYMFLIX - Stats (owner)</title>
+  <meta name="theme-color" content="#0B0B0F">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+  <link rel="stylesheet" href="style.css?v=160.6">
+  <link rel="stylesheet" href="theme-v2.css?v=1.3">
+  <style>
+    /* Scoped to this owner-only page so the public stylesheets stay untouched. */
+    body { padding: 28px 16px calc(40px + env(safe-area-inset-bottom, 0px)); }
+    .st-wrap { max-width: 980px; margin: 0 auto; }
+    .st-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+    .st-title { font-size: 1.5rem; font-weight: 800; letter-spacing: .3px; margin: 0; }
+    .st-title .r { color: #e50914; }
+    .st-sub { color: rgba(255,255,255,.55); font-size: .82rem; margin: 0 0 20px; }
+    .st-btn { background: #e50914; color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font-weight: 700; cursor: pointer; font-size: .85rem; }
+    .st-btn:hover { filter: brightness(1.1); }
+    .st-btn.ghost { background: rgba(255,255,255,.1); }
+
+    .st-card { background: rgba(20,20,24,.85); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    .st-card h3 { margin: 0 0 14px; font-size: .95rem; font-weight: 700; color: rgba(255,255,255,.85); letter-spacing: .4px; text-transform: uppercase; }
+
+    .st-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .st-kpi { background: rgba(20,20,24,.85); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 16px; }
+    .st-kpi-v { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.1; }
+    .st-kpi-l { font-size: .78rem; color: rgba(255,255,255,.7); margin-top: 4px; }
+    .st-kpi-s { font-size: .7rem; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+    .st-chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; }
+    .st-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+    .st-barwrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .st-bar { width: 100%; background: linear-gradient(180deg,#e50914,#7a0409); border-radius: 4px 4px 0 0; min-height: 0; }
+    .st-day { font-size: .6rem; color: rgba(255,255,255,.45); margin-top: 5px; white-space: nowrap; }
+    .st-cnt { font-size: .6rem; color: rgba(255,255,255,.75); }
+
+    .st-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .st-table th { text-align: left; color: rgba(255,255,255,.5); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .4px; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .st-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .st-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .st-dim { color: rgba(255,255,255,.45); }
+    .st-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .86rem; }
+    .st-none { color: rgba(255,255,255,.4); font-size: .85rem; margin: 0; }
+
+    .st-gate { max-width: 380px; margin: 12vh auto 0; text-align: center; }
+    .st-gate input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.4); color: #fff; font-size: .95rem; margin-bottom: 10px; }
+    .st-err { color: #e50914; font-size: .82rem; min-height: 1em; margin: 6px 0 0; }
+    .st-foot { color: rgba(255,255,255,.35); font-size: .75rem; text-align: center; margin-top: 22px; }
+    .st-foot a { color: rgba(255,255,255,.55); }
+  </style>
+</head>
+<body>
+
+  <!-- Gate (hidden once unlocked) -->
+  <div id="stats-gate" class="st-gate">
+    <h1 class="st-title">DEYM<span class="r">FLIX</span> Stats</h1>
+    <p class="st-sub">Owner dashboard</p>
+    <form id="stats-gate-form" autocomplete="off">
+      <input id="stats-pass" type="password" placeholder="Owner passphrase" autofocus>
+      <button class="st-btn" type="submit" style="width:100%">Unlock</button>
+      <p id="stats-gate-err" class="st-err"></p>
+    </form>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="stats-app" class="st-wrap" style="display:none">
+    <div class="st-head">
+      <h1 class="st-title">DEYM<span class="r">FLIX</span> Stats</h1>
+      <div>
+        <button id="stats-refresh" class="st-btn ghost" type="button">↻ Refresh</button>
+      </div>
+    </div>
+    <p class="st-sub">First-party, cookie-free counters from the site's own database. <span id="stat-stamp"></span></p>
+
+    <div id="stat-empty" class="st-card" style="display:none">
+      <h3>No data yet</h3>
+      <p class="st-none">The counters start filling once real visitors browse the live site. Audits and headless runs are deliberately excluded, so this stays empty until genuine traffic arrives.</p>
+    </div>
+
+    <div id="stat-kpis" class="st-kpis"></div>
+    <p id="stat-status" class="st-sub"></p>
+
+    <div class="st-card">
+      <h3>Views — last 14 days</h3>
+      <div id="stat-chart" class="st-chart"></div>
+    </div>
+
+    <div class="st-card">
+      <h3>Top titles</h3>
+      <div id="stat-titles"></div>
+    </div>
+
+    <div class="st-card">
+      <h3>Where visitors came from</h3>
+      <div id="stat-refs"></div>
+    </div>
+
+    <div class="st-card">
+      <h3>Top pages</h3>
+      <div id="stat-pages"></div>
+    </div>
+
+    <p class="st-foot">Aggregate counts only — no IPs, no cookies, no personal data. <a href="index.html">← Back to site</a></p>
+  </div>
+
+  <script src="config.js?v=2.0"></script>
+  <script src="stats.js?v=1.0"></script>
+</body>
+</html>
