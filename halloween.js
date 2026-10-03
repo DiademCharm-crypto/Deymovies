@@ -5,7 +5,7 @@
 //
 //   · swaps the brand logo + favicon for the jack-o'-lantern versions
 //   · an orange announcement strip above the first catalogue row
-//   · bats drifting across the top of the page, cobwebs in the bottom corners
+//   · bats drifting across the top of the page
 //   · a jack-o'-lantern greeting in the site footer
 //
 // Rules it keeps:
@@ -22,7 +22,7 @@
 (function () {
   'use strict';
 
-  var V = '1.2';   // bump when the halloween art changes (logo, icons, cards)
+  var V = '1.3';   // bump when the halloween art changes (logo, icons, cards)
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var VIDEO_FIRST = ['player.html', 'reels.html', 'offline.html', 'local-player.html', 'install-app-files.html'].indexOf(page) !== -1;
 
@@ -46,13 +46,6 @@
   }
 
   // 3 ── graphics
-  var WEBSVG = '<svg viewBox="0 0 100 100" aria-hidden="true">'
-    + '<g fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.9">'
-    + '<path d="M2 2 L98 30 M2 2 L90 60 M2 2 L60 92 M2 2 L30 99"/>'
-    + '<path d="M18 4 Q22 20 14 34 M34 6 Q40 30 26 56 M50 10 Q56 40 38 74"/>'
-    + '<circle cx="2" cy="2" r="3.4" fill="rgba(255,255,255,0.45)" stroke="none"/>'
-    + '</g></svg>';
-
   var BATSVG = '<svg viewBox="0 0 100 42" aria-hidden="true">'
     + '<path d="M50 8c5 0 8 6 8 12 0 3-1 6-3 8h-10c-2-2-3-5-3-8 0-6 3-12 8-12z" fill="#0d0714"/>'
     + '<path d="M50 14C42 6 30 2 14 6c8 4 12 9 14 14-6-1-11 0-16 3 8 1 14 4 18 8 5 4 12 5 20 0z" fill="#0d0714"/>'
@@ -79,16 +72,6 @@
     layer.id = 'hw-decor';
     layer.className = 'hw-decor';
     layer.setAttribute('aria-hidden', 'true');
-
-    // cobwebs in the bottom corners, out of the way of the navigation
-    var wl = document.createElement('div');
-    wl.className = 'hw-web left';
-    wl.innerHTML = WEBSVG;
-    var wr = document.createElement('div');
-    wr.className = 'hw-web right';
-    wr.innerHTML = WEBSVG;
-    layer.appendChild(wl);
-    layer.appendChild(wr);
 
     // bats: staggered lanes and speeds so the sky never looks like a loop
     var bats = [
@@ -119,7 +102,7 @@
     strip.className = 'hw-ribbon';
     strip.innerHTML = '<span class="hw-flicker">🎃</span>'
       + '<span>It&rsquo;s Halloween on DEYMFLIX &mdash; spooky-season movies, series and K-drama, still free</span>'
-      + '<span class="hw-flicker">🕸️</span>';
+      + '<span class="hw-flicker">🦇</span>';
     // Before <main>, never inside it: explore / mylist re-render their main's
     // innerHTML and would wipe a child. On the home page there is no <main>,
     // so the strip lands between the hero and the first catalogue row.
