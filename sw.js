@@ -22,7 +22,9 @@
 // v10: spider-web corner art removed; touch devices composite the fixed bars
 // instead of live-blurring them (Android scroll fix in theme-v2.css); phones
 // pick smaller poster sizes (app.js srcset); developer card reworded.
-const CACHE = 'deymflix-v10';
+// v11: Chinese movies & series (chinese-movies.js + chinese-series.js), CW
+// season progress, NEW EP badges, history shows the furthest episode.
+const CACHE = 'deymflix-v11';
 const SHELL = [
   'index.html',
   'player.html',
@@ -37,6 +39,8 @@ const SHELL = [
   'app.js',
   'episodes.js',
   'kdrama-episode.js',
+  'chinese-movies.js',
+  'chinese-series.js',
   'tv.js',
   'manifest.json',
   'favicon.svg',
