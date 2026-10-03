@@ -2212,3 +2212,66 @@ html.dfx-app body { padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   font-size: 0.72rem;
   color: #9a9aa3;
 }
+
+/* ============================================
+   HOVER PREVIEW — clean video + Netflix-style meta row (v13)
+   The trailer plays with NO YouTube title bar or overlay text: the embed is
+   youtube-nocookie with controls/annotations/related off, and the top strip
+   where YouTube still paints its title is cropped away here.
+   ============================================ */
+.hover-preview .hp-video {
+  overflow: hidden;
+}
+/* Crop the residual YouTube top chrome. The clip-path shorthand resets: top is
+   set below. */
+.hover-preview .hp-video iframe {
+  height: calc(100% + 46px) !important;
+  clip-path: inset(46px 0 0 0);
+}
+/* No words inside the video box, ever */
+.hover-preview .hp-video .hp-loading { display: none !important; }
+
+/* Meta row: ★ rating · match% · year · country */
+.hover-preview .hp-rating {
+  color: #f5c518;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hover-preview .hp-rating:empty { display: none; }
+.hover-preview .hp-country { white-space: nowrap; }
+.hover-preview .hp-country:empty { display: none; }
+.hover-preview .hp-match,
+.hover-preview .hp-year,
+.hover-preview .hp-country { white-space: nowrap; }
+.hover-preview .hp-meta { flex-wrap: wrap; row-gap: 4px; }
+/* Dot separators between meta items that are actually present */
+.hover-preview .hp-meta > span:not(:empty) ~ span:not(:empty)::before {
+  content: '·';
+  color: rgba(255, 255, 255, 0.45);
+  margin-right: 10px;
+}
+
+/* Play pill + round add button (reference: white "▶ Play" + "+") */
+.hover-preview .hp-play {
+  width: auto !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  gap: 8px;
+  border-radius: 999px !important;
+}
+.hover-preview .hp-play .hp-play-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+.hover-preview .hp-add {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50%;
+}
+/* Small screens: keep the pill compact */
+@media (hover: none) and (pointer: coarse) {
+  .hover-preview .hp-play { height: 32px !important; padding: 0 14px !important; }
+  .hover-preview .hp-play .hp-play-label { font-size: 0.8rem; }
+  .hover-preview .hp-add { width: 32px !important; height: 32px !important; }
+}
