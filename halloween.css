@@ -13,9 +13,9 @@
      · candlelit night: deep purple-black base, pumpkin-orange as the accent
      · red is retired for the season — orange takes its place everywhere the
        site used --primary-red (buttons, dots, badges, hovers)
-     · a few friendly graphics: cobwebs on the corners, bats drifting across
-       the sky, jack-o'-lanterns at the footer (all from halloween.js, all
-       pointer-events:none, all disabled under prefers-reduced-motion)
+     · a few friendly graphics: bats drifting across the sky, jack-o'-lanterns
+       at the footer (all from halloween.js, all pointer-events:none, all
+       disabled under prefers-reduced-motion)
      · the player and reels pages stay clean — video first, theme second
    ══════════════════════════════════════════════════════════════════════════ */
 
@@ -166,19 +166,7 @@ html.halloween .row-card:hover {
   contain: strict;
 }
 
-/* cobwebs: bottom corners, so they never fight the navigation bar */
-.hw-web {
-  position: absolute;
-  bottom: 0;
-  width: 190px;
-  height: 190px;
-  opacity: 0.5;
-}
-
-.hw-web.left { left: 0; transform: scaleY(-1); }
-.hw-web.right { right: 0; transform: rotate(180deg); }
-
-.hw-web svg,
+/* bats: the only free-flying decoration — no cobwebs anywhere on the page */
 .hw-bat svg {
   display: block;
   width: 100%;
@@ -284,7 +272,6 @@ html.halloween .row-card:hover {
 
 /* ── 7. MOTION / SMALL SCREENS ──────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .hw-web { width: 120px; height: 120px; opacity: 0.4; bottom: 76px; }
   .hw-greeting { font-size: 0.78rem; gap: 8px; }
   .hw-greeting svg { width: 26px; height: 26px; }
   .hw-ribbon { font-size: 0.74rem; padding: 7px 10px; }
