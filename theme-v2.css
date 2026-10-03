@@ -643,3 +643,40 @@ html {
   .horizontal-scroll img { transition: none !important; opacity: 1 !important; }
   #dfx-install-banner { transition: none !important; }
 }
+
+/* ── 15. TOUCH DEVICES — COMPOSITE, DON'T RE-BLUR ────────────────────────
+   backdrop-filter re-renders its backdrop on every scroll frame. On Android
+   that bill is paid by the two fixed bars (top nav, bottom nav) plus every
+   badge that scrolls past, and it is the biggest single source of scroll
+   jank on a phone. On touch hardware every glass surface drops to its solid
+   tint instead — within a shade of the desktop look, but the page then
+   scrolls on the compositor instead of repainting. Desktop browsers (and
+   touch-screen laptops whose primary pointer is a mouse) keep the glass. */
+@media (pointer: coarse), (hover: none) {
+  .top-nav,
+  .bottom-nav,
+  .search-input-wrapper,
+  .search-suggestions-box,
+  .header-request-btn,
+  .hero-kicker,
+  .hero-info-btn,
+  .see-all-link,
+  .rank-badge-box,
+  .tag-badge-top-right,
+  .reel-badge-tag,
+  .mylist-progress-badge,
+  .remove-continue-btn,
+  #dfx-install-banner {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* the tint the blur was sitting on, just opaque enough to read while the
+     page moves underneath it */
+  .top-nav {
+    background: linear-gradient(180deg, rgba(7, 8, 11, 0.98) 0%, rgba(7, 8, 11, 0.9) 62%, transparent 100%);
+  }
+  .bottom-nav { background: rgba(14, 16, 22, 0.96); }
+  .search-input-wrapper { background: rgba(25, 25, 25, 0.94); }
+  .remove-continue-btn { background: rgba(0, 0, 0, 0.72); }
+}
