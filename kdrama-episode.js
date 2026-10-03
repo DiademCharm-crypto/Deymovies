@@ -556,20 +556,12 @@ const kdramaSeriesData = [
       {
         seasonNumber: 1,
         episodes: [
-          { episodeNumber: 1, title: "Episode 1", embedUrl: "cos:tv/314939/1/1" },
-          { episodeNumber: 2, title: "Episode 2", embedUrl: "cos:tv/314939/1/2" },
-          { episodeNumber: 3, title: "Episode 3", embedUrl: "cos:tv/314939/1/3" },
-          { episodeNumber: 4, title: "Episode 4", embedUrl: "cos:tv/314939/1/4" },
-          { episodeNumber: 5, title: "Episode 5", embedUrl: "cos:tv/314939/1/5" },
-          { episodeNumber: 6, title: "Episode 6", embedUrl: "cos:tv/314939/1/6" },
-          { episodeNumber: 7, title: "Episode 7", embedUrl: "cos:tv/314939/1/7" },
-          { episodeNumber: 8, title: "Episode 8", embedUrl: "cos:tv/314939/1/8" },
-          { episodeNumber: 9, title: "Episode 9", embedUrl: "cos:tv/314939/1/9" },
-          { episodeNumber: 10, title: "Episode 10", embedUrl: "cos:tv/314939/1/10" },
-          { episodeNumber: 11, title: "Episode 11", embedUrl: "cos:tv/314939/1/11" },
-          { episodeNumber: 12, title: "Episode 12", embedUrl: "cos:tv/314939/1/12" },
-          { episodeNumber: 13, title: "Episode 13", embedUrl: "cos:tv/314939/1/13" },
-          { episodeNumber: 14, title: "Episode 14", embedUrl: "cos:tv/314939/1/14" }
+          { episodeNumber: 1, title: "Episode 1", embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/K-DRAMA/A+Love+Other+Than+Yours/Dive+into+You+S01E01+-+MkvDrama.mp4" },
+          { episodeNumber: 2, title: "Episode 2", embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/K-DRAMA/A+Love+Other+Than+Yours/Dive+into+You+S01E02+-+MkvDrama.net.mp4cos:tv/314939/1/2" },
+          { episodeNumber: 3, title: "Episode 3", embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/K-DRAMA/A+Love+Other+Than+Yours/Dive+into+You+S01E03-+MkvDrama.net.mp4" },
+          { episodeNumber: 4, title: "Episode 4", embedUrl: "https://deymflix01.s3.us-east-005.backblazeb2.com/K-DRAMA/A+Love+Other+Than+Yours/Dive+into+You+S01E04+-+MkvDrama.mp4" },
+          
+          
         ]
       }
     ]
