@@ -22,9 +22,9 @@
 }
 .wp-root > * { pointer-events: auto; }
 
-/* Controls hidden (or idle) → the dock fades away with them and stops
-   swallowing clicks, leaving a completely clean picture. An OPEN panel keeps
-   the whole layer awake: the viewer is actively reading it. */
+/* Controls hidden (or idle) → the WHOLE party layer (dock + panel, open or
+   not) fades away with them and stops swallowing clicks, leaving a completely
+   clean picture. Mouse move / tap brings it all back. */
 .wp-root.wp-faded { opacity: 0; }
 .wp-root.wp-faded > * { pointer-events: none; }
 
