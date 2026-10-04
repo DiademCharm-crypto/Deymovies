@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DFX PROBE</title>
+<style>
+  html,body{margin:0;background:#000;color:#0f0}
+  pre{padding:10px;font:700 21px/1.35 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<pre id="out">PROBE RUNNING …</pre>
+<script>
+(async function () {
+  var L = [];
+  var out = document.getElementById('out');
+  function log(s) { try { console.log('DFXPROBE ' + s); } catch (e) {} }
+  function add(k, v) {
+    var line = k + '=' + v;
+    L.push(line);
+    out.textContent = L.join('\n');
+    log(line);
+  }
+  log('BEGIN');
+  try {
+    add('UA', navigator.userAgent);
+    add('UA_APP', /DeymflixApp/i.test(navigator.userAgent) ? 'yes' : 'NO');
+    add('VPX', window.innerWidth + 'x' + window.innerHeight + ' dpr' + window.devicePixelRatio);
+
+    // ── service worker / cache state ──
+    var ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+    add('SW_CTRL', ctrl ? String(ctrl.scriptURL).replace(/^https?:\/\//, '') : 'none');
+    var regs = [];
+    try { regs = await navigator.serviceWorker.getRegistrations(); } catch (e) {}
+    add('SW_REGS', regs.length);
+    regs.forEach(function (r, i) {
+      add('SW_REG' + i, 'active=' + (r.active ? 'y' : 'n') +
+        ' waiting=' + (r.waiting ? 'y' : 'n') +
+        ' installing=' + (r.installing ? 'y' : 'n'));
+    });
+    var ck = [];
+    try { ck = await caches.keys(); } catch (e) {}
+    add('CACHES', ck.join(',') || 'none');
+
+    // ── what the network serves for app.js right now ──
+    try {
+      var fresh = await (await fetch('/app.js?_p=' + Date.now(), { cache: 'no-store' })).text();
+      add('LIVE_APPJS_BYTES', fresh.length);
+      add('LIVE_APPJS_ME', fresh.indexOf('installMeNavItem') !== -1 ? 'yes' : 'NO');
+      add('LIVE_APPJS_VER', (/"DFX_APP_JS"[^,]{0,40}/.exec(fresh) || ['none'])[0]);
+    } catch (e) { add('LIVE_APPJS_ERR', e.message); }
+
+    // ── what the reported app.js actually executes: real page in an iframe ──
+    var f = document.createElement('iframe');
+    f.style.cssText = 'position:fixed;left:0;top:0;width:360px;height:812px;border:0;background:#111;opacity:0.02;z-index:-1';
+    document.body.appendChild(f);
+    var loaded = await new Promise(function (res) {
+      var t = setTimeout(function () { res(false); }, 15000);
+      f.onload = function () { clearTimeout(t); setTimeout(function () { res(true); }, 3500); };
+      f.src = '/index.html?_p=' + Date.now();
+    });
+    add('IFRAME_LOAD', loaded ? 'yes' : 'TIMEOUT');
+    if (loaded) {
+      var w = f.contentWindow, d = f.contentDocument;
+      add('IFRAME_HTMLCLASS', d.documentElement.className || 'none');
+      add('IFRAME_ISAPP', w.DFX_IS_APP ? 'yes' : 'no');
+      var items = [].slice.call(d.querySelectorAll('.bottom-nav-item'));
+      add('IFRAME_NAVCOUNT', items.length);
+      add('IFRAME_NAVLABELS', [].slice.call(d.querySelectorAll('.bottom-nav-label')).map(function (n) { return n.textContent.trim(); }).join(',') || 'none');
+      var rects = items.map(function (n) {
+        var r = n.getBoundingClientRect();
+        var cs = getComputedStyle(n);
+        return n.getAttribute('data-page') + '@' + Math.round(r.left) + '+' + Math.round(r.width) + 'disp=' + cs.display;
+      });
+      add('IFRAME_RECTS', rects.join(' '));
+      var ul = d.querySelector('.bottom-nav-items');
+      if (ul) {
+        var ur = ul.getBoundingClientRect();
+        add('IFRAME_UL', 'left' + Math.round(ur.left) + ' w' + Math.round(ur.width) + ' scrollW' + ul.scrollWidth + ' cw' + ul.clientWidth);
+      }
+      var cw = d.getElementById('continue-watching-section');
+      add('IFRAME_CW', cw ? (getComputedStyle(cw).display === 'none' || cw.hasAttribute('hidden') ? 'HIDDEN' : 'shown') : 'absent');
+      add('IFRAME_MEBTN', d.querySelector('[data-page="me"]') ? 'PRESENT' : 'ABSENT');
+    }
+  } catch (e) {
+    add('FATAL', (e && e.message) || String(e));
+  }
+  log('END');
+})();
+</script>
+</body>
+</html>
