@@ -480,12 +480,28 @@ public class LocalPlayer85 {
             }
             if (subLang == 2) {
                 if (ph != null) return ph;
-                return eng != null ? eng : (named != null && named.exists() ? named : plain.exists() ? plain : null);
+                if (eng != null) return eng;
+                if (named != null && named.exists()) return named;
+                if (plain.exists()) return plain;
+                return cachedFallback();
             }
             if (eng != null) return eng;
             if (ph != null) return ph;
             if (named != null && named.exists()) return named;
-            return plain.exists() ? plain : null;
+            if (plain.exists()) return plain;
+            return cachedFallback();
+        }
+
+        // Nothing beside the movie? Fall back to the subtitle cache the ONLINE
+        // player filled for this title (DlSpeed85.cacheSubsForTitle) — a download
+        // that missed its sidecar still shows subtitles instead of
+        // "No subtitle file for this title yet".
+        private File cachedFallback() {
+            try {
+                File c = DlSpeed85.cachedSubFor(ui.act, title85, subLang);
+                if (c != null && c.exists() && c.length() > 0) return c;
+            } catch (Exception e) { }
+            return null;
         }
 
         // ONLINE mode: subtitle sidecars live in the same cache folder the
