@@ -57,7 +57,7 @@ public class DlUpdate85 {
     // (PackageManager), so Sketchware's "App Version" setting is the single
     // source of truth: whatever you set there is what gets compared against
     // app-update.json. No more second number to maintain.
-    public static final String CURRENT_VERSION = "1.6";
+    public static final String CURRENT_VERSION = "1.7";
 
     private static final String MANIFEST_URL =
             "https://deymflix.eu.cc/app-update.json";
