@@ -30,7 +30,7 @@
 // v14: hover-preview trailers play clean (YouTube chrome cropped away), the
 // stats dashboard is owner-gated by the database rules (token) with a realtime
 // stream, and a visible in-app notice announces a downloaded update.
-// v19: app-only Me screen (apponly.js v1.1) (me.html + apponly.js), app Download settings and
+// v19: app-only Me screen (apponly.js v1.2) (me.html + apponly.js), app Download settings and
 // the app-side Watch Party mic permission; watch-party.js asks the shell for
 // the microphone before getUserMedia.
 // v15: Watch Party — rooms + peer-to-peer voice with a mute/unmute mic and
