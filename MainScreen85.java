@@ -85,6 +85,7 @@ public class MainScreen85 {
         // first release. The gate is a non-dismissible branded screen with a
         // one-tap shortcut to the exact Android switch. boot() only runs
         // after the gate passes.
+        log85("app", "start v" + versionName85(act) + " (code " + versionCode85(act) + ")");
         runFirstLaunchGates(act, new Runnable() { @Override public void run() {
             MainScreen85 m = new MainScreen85(act);
             INSTANCES.put(act, m);
@@ -654,6 +655,47 @@ public class MainScreen85 {
                 customViewCallback = null;
                 exitAppFullscreen();
             }
+
+            // ── v1.7 -- MIC / MEDIA PERMISSION GRANT (Watch Party voice) ──
+            // The site asks for the microphone through getUserMedia while the
+            // Watch Party is live. A WebView routes that request HERE; if it
+            // is never answered the request dies silently and voice chat just
+            // does not work -- which is exactly what happened before 1.7.
+            // Policy: only our own pages may capture, and only AUDIO.
+            @Override
+            public void onPermissionRequest(final android.webkit.PermissionRequest request) {
+                try {
+                    String origin = request.getOrigin() == null ? "" : request.getOrigin().toString();
+                    if (!isOurCaptureOrigin(origin)) {
+                        log85("mic", "capture denied for " + origin);
+                        request.deny();
+                        return;
+                    }
+                    java.util.ArrayList<String> want = new java.util.ArrayList<String>();
+                    String[] res = request.getResources();
+                    for (int i = 0; res != null && i < res.length; i++) {
+                        if (android.webkit.PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(res[i])) want.add(res[i]);
+                    }
+                    if (want.isEmpty()) { request.deny(); return; }
+                    if (!hasMic85(act)) {
+                        // Keep the live request, ask Android, and grant the
+                        // moment the user allows (the poll below) -- so a
+                        // single tap on the party's mic button is enough.
+                        pendingWebMic85 = request;
+                        askMic85(act);
+                        return;
+                    }
+                    request.grant(want.toArray(new String[0]));
+                    log85("mic", "audio capture granted to " + origin);
+                } catch (Throwable t) {
+                    try { request.deny(); } catch (Throwable t2) { }
+                }
+            }
+
+            @Override
+            public void onPermissionRequestCanceled(android.webkit.PermissionRequest request) {
+                if (pendingWebMic85 == request) pendingWebMic85 = null;
+            }
         });
 
         // -- 6) Swipe-to-refresh --
@@ -701,9 +743,11 @@ public class MainScreen85 {
         purgeOldDlMeta86();
 
         // -- 9) Load the site --
+        log85("net", networkLabel85(act));
         if (isNetworkAvailable()) {
             wv.loadUrl("https://deymflix.eu.cc/index.html");
         } else {
+            log85("net", "offline at boot -- bundled page");
             wv.loadUrl("file:///android_asset/offline.html");
         }
 
@@ -1333,6 +1377,7 @@ public class MainScreen85 {
                     String use = url == null ? "" : url;
                     if (use.startsWith("blob:")) use = url2 == null ? "" : url2;
                     if (use.length() == 0) return; // nothing usable: page keeps playing
+                    log85("player", "native player: " + (title == null ? "" : title));
                     launchNativePlayer(use, title);
                 }});
             }
@@ -1356,7 +1401,322 @@ public class MainScreen85 {
                     }
                 }});
             }
+
+            // ══ v1.7 APP PANEL (used by me.html inside the app only) ══
+            // Ask for the microphone up-front (the party calls this right
+            // before getUserMedia so Android's dialog appears in context).
+            @android.webkit.JavascriptInterface
+            public void requestMic() {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try { askMic85(act); } catch (Throwable t) { }
+                }});
+            }
+            @android.webkit.JavascriptInterface
+            public boolean hasMic() {
+                return hasMic85(act);
+            }
+            // Download settings (quality + Wi-Fi only) live natively so the
+            // engine, the downloads screen and the site all read one value.
+            @android.webkit.JavascriptInterface
+            public String getDownloadPrefs() {
+                return downloadPrefsJson(act);
+            }
+            @android.webkit.JavascriptInterface
+            public void setDownloadPrefs(final String quality, final boolean wifiOnly) {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try {
+                        appPrefs(act).edit()
+                                .putString("dl_quality", quality == null ? "auto" : quality)
+                                .putBoolean("dl_wifi_only", wifiOnly).apply();
+                        log85("prefs", "download quality=" + (quality == null ? "auto" : quality)
+                                + " wifiOnly=" + wifiOnly);
+                    } catch (Throwable t) { }
+                }});
+            }
+            // Diagnostics: everything a support reply needs, in one string.
+            @android.webkit.JavascriptInterface
+            public String getDiagnostics(final String extra) {
+                try { return diagnosticsJson(act, extra); } catch (Throwable t) { return "{}"; }
+            }
+            @android.webkit.JavascriptInterface
+            public String getLogs() {
+                try { return logsText(); } catch (Throwable t) { return ""; }
+            }
+            @android.webkit.JavascriptInterface
+            public void copyText(final String label, final String text) {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try { copy85(act, label, text); } catch (Throwable t) { }
+                }});
+            }
+            // The phone's own Google accounts (used by "Log in with Google"
+            // in the app's sign-in screen -- no password typing, no popup).
+            @android.webkit.JavascriptInterface
+            public String getGoogleAccounts() {
+                try { return googleAccountsJson(act); } catch (Throwable t) { return "[]"; }
+            }
+            @android.webkit.JavascriptInterface
+            public String getAppInfo() {
+                try { return appInfoJson(act); } catch (Throwable t) { return "{}"; }
+            }
+            // The JS console, mirrored into the diagnostics log so a copied
+            // report shows page errors too.
+            @android.webkit.JavascriptInterface
+            public void log(final String tag, final String msg) {
+                try { log85(tag == null ? "js" : ("js:" + tag), msg == null ? "" : msg); } catch (Throwable t) { }
+            }
         };
+    }
+
+    // =======================================================================
+    //  v1.7 -- APP PANEL BACKEND
+    //  mic permission, download prefs, diagnostics log, Google accounts
+    // =======================================================================
+    // Nothing in this section may ever throw into the WebView: every entry
+    // point is wrapped and answers with a safe default instead.
+    private static final String APP_PREFS85 = "deymflix_prefs";
+    public static final int REQ_MIC85 = 4103;
+    private static volatile android.webkit.PermissionRequest pendingWebMic85 = null;
+    private static final java.util.ArrayDeque<String> LOG85 = new java.util.ArrayDeque<String>();
+    private static final Object LOG_LOCK85 = new Object();
+
+    private static android.content.SharedPreferences appPrefs(Context c) {
+        return c.getApplicationContext().getSharedPreferences(APP_PREFS85, 0);
+    }
+
+    public static String dlQuality85(Context c) {
+        try {
+            String q = appPrefs(c).getString("dl_quality", "auto");
+            return (q == null || q.length() == 0) ? "auto" : q;
+        } catch (Throwable t) { return "auto"; }
+    }
+
+    public static boolean wifiOnly85(Context c) {
+        try { return appPrefs(c).getBoolean("dl_wifi_only", false); } catch (Throwable t) { return false; }
+    }
+
+    // "On mobile data" -- isActiveNetworkMetered covers mobile, metered
+    // hotspots and Wi-Fi-without-internet fallbacks in one call.
+    public static boolean isMetered85(Context c) {
+        try {
+            android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                    c.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return false;
+            return cm.isActiveNetworkMetered();
+        } catch (Throwable t) { return false; }
+    }
+
+    // True while a download must NOT start (Wi-Fi-only on + mobile data).
+    public static boolean wifiHold85(Context c) {
+        return wifiOnly85(c) && isMetered85(c);
+    }
+
+    public static String downloadPrefsJson(Context c) {
+        return "{\"quality\":" + jesc85(dlQuality85(c))
+                + ",\"wifiOnly\":" + wifiOnly85(c)
+                + ",\"metered\":" + isMetered85(c) + "}";
+    }
+
+    // ---- diagnostics log ring (memory only: nothing is sent anywhere until
+    //      the user taps "Copy logs" and shares the text themselves) ----
+    public static void log85(String tag, String msg) {
+        try {
+            String when = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US)
+                    .format(new java.util.Date());
+            String line = when + "  " + (tag == null ? "app" : tag) + "  "
+                    + (msg == null ? "" : msg);
+            synchronized (LOG_LOCK85) {
+                LOG85.addLast(line);
+                while (LOG85.size() > 400) LOG85.removeFirst();
+            }
+        } catch (Throwable t) { }
+    }
+
+    private static String logsText() {
+        StringBuilder sb = new StringBuilder();
+        synchronized (LOG_LOCK85) {
+            for (String l : LOG85) sb.append(l).append("\r\n");
+        }
+        return sb.toString();
+    }
+
+    private static String jesc85(String s) {
+        if (s == null) return "\"\"";
+        StringBuilder sb = new StringBuilder("\"");
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '"') sb.append("\\\"");
+            else if (ch == '\\') sb.append("\\\\");
+            else if (ch == '\n') sb.append("\\n");
+            else if (ch == '\r') sb.append("");
+            else if (ch < ' ') sb.append(' ');
+            else sb.append(ch);
+        }
+        return sb.append("\"").toString();
+    }
+
+    public static String versionName85(Context c) {
+        try {
+            return c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionName;
+        } catch (Throwable t) { return DlUpdate85.CURRENT_VERSION; }
+    }
+
+    public static int versionCode85(Context c) {
+        try {
+            return c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionCode;
+        } catch (Throwable t) { return 0; }
+    }
+
+    public static String networkLabel85(Context c) {
+        try {
+            android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                    c.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return "unknown";
+            android.net.NetworkInfo ni = cm.getActiveNetworkInfo();
+            if (ni == null || !ni.isConnected()) return "offline";
+            String t = ni.getTypeName() == null ? "" : ni.getTypeName();
+            String sub = ni.getSubtypeName() == null ? "" : ni.getSubtypeName();
+            return (t + " " + sub).trim() + (cm.isActiveNetworkMetered() ? " (metered)" : " (unmetered)");
+        } catch (Throwable t) { return "unknown"; }
+    }
+
+    private static String appInfoJson(Context c) {
+        return "{\"version\":" + jesc85(versionName85(c))
+                + ",\"code\":" + versionCode85(c)
+                + ",\"package\":" + jesc85(c.getPackageName())
+                + ",\"android\":" + jesc85(String.valueOf(android.os.Build.VERSION.SDK_INT))
+                + ",\"device\":" + jesc85(android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL) + "}";
+    }
+
+    // Full diagnostics report: build info + network + storage + prefs + the
+    // log ring. `extra` is whatever the page adds (route, last error, ...).
+    public static String diagnosticsJson(Activity act, String extra) {
+        StringBuilder sb = new StringBuilder("{");
+        sb.append("\"app\":").append(appInfoJson(act)).append(",");
+        sb.append("\"network\":").append(jesc85(networkLabel85(act))).append(",");
+        sb.append("\"prefs\":").append(downloadPrefsJson(act)).append(",");
+        sb.append("\"micGranted\":").append(hasMic85(act)).append(",");
+        long free = 0L;
+        try { free = DlSpeed85.freeBytes(); } catch (Throwable t) { free = -1L; }
+        sb.append("\"freeBytes\":").append(free).append(",");
+        int rows = 0;
+        try {
+            SharedPreferences p = act.getSharedPreferences("deymflix_dl", 0);
+            for (java.util.Map.Entry<String, ?> e : p.getAll().entrySet()) {
+                if (String.valueOf(e.getKey()).startsWith("M")) rows++;
+            }
+        } catch (Throwable t) { }
+        sb.append("\"downloadRows\":").append(rows).append(",");
+        String ua = "";
+        try {
+            WebView wv = findWebView(act);
+            if (wv != null) ua = wv.getSettings().getUserAgentString();
+        } catch (Throwable t) { }
+        sb.append("\"ua\":").append(jesc85(ua)).append(",");
+        sb.append("\"extra\":").append(jesc85(extra == null ? "" : extra)).append(",");
+        sb.append("\"logs\":[");
+        boolean first = true;
+        synchronized (LOG_LOCK85) {
+            for (String l : LOG85) {
+                if (!first) sb.append(",");
+                sb.append(jesc85(l));
+                first = false;
+            }
+        }
+        sb.append("]}");
+        return sb.toString();
+    }
+
+    // ---- clipboard: "Copy logs" / "Copy UID" land here ----
+    public static void copy85(Activity act, String label, String text) {
+        try {
+            android.content.ClipboardManager cb = (android.content.ClipboardManager)
+                    act.getSystemService(Context.CLIPBOARD_SERVICE);
+            cb.setPrimaryClip(android.content.ClipData.newPlainText(
+                    label == null ? "DEYMFLIX" : label, text == null ? "" : text));
+            Toast.makeText(act.getApplicationContext(),
+                    "Copied -- paste it in your message", Toast.LENGTH_SHORT).show();
+            log85("copy", (label == null ? "text" : label) + " copied ("
+                    + (text == null ? 0 : text.length()) + " chars)");
+        } catch (Throwable t) {
+            Toast.makeText(act.getApplicationContext(), "Copy failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // ---- microphone (Watch Party voice) ----
+    public static boolean hasMic85(Context c) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT < 23) return true;
+            return c.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        } catch (Throwable t) { return false; }
+    }
+
+    private static void askMic85(final Activity act) {
+        try {
+            if (hasMic85(act)) { grantPendingMic85(); return; }
+            if (android.os.Build.VERSION.SDK_INT < 23) return;
+            act.requestPermissions(new String[]{ android.Manifest.permission.RECORD_AUDIO }, REQ_MIC85);
+            log85("mic", "asked Android for RECORD_AUDIO");
+            // The permission dialog has no callback hook in every build, so
+            // poll briefly: the moment it is granted, the waiting WebView
+            // request is answered and voice chat starts without a second tap.
+            final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+            final long until = System.currentTimeMillis() + 20000L;
+            h.postDelayed(new Runnable() {
+                @Override public void run() {
+                    try {
+                        if (hasMic85(act)) { grantPendingMic85(); return; }
+                        if (System.currentTimeMillis() < until) h.postDelayed(this, 600L);
+                        else {
+                            pendingWebMic85 = null;
+                            log85("mic", "permission not granted (timed out)");
+                        }
+                    } catch (Throwable t) { }
+                }
+            }, 600L);
+        } catch (Throwable t) { }
+    }
+
+    private static void grantPendingMic85() {
+        try {
+            android.webkit.PermissionRequest req = pendingWebMic85;
+            if (req == null) return;
+            pendingWebMic85 = null;
+            java.util.ArrayList<String> want = new java.util.ArrayList<String>();
+            String[] res = req.getResources();
+            for (int i = 0; res != null && i < res.length; i++) {
+                if (android.webkit.PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(res[i])) want.add(res[i]);
+            }
+            if (want.isEmpty()) { req.deny(); return; }
+            req.grant(want.toArray(new String[0]));
+            log85("mic", "audio capture granted after permission allow");
+        } catch (Throwable t) { }
+    }
+
+    // Our own pages may capture audio (the site + the bundled offline page).
+    private static boolean isOurCaptureOrigin(String origin) {
+        String o = origin == null ? "" : origin.toLowerCase();
+        return o.contains("deymflix.eu.cc") || o.startsWith("file:") || o.length() == 0;
+    }
+
+    // ---- the phone's Google accounts ("Log in with Google", app only) ----
+    public static String googleAccountsJson(Context c) {
+        StringBuilder sb = new StringBuilder("[");
+        try {
+            android.accounts.AccountManager am = android.accounts.AccountManager.get(c.getApplicationContext());
+            android.accounts.Account[] accs = am.getAccountsByType("com.google");
+            int n = 0;
+            for (int i = 0; accs != null && i < accs.length; i++) {
+                String em = accs[i].name == null ? "" : accs[i].name.trim();
+                if (em.length() == 0) continue;
+                if (n > 0) sb.append(",");
+                sb.append("{\"email\":").append(jesc85(em)).append("}");
+                n++;
+            }
+        } catch (Throwable t) {
+            log85("google", "account list unavailable: " + t.getMessage());
+        }
+        return sb.append("]").toString();
     }
 
     // =======================================================================
@@ -1655,6 +2015,38 @@ public class MainScreen85 {
         }
         if (url.length() == 0) {
             Toast.makeText(act.getApplicationContext(), "This title cannot be downloaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        confirmAndDownload(url, title, quality, poster, false);
+    }
+
+    // v1.7 -- WI-FI-ONLY GATE.
+    // Preference owned by the app's Download settings (site UI -> bridge).
+    // When it is on and the phone is on mobile data the download must not
+    // start silently: the user is told exactly why and can override once.
+    private void confirmAndDownload(final String url, final String title, final String quality,
+            final String poster, final boolean wifiOverride) {
+        if (url == null) {
+            Toast.makeText(act.getApplicationContext(), "This title cannot be downloaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (url.length() == 0) {
+            Toast.makeText(act.getApplicationContext(), "This title cannot be downloaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!wifiOverride && wifiOnly85(act) && isMetered85(act)) {
+            log85("download", "held by Wi-Fi-only: " + (title == null ? "" : title));
+            android.app.AlertDialog.Builder wb = new android.app.AlertDialog.Builder(act);
+            wb.setTitle("Wi-Fi only is on");
+            wb.setMessage("Downloads wait for Wi-Fi. You are on mobile data right now.");
+            wb.setPositiveButton("Download anyway", new android.content.DialogInterface.OnClickListener() {
+                @Override public void onClick(android.content.DialogInterface d, int w) {
+                    try { d.dismiss(); } catch (Exception e) { }
+                    confirmAndDownload(url, title, quality, poster, true);
+                }
+            });
+            wb.setNegativeButton("Wait for Wi-Fi", null);
+            wb.show();
             return;
         }
         if (android.os.Build.VERSION.SDK_INT >= 33
@@ -2251,6 +2643,9 @@ public class MainScreen85 {
     //  names (dfx_x7k2m9q4.mp4) -- no movie titles outside the app.
     // =======================================================================
     private void enqueueDownload(final android.net.Uri uri, final String title, final String quality, final String poster, final String subUrl) {
+        log85("download", "start " + (title == null ? "" : title)
+                + " q=" + (quality == null || quality.length() == 0 ? "auto" : quality)
+                + " sub=" + (subUrl == null || subUrl.length() == 0 ? "none" : "yes"));
         // Belt-and-braces: if the pre-check found no subtitle (network blip
         // at dialog time), re-resolve right now before starting.
         String useSub = subUrl == null ? "" : subUrl;
