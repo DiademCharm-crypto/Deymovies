@@ -267,6 +267,15 @@
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { S.mic = 'unsupported'; render(); return Promise.resolve(null); }
     if (S.stream) return Promise.resolve(S.stream);
     S.mic = 'asking'; render();
+    // INSIDE THE APP: a WebView does not show Android's permission dialog on
+    // its own for getUserMedia -- the shell has to ask. DeymflixApp.requestMic()
+    // starts that ask and holds the page's capture request until it is
+    // allowed, so the very first tap on the mic button can succeed (v1.7).
+    try {
+      if (window.DeymflixApp && typeof window.DeymflixApp.requestMic === 'function') {
+        window.DeymflixApp.requestMic();
+      }
+    } catch (e) { }
     return navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false,
     }).then(function (st) {
@@ -684,7 +693,8 @@
   function micGlyph() {
     if (S.mic === 'off') return { cls: '', icon: MIC_ICON, title: 'Turn on microphone' };
     if (S.mic === 'asking') return { cls: 'connecting', icon: MIC_ICON, title: 'Allowing microphone…' };
-    if (S.mic === 'denied' || S.mic === 'unsupported') return { cls: 'muted', icon: MIC_OFF_ICON, title: 'Microphone blocked by the browser' };
+    if (S.mic === 'denied') return { cls: 'muted', icon: MIC_OFF_ICON, title: (window.DeymflixApp ? 'Microphone blocked \u2014 allow it for DEYMFLIX in Android settings, then tap again' : 'Microphone blocked by the browser') };
+    if (S.mic === 'unsupported') return { cls: 'muted', icon: MIC_OFF_ICON, title: 'Microphone not available here' };
     return S.muted ? { cls: 'muted', icon: MIC_OFF_ICON, title: 'Unmute' } : { cls: '', icon: MIC_ICON, title: 'Mute' };
   }
 
