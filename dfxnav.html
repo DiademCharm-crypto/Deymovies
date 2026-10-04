@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DFXNAV</title>
+<style>
+  html,body{margin:0;background:#000;color:#0f0}
+  pre{padding:8px;font:700 16px/1.25 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word}
+  iframe{width:360px;height:600px;border:0;background:#151515;display:block;margin:4px 0}
+</style>
+</head>
+<body>
+<pre id="out">DFXNAV RUNNING …</pre>
+<iframe id="fr" src="about:blank"></iframe>
+<script>
+(function () {
+  var EP = 'http://localhost:8899';
+  var out = document.getElementById('out');
+  var lines = [];
+  function beacon(s) {
+    try {
+      s = String(s);
+      for (var i = 0; i < s.length; i += 1400) new Image().src = EP + '/b?d=' + encodeURIComponent(s.slice(i, i + 1400));
+    } catch (e) {}
+  }
+  function add(k, v) {
+    var line = k + '=' + v;
+    lines.push(line);
+    out.textContent = lines.slice(-40).join('\n');
+    beacon(line);
+  }
+  window.__add = add;
+  var fr = document.getElementById('fr');
+  window.__frame = fr;
+  window.__q = function (sel) { return fr.contentDocument.querySelector(sel); };
+
+  add('BEGIN', 'dfxnav');
+  add('UA', navigator.userAgent);
+  add('UAAPP', /DeymflixApp/i.test(navigator.userAgent) ? 'yes' : 'NO');
+  add('VPX', window.innerWidth + 'x' + window.innerHeight + ' dpr' + window.devicePixelRatio);
+
+  try {
+    var ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+    add('SWCTRL', ctrl ? String(ctrl.scriptURL).replace(/^https?:\/\//, '') : 'none');
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+      add('SWREGS', regs.length);
+      regs.forEach(function (r, i) {
+        add('SWREG' + i, 'scope=' + r.scope.replace(/^https?:\/\/[^/]+/, '') +
+          ' active=' + (r.active ? 'y' : 'n') + ' waiting=' + (r.waiting ? 'y' : 'n') + ' installing=' + (r.installing ? 'y' : 'n'));
+      });
+    }).catch(function (e) { add('SWERR', e.message); });
+  } catch (e) { add('SWERR', e.message); }
+  if (window.caches) caches.keys().then(function (k) { add('CACHES', k.join(',') || 'none'); }).catch(function () {});
+
+  fetch('/app.js?_p=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+    add('LIVEAPPJS_BYTES', t.length);
+    add('LIVEAPPJS_ME', t.indexOf('installMeNavItem') !== -1 ? 'yes' : 'NO');
+  }).catch(function (e) { add('LIVEAPPJS_ERR', e.message); });
+
+  function navSnapshot(tag) {
+    try {
+      var w = fr.contentWindow, d = fr.contentDocument;
+      if (!d || !d.querySelector) { add(tag + '.noDOM', '1'); return; }
+      add(tag + '.url', String(d.location.href).replace(/^https?:\/\/[^/]+/, ''));
+      add(tag + '.htmlclass', d.documentElement.className || 'none');
+      add(tag + '.isapp', w.DFX_IS_APP ? 'yes' : 'no');
+      var items = [].slice.call(d.querySelectorAll('.bottom-nav-item'));
+      add(tag + '.count', items.length);
+      add(tag + '.labels', [].slice.call(d.querySelectorAll('.bottom-nav-label')).map(function (n) { return n.textContent.trim(); }).join(',') || 'none');
+      add(tag + '.rects', items.map(function (n) {
+        var r = n.getBoundingClientRect();
+        return n.getAttribute('data-page') + '@' + Math.round(r.left) + '+' + Math.round(r.width) + 'disp=' + getComputedStyle(n).display;
+      }).join(' '));
+      var ul = d.querySelector('.bottom-nav-items');
+      if (ul) {
+        var ur = ul.getBoundingClientRect(), cs = getComputedStyle(ul);
+        add(tag + '.ul', 'L' + Math.round(ur.left) + ' W' + Math.round(ur.width) + ' scrollW' + ul.scrollWidth +
+          ' clientW' + ul.clientWidth + ' justify=' + cs.justifyContent + ' overflowX=' + cs.overflowX + ' display=' + cs.display);
+      }
+      var cw = d.getElementById('continue-watching-section');
+      add(tag + '.cw', cw ? (getComputedStyle(cw).display === 'none' || cw.hasAttribute('hidden') ? 'HIDDEN' : 'shown') : 'absent');
+      add(tag + '.mebtn', d.querySelector('[data-page="me"]') ? 'PRESENT' : 'ABSENT');
+      var sc = [].slice.call(d.scripts).filter(function (n) { return /app\.js/.test(n.src || ''); }).map(function (n) { return n.src.replace(/^https?:\/\/[^/]+/, ''); });
+      add(tag + '.appjsscript', sc.join(',') || 'none');
+      try {
+        var res = (w.performance.getEntriesByType('resource') || []).filter(function (e) { return /app\.js/.test(e.name); });
+        add(tag + '.appjsres', res.map(function (e) {
+          return e.name.replace(/^https?:\/\/[^/]+/, '').split('?')[1] + '|enc' + e.encodedBodySize + '|tr' + e.transferSize + '|st' + (e.responseStatus || 0);
+        }).join(' ') || 'none');
+      } catch (e2) { add(tag + '.resERR', e2.message); }
+      try { document.title = 'NAV:' + items.length + ':' + (d.querySelector('[data-page="me"]') ? 'ME' : 'NOME'); } catch (e3) {}
+    } catch (e) { add(tag + '.ERR', e.message); }
+  }
+  window.__nav = navSnapshot;
+
+  fr.addEventListener('load', function () {
+    add('IFRAME_LOAD', 'yes');
+    setTimeout(function () { navSnapshot('NAV1'); }, 1500);
+    setTimeout(function () { navSnapshot('NAV4'); }, 4000);
+    setTimeout(function () { navSnapshot('NAV8'); }, 8000);
+    try {
+      var mo = new MutationObserver(function () { navSnapshot('NAVMUT'); });
+      mo.observe(fr.contentDocument.body, { childList: true, subtree: true });
+    } catch (e) { add('MO_ERR', e.message); }
+  });
+  fr.src = '/index.html?navtest=' + Date.now();
+
+  var lastV = '0';
+  setInterval(function () {
+    fetch(EP + '/cmd?v=' + lastV, { cache: 'no-store' }).then(function (r) {
+      return r.status === 204 ? null : r.json();
+    }).then(function (j) {
+      if (!j) return;
+      lastV = j.v;
+      return Promise.resolve().then(function () { return eval('(async () => {\n' + j.js + '\n})()'); })
+        .then(function (v) { beacon('R:' + JSON.stringify(v === undefined ? 'ok' : v)); })
+        .catch(function (e) { beacon('RERR:' + ((e && e.message) || String(e))); });
+    }).catch(function () {});
+  }, 900);
+})();
+</script>
+</body>
+</html>
