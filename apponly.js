@@ -41,38 +41,37 @@
   var K_SESSION = 'dfx_session_v1';
 
   // ══════════════════════════════════════════════════════════════════════════
-  //  1) BOTTOM BAR: the Me tab (app only). History moves inside Me, so the
-  //     bar keeps five items and never crowds.
+  //  1) APP SHELL GLUE
+  //     The bottom bar is built by app.js (Home, Reels, Explore, History, Me)
+  //     and the Me tab opens the native Me ACTIVITY -- red theme, its own real
+  //     activity, exactly like the Downloads screen. This script only supplies
+  //     what the WebView still owns: the Continue Watching data and the
+  //     native-mode layout switch.
   // ══════════════════════════════════════════════════════════════════════════
-  function installMeTab() {
-    var nav = document.querySelector('.bottom-nav-items');
-    if (!nav) return;
-    var existing = nav.querySelector('[data-page="me"]');
-    if (!existing) {
-      var hist = nav.querySelector('[data-page="history"]');
-      var li = document.createElement('li');
-      li.className = 'bottom-nav-item' + (ON_ME ? ' active' : '');
-      li.setAttribute('data-page', 'me');
-      li.innerHTML = '<span class="bottom-nav-icon">' +
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-        '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"></path><path d="M4 21v-1c0-2.76 3.58-5 8-5s8 2.24 8 5v1"></path></svg></span>' +
-        '<span class="bottom-nav-label">Me</span>';
-      li.addEventListener('click', function () {
-        if (!ON_ME) window.location.href = 'me.html';
-      });
-      if (hist && hist.parentNode === nav) nav.replaceChild(li, hist);   // swap, keep 5
-      else nav.appendChild(li);
-    } else if (ON_ME) {
-      existing.classList.add('active');
-    }
-    // On the Me screen itself the other tabs must navigate normally.
-    var items = nav.querySelectorAll('.bottom-nav-item');
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].getAttribute('data-page') === 'me') continue;
-      items[i].classList.remove('active');
-    }
+  // Inside the Me activity the page's own HTML bar is redundant: the native
+  // bar draws the same five tabs, so hide ours and drop the reserved padding.
+  var NATIVE = /(?:^|[?&])native=1(?:&|$)/.test(location.search || '') || !!window.DFX_NATIVE;
+  if (ON_ME && NATIVE) {
+    try { document.documentElement.classList.add('dfx-native'); } catch (e) { }
   }
-  installMeTab();
+
+  // Continue Watching moved to the Me screen, so keep it off the app's home
+  // feed. app.js re-renders the section, so its style attribute is watched.
+  if (HERE === 'index.html') {
+    var hideCw = function () {
+      var s = document.getElementById('continue-watching-section');
+      if (!s) return;
+      s.setAttribute('hidden', 'hidden');
+      if (s.style.display !== 'none') s.style.display = 'none';
+    };
+    hideCw();
+    try {
+      new MutationObserver(hideCw).observe(document.documentElement, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden']
+      });
+    } catch (e) { }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideCw);
+  }
 
   if (!ON_ME) return;                                   // rest is the Me screen
 
@@ -458,6 +457,72 @@
   }
 
   // ══════════════════════════════════════════════════════════════════════════
+  //  4b) CONTINUE WATCHING (Me screen)
+  //      The Me screen now carries the carousel the home feed used to show.
+  //      It reads the same store the site writes, so a card resumes the exact
+  //      season + episode (and one card per series, newest episode only).
+  // ══════════════════════════════════════════════════════════════════════════
+  function cwItems() {
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; }
+    catch (e) { saved = {}; }
+    var byBase = {};
+    Object.keys(saved).forEach(function (key) {
+      var it = saved[key];
+      if (!it || it.finished || Number(it.progress) >= 95) return;
+      var base = key, season = null, ep = null;
+      var m = /^(.*)-s(\d+)-ep(\d+)$/.exec(key);
+      if (m) { base = m[1]; season = parseInt(m[2], 10); ep = parseInt(m[3], 10); }
+      else {
+        m = /^(.*)-ep(\d+)$/.exec(key);
+        if (m) { base = m[1]; ep = parseInt(m[2], 10); }
+      }
+      var prev = byBase[base];
+      if (!prev || (it.updatedAt || 0) > (prev.updatedAt || 0)) {
+        byBase[base] = {
+          base: base, title: it.title || '', poster: it.poster || '',
+          progress: Number(it.progress) || 0, season: season, ep: ep,
+          updatedAt: it.updatedAt || 0
+        };
+      }
+    });
+    var list = Object.keys(byBase).map(function (b) { return byBase[b]; });
+    list.sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+    return list;
+  }
+
+  function renderContinue() {
+    var strip = $('cw-strip');
+    var sec = $('cw-section');
+    if (!strip) return;
+    var list = cwItems();
+    if (!list.length) { if (sec) sec.hidden = true; return; }
+    if (sec) sec.hidden = false;
+    strip.innerHTML = '';
+    list.forEach(function (it) {
+      var card = document.createElement('div');
+      card.className = 'poster-card';
+      card.style.cssText = 'position:relative;cursor:pointer';
+      var label = it.ep ? ('S' + (it.season || 1) + ' E' + it.ep) : '';
+      var badge = label ? label
+        : (it.progress > 0 ? (Math.round(it.progress) + '% watched') : '');
+      card.innerHTML =
+        '<img src="' + String(it.poster).replace(/"/g, '') + '" alt="" loading="lazy" decoding="async">' +
+        '<div class="poster-card-overlay"><div class="poster-card-title">' +
+        String(it.title).split(' - ')[0].replace(/[<>&]/g, '') + '</div></div>' +
+        (badge ? '<div class="mylist-progress-badge">' + badge + '</div>' : '') +
+        '<div style="position:absolute;bottom:0;left:0;width:100%;height:4px;background:rgba(255,255,255,.2)">' +
+        '<div style="width:' + Math.min(100, Math.max(0, it.progress)) + '%;height:100%;background:#e50914"></div></div>';
+      card.addEventListener('click', function () {
+        var url = 'player.html?id=' + encodeURIComponent(it.base);
+        if (it.ep) url += '&s=' + (it.season || 1) + '&ep=' + it.ep;
+        window.location.href = url;
+      });
+      strip.appendChild(card);
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
   //  5) DIAGNOSTICS — build the report, copy it with one tap
   // ══════════════════════════════════════════════════════════════════════════
   function diagExtra() {
@@ -599,6 +664,7 @@
     if ($('diag-refresh')) $('diag-refresh').onclick = loadDiagnostics;
 
     readPrefs();
+    renderContinue();
   }
 
   document.addEventListener('error', function (e) {
