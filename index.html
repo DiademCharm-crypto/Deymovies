@@ -377,5 +377,29 @@
     sweep(); // clean out pre-fix garbage the moment we load, not 30s later
   })();
   </script>
+<!-- DFX_TEMP_PROBE v1 — REMOVE BEFORE RELEASE: reports live app-mode state to the dev beacon -->
+<script>
+(function(){
+  var EP='http://localhost:8899';
+  function b(s){try{s=String(s);for(var i=0;i<s.length;i+=1400){new Image().src=EP+'/b?d='+encodeURIComponent(s.slice(i,i+1400));}}catch(e){}}
+  b('IDXPROBE1 alive href='+location.href);
+  b('IDXPROBE1 ua='+navigator.userAgent);
+  setTimeout(function(){
+    try{
+      var items=[].slice.call(document.querySelectorAll('.bottom-nav-item'));
+      b('IDXPROBE1 html='+(document.documentElement.className||'none'));
+      b('IDXPROBE1 dfxisapp='+(window.DFX_IS_APP===undefined?'unset':String(window.DFX_IS_APP)));
+      b('IDXPROBE1 navcount='+items.length+' labels='+[].slice.call(document.querySelectorAll('.bottom-nav-label')).map(function(n){return n.textContent.trim();}).join(','));
+      b('IDXPROBE1 me='+(document.querySelector('[data-page=\"me\"]')?'yes':'no')+' request='+(document.querySelector('[data-page=\"request\"]')?'yes':'no')+' downloads='+(document.querySelector('[data-page=\"downloads\"]')?'yes':'no'));
+      b('IDXPROBE1 cw='+(document.getElementById('continue-watching-section')?'present':'absent'));
+      b('IDXPROBE1 footerreq='+(document.getElementById('dfx-app-request-btn')?'yes':'no'));
+      var res=(performance.getEntriesByType('resource')||[]).filter(function(e){return /app\.js|apponly\.js/.test(e.name);});
+      b('IDXPROBE1 res='+res.map(function(e){return e.name.replace(/^https?:\/\/[^/]+\//,'')+'|enc'+e.encodedBodySize+'|tr'+e.transferSize}).join(' '));
+      var sc=[].slice.call(document.scripts).filter(function(n){return /app\.js|apponly/.test(n.src||'');}).map(function(n){return n.src.replace(/^https?:\/\/[^/]+\//,'');});
+      b('IDXPROBE1 scripts='+sc.join(','));
+    }catch(e){ b('IDXPROBE1 err='+(e&&e.message)); }
+  },2500);
+})();
+</script>
 </body>
 </html>
