@@ -1461,6 +1461,26 @@ public class MainScreen85 {
             public String requestAccounts() {
                 try { return askAccounts85(act); } catch (Throwable t) { return "unavailable"; }
             }
+            // Android 14+ hides other apps' accounts from getAccountsByType,
+            // so the reliable path is the phone's own account picker: the
+            // chosen address comes back through MainActivity.onActivityResult
+            // and is handed to the page as DfxGooglePicked(email).
+            @android.webkit.JavascriptInterface
+            public String takeGoogleEmail() {
+                try {
+                    String e = PENDING_GOOGLE85;
+                    PENDING_GOOGLE85 = null;
+                    if (e == null) return "null";
+                    if (e.length() == 0) return "\"\"";
+                    return "\"" + jesc85(e) + "\"";
+                } catch (Throwable t) { return "null"; }
+            }
+            @android.webkit.JavascriptInterface
+            public void pickGoogleAccount() {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try { MainScreen85.pickGoogleAccount(act); } catch (Throwable t) { }
+                }});
+            }
             @android.webkit.JavascriptInterface
             public String getAppInfo() {
                 try { return appInfoJson(act); } catch (Throwable t) { return "{}"; }
@@ -1483,6 +1503,7 @@ public class MainScreen85 {
     private static final String APP_PREFS85 = "deymflix_prefs";
     public static final int REQ_MIC85 = 4103;
     public static final int REQ_ACCT85 = 4104;
+    public static final int REQ_PICK85 = 4105;
     private static volatile android.webkit.PermissionRequest pendingWebMic85 = null;
     private static final java.util.ArrayDeque<String> LOG85 = new java.util.ArrayDeque<String>();
     private static final Object LOG_LOCK85 = new Object();
@@ -1702,6 +1723,57 @@ public class MainScreen85 {
                 }
             }, 600L);
         } catch (Throwable t) { }
+    }
+
+    // ---- the phone's account picker (works where the list is hidden) ----
+    // MainActivity.onActivityResult forwards here (see _tools/_app_build.cjs,
+    // which injects that one-line hook into the generated MainActivity).
+    public static void pickGoogleAccount(final Activity act) {
+        try {
+            android.accounts.AccountManager am = android.accounts.AccountManager.get(act);
+            android.content.Intent it = am.newChooseAccountIntent(null, null,
+                    new String[] { "com.google" }, true,
+                    "Choose the Google account to log in with", null, null, null);
+            act.startActivityForResult(it, REQ_PICK85);
+            log85("google", "opened the phone's account picker");
+        } catch (Throwable t) {
+            log85("google", "picker unavailable: " + t.getMessage());
+            jsGooglePicked(act, null);
+        }
+    }
+
+    public static void onActivityResult(Activity act, int requestCode, int resultCode,
+            android.content.Intent data) {
+        try {
+            if (requestCode != REQ_PICK85) return;
+            String email = null;
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                email = data.getStringExtra(android.accounts.AccountManager.KEY_ACCOUNT_NAME);
+            }
+            log85("google", email == null ? "account picker dismissed" : "account picked");
+            jsGooglePicked(act, email);
+        } catch (Throwable t) { }
+    }
+
+    // The picked address is BOTH pushed into the page and left in a slot the
+    // page polls (takeGoogleEmail): a WebView that is mid-resume when the
+    // picker returns can drop the pushed call, the slot never gets lost.
+    private static volatile String PENDING_GOOGLE85 = null;
+
+    private static void jsGooglePicked(final Activity act, final String email) {
+        try {
+            PENDING_GOOGLE85 = email == null ? "" : email;
+            final WebView wv = findWebView(act);
+            if (wv == null) {
+                log85("google", "no WebView to hand the picked account to");
+                return;
+            }
+            final String code = "window.DfxGooglePicked&&window.DfxGooglePicked("
+                    + (email == null ? "null" : ("\"" + jesc85(email) + "\"")) + ");";
+            act.runOnUiThread(new Runnable() { @Override public void run() {
+                try { wv.evaluateJavascript(code, null); } catch (Throwable t) { }
+            }});
+        } catch (Throwable t) { log85("google", "relay failed: " + t.getMessage()); }
     }
 
     // ---- Google accounts: GET_ACCOUNTS is a runtime permission too ----
