@@ -307,6 +307,14 @@
       var list = [];
       try { list = JSON.parse(get() || '[]') || []; } catch (e) { list = []; }
       if (!list.length) {
+        // Android 14+ hides other apps' accounts, so the phone's own picker is
+        // the supported way in; the answer arrives as DfxGooglePicked(email).
+        var pick = bridge('pickGoogleAccount');
+        if (pick) {
+          err($('si-err'), 'Choose your Google account in the Android dialog.');
+          try { pick(); } catch (e) { }
+          return;
+        }
         err($('si-err'), 'No Google account found on this phone. Add one in Android Settings › Accounts, then tap again.');
         return;
       }
@@ -584,6 +592,14 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
   else wire();
+
+  // The phone's account picker answers through the app shell
+  // (MainScreen85.pickGoogleAccount -> MainActivity.onActivityResult).
+  window.DfxGooglePicked = function (email) {
+    if (!email) { err($('si-err'), 'No account chosen.'); return; }
+    err($('si-err'), '');
+    googleUse(String(email));
+  };
 
   // Public hook: other app pages can ask about the signed-in user.
   window.DfxMe = { user: currentUser, isApp: true };
