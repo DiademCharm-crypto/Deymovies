@@ -8,7 +8,6 @@
 //      - center controls: circle-arrow -10 / big play-pause circle / +10,
 //        drawn from the same SVG path data the site uses
 //      - seek badges ("-10" left, "+10" right) on double-tap seek
-//      - floating speed badge ("2.0x Speed") on long-press 2x
 //      - bottom bar: red seekbar (e50914, buffered track), bottom play icon,
 //        HH:MM:SS time display, volume icon, settings, CC, fullscreen icon
 //        + the SKIP FEATURE pill (same as player.html): one tap jumps back to
@@ -707,7 +706,6 @@ public class LocalPlayer85 {
             try {
                 mp.setPlaybackParams(mp.getPlaybackParams().setSpeed(f));
                 speed = f;
-                ui.speedBadge.setText(String.valueOf(f) + "x Speed");
                 ui.syncPlay(playing());
             } catch (Exception e) { }
         }
@@ -758,7 +756,6 @@ public class LocalPlayer85 {
         int preMuteVol = 0;
         TextView rewBadge;
         TextView fwdBadge;
-        TextView speedBadge;
         VSlider brightness;
         VSlider volume;
         LinearLayout buffering;
@@ -979,15 +976,6 @@ public class LocalPlayer85 {
                     Gravity.CENTER_VERTICAL + Gravity.END);
             fb.rightMargin = (int) (60 * d);
             root.addView(fwdBadge, fb);
-
-            // -- floating speed badge --------------------------------------
-            speedBadge = pill(a, "1.0x Speed");
-            FrameLayout.LayoutParams sb = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL + Gravity.TOP);
-            sb.topMargin = (int) (70 * d);
-            root.addView(speedBadge, sb);
 
             // -- edge sliders -----------------------------------------------
             brightness = new VSlider(a, P_SUN, d, true);
@@ -1544,16 +1532,10 @@ public class LocalPlayer85 {
         float gy;
         long gtime;
         long lastTap;
-        boolean longFired;
         boolean sliding;
         int slideStartPct;
-        final Runnable longRun = new Runnable() {
-            @Override public void run() {
-                longFired = true;
-                slideStartPct = 0;
-                speedBadge.setVisibility(View.VISIBLE);
-            }
-        };
+        // Long-press → 2x speed (and its floating badge) is gone by request.
+        // Double-tap seek and the brightness/volume swipe below are untouched.
 
         void surfaceTouch(final Player p) {
             togglePlayRef = p;
@@ -1565,15 +1547,12 @@ public class LocalPlayer85 {
                             gx = e.getX();
                             gy = e.getY();
                             gtime = System.currentTimeMillis();
-                            longFired = false;
                             sliding = false;
-                            if (p.playing()) handler.postDelayed(longRun, 500);
                             return true;
                         case MotionEvent.ACTION_MOVE:
                             float dx = e.getX() - gx;
                             float dy = e.getY() - gy;
-                            if (!longFired && Math.abs(dy) > 40 * d && Math.abs(dy) > Math.abs(dx)) {
-                                handler.removeCallbacks(longRun);
+                            if (Math.abs(dy) > 40 * d && Math.abs(dy) > Math.abs(dx)) {
                                 sliding = true;
                                 boolean left = gx < w / 2f;
                                 VSlider s = left ? brightness : volume;
@@ -1586,12 +1565,6 @@ public class LocalPlayer85 {
                             }
                             return true;
                         case MotionEvent.ACTION_UP:
-                            handler.removeCallbacks(longRun);
-                            if (longFired) {
-                                p.setSpeed(1.0f);
-                                speedBadge.setVisibility(View.GONE);
-                                return true;
-                            }
                             if (sliding) {
                                 handler.postDelayed(new Runnable() {
                                     @Override public void run() {

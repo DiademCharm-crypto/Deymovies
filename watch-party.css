@@ -225,26 +225,42 @@
    phone it grew past the top of the video and got clipped. Now it sits under the
    dock, is capped to the space that is left, and scrolls inside itself. */
 @media (max-width: 560px), (max-height: 560px) {
+  /* A compact card at the right edge under the mic pill — not a full-width
+     sheet. Narrow (268px), short rows, everything one step smaller. */
   .wp-panel {
-    right: 8px; left: 8px; width: auto;
-    top: 58px; bottom: auto;
-    max-height: calc(100% - 66px);
+    right: 8px; left: auto; width: min(268px, calc(100% - 16px));
+    top: 56px; bottom: auto;
+    max-height: calc(100% - 64px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 12px;
-    border-radius: 14px;
+    padding: 10px;
+    border-radius: 12px;
   }
-  .wp-title { font-size: .95rem; }
-  .wp-head { gap: 10px; }
-  .wp-head-icon { width: 36px; height: 36px; flex-basis: 36px; }
-  .wp-head-icon svg { width: 18px; height: 18px; }
-  .wp-now { margin: 10px 0 8px; padding: 10px; }
-  .wp-btn-primary, .wp-btn-secondary { padding: 11px; font-size: .88rem; }
-  .wp-btn-primary svg, .wp-btn-secondary svg { width: 17px; height: 17px; }
-  .wp-room-code { padding: 10px; margin: 10px 0; }
-  .wp-room-code-val { font-size: 1.1rem; letter-spacing: 4px; }
-  .wp-person { font-size: .82rem; }
-  .wp-code-input { padding: 10px 12px; font-size: .95rem; }
+  .wp-head { gap: 8px; }
+  .wp-head-icon { width: 28px; height: 28px; flex-basis: 28px; }
+  .wp-head-icon svg { width: 14px; height: 14px; }
+  .wp-title { font-size: .86rem; }
+  .wp-sub { font-size: .64rem; }
+  .wp-close { width: 24px; height: 24px; flex-basis: 24px; font-size: 1rem; }
+  .wp-now { margin: 8px 0 6px; padding: 8px; gap: 8px; }
+  .wp-now-icon { width: 24px; height: 24px; flex-basis: 24px; border-radius: 7px; }
+  .wp-now-icon svg { width: 11px; height: 11px; }
+  .wp-now-label { font-size: .6rem; margin-bottom: 2px; }
+  .wp-now-value { font-size: .72rem; }
+  .wp-btn-primary, .wp-btn-secondary {
+    padding: 8px; font-size: .8rem; border-radius: 10px; gap: 7px;
+  }
+  .wp-btn-primary { margin-bottom: 6px; }
+  .wp-btn-primary svg, .wp-btn-secondary svg { width: 14px; height: 14px; }
+  .wp-hint { font-size: .64rem; margin-top: 7px; }
+  .wp-err { font-size: .68rem; margin-top: 6px; }
+  .wp-room-code { padding: 8px; margin: 8px 0; }
+  .wp-room-code-val { font-size: .95rem; letter-spacing: 3px; }
+  .wp-copy { font-size: .68rem; padding: 6px 9px; }
+  .wp-people { gap: 6px; margin-bottom: 8px; }
+  .wp-person { font-size: .76rem; }
+  .wp-person-av { width: 24px; height: 24px; flex-basis: 24px; font-size: .62rem; }
+  .wp-code-input { padding: 8px 10px; font-size: .85rem; letter-spacing: 2px; }
   .wp-dock { top: 8px; right: 8px; padding: 5px 10px 5px 5px; gap: 8px; }
   .wp-mic { width: 34px; height: 34px; flex-basis: 34px; }
 }
