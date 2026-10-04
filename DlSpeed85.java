@@ -405,6 +405,14 @@ public class DlSpeed85 {
     // =======================================================================
     public static void restartRow(final Context ctx, final String rowId) {
         try {
+            // v1.7 -- Wi-Fi-only deliberately HOLDS retries: the user asked
+            // for this download to wait until the phone is back on Wi-Fi.
+            if (MainScreen85.wifiHold85(ctx)) {
+                Toast.makeText(ctx, "Wi-Fi only is on -- this will resume when you are on Wi-Fi",
+                        Toast.LENGTH_LONG).show();
+                MainScreen85.log85("download", "retry held by Wi-Fi-only: " + rowId);
+                return;
+            }
             String[] meta = readRow(ctx, rowId);
             // no url stored: cannot restart without it
             if (meta[2] == null) return;
@@ -728,6 +736,31 @@ public class DlSpeed85 {
             // Additionally: DownloadManager-fallback subtitles land in their
             // own folder; copy any sidecar next to THIS movie too.
             copyDmSubtitleIfExists(ctx, meta3Safe(ctx, rowId));
+
+            // -- 5b) OFFLINE SUBTITLE GUARANTEE (v1.7) -------------------
+            // Whatever happened above, a downloaded episode MUST find a
+            // subtitle with no network. If the sidecar is missing or empty:
+            //   1. copy the one the online player already cached for this
+            //      title (instant, no network, survives a dead CDN), then
+            //   2. if the cache is empty, resolve it from the manifest NOW,
+            //      while the phone is still online.
+            try {
+                String[] metaG = readRow(ctx, rowId);
+                String titleG = metaG[0] == null ? "" : metaG[0];
+                String stemG = finalFile.getName();
+                int dotG = stemG.lastIndexOf('.');
+                if (dotG > 0) stemG = stemG.substring(0, dotG);
+                File sideG = new File(dir, stemG + ".srt");
+                if (!sideG.exists() || sideG.length() == 0) {
+                    File cachedG = null;
+                    try { cachedG = cachedSubFor(ctx, titleG, 0); } catch (Exception eg1) { }
+                    if (cachedG != null) copyFile(cachedG, sideG);
+                    if (!sideG.exists() || sideG.length() == 0) {
+                        try { ensureSubtitle(ctx, finalFile.getAbsolutePath(), titleG); }
+                        catch (Exception eg2) { }
+                    }
+                }
+            } catch (Exception eg) { }
         }}).start();
     }
 
