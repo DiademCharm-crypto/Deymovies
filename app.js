@@ -12160,9 +12160,10 @@ try {
 // v160.3 CHANGES
 //  - 2-arg toggleFullscreen(enter, isVideo): only the VIDEO element rotates
 //    the phone landscape now (Netflix/LokLok). Page fullscreen keeps portrait.
-//  - The Request nav item is REMOVED in app mode (the 6-slot bar didn't fit);
-//    a "Request a Movie" button is shown at the bottom of the footer instead.
-//  - Downloads nav item stays.
+//  - The Request nav item is REPLACED by Me in app mode; Me opens the native
+//    Me activity (red theme) which carries Downloads, watch history and the
+//    account screens. History keeps its own slot: Home, Reels, Explore,
+//    History, Me.
 // ═══════════════════════════════════════════════════════════════
 (function () {
   const IS_APP = /DeymflixApp/i.test(navigator.userAgent || '');
@@ -12177,30 +12178,34 @@ try {
   // "Get the Android App" button makes no sense inside the app itself)
   document.documentElement.classList.add('dfx-app');
 
-  const DL_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+  const ME_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"></path><path d="M4 21v-1c0-2.76 3.58-5 8-5s8 2.24 8 5v1"></path></svg>';
   const REQ_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>';
 
-  // ── 1) Bottom nav: Downloads added, Request removed (app mode only) ──
-  function addDownloadsNavItem() {
+  // ── 1) Bottom nav (app mode): Home, Reels, Explore, History, Me ──
+  //  The Request item is replaced by Me; Downloads leaves the bar and lives
+  //  on the Me screen instead, so History stays where users expect it. Me is
+  //  a real activity in the app (red theme), not a page.
+  function installMeNavItem() {
     const nav = document.querySelector('.bottom-nav-items');
     if (!nav) return;
-    // Request doesn't fit beside Downloads -- the footer button replaces it
     const req = nav.querySelector('[data-page="request"]');
     if (req) req.remove();
-    if (!nav.querySelector('[data-page="downloads"]')) {
+    const dl = nav.querySelector('[data-page="downloads"]');
+    if (dl) dl.remove();
+    if (!nav.querySelector('[data-page="me"]')) {
       const li = document.createElement('li');
       li.className = 'bottom-nav-item';
-      li.setAttribute('data-page', 'downloads');
-      li.innerHTML = '<span class="bottom-nav-icon">' + DL_ICON + '</span>' +
-                     '<span class="bottom-nav-label">Downloads</span>';
+      li.setAttribute('data-page', 'me');
+      li.innerHTML = '<span class="bottom-nav-icon">' + ME_ICON + '</span>' +
+                     '<span class="bottom-nav-label">Me</span>';
       li.addEventListener('click', function () {
         try {
-          if (window.DeymflixApp && typeof window.DeymflixApp.openDownloads === 'function') {
-            window.DeymflixApp.openDownloads();
+          if (window.DeymflixApp && typeof window.DeymflixApp.openMe === 'function') {
+            window.DeymflixApp.openMe();
             return;
           }
         } catch (e) { /* bridge not ready -- fall through */ }
-        window.location.href = 'downloads.html'; // graceful fallback inside the app
+        window.location.href = 'me.html'; // graceful fallback inside the app
       });
       nav.appendChild(li);
     }
@@ -12344,7 +12349,7 @@ try {
   }
 
   function initAppOnlyUi() {
-    addDownloadsNavItem();
+    installMeNavItem();
     addFooterRequestButton();
     if (!document.querySelector('.video-container')) return; // player page only
     addDownloadButton();
