@@ -2402,6 +2402,19 @@ public class MainScreen85 {
             all.add(series + "/" + title + ".srt");
             all.add(title + " Engsub.srt");
             all.add(title + " PHsub.srt");
+            // The site's real per-episode convention is
+            // "<Series>/<Series> ep<N> Engsub.srt". When the title does NOT
+            // already carry the episode number (bulk series downloads pass the
+            // series name plus the episode), every guess above misses and a
+            // subtitle that exists on the site is never found -- exactly what
+            // an offline download used to hit.
+            all.add(series + "/" + series + " ep" + ep + " Engsub.srt");
+            all.add(series + "/" + series + " ep" + ep + " PHsub.srt");
+            all.add(series + "/ep" + ep + ".srt");
+            all.add(series + "/Episode " + ep + ".srt");
+            all.add(series + "/S01E" + (ep < 10 ? "0" : "") + ep + ".srt");
+            all.add(series + " ep" + ep + " Engsub.srt");
+            all.add(series + " ep" + ep + " PHsub.srt");
         } else {
             all.add(title + " Engsub.srt");
             all.add(title + " PHsub.srt");
