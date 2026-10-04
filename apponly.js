@@ -313,6 +313,21 @@
         if (pick) {
           err($('si-err'), 'Choose your Google account in the Android dialog.');
           try { pick(); } catch (e) { }
+          // The picked address is pushed (DfxGooglePicked) AND left in a slot
+          // we poll, so neither a dropped push nor a paused WebView loses it.
+          var take = bridge('takeGoogleEmail');
+          if (take) {
+            var pt = 0;
+            var pollPick = function () {
+              pt++;
+              var v = null;
+              try { v = JSON.parse(take() || 'null'); } catch (e3) { v = null; }
+              if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
+              if (pt < 40) setTimeout(pollPick, 700);
+              else err($('si-err'), 'No account chosen.');
+            };
+            setTimeout(pollPick, 700);
+          }
           return;
         }
         err($('si-err'), 'No Google account found on this phone. Add one in Android Settings › Accounts, then tap again.');
