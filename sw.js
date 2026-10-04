@@ -30,10 +30,13 @@
 // v14: hover-preview trailers play clean (YouTube chrome cropped away), the
 // stats dashboard is owner-gated by the database rules (token) with a realtime
 // stream, and a visible in-app notice announces a downloaded update.
+// v18: app-only Me screen (me.html + apponly.js), app Download settings and
+// the app-side Watch Party mic permission; watch-party.js asks the shell for
+// the microphone before getUserMedia.
 // v15: Watch Party — rooms + peer-to-peer voice with a mute/unmute mic and
 // host-driven playback sync, with the panel and mic dock living inside the
 // fullscreen element so they stay usable in fullscreen.
-const CACHE = 'deymflix-v17';
+const CACHE = 'deymflix-v18';
 const SHELL = [
   'index.html',
   'player.html',
