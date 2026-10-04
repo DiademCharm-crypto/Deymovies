@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PINGSTART</title>
+<style>html,body{margin:0;background:#000;color:#0f0}pre{padding:12px;font:700 24px/1.4 ui-monospace,monospace;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="x">PING START</pre>
+<script>
+(function () {
+  var out = document.getElementById('x');
+  var got = /[?&]r=([^&]*)/.exec(location.search);
+  if (got) {                      // second visit: results arrived, just display
+    var p = decodeURIComponent(got[1]);
+    document.title = 'PINGDONE ' + p.slice(0, 220);
+    out.textContent = 'DONE ' + p;
+    return;
+  }
+  window.__ping = function (t) { out.textContent = t; document.title = t.slice(0, 220); };
+  var R = [];
+  function note(k) { R.push(k); window.__ping('PING ' + R.join(' ')); }
+  var finished = false;
+  function finish() {
+    if (finished) return;
+    finished = true;
+    var p = R.join(' ');
+    window.__ping('PINGFIN ' + p);
+    setTimeout(function () {        // park the payload where /json/list can show it
+      try { location.href = '/dfxping.html?r=' + encodeURIComponent(p); } catch (e) {}
+    }, 1500);
+  }
+  // 1) image beacon to the host helper (adb reverse tcp:8899)
+  var im = new Image();
+  im.onload = function () { note('img=OK'); };
+  im.onerror = function () { note('img=ERR'); };
+  im.src = 'http://localhost:8899/b?d=PING_IMG_' + Date.now();
+  // 2) no-cors fetch to the same helper
+  try {
+    fetch('http://localhost:8899/b?d=PING_FETCH', { mode: 'no-cors' })
+      .then(function () { note('fetch=OK'); })
+      .catch(function () { note('fetch=ERR'); });
+  } catch (e) { note('fetch=THROW'); }
+  // 3) sendBeacon
+  try { note('beacon=' + (navigator.sendBeacon('http://localhost:8899/b?d=PING_BEACON') ? 'OK' : 'ERR')); }
+  catch (e) { note('beacon=THROW'); }
+  // 4) raw-IP variant (different origin from localhost)
+  var im2 = new Image();
+  im2.onload = function () { note('ip=OK'); };
+  im2.onerror = function () { note('ip=ERR'); };
+  im2.src = 'http://127.0.0.1:8899/b?d=PING_IP_' + Date.now();
+
+  setTimeout(note, 1500, 'w1');
+  setTimeout(note, 3000, 'w2');
+  setTimeout(finish, 5000);
+})();
+</script>
+</body>
+</html>
