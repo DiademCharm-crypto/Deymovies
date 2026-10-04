@@ -1454,6 +1454,13 @@ public class MainScreen85 {
             public String getGoogleAccounts() {
                 try { return googleAccountsJson(act); } catch (Throwable t) { return "[]"; }
             }
+            // Reading the phone's accounts needs GET_ACCOUNTS, which is a
+            // runtime permission: the page calls this first so Android's
+            // dialog appears, then polls until it answers "granted".
+            @android.webkit.JavascriptInterface
+            public String requestAccounts() {
+                try { return askAccounts85(act); } catch (Throwable t) { return "unavailable"; }
+            }
             @android.webkit.JavascriptInterface
             public String getAppInfo() {
                 try { return appInfoJson(act); } catch (Throwable t) { return "{}"; }
@@ -1475,6 +1482,7 @@ public class MainScreen85 {
     // point is wrapped and answers with a safe default instead.
     private static final String APP_PREFS85 = "deymflix_prefs";
     public static final int REQ_MIC85 = 4103;
+    public static final int REQ_ACCT85 = 4104;
     private static volatile android.webkit.PermissionRequest pendingWebMic85 = null;
     private static final java.util.ArrayDeque<String> LOG85 = new java.util.ArrayDeque<String>();
     private static final Object LOG_LOCK85 = new Object();
@@ -1505,15 +1513,33 @@ public class MainScreen85 {
         } catch (Throwable t) { return false; }
     }
 
-    // True while a download must NOT start (Wi-Fi-only on + mobile data).
+    // True while the active network is Wi-Fi, metered or not. Android flags
+    // some Wi-Fi as metered (phone hotspots answer DHCP with ANDROID_METERED),
+    // so "metered" alone must never be read as "mobile data".
+    public static boolean onWifi85(Context c) {
+        try {
+            android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                    c.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return false;
+            android.net.Network n = cm.getActiveNetwork();
+            if (n == null) return false;
+            android.net.NetworkCapabilities caps = cm.getNetworkCapabilities(n);
+            return caps != null && caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI);
+        } catch (Throwable t) { return false; }
+    }
+
+    // True while a download must NOT start: Wi-Fi-only is on and the phone is
+    // on a metered network that is NOT Wi-Fi (mobile data, metered hotspot).
+    // A metered Wi-Fi still counts as Wi-Fi -- the user asked for Wi-Fi.
     public static boolean wifiHold85(Context c) {
-        return wifiOnly85(c) && isMetered85(c);
+        return wifiOnly85(c) && isMetered85(c) && !onWifi85(c);
     }
 
     public static String downloadPrefsJson(Context c) {
         return "{\"quality\":" + jesc85(dlQuality85(c))
                 + ",\"wifiOnly\":" + wifiOnly85(c)
-                + ",\"metered\":" + isMetered85(c) + "}";
+                + ",\"metered\":" + isMetered85(c)
+                + ",\"onWifi\":" + onWifi85(c) + "}";
     }
 
     // ---- diagnostics log ring (memory only: nothing is sent anywhere until
@@ -1595,6 +1621,7 @@ public class MainScreen85 {
         sb.append("\"network\":").append(jesc85(networkLabel85(act))).append(",");
         sb.append("\"prefs\":").append(downloadPrefsJson(act)).append(",");
         sb.append("\"micGranted\":").append(hasMic85(act)).append(",");
+        sb.append("\"accountsGranted\":").append(hasAccounts85(act)).append(",");
         long free = 0L;
         try { free = DlSpeed85.freeBytes(); } catch (Throwable t) { free = -1L; }
         sb.append("\"freeBytes\":").append(free).append(",");
@@ -1675,6 +1702,27 @@ public class MainScreen85 {
                 }
             }, 600L);
         } catch (Throwable t) { }
+    }
+
+    // ---- Google accounts: GET_ACCOUNTS is a runtime permission too ----
+    public static boolean hasAccounts85(Context c) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT < 23) return true;
+            return c.checkSelfPermission(android.Manifest.permission.GET_ACCOUNTS)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        } catch (Throwable t) { return false; }
+    }
+
+    // "granted" -> the account list can be read now; "asked" -> Android's
+    // dialog is on screen (the page keeps polling until it flips).
+    public static String askAccounts85(final Activity act) {
+        try {
+            if (hasAccounts85(act)) return "granted";
+            if (android.os.Build.VERSION.SDK_INT < 23) return "granted";
+            act.requestPermissions(new String[]{ android.Manifest.permission.GET_ACCOUNTS }, REQ_ACCT85);
+            log85("google", "asked Android for GET_ACCOUNTS");
+            return "asked";
+        } catch (Throwable t) { return "unavailable"; }
     }
 
     private static void grantPendingMic85() {
@@ -2034,11 +2082,11 @@ public class MainScreen85 {
             Toast.makeText(act.getApplicationContext(), "This title cannot be downloaded.", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!wifiOverride && wifiOnly85(act) && isMetered85(act)) {
+        if (!wifiOverride && wifiHold85(act)) {
             log85("download", "held by Wi-Fi-only: " + (title == null ? "" : title));
             android.app.AlertDialog.Builder wb = new android.app.AlertDialog.Builder(act);
             wb.setTitle("Wi-Fi only is on");
-            wb.setMessage("Downloads wait for Wi-Fi. You are on mobile data right now.");
+            wb.setMessage("Downloads wait for Wi-Fi. You are not on Wi-Fi right now.");
             wb.setPositiveButton("Download anyway", new android.content.DialogInterface.OnClickListener() {
                 @Override public void onClick(android.content.DialogInterface d, int w) {
                     try { d.dismiss(); } catch (Exception e) { }
