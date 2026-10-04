@@ -33,7 +33,7 @@
 // v15: Watch Party — rooms + peer-to-peer voice with a mute/unmute mic and
 // host-driven playback sync, with the panel and mic dock living inside the
 // fullscreen element so they stay usable in fullscreen.
-const CACHE = 'deymflix-v15';
+const CACHE = 'deymflix-v16';
 const SHELL = [
   'index.html',
   'player.html',
