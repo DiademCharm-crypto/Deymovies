@@ -220,10 +220,31 @@
 .wp-dock-live.warn { background: #f5a623; box-shadow: 0 0 0 3px rgba(245, 166, 35, .18); }
 .wp-dock-people { font-size: .72rem; color: rgba(255, 255, 255, .7); }
 
-/* Phones: panel docks to the bottom of the player, dock stays small */
-@media (max-width: 560px) {
-  .wp-panel { right: 8px; left: 8px; width: auto; bottom: 66px; }
+/* Phones + short screens (landscape phones, small windows): the panel must FIT
+   inside the player. It used to be bottom-anchored with no height cap, so on a
+   phone it grew past the top of the video and got clipped. Now it sits under the
+   dock, is capped to the space that is left, and scrolls inside itself. */
+@media (max-width: 560px), (max-height: 560px) {
+  .wp-panel {
+    right: 8px; left: 8px; width: auto;
+    top: 58px; bottom: auto;
+    max-height: calc(100% - 66px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
+    border-radius: 14px;
+  }
   .wp-title { font-size: .95rem; }
+  .wp-head { gap: 10px; }
+  .wp-head-icon { width: 36px; height: 36px; flex-basis: 36px; }
+  .wp-head-icon svg { width: 18px; height: 18px; }
+  .wp-now { margin: 10px 0 8px; padding: 10px; }
+  .wp-btn-primary, .wp-btn-secondary { padding: 11px; font-size: .88rem; }
+  .wp-btn-primary svg, .wp-btn-secondary svg { width: 17px; height: 17px; }
+  .wp-room-code { padding: 10px; margin: 10px 0; }
+  .wp-room-code-val { font-size: 1.1rem; letter-spacing: 4px; }
+  .wp-person { font-size: .82rem; }
+  .wp-code-input { padding: 10px 12px; font-size: .95rem; }
   .wp-dock { top: 8px; right: 8px; padding: 5px 10px 5px 5px; gap: 8px; }
   .wp-mic { width: 34px; height: 34px; flex-basis: 34px; }
 }
