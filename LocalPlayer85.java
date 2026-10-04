@@ -65,6 +65,8 @@ public class LocalPlayer85 {
     private static final String P_FS = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z";
     private static final String P_CC = "M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z";
     private static final String P_GEAR = "M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z";
+    // Watch Party (v1.7): people icon beside the gear
+    private static final String P_PARTY = "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z";
     private static final String P_VOL = "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z";
     // speaker with a slash through it (material volume_off)
     private static final String P_MUTE = "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z";
@@ -649,6 +651,12 @@ public class LocalPlayer85 {
                         }
                     }
                 } catch (Exception e) { }
+                // Watch Party: poll the room + heartbeat (no-ops when not in
+                // a room) and drop our presence when the player closes.
+                try {
+                    if (act.isFinishing()) Party85.leftPlayer();
+                    else Party85.tick(Player.this, ui);
+                } catch (Throwable tP) { }
                 ui.handler.postDelayed(this, 1000);
             }
         };
@@ -670,6 +678,42 @@ public class LocalPlayer85 {
             catch (Exception e) { return false; }
         }
 
+        int pos() {
+            try { return (mp != null && prepared) ? mp.getCurrentPosition() : 0; }
+            catch (Exception e) { return 0; }
+        }
+
+        // A local press is what the room adopts -- tell the party first.
+        void noteParty() {
+            try { Party85.noteLocal(this, playing(), pos()); } catch (Throwable t) { }
+        }
+
+        // Remote-driven changes: never re-announce them (that is the
+        // ping-pong the site's sync rules exist to prevent).
+        void playQuiet() {
+            try {
+                if (mp == null || !prepared) return;
+                if (!mp.isPlaying()) { mp.start(); ui.syncPlay(true); }
+            } catch (Exception e) { }
+        }
+
+        void pauseQuiet() {
+            try {
+                if (mp == null || !prepared) return;
+                if (mp.isPlaying()) { mp.pause(); ui.syncPlay(false); }
+            } catch (Exception e) { }
+        }
+
+        void seekToMsQuiet(int ms) {
+            try {
+                if (mp == null || !prepared) return;
+                int dur = mp.getDuration();
+                if (ms < 0) ms = 0;
+                if (dur > 0 && ms > dur) ms = dur;
+                mp.seekTo(ms);
+            } catch (Exception e) { }
+        }
+
         void togglePlay() {
             if (mp == null) return;
             if (!prepared) return;
@@ -682,6 +726,7 @@ public class LocalPlayer85 {
                     ui.syncPlay(true);
                 }
                 ui.showBars();
+                noteParty();
             } catch (Exception e) { }
         }
 
@@ -694,6 +739,7 @@ public class LocalPlayer85 {
                 if (d > mp.getDuration()) d = mp.getDuration();
                 mp.seekTo(d);
                 ui.showBars();
+                noteParty();
             } catch (Exception e) { }
         }
 
@@ -724,6 +770,7 @@ public class LocalPlayer85 {
             userSeeking = false;
             if (mp != null && prepared) mp.seekTo(sb.getProgress());
             ui.showBars();
+            noteParty();
         }
     }
 
@@ -752,6 +799,7 @@ public class LocalPlayer85 {
         TextView time;
         IconView volBtn;          // mute / unmute (sits right beside the timestamp)
         IconView gearBtn;
+        IconView partyBtn;        // Watch Party (v1.7) -- room join + playback sync
         boolean muted = false;
         int preMuteVol = 0;
         TextView rewBadge;
@@ -1030,6 +1078,16 @@ public class LocalPlayer85 {
             vgap.rightMargin = (int) (12 * d);
             volBtn.setLayoutParams(vgap);
 
+            // ── Watch Party (v1.7) -- same rooms as the site's party, so an
+            // app viewer and a browser viewer share one room code. ──
+            partyBtn = new IconView(a, P_PARTY, null, Color.WHITE, 20 * d);
+            row.addView(partyBtn, new LinearLayout.LayoutParams(
+                    (int) (24 * d), (int) (24 * d)));
+            LinearLayout.LayoutParams ptgap = (LinearLayout.LayoutParams)
+                    partyBtn.getLayoutParams();
+            ptgap.rightMargin = (int) (12 * d);
+            partyBtn.setLayoutParams(ptgap);
+
             gearBtn = new IconView(a, P_GEAR, null, Color.WHITE, 20 * d);
             row.addView(gearBtn, new LinearLayout.LayoutParams(
                     (int) (24 * d), (int) (24 * d)));
@@ -1307,6 +1365,9 @@ public class LocalPlayer85 {
             });
             gearBtn.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) { toggleSettings(p); }
+            });
+            partyBtn.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { Party85.openPanel(act, p, Ui.this); }
             });
             subRow.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
@@ -1623,6 +1684,467 @@ public class LocalPlayer85 {
                     am.setStreamVolume(AudioManager.STREAM_MUSIC, max * pct / 100, 0);
                 } catch (Exception e) { }
             }
+        }
+    }
+
+    // =======================================================================
+    //  WATCH PARTY (v1.7) -- the site's party, running natively
+    // =======================================================================
+    // Rooms live in the SAME Firebase Realtime Database the website's
+    // watch-party.js uses, with the same wire shape, so an app viewer and a
+    // browser viewer share one code:
+    //    /watchparty/<CODE>/members/<ID>   {name, mic, seen}
+    //    /watchparty/<CODE>/host           "<ID>"
+    //    /watchparty/<CODE>/sync           {p, t, at, by}
+    // No SDK is added to the project: plain REST (HttpURLConnection) reads the
+    // room once a second and writes on every press. The sync rules mirror the
+    // site's: ANYONE may drive, our own echoes are ignored, an older press can
+    // never undo a newer one, and drift over 1.2s re-seeks.
+    // Voice stays in the site's WebRTC layer (the party panel on the site) --
+    // this is the playback-sync half, which is what the offline player needs.
+    static final class Party85 {
+        private static final String ROOT =
+                "https://deymflix-default-rtdb.firebaseio.com/watchparty";
+        private static volatile Party85 S = null;
+
+        private final java.util.concurrent.LinkedBlockingQueue<String[]> jobs =
+                new java.util.concurrent.LinkedBlockingQueue<String[]>();
+        private Activity act;
+        private Player player;
+        private Ui ui;
+        private volatile String room = "";
+        private volatile String me = "";
+        private volatile String hostId = "";
+        private volatile String status = "";
+        private volatile String lastError = "";
+        private volatile boolean joined = false;
+        private volatile int memberCount = 0;
+        private volatile long lastAppliedAt = 0L;     // newest state honoured
+        private volatile long lastLocalPressAt = 0L;  // newest local press
+        private long lastHeartbeat = 0L;
+        private long lastPoll = 0L;
+        private Thread worker;
+
+        // ---- entry point: the party button on the player ----
+        static void openPanel(final Activity act, final Player p, final Ui ui) {
+            try {
+                final Party85 cur = S;
+                float d = ui.d;
+                LinearLayout box = new LinearLayout(act);
+                box.setOrientation(LinearLayout.VERTICAL);
+                box.setPadding((int) (18 * d), (int) (8 * d), (int) (18 * d), 0);
+
+                final TextView state = new TextView(act);
+                state.setTextColor(0xFFB9BAC4);
+                state.setTextSize(13);
+                state.setPadding(0, 0, 0, (int) (10 * d));
+                box.addView(state);
+
+                final android.widget.EditText code = new android.widget.EditText(act);
+                code.setHint("Room code (e.g. MOVIE1)");
+                code.setSingleLine(true);
+                code.setTextColor(0xFFFFFFFF);
+                code.setHintTextColor(0xFF7A7B85);
+                if (cur != null && cur.joined) code.setText(cur.room);
+                box.addView(code, new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                final android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(act)
+                        .setTitle("Watch Party")
+                        .setView(box)
+                        .setPositiveButton("Join room", null)
+                        .setNeutralButton("Create room", null)
+                        .setNegativeButton("Close", null)
+                        .create();
+                dlg.setOnShowListener(new android.content.DialogInterface.OnShowListener() {
+                    @Override public void onShow(android.content.DialogInterface dd) {
+                        android.app.AlertDialog a = (android.app.AlertDialog) dd;
+                        a.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
+                                .setOnClickListener(new View.OnClickListener() {
+                            @Override public void onClick(View v) {
+                                String c = code.getText() == null ? "" : code.getText().toString();
+                                if (norm(c).length() == 0) { ui.toast("Enter a room code first"); return; }
+                                join(act, p, ui, c, false, dlg);
+                            }
+                        });
+                        a.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)
+                                .setOnClickListener(new View.OnClickListener() {
+                            @Override public void onClick(View v) {
+                                String c = code.getText() == null ? "" : code.getText().toString();
+                                if (norm(c).length() == 0) c = newCode();
+                                code.setText(norm(c));
+                                join(act, p, ui, c, true, dlg);
+                            }
+                        });
+                        // live status line while the panel is open
+                        final android.os.Handler h = new android.os.Handler(
+                                android.os.Looper.getMainLooper());
+                        h.post(new Runnable() {
+                            @Override public void run() {
+                                try {
+                                    Party85 s = S;
+                                    String txt;
+                                    if (s == null || !s.joined) {
+                                        txt = "Not in a room. Share a code and watch together.";
+                                        if (s != null && s.lastError.length() > 0) {
+                                            txt = txt + "\nLast error: " + s.lastError;
+                                        }
+                                    } else {
+                                        txt = "Room " + s.room + " -- " + s.memberCount
+                                                + (s.memberCount == 1 ? " viewer" : " viewers")
+                                                + "\n" + s.status;
+                                    }
+                                    state.setText(txt);
+                                } catch (Throwable t) { }
+                                if (dlg.isShowing()) h.postDelayed(this, 900L);
+                            }
+                        });
+                    }
+                });
+                if (cur != null && cur.joined) {
+                    dlg.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, "Leave room",
+                            new android.content.DialogInterface.OnClickListener() {
+                        @Override public void onClick(android.content.DialogInterface dd, int w) {
+                            leave(true);
+                            ui.toast("Left the watch party");
+                            try { dd.dismiss(); } catch (Throwable t) { }
+                        }
+                    });
+                }
+                dlg.show();
+            } catch (Throwable t) { }
+        }
+
+        private static String norm(String c) {
+            String s = c == null ? "" : c.toUpperCase(java.util.Locale.US).replaceAll("[^A-Z0-9]", "");
+            return s.length() > 6 ? s.substring(0, 6) : s;
+        }
+
+        private static String newCode() {
+            String abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 5; i++) {
+                sb.append(abc.charAt((int) (Math.random() * abc.length())));
+            }
+            return sb.toString();
+        }
+
+        static void join(final Activity act, final Player p, final Ui ui,
+                final String code, final boolean create, final android.app.Dialog dlg) {
+            try {
+                String r = norm(code);
+                if (r.length() == 0) return;
+                leave(false);
+                Party85 s = new Party85();
+                s.act = act;
+                s.player = p;
+                s.ui = ui;
+                s.room = r;
+                s.me = "N" + Long.toHexString(System.currentTimeMillis())
+                        .toUpperCase(java.util.Locale.US)
+                        + Integer.toHexString((int) (Math.random() * 4096));
+                s.joined = true;
+                s.status = create ? "Room created -- share this code" : "Joining...";
+                S = s;
+                MainScreen85.log85("party", (create ? "create " : "join ") + r + " as " + s.me);
+                s.start();
+                ui.toast(create ? ("Room " + r + " created") : ("Joining " + r + "..."));
+                try { if (dlg != null) dlg.dismiss(); } catch (Throwable t) { }
+                // the player is the room's source of truth from here on
+                s.pushPlayback(p.playing(), p.pos());
+            } catch (Throwable t) { }
+        }
+
+        // ---- live loop: one thread per room, 1s poll + 15s heartbeat ----
+        private void start() {
+            try {
+                worker = new Thread(new Runnable() {
+                    @Override public void run() {
+                        lastHeartbeat = 0L;
+                        lastPoll = 0L;
+                        while (joined) {
+                            try {
+                                // 1) outbound writes queued by presses
+                                String[] j;
+                                while ((j = jobs.poll()) != null) {
+                                    if (send(j[0], j[1], j[2]).length() == 0) {
+                                        lastError = "write failed (" + j[1] + ")";
+                                    }
+                                }
+                                long now = System.currentTimeMillis();
+                                // 2) presence: publish me, refresh every 15s
+                                if (now - lastHeartbeat > 15000L) {
+                                    lastHeartbeat = now;
+                                    send("PUT", "/members/" + me, memberJson());
+                                }
+                                // 3) read the room once a second
+                                if (now - lastPoll > 1000L) {
+                                    lastPoll = now;
+                                    String roomJson = send("GET", "", null);
+                                    try { consume(roomJson, now); } catch (Throwable t2) { }
+                                }
+                            } catch (Throwable t) { }
+                            try { Thread.sleep(150L); } catch (InterruptedException ie) { }
+                        }
+                        // last words: take our seat out of the room
+                        try { send("DELETE", "/members/" + me, null); } catch (Throwable t) { }
+                    }
+                }, "dfx-party");
+                worker.setDaemon(true);
+                worker.start();
+            } catch (Throwable t) { }
+        }
+
+        private String memberJson() {
+            String name = "";
+            try { name = android.os.Build.MODEL == null ? "App viewer" : android.os.Build.MODEL; }
+            catch (Throwable t) { name = "App viewer"; }
+            return "{\"name\":\"" + esc(name) + "\",\"mic\":false,\"seen\":"
+                    + System.currentTimeMillis() + "}";
+        }
+
+        private static String esc(String s) {
+            if (s == null) return "";
+            return s.replace("\\", "").replace("\"", "");
+        }
+
+        private String url(String path) {
+            return ROOT + "/" + room + path + ".json";
+        }
+
+        // Returns the response body for GET, "ok" for a successful write and
+        // "" when anything at all went wrong (never throws).
+        private String send(String method, String path, String body) {
+            java.net.HttpURLConnection c = null;
+            try {
+                c = (java.net.HttpURLConnection) new java.net.URL(url(path)).openConnection();
+                c.setRequestMethod(method);
+                c.setConnectTimeout(8000);
+                c.setReadTimeout(9000);
+                c.setRequestProperty("User-Agent", "DeymflixApp/native-party");
+                if (body != null) {
+                    c.setDoOutput(true);
+                    c.setRequestProperty("Content-Type", "application/json");
+                    java.io.OutputStream os = c.getOutputStream();
+                    os.write(body.getBytes("UTF-8"));
+                    os.close();
+                }
+                int code = c.getResponseCode();
+                if (code < 200 || code >= 300) {
+                    lastError = "HTTP " + code + " on " + method + " " + path;
+                    return "";
+                }
+                if (!"GET".equals(method)) return "ok";
+                java.io.InputStream in = c.getInputStream();
+                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[4096];
+                int n;
+                while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+                in.close();
+                return new String(bos.toByteArray(), "UTF-8");
+            } catch (Throwable t) {
+                lastError = String.valueOf(t.getMessage());
+                return "";
+            } finally {
+                try { if (c != null) c.disconnect(); } catch (Throwable t2) { }
+            }
+        }
+
+        // ---- room state -> member count, host, and the sync decision ----
+        private void consume(String roomJson, long now) {
+            if (roomJson == null || roomJson.length() == 0) return;
+            if (roomJson.equals("null")) { memberCount = 0; hostId = ""; status = "Waiting for the room..."; return; }
+            // members (fresh = seen within 60s, same rule as the site)
+            int count = 0;
+            String members = jobj(roomJson, "members");
+            if (members.length() > 0) {
+                int idx = 0;
+                while (true) {
+                    int seen = members.indexOf("\"seen\"", idx);
+                    if (seen < 0) break;
+                    long v = jlong(members.substring(seen), "seen");
+                    if (v > 0 && now - v < 60000L) count++;
+                    idx = seen + 6;
+                }
+            }
+            memberCount = count;
+            String seenHost = jstr(roomJson, "host");
+            // host seat: whoever holds it, or the first member present
+            if (seenHost != null && seenHost.length() > 0) hostId = seenHost;
+            else { hostId = me; send("PUT", "/host", "\"" + me + "\""); }
+            // sync
+            String sync = jobj(roomJson, "sync");
+            if (sync.length() > 0) apply(sync, now);
+            status = (me.equals(hostId) ? "You are the host" : "Host in the room")
+                    + " -- anyone can play, pause or seek";
+        }
+
+        private void apply(String sync, long now) {
+            try {
+                String by = jstr(sync, "by");
+                long at = jlong(sync, "at");
+                double t = jdbl(sync, "t");
+                boolean playing = jbool(sync, "p");
+                if (me.equals(by)) return;                       // our own echo
+                if (at > 0 && at <= lastAppliedAt) return;       // already honoured
+                // a state older than our own fresh press must not undo it
+                if (lastLocalPressAt > 0 && at > 0 && at < lastLocalPressAt
+                        && now - lastLocalPressAt < 1500L) return;
+                lastAppliedAt = at > 0 ? at : now;
+                final Player p = player;
+                if (p == null) return;
+                long age = at > 0 ? (now - at) : 0L;
+                final int target = (int) ((t + (playing ? age / 1000.0 : 0.0)) * 1000.0);
+                p.ui.handler.post(new Runnable() {
+                    @Override public void run() {
+                        try {
+                            if (Math.abs(p.pos() - target) > 1200) p.seekToMsQuiet(target);
+                            if (playing) p.playQuiet(); else p.pauseQuiet();
+                            if (p.ui != null) p.ui.toast("Following the room");
+                        } catch (Throwable t2) { }
+                    }
+                });
+            } catch (Throwable t) { }
+        }
+
+        // ---- called by the player ----
+        static void noteLocal(Player p, boolean playing, int msec) {
+            try {
+                Party85 s = S;
+                if (s == null || !s.joined) return;
+                s.pushPlayback(playing, msec);
+            } catch (Throwable t) { }
+        }
+
+        private void pushPlayback(boolean playing, int msec) {
+            try {
+                long now = System.currentTimeMillis();
+                lastLocalPressAt = now;
+                // our press is the newest state on the table, so an older
+                // remote state arriving late is history, not news
+                lastAppliedAt = now;
+                jobs.offer(new String[] { "PUT", "/sync",
+                        "{\"p\":" + playing + ",\"t\":" + (msec / 1000.0)
+                        + ",\"at\":" + now + ",\"by\":\"" + me + "\"}" });
+            } catch (Throwable t) { }
+        }
+
+        static void tick(Player p, Ui ui) {
+            try {
+                Party85 s = S;
+                if (s == null || !s.joined) return;
+                if (s.act != null && s.act.isFinishing()) { leave(true); return; }
+                if (s.ui == null) s.ui = ui;
+                if (s.player == null) s.player = p;
+            } catch (Throwable t) { }
+        }
+
+        static void leftPlayer() {
+            try { if (S != null) leave(true); } catch (Throwable t) { }
+        }
+
+        static void leave(boolean told) {
+            try {
+                Party85 s = S;
+                S = null;
+                if (s == null) return;
+                s.joined = false;
+                try { if (s.worker != null) s.worker.interrupt(); } catch (Throwable t) { }
+                if (told) {
+                    try { MainScreen85.log85("party", "left " + s.room); } catch (Throwable t) { }
+                }
+            } catch (Throwable t) { }
+        }
+
+        // ---- tiny flat-JSON readers (the room payload is small and flat) ----
+        private static String jobj(String json, String key) {
+            try {
+                int i = json.indexOf("\"" + key + "\"");
+                if (i < 0) return "";
+                i = json.indexOf(':', i);
+                if (i < 0) return "";
+                i++;
+                while (i < json.length() && Character.isWhitespace(json.charAt(i))) i++;
+                if (i >= json.length() || json.charAt(i) != '{') return "";
+                int depth = 0;
+                boolean inStr = false;
+                for (int e = i; e < json.length(); e++) {
+                    char c = json.charAt(e);
+                    if (inStr) {
+                        if (c == '\\') { e++; continue; }
+                        if (c == '"') inStr = false;
+                        continue;
+                    }
+                    if (c == '"') { inStr = true; continue; }
+                    if (c == '{') depth++;
+                    else if (c == '}') {
+                        depth--;
+                        if (depth == 0) return json.substring(i, e + 1);
+                    }
+                }
+            } catch (Throwable t) { }
+            return "";
+        }
+
+        private static String jstr(String json, String key) {
+            try {
+                int i = json.indexOf("\"" + key + "\"");
+                if (i < 0) return "";
+                i = json.indexOf(':', i);
+                if (i < 0) return "";
+                i++;
+                while (i < json.length() && Character.isWhitespace(json.charAt(i))) i++;
+                if (i >= json.length() || json.charAt(i) != '"') return "";
+                int e = i + 1;
+                StringBuilder sb = new StringBuilder();
+                while (e < json.length()) {
+                    char c = json.charAt(e);
+                    if (c == '\\') { sb.append(json.charAt(e + 1)); e += 2; continue; }
+                    if (c == '"') break;
+                    sb.append(c);
+                    e++;
+                }
+                return sb.toString();
+            } catch (Throwable t) { return ""; }
+        }
+
+        private static long jlong(String json, String key) {
+            try {
+                int i = json.indexOf("\"" + key + "\"");
+                if (i < 0) return 0L;
+                i = json.indexOf(':', i);
+                if (i < 0) return 0L;
+                i++;
+                int e = i;
+                while (e < json.length() && "-+0123456789.".indexOf(json.charAt(e)) >= 0) e++;
+                if (e == i) return 0L;
+                return (long) Double.parseDouble(json.substring(i, e));
+            } catch (Throwable t) { return 0L; }
+        }
+
+        private static double jdbl(String json, String key) {
+            try {
+                int i = json.indexOf("\"" + key + "\"");
+                if (i < 0) return 0.0;
+                i = json.indexOf(':', i);
+                if (i < 0) return 0.0;
+                i++;
+                int e = i;
+                while (e < json.length() && "-+0123456789.eE".indexOf(json.charAt(e)) >= 0) e++;
+                if (e == i) return 0.0;
+                return Double.parseDouble(json.substring(i, e));
+            } catch (Throwable t) { return 0.0; }
+        }
+
+        private static boolean jbool(String json, String key) {
+            try {
+                int i = json.indexOf("\"" + key + "\"");
+                if (i < 0) return false;
+                i = json.indexOf(':', i);
+                if (i < 0) return false;
+                return json.substring(i + 1).trim().startsWith("true");
+            } catch (Throwable t) { return false; }
         }
     }
 }
