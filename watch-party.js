@@ -427,28 +427,86 @@
     if (!quiet) render();
   }
 
-  // ── playback sync ────────────────────────────────────────────────────────
+  // ── playback sync: ANYONE in the room can drive ─────────────────────────
+  // Every member's play/pause/seek becomes the shared state and the others
+  // follow it, so a guest can pause, resume or scrub and the creator follows
+  // too — not just the other way round. Each state carries the moment it was
+  // made (`at`): the newest press wins when two arrive together, and an applier
+  // adopts what it honoured as its own state, so two viewers can never bounce
+  // the movie back and forth between them.
   function pushSync() {
-    if (!S.transport || !isHost() || S.applying) return;
+    if (!S.transport || !S.room) return;
     var v = directVideo();
     if (!v) return;
+    // Is this the state we already announced (or adopted) moments ago? That is
+    // what an apply-caused event looks like, and re-announcing it would let two
+    // members ping-pong the same state between them.
+    if (S.lastPushPaused === v.paused && Math.abs((S.lastPushT || 0) - v.currentTime) < 0.75 &&
+        Date.now() - (S.lastStateAt || 0) < 4000) {
+      tr('sync-skip', 'duplicate');
+      return;
+    }
+    // A remote state is being applied right now: retry shortly instead of
+    // dropping the press. A viewer's play/pause/seek must not be lost just
+    // because it landed inside that ~350ms window.
+    if (S.applying) {
+      clearTimeout(S.pushRetry);
+      S.pushRetry = setTimeout(pushSync, 420);
+      return;
+    }
+    var now = Date.now();
     S.pushed = (S.pushed || 0) + 1;
     S.lastPushT = v.currentTime;
     S.lastPushPaused = !!v.paused;
+    S.pushedAt = now;          // when THIS viewer genuinely pressed
+    S.lastStateAt = now;
+    // Our own press is the newest state on the table; keep it so.
+    S.lastRemoteAt = now;
+    S.lastSyncT = v.currentTime;
+    S.lastSyncAt = now;
+    S.lastSyncPlaying = !v.paused;
     tr('sync-tx', (v.paused ? 'paused' : 'playing') + ' t=' + v.currentTime.toFixed(1));
-    S.transport.put('/sync', { p: !v.paused, t: v.currentTime, at: Date.now(), by: ME });
+    S.transport.put('/sync', { p: !v.paused, t: v.currentTime, at: now, by: ME });
   }
   function applySync(st) {
-    if (!st || !S.joined || isHost()) { tr('sync-skip', !st ? 'empty' : !S.joined ? 'not-joined' : 'i-am-host'); return; }
+    if (!st || !S.joined) { tr('sync-skip', !st ? 'empty' : 'not-joined'); return; }
     if (!syncPossible()) { tr('sync-skip', 'source-not-syncable'); return; }
+    var at = Number(st.at) || 0;
+    // Our own write, echoed back by the transport: we are already in that
+    // state, and an older echo of ours must never undo a newer press of ours.
+    if (st.by === ME) { tr('sync-skip', 'own-echo'); return; }
+    // A state older than our own press, arriving while that press is still
+    // fresh, is history: applying it would undo the press. Anything later —
+    // and anything after this short window — always applies, so differing
+    // clocks between viewers can never lock a room up.
+    if (S.pushedAt && at && at < S.pushedAt && Date.now() - S.pushedAt < 1500) {
+      tr('sync-skip', 'predates-our-press');
+      return;
+    }
+    // Out-of-order delivery, or a press older than one already honoured
+    // (including our own, made moments ago): drop it instead of flapping.
+    // The window is deliberately wide — it only has to beat reordering and
+    // clock skew, and the next press is always newer than this one.
+    if (st.by !== ME && at && S.lastRemoteAt && at < S.lastRemoteAt - 2000) {
+      tr('sync-skip', 'stale t=' + (Number(st.t) || 0).toFixed(1));
+      return;
+    }
     var v = directVideo();
     if (!v) return;
-    var target = (Number(st.t) || 0) + (st.p ? (Date.now() - (Number(st.at) || Date.now())) / 1000 : 0);
+    var target = (Number(st.t) || 0) + (st.p ? (Date.now() - (at || Date.now())) / 1000 : 0);
     S.applying = true;
     S.applied = (S.applied || 0) + 1;
     S.lastSyncT = target;
-    S.lastSyncAt = Date.now();
+    S.lastSyncAt = Date.now();      // local apply time (the drift math uses it)
     S.lastSyncPlaying = !!st.p;
+    S.lastRemoteAt = at || Date.now();
+    S.appliedRemoteAt = Date.now();
+    // Adopt the state we just honoured as OUR announced one, so the host's
+    // reconciliation heartbeat re-publishes it (idempotent) rather than
+    // fighting it.
+    S.lastPushT = target;
+    S.lastPushPaused = !st.p;
+    S.lastStateAt = Date.now();
     try {
       if (Math.abs((v.currentTime || 0) - target) > 1.2) v.currentTime = target;
       if (st.p && v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
@@ -480,20 +538,27 @@
     if (boundVideo !== v) {
       boundVideo = v;
       ['play', 'pause', 'seeked'].forEach(function (ev) {
-        v.addEventListener(ev, function () { if (!S.applying) setTimeout(pushSync, 60); });
+        // No S.applying gate here: pushSync defers through the apply window and
+        // itself suppresses states that were just announced or adopted, so a
+        // viewer's real press is never lost while apply-caused events are still
+        // ignored (they re-announce what we already adopted).
+        v.addEventListener(ev, function () { setTimeout(pushSync, 60); });
       });
     }
     if (v.dataset.wpSync !== '1') v.dataset.wpSync = '1';
     if (attachSync.timers) return;   // attachSync is re-run by the watchdog
     attachSync.timers = true;
-    // Reconciliation loop, not just events: it catches a seek even if the
-    // player swallowed the 'seeked' event, plus stalls, drift and the guest
-    // arriving late. Anything more than a second off what we last announced
-    // with the pause/play state changed gets republished.
+    // Reconciliation heartbeat, not just events: it catches a seek even if the
+    // player swallowed the 'seeked' event, plus stalls, drift and a viewer
+    // arriving late. Only the host runs it — one writer means two people can
+    // never bounce the movie between them, while any member's own play/pause/
+    // seek still propagates instantly through the event pushes above.
     setInterval(function () {
       if (!S.joined || !isHost() || !syncPossible()) return;
       var d = directVideo();
       if (!d) return;
+      // Just honoured someone else's press: let it stand instead of stomping it.
+      if (Date.now() - (S.appliedRemoteAt || 0) < 1600) return;
       var moved = Math.abs((d.currentTime || 0) - (S.lastPushT || 0)) > 1.0;
       if (moved || S.lastPushPaused !== d.paused) pushSync();
     }, 1500);
@@ -537,13 +602,14 @@
             '<input class="wp-code-input" id="wp-code" maxlength="6" placeholder="CODE" autocomplete="off">' +
             '<button class="wp-btn-secondary" id="wp-join" type="button" style="width:auto;padding:12px 18px">Join</button>' +
           '</div><div class="wp-err" id="wp-err"></div>' +
-          '<div class="wp-hint">Share the code with whoever you are watching with. Voice works both ways — mute anytime with the mic button. The host\'s play / pause / seek stays in sync for titles that play in our own player.</div></div>' +
+          '<div class="wp-hint">Share the code with whoever you are watching with. Voice works both ways — mute anytime with the mic button. Play, pause and seek stay in sync for everyone, in both directions, on titles that play in our own player.</div></div>' +
         '</div>' +
         '<div class="wp-room" id="wp-room">' +
           '<div class="wp-room-code"><div><div class="wp-now-label">Room code</div>' +
             '<div class="wp-room-code-val" id="wp-code-show">----</div></div>' +
             '<button class="wp-copy" id="wp-copy" type="button">Copy</button></div>' +
           '<div class="wp-people" id="wp-people"></div>' +
+          '<div class="wp-hint" style="margin:0 0 12px">Anyone in the room can play, pause or seek the movie — everyone follows.</div>' +
           '<button class="wp-btn-secondary" id="wp-leave" type="button">Leave room</button>' +
         '</div>' +
       '</div>';
