@@ -952,7 +952,16 @@ public class DlSpeed85 {
             int dot = base.lastIndexOf('.');
             String stem = dot > 0 ? base.substring(0, dot) : base;
             File sidecar = new File(vid.getParentFile(), stem + ".srt");
-            if (sidecar.exists()) return; // already have it
+            // A 0-byte sidecar (interrupted fetch) is as good as missing.
+            if (sidecar.exists() && sidecar.length() > 0) return; // already have it
+            // 1) The ONLINE cache usually already holds this episode (the player
+            //    caches both languages whenever the title is streamed). Copying
+            //    from it is instant and needs no network at all — this is the
+            //    path that makes a downloaded episode show subtitles offline.
+            if (title != null && title.length() > 0) {
+                File cached = cachedSubFor(ctx, title, 0);
+                if (cached != null && copyFile(cached, sidecar)) return;
+            }
             if (title == null) return;
             if (title.length() == 0) return;
             int ep = MainScreen85.episodeNumFromTitle(title);
@@ -963,6 +972,10 @@ public class DlSpeed85 {
             int code = c.getResponseCode();
             if (code != 200) {
                 c.disconnect();
+                // 2) The probe failed mid-flight (manifest blip, offline moment):
+                //    try the cache once more before giving up.
+                File cached2 = cachedSubFor(ctx, title, 0);
+                if (cached2 != null) copyFile(cached2, sidecar);
                 return;
             }
             InputStream in = new BufferedInputStream(c.getInputStream());
@@ -974,6 +987,58 @@ public class DlSpeed85 {
             in.close();
             c.disconnect();
         } catch (Exception e) { }
+    }
+
+    // Best sidecar for a title inside the subtitle cache dir, Engsub first (or
+    // Tagalog first when subLang == 2). Reuses the site's own name matching, so
+    // "The Scandal" + ep1 finds "The Scandal ep1 Engsub.srt" whether the title
+    // carried the episode number or not.
+    public static File cachedSubFor(Context ctx, String title, int subLang) {
+        try {
+            if (title == null) return null;
+            if (title.length() == 0) return null;
+            File dir = subCacheDir(ctx);
+            File[] all = dir.listFiles();
+            if (all == null) return null;
+            int ep = MainScreen85.episodeNumFromTitle(title);
+            File eng = null;
+            File ph = null;
+            File any = null;
+            for (int i = 0; i < all.length; i++) {
+                String n = all[i].getName();
+                if (!n.toLowerCase(java.util.Locale.US).endsWith(".srt")) continue;
+                if (all[i].length() <= 0) continue;
+                if (!MainScreen85.subNameMatchesMovie(n, title, ep)) continue;
+                if (any == null) any = all[i];
+                int rank = MainScreen85.localSubLangRank(n);
+                if (rank == 0 && eng == null) eng = all[i];
+                if (rank == 1 && ph == null) ph = all[i];
+            }
+            if (subLang == 2 && ph != null) return ph;
+            if (eng != null) return eng;
+            if (ph != null) return ph;
+            return any;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Small binary copy for sidecars (returns false when nothing was written).
+    public static boolean copyFile(File from, File to) {
+        try {
+            if (from == null || to == null) return false;
+            if (!from.exists() || from.length() <= 0) return false;
+            InputStream in = new BufferedInputStream(new FileInputStream(from));
+            FileOutputStream out = new FileOutputStream(to);
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+            out.close();
+            in.close();
+            return to.length() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static HttpURLConnection open(String url) throws Exception {
