@@ -296,16 +296,40 @@
   function googleLogin() {
     err($('si-err'), '');
     var get = bridge('getGoogleAccounts');
-    var list = [];
-    if (get) {
-      try { list = JSON.parse(get() || '[]') || []; } catch (e) { list = []; }
-    }
-    if (!list.length) {
-      err($('si-err'), 'No Google account found on this phone. Add one in Android Settings › Accounts, then tap again.');
+    if (!get) {
+      err($('si-err'), 'Google login works inside the DEYMFLIX app only.');
       return;
     }
-    if (list.length === 1) { googleUse(list[0].email); return; }
-    // several Google accounts: let the user pick (Google-style sheet)
+    // GET_ACCOUNTS is a runtime permission: ask first, then keep checking so
+    // the picker opens by itself the moment Android flips it to granted.
+    var ask = bridge('requestAccounts');
+    function withAccounts() {
+      var list = [];
+      try { list = JSON.parse(get() || '[]') || []; } catch (e) { list = []; }
+      if (!list.length) {
+        err($('si-err'), 'No Google account found on this phone. Add one in Android Settings › Accounts, then tap again.');
+        return;
+      }
+      if (list.length === 1) { googleUse(list[0].email); return; }
+      openGoogleSheet(list);
+    }
+    if (!ask) { withAccounts(); return; }
+    var st = '';
+    try { st = String(ask() || ''); } catch (e) { st = ''; }
+    if (st === 'granted') { withAccounts(); return; }
+    err($('si-err'), 'Android is asking to let DEYMFLIX see this phone\'s accounts — tap Allow and the picker opens on its own.');
+    var tries = 0;
+    (function poll() {
+      tries++;
+      var s2 = '';
+      try { s2 = String(ask() || ''); } catch (e) { s2 = ''; }
+      if (s2 === 'granted') { err($('si-err'), ''); withAccounts(); return; }
+      if (tries < 20) setTimeout(poll, 700);
+    })();
+  }
+
+  // several Google accounts: let the user pick (Google-style sheet)
+  function openGoogleSheet(list) {
     var box = document.createElement('div');
     box.style.cssText = 'position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;';
     var sheet = document.createElement('div');
@@ -356,7 +380,7 @@
   //  4) DOWNLOAD SETTINGS (quality + Wi-Fi only) -- stored NATIVELY through
   //     the bridge so the download engine enforces exactly what is shown here.
   // ══════════════════════════════════════════════════════════════════════════
-  var DL = { quality: 'auto', wifiOnly: false, metered: false };
+  var DL = { quality: 'auto', wifiOnly: false, metered: false, onWifi: false };
 
   function readPrefs() {
     var get = bridge('getDownloadPrefs');
@@ -366,7 +390,15 @@
         DL.quality = p.quality || 'auto';
         DL.wifiOnly = !!p.wifiOnly;
         DL.metered = !!p.metered;
+        DL.onWifi = !!p.onWifi;
       } catch (e) { }
+    } else {
+      // browser / harness fallback: same shape, remembered locally
+      try {
+        var q = JSON.parse(localStorage.getItem('dfx_dl_prefs') || '{}') || {};
+        if (q.quality) DL.quality = q.quality;
+        DL.wifiOnly = !!q.wifiOnly;
+      } catch (e2) { }
     }
     renderPrefs();
   }
@@ -394,9 +426,9 @@
       var line = 'Quality: ' + (DL.quality === 'auto' ? 'Auto (best available)' : DL.quality + 'p')
         + ' · Wi-Fi only: ' + (DL.wifiOnly ? 'on' : 'off');
       if (DL.wifiOnly) {
-        line += DL.metered
-          ? '\nYou are on mobile data right now — new downloads will ask first.'
-          : '\nYou are on Wi-Fi right now.';
+        if (DL.onWifi) line += '\nYou are on Wi-Fi right now.';
+        else if (DL.metered) line += '\nYou are on mobile data right now — new downloads will ask first.';
+        else line += '\nYou are not on Wi-Fi right now — new downloads will ask first.';
       }
       st.textContent = line;
     }
