@@ -591,15 +591,15 @@
   // ── fade with the player chrome ──────────────────────────────────────────
   // The dock + panel live in their own layer (so they survive fullscreen), which
   // means they do NOT fade when the player hides its controls. Mirror the
-  // player's own overlay state so the party UI disappears with everything else
-  // and leaves a clean, unobstructed picture.
+  // player's overlay state EXACTLY — dock and an open panel alike — so an idle
+  // viewer gets a completely clear picture. Moving the mouse (or tapping) brings
+  // the whole chrome back, party UI included; an open panel just reappears with
+  // it, nothing is lost.
   function syncFade() {
     if (!UI) return;
     var ov = document.getElementById('player-gesture-overlay');
     if (!ov) return;
-    var panel = $('wp-panel');
-    var show = ov.classList.contains('active') || !!(panel && panel.classList.contains('open'));
-    UI.classList.toggle('wp-faded', !show);
+    UI.classList.toggle('wp-faded', !ov.classList.contains('active'));
   }
 
   function attachFade() {
