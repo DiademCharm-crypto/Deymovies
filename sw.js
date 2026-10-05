@@ -39,7 +39,10 @@
 // v22: the app's Me screen gained the profile editor, Manage Account, Account
 // and Security (device list) and the 6-digit verification code -- me.html now
 // loads me.css, and apponly.js is at v2.0 on every page that includes it.
-const CACHE = 'deymflix-v22';
+// v23: the app's Me screen lost its dock (native back arrow instead), Continue
+// Watching is a plain poster strip (posters looked up from the catalogs) and
+// Sign Out moved under Manage Account -- apponly.js is at v2.3 on every page.
+const CACHE = 'deymflix-v23';
 const SHELL = [
   'index.html',
   'player.html',
