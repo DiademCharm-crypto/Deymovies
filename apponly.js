@@ -56,21 +56,22 @@
   }
 
   // Continue Watching moved to the Me screen, so keep it off the app's home
-  // feed. app.js re-renders the section, so its style attribute is watched.
+  // feed. This MUST stay a stylesheet: the previous version used a
+  // MutationObserver watching [style, hidden] that re-wrote
+  // setAttribute('hidden') from inside its own callback. Chrome queues a
+  // mutation record even for a same-value setAttribute, so the observer
+  // re-triggered itself forever -- an infinite microtask storm (measured:
+  // 3000+ passes in 33ms) that starved the renderer's main thread. Timers and
+  // touch never ran again: dead navbar, and posters stayed unrevealed because
+  // the fade-in sweeps could not fire. A style element hides the section with
+  // zero events, however often the page re-renders it.
   if (HERE === 'index.html') {
-    var hideCw = function () {
-      var s = document.getElementById('continue-watching-section');
-      if (!s) return;
-      s.setAttribute('hidden', 'hidden');
-      if (s.style.display !== 'none') s.style.display = 'none';
-    };
-    hideCw();
     try {
-      new MutationObserver(hideCw).observe(document.documentElement, {
-        childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden']
-      });
+      var hideCwStyle = document.createElement('style');
+      hideCwStyle.id = 'dfx-hide-cw';
+      hideCwStyle.textContent = '#continue-watching-section{display:none !important}';
+      (document.head || document.documentElement).appendChild(hideCwStyle);
     } catch (e) { }
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideCw);
   }
 
   if (!ON_ME) return;                                   // rest is the Me screen
