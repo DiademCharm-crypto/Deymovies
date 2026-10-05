@@ -198,7 +198,7 @@ const movies = [
     releaseDate: "2026-07-29",
     rating: 7.9,
     poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
-    manualEmbed: "cos:movie/969681",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/MOVIES+003/Spider-Man.Brand.New.Day.2026.720p.WEBRip.x264.AAC-%5BYTS.GG+-+YTS.BZ%5D.mp4",
     trailerEmbed: "https://www.youtube.com/watch?v=daXaTug8rL4",
     isSeries: false
   },
