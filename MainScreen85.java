@@ -297,6 +297,13 @@ public class MainScreen85 {
     private LinearLayout splashContent;   // logo group -- animated on exit
     private java.util.Timer splashTimeoutTimer;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRef;
+    private WebView wvRef85;                       // the shell page (swipe-gate + cards)
+    private View playerErrCard85;                  // "video could not load" card
+    // A failed load ALSO ends with onPageFinished (the WebView finishes the
+    // error document), so "finished" cannot mean "worked": the card was being
+    // removed the instant it appeared. Every load starts clean here; only a
+    // main-frame error marks it failed.
+    private boolean lastLoadFailed85 = false;
     private View hexagonView;
     private android.animation.ValueAnimator splashAnimator;
 
@@ -328,6 +335,7 @@ public class MainScreen85 {
                         ? (androidx.swiperefreshlayout.widget.SwipeRefreshLayout) wv.getParent()
                         : null;
         swipeRef = swipe;
+        wvRef85 = wv;
 
         // -- 1) WebView settings --
         wv.getSettings().setJavaScriptEnabled(true);
@@ -371,7 +379,15 @@ public class MainScreen85 {
         }
 
         // -- 3) SPLASH --
-        showSplash();
+        // A route change handed over by the Me screen sets dfx_nosplash: the
+        // user is already inside the app, so showing the loading logo again
+        // reads as a stall. The page is simply swapped underneath instead.
+        boolean nosplash85 = false;
+        try {
+            nosplash85 = act.getIntent() != null
+                    && act.getIntent().getBooleanExtra("dfx_nosplash", false);
+        } catch (Throwable tN) { }
+        if (!nosplash85) showSplash();
 
         // -- 4) WebViewClient: spinner fix + offline redirect + splash dismiss --
         wv.setWebViewClient(new android.webkit.WebViewClient() {
@@ -599,8 +615,15 @@ public class MainScreen85 {
                 return null; // null = request proceeds normally
             }
             @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                lastLoadFailed85 = false;      // a fresh attempt: judge it below
+                updateSwipeGate();
+            }
+            @Override
             public void onPageFinished(WebView view, String url) {
                 if (swipe != null) swipe.setRefreshing(false);
+                updateSwipeGate();      // player.html: no pull-to-refresh
+                if (!lastLoadFailed85) hidePlayerErrorCard();  // only a real success clears it
                 // page load COMPLETE (site or offline.html): only now may the
                 // splash exit -- after the 2s minimum enforced in hideSplash()
                 pageReady85 = true;
@@ -611,12 +634,31 @@ public class MainScreen85 {
             }
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                lastLoadFailed85 = true;   // this load did NOT work (see onPageFinished)
+                // The player is the one page where the site's own UI cannot
+                // recover (nothing to tap, no navbar): show the native card
+                // with Refresh + Home instead of a dead black screen.
+                boolean player85 = isPlayerUrl(failingUrl) || isPlayerUrl(view.getUrl());
                 if (!isNetworkAvailable()) {
-                    view.loadUrl("file:///android_asset/offline.html");
+                    if (player85) showPlayerErrorCard();
+                    else view.loadUrl("file:///android_asset/offline.html");
+                } else if (player85) {
+                    showPlayerErrorCard();
                 }
                 if (swipe != null) swipe.setRefreshing(false);
                 // no immediate hideSplash(): wait for the (re)load to finish,
                 // the offline page's onPageFinished, or the 15s safety cap
+            }
+            @Override
+            public void onReceivedHttpError(WebView view, android.webkit.WebResourceRequest request,
+                                            android.webkit.WebResourceResponse errorResponse) {
+                try {
+                    if (request == null || !request.isForMainFrame()) return;
+                    String u85 = request.getUrl() == null ? null : request.getUrl().toString();
+                    int st85 = errorResponse == null ? 0 : errorResponse.getStatusCode();
+                    if (st85 >= 400) lastLoadFailed85 = true;
+                    if (isPlayerUrl(u85) && st85 >= 400) showPlayerErrorCard();
+                } catch (Throwable tH) { }
             }
         });
 
@@ -2138,6 +2180,164 @@ public class MainScreen85 {
         }
     }
 
+    // ── Smooth tab switches from the native Me screen ───────────────────────
+    // Starting MainActivity again (CLEAR_TOP + finish) tore the shell down and
+    // rebuilt it, so every tab tap from Me replayed the 2s loading splash. The
+    // shell is normally still alive underneath: swap its page instead and let
+    // Me close -- no splash, no black flash. Returns false when there is no
+    // live shell (process was recreated), so the caller falls back to an
+    // intent that carries dfx_nosplash.
+    public static boolean navigateFromMe(Activity me, String route) {
+        try {
+            if (route == null || route.length() == 0) return false;
+            purgeDeadInstances();
+            Activity host = null;
+            MainScreen85 m = null;
+            for (java.util.Map.Entry<Activity, MainScreen85> e : INSTANCES.entrySet()) {
+                Activity a = e.getKey();
+                if (a == null || a == me) continue;
+                if (a.getClass().getName().endsWith(".MainActivity")) {
+                    host = a;
+                    m = e.getValue();
+                    break;
+                }
+            }
+            if (host == null || m == null) return false;
+            final MainScreen85 fm = m;
+            final String fRoute = route;
+            host.runOnUiThread(new Runnable() { @Override public void run() {
+                try {
+                    if (fm.wvRef85 == null) return;
+                    fm.hidePlayerErrorCard();
+                    fm.wvRef85.loadUrl(fm.siteUrl85(fRoute));
+                    fm.updateSwipeGate();
+                    log85("nav", "tab -> " + fRoute + " (no splash)");
+                } catch (Throwable t) { log85("nav", "tab load failed " + fRoute); }
+            }});
+            return true;
+        } catch (Throwable t) { return false; }
+    }
+
+    // ── player.html: no pull-to-refresh, plus a way out when it dies ────────
+    // Swiping down on the player refreshes the page by accident, so the app
+    // keeps pull-to-refresh OFF on that page only. If the video page cannot
+    // load at all, the site's own UI cannot help (no bar, nothing to tap), so a
+    // native card takes over with Refresh and Home.
+    private static boolean isPlayerUrl(String u) {
+        return u != null && u.toLowerCase().indexOf("player.html") >= 0;
+    }
+
+    private void updateSwipeGate() {
+        try {
+            if (swipeRef == null) return;
+            String u = wvRef85 == null ? null : wvRef85.getUrl();
+            boolean allowed = !appFullscreen && !isPlayerUrl(u);
+            if (swipeRef.isEnabled() != allowed) swipeRef.setEnabled(allowed);
+            if (!allowed) swipeRef.setRefreshing(false);
+        } catch (Throwable t) { }
+    }
+
+    private android.graphics.drawable.GradientDrawable pill85(int fill, int stroke, float radiusDp) {
+        float d = act.getResources().getDisplayMetrics().density;
+        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+        g.setColor(fill);
+        g.setCornerRadius(radiusDp * d);
+        if (stroke != 0) g.setStroke(Math.max(1, (int) d), stroke);
+        return g;
+    }
+
+    private void showPlayerErrorCard() {
+        try {
+            if (playerErrCard85 != null) return;
+            float d = act.getResources().getDisplayMetrics().density;
+            LinearLayout card = new LinearLayout(act);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setGravity(Gravity.CENTER);
+            card.setBackgroundColor(Color.parseColor("#0B0B0F"));
+            card.setClickable(true);
+            card.setFocusable(true);
+
+            TextView title = new TextView(act);
+            title.setText("This video could not load");
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(18);
+            title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            title.setGravity(Gravity.CENTER);
+            card.addView(title);
+
+            TextView sub = new TextView(act);
+            sub.setText("Your connection dropped. Try again, or head back home.");
+            sub.setTextColor(Color.parseColor("#9A9A9A"));
+            sub.setTextSize(13.5f);
+            sub.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.topMargin = (int) (10 * d);
+            card.addView(sub, sp);
+
+            LinearLayout bar = new LinearLayout(act);
+            bar.setOrientation(LinearLayout.VERTICAL);
+            bar.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            bp.topMargin = (int) (26 * d);
+            bp.leftMargin = (int) (30 * d);
+            bp.rightMargin = (int) (30 * d);
+            card.addView(bar, bp);
+
+            TextView refresh = new TextView(act);
+            refresh.setText("Refresh");
+            refresh.setTextColor(Color.WHITE);
+            refresh.setTextSize(15.5f);
+            refresh.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            refresh.setGravity(Gravity.CENTER);
+            refresh.setBackground(pill85(Color.parseColor("#E50914"), 0, 12f));
+            refresh.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
+                hidePlayerErrorCard();
+                try { if (wvRef85 != null) wvRef85.reload(); } catch (Throwable t) { }
+            }});
+            bar.addView(refresh, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, (int) (52 * d)));
+
+            TextView home = new TextView(act);
+            home.setText("Home");
+            home.setTextColor(Color.WHITE);
+            home.setTextSize(15.5f);
+            home.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            home.setGravity(Gravity.CENTER);
+            home.setBackground(pill85(Color.parseColor("#15151B"), 0x33FFFFFF, 12f));
+            home.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
+                hidePlayerErrorCard();
+                try { if (wvRef85 != null) wvRef85.loadUrl(siteUrl85("index.html")); } catch (Throwable t) { }
+                updateSwipeGate();
+            }});
+            LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, (int) (52 * d));
+            hp.topMargin = (int) (12 * d);
+            bar.addView(home, hp);
+
+            android.view.ViewGroup contentRoot =
+                    (android.view.ViewGroup) act.findViewById(android.R.id.content);
+            contentRoot.addView(card, new android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+            playerErrCard85 = card;
+            log85("web", "player error card shown (refresh + home)");
+        } catch (Throwable t) { }
+    }
+
+    private void hidePlayerErrorCard() {
+        try {
+            View c = playerErrCard85;
+            playerErrCard85 = null;
+            if (c == null) return;
+            android.view.ViewParent p = c.getParent();
+            if (p instanceof android.view.ViewGroup) ((android.view.ViewGroup) p).removeView(c);
+        } catch (Throwable t) { }
+    }
+
     // =======================================================================
     //  APP FULLSCREEN (movie = landscape, exactly like the offline player)
     //  Fullscreen MEANS: rotate to landscape, hide every bar, and the page's
@@ -2151,7 +2351,7 @@ public class MainScreen85 {
         appFullscreen = true;
         videoFs85 = true;
         // swipe-to-refresh must not fight the fullscreen video
-        if (swipeRef != null) swipeRef.setEnabled(false);
+        updateSwipeGate();
         // v1.0 / Netflix behavior: the player goes LANDSCAPE fullscreen --
         // rotate the activity, hide every bar, and the video element fills
         // the screen edge to edge. You see only the movie, in landscape,
@@ -2173,7 +2373,7 @@ public class MainScreen85 {
     private void exitAppFullscreen() {
         appFullscreen = false;
         videoFs85 = false;
-        if (swipeRef != null) swipeRef.setEnabled(true);
+        updateSwipeGate();
         act.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         android.view.Window w = act.getWindow();
         w.clearFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);

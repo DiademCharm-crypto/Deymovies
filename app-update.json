@@ -1,12 +1,12 @@
 {
   "version": "1.7",
-  "code": 16,
+  "code": 17,
   "released": "2026-10-05",
-  "url": "apk/Deymflix-v1.7-r16.apk",
+  "url": "apk/Deymflix-v1.7-r17.apk",
   "notes": [
-    "Fixed: posters and the bottom nav could freeze in the app - both work again",
-    "If the page ever freezes, reopening the app reloads it by itself now",
-    "Nav is Home, Reels, Explore, History, Me - native Me screen keeps watch history, downloads and account",
-    "Still free - new movies and K-drama added daily"
+    "Fixed bugs on the Me tab",
+    "New features on Explore",
+    "Smoother navigation between tabs",
+    "Player: Refresh and Home buttons when a video fails"
   ]
 }
