@@ -1025,7 +1025,29 @@
       // No click handler: the row is a plain "Continue Watching" strip now —
       // the user asked for the text without the button behaviour.
       strip.appendChild(card);
+      // A poster URL that 404s or is blocked would leave a silent empty card,
+      // so the strip reports the failure to the app's own log (Diagnostics).
+      var im = card.querySelector('img');
+      if (im) im.addEventListener('error', function () {
+        var elg = bridge('log');
+        if (elg) { try { elg('cw', 'poster image failed: ' + im.getAttribute('src')); } catch (e) { } }
+      });
     });
+    // One line per strip build once the catalog map is in: which titles got
+    // artwork and which stayed on the placeholder (visible in Diagnostics).
+    if (POSTER_MAP) {
+      var lg = bridge('log');
+      if (lg) {
+        try {
+          var miss = [];
+          list.forEach(function (it) {
+            if (!posterFor(it)) miss.push(String(it.title || '?').slice(0, 60));
+          });
+          lg('cw', 'strip: ' + list.length + ' cards, ' + (list.length - miss.length) + ' posters'
+            + (miss.length ? ', no artwork for: ' + miss.join(' | ') : ''));
+        } catch (e) { }
+      }
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════════════
