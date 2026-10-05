@@ -12355,6 +12355,13 @@ try {
     addDownloadButton();
   }
 
+  // Run the app-only chrome NOW: app.js is a blocking script placed after the
+  // nav and footer markup, so those nodes are already parsed even while the
+  // document still says "loading". Heavy pages (index.html) can sit in
+  // "loading" for a long time inside the app WebView, and the dock must never
+  // wait for that.
+  installMeNavItem();
+  addFooterRequestButton();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAppOnlyUi);
   } else {
