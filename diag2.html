@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DFX Beat</title>
+<style>body{background:#0b0b0f;color:#eee;font:16px monospace;padding:20px}</style>
+</head><body>
+<h3 style="color:#e11;font-family:sans-serif;margin:0 0 10px">DFX HEARTBEAT</h3>
+<pre id="out">starting…</pre>
+<script>
+(function () {
+  var out = document.getElementById('out');
+  function L(tag, obj) {
+    var s = (typeof obj === 'string') ? obj : JSON.stringify(obj);
+    try { out.textContent += '\n' + s; } catch (e) {}
+    try { if (window.DeymflixApp && DeymflixApp.log) DeymflixApp.log('beat', tag + ' ' + s); } catch (e) {}
+  }
+  var t0 = Date.now(), last = t0, n = 0;
+  L('start', 'ua-app=' + /DeymflixApp/.test(navigator.userAgent) + ' bridge=' + !!window.DeymflixApp);
+  document.addEventListener('visibilitychange', function () {
+    L('vis', document.visibilityState + ' hidden=' + document.hidden);
+  });
+  window.addEventListener('blur', function () { L('win', 'blur'); });
+  window.addEventListener('focus', function () { L('win', 'focus'); });
+  document.addEventListener('pointerdown', function (e) {
+    L('evt', 'pointerdown y=' + Math.round(e.clientY) + ' tag=' + (e.target && e.target.tagName));
+  }, true);
+  setInterval(function () {
+    var now = Date.now(), gap = now - last; last = now; n++;
+    // report every 3rd beat, and always report a stall (gap far bigger than the interval)
+    if (n % 3 === 0 || gap > 5000) {
+      L('beat', '#' + n + ' t=' + Math.round((now - t0) / 1000) + 's gap=' + gap + 'ms vis=' + document.visibilityState);
+    }
+    if ((now - t0) > 120000) { L('beat', 'FINAL #' + n); }
+  }, 2000);
+})();
+</script>
+</body></html>
