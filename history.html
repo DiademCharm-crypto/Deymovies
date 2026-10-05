@@ -181,6 +181,74 @@
       font-size: 1.1rem;
       margin-bottom: 14px;
     }
+
+    /* ── Watch history: Edit mode (pick titles, then delete them) ──────────── */
+    .hist-bar {
+      display: flex;
+      align-items: center;
+      padding: 2px 16px 10px;
+    }
+    .hist-title { color: #fff; font-size: 1.25rem; font-weight: 800; letter-spacing: .2px; }
+    .hist-edit {
+      margin-left: auto;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font-family: inherit;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px 4px;
+    }
+    .hist-edit.on { color: #e50914; }
+    .mylist-content.edit-mode .mylist-remove-btn { display: none !important; }
+    .mylist-item.picked { outline: 3px solid #e50914; outline-offset: -3px; }
+    .mylist-item.picked::after {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e50914;
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 900;
+      line-height: 26px;
+      text-align: center;
+      z-index: 5;
+    }
+    .hist-selbar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+      width: calc(100% - 32px);
+      max-width: 420px;
+      z-index: 9500;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(22, 22, 22, .96);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 20px;
+      padding: 10px 12px;
+    }
+    .hist-selbar.on { display: flex; }
+    .hist-selbar .cnt { color: #9a9aa5; font-size: .8rem; margin-right: auto; }
+    .hist-selbar button {
+      border: 0;
+      border-radius: 16px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: .85rem;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    #hist-del { background: #e50914; color: #fff; }
+    #hist-del:disabled { opacity: .45; }
+    #hist-cancel { background: rgba(255, 255, 255, .1); color: #fff; }
   </style>
 </head>
 <body>
@@ -190,6 +258,17 @@
       <span class="brand-title-text">DEYM<span class="highlight-red">FLIX</span></span>
     </a>
   </header>
+
+  <div class="hist-bar">
+    <div class="hist-title">Watch History</div>
+    <button class="hist-edit" id="hist-edit" onclick="toggleHistEdit()">Edit</button>
+  </div>
+
+  <div class="hist-selbar" id="hist-selbar">
+    <span class="cnt" id="hist-cnt">Select titles to delete</span>
+    <button id="hist-cancel" onclick="toggleHistEdit(false)">Cancel</button>
+    <button id="hist-del" onclick="deleteSelectedHistory()" disabled>Delete</button>
+  </div>
 
   <div class="mylist-tabs" id="mylist-tabs">
     <button class="mylist-tab active" data-tab="movies" onclick="switchTab('movies')">🎬 Movies</button>
@@ -260,9 +339,81 @@
   <!-- Viewer analytics: first-party, cookie-free (see analytics.js) -->
   <script src="analytics.js?v=1.0" defer></script>
   <script src="app.js?v=160.28"></script>
-  <script src="apponly.js?v=1.9" defer></script>
+  <script src="apponly.js?v=2.0" defer></script>
   <script>
     let activeTab = 'movies';
+
+    // ── EDIT MODE ────────────────────────────────────────────────────────────
+    // The Edit button (top right of Watch History) turns every card into a
+    // selectable tile: tap the titles you want gone, then Delete. The cards
+    // keep their normal tap-to-open behaviour the rest of the time.
+    let histEdit = false;
+    const histSel = new Set();
+
+    function toggleHistEdit(force) {
+      histEdit = (force === undefined) ? !histEdit : !!force;
+      histSel.clear();
+      const btn = document.getElementById('hist-edit');
+      if (btn) { btn.textContent = histEdit ? 'Done' : 'Edit'; btn.classList.toggle('on', histEdit); }
+      const bar = document.getElementById('hist-selbar');
+      if (bar) bar.classList.toggle('on', histEdit);
+      const box = document.getElementById('mylist-content');
+      if (box) box.classList.toggle('edit-mode', histEdit);
+      updateSelBar();
+      renderTabContent();
+    }
+
+    function updateSelBar() {
+      const cnt = document.getElementById('hist-cnt');
+      const del = document.getElementById('hist-del');
+      if (cnt) cnt.textContent = histSel.size ? histSel.size + ' selected' : 'Select titles to delete';
+      if (del) del.disabled = !histSel.size;
+    }
+
+    // Capture phase: runs BEFORE the card's own onclick, so in edit mode a tap
+    // selects instead of opening the player.
+    function tapInEditMode(e) {
+      if (!histEdit) return;
+      const card = e.target && e.target.closest ? e.target.closest('.mylist-item') : null;
+      if (!card) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const key = card.getAttribute('data-del');
+      if (!key) return;
+      if (histSel.has(key)) { histSel.delete(key); card.classList.remove('picked'); }
+      else { histSel.add(key); card.classList.add('picked'); }
+      updateSelBar();
+    }
+
+    function loadCW() {
+      try { return JSON.parse(localStorage.getItem('deymflix_continue_watching') || '{}') || {}; } catch (e) { return {}; }
+    }
+
+    function deleteSelectedHistory() {
+      if (!histSel.size) return;
+      const saved = loadCW();
+      const reels = getReelHistory();
+      let list = getMyList();
+      let removed = 0;
+      histSel.forEach(key => {
+        const i = String(key).indexOf(':');
+        const kind = i > 0 ? String(key).slice(0, i) : String(key);
+        const id = i > 0 ? String(key).slice(i + 1) : '';
+        if (kind === 'movie') { delete saved[id]; removed++; }
+        else if (kind === 'series') {
+          Object.keys(saved).forEach(k => { if (k === id || seriesBaseId(k) === id) delete saved[k]; });
+          removed++;
+        } else if (kind === 'reel') { delete reels[id]; removed++; }
+        else if (kind === 'bookmark') { list = list.filter(m => m.id !== id); removed++; }
+      });
+      try { localStorage.setItem('deymflix_continue_watching', JSON.stringify(saved)); } catch (e) {}
+      try { localStorage.setItem('deymflix_reel_history', JSON.stringify(reels)); } catch (e) {}
+      try { localStorage.setItem('deymflix_my_list', JSON.stringify(list)); } catch (e) {}
+      histSel.clear();
+      renderTabContent();
+      updateSelBar();
+      showToast(removed + ' removed from history');
+    }
 
     function switchTab(tab) {
       activeTab = tab;
@@ -289,7 +440,7 @@
         return;
       }
       container.innerHTML = '<div class="mylist-grid">' + list.map(m => `
-        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(m.id)}'">
+        <div class="mylist-item" data-del="bookmark:${sanitizeHTML(m.id)}" onclick="window.location.href='player.html?id=${encodeURIComponent(m.id)}'">
           <img src="${sanitizeHTML(m.poster)}" alt="${sanitizeHTML(m.title)}" loading="lazy">
           <div class="mylist-item-overlay">
             <div class="mylist-item-title">${sanitizeHTML(m.title)}</div>
@@ -366,7 +517,7 @@
         const finished = !!item.finished || pct >= 95;
         const watchAgain = finished ? `<button class="watch-again-btn" onclick="event.stopPropagation(); watchAgainFromHistory('${sanitizeHTML(item.id)}')" title="Watch Again">⟳ Watch Again</button>` : '';
         return `
-        <div class="mylist-item" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
+        <div class="mylist-item" data-del="movie:${sanitizeHTML(item.id)}" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
           <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
           ${finished ? '<div class="mylist-progress-badge">Finished</div>' : (pct > 0 ? `<div class="mylist-progress-badge">${pct}% watched</div>` : '')}
           <div class="mylist-progress" style="width: ${pct}%"></div>
@@ -446,7 +597,7 @@
         const badge = epLabel + (finished ? ' · Finished' : (pct > 0 ? ' · ' + pct + '% watched' : ''));
         const href = 'player.html?id=' + encodeURIComponent(pick.baseId) + '&s=' + pick.season + '&ep=' + pick.ep;
         return `
-        <div class="mylist-item" onclick="window.location.href='${href}'">
+        <div class="mylist-item" data-del="series:${sanitizeHTML(pick.baseId)}" onclick="window.location.href='${href}'">
           <img src="${sanitizeHTML(item.poster)}" alt="${sanitizeHTML(seriesTitle)}" loading="lazy">
           <div class="mylist-progress-badge">${sanitizeHTML(badge)}</div>
           <div class="mylist-progress" style="width: ${pct}%"></div>
@@ -473,7 +624,7 @@
       container.innerHTML = '<div class="mylist-grid">' + items.map(item => {
         const pct = Math.min(100, Math.round(item.progress || 0));
         return `
-        <div class="mylist-item" onclick="window.location.href='reels.html?id=${encodeURIComponent(item.id)}'">
+        <div class="mylist-item" data-del="reel:${sanitizeHTML(item.id)}" onclick="window.location.href='reels.html?id=${encodeURIComponent(item.id)}'">
           <img src="${sanitizeHTML(item.poster || '')}" alt="${sanitizeHTML(item.title || '')}" loading="lazy">
           ${(item.finished || pct >= 95) ? '<div class="mylist-progress-badge">Finished</div>' : (pct > 0 ? `<div class="mylist-progress-badge">${pct}% watched</div>` : '')}
           <div class="mylist-progress" style="width: ${pct}%"></div>
@@ -493,6 +644,8 @@
     // Initial render
     document.addEventListener('DOMContentLoaded', () => {
       renderTabContent();
+      const box = document.getElementById('mylist-content');
+      if (box) box.addEventListener('click', tapInEditMode, true);
     });
   </script>
 </body>
