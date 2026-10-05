@@ -958,6 +958,48 @@ public class MainScreen85 {
                 && wvR.getUrl().startsWith("file:///android_asset/offline.html")) {
             wvR.loadUrl(siteUrl85("index.html"));
         }
+        checkRendererAlive(wvR);
+    }
+
+    // -- frozen-renderer recovery -------------------------------------------
+    // The OS can freeze an app's page while it is in the background. What the
+    // user is left looking at is the LAST PAINTED frame: the poster rows never
+    // finished building, the nav does nothing, timers are dead -- and nothing
+    // running inside that page can fix it. So on every resume the shell pings
+    // the page; if the renderer never answers (a healthy one replies in
+    // milliseconds) the page is reloaded. localStorage keeps the session, so
+    // the user loses nothing but the frozen frame.
+    private int alivePing85 = 0;
+    private boolean rendererAnswered85 = false;
+
+    private void checkRendererAlive(final WebView wv) {
+        try {
+            if (wv == null || !pageReady85) return;   // not loaded yet: nothing to judge
+            String u = wv.getUrl();
+            if (u == null || u.startsWith("file://")) return;
+            // Never interrupt a page that may be mid-playback.
+            if (u.indexOf("player.html") >= 0) return;
+            final int token = ++alivePing85;
+            rendererAnswered85 = false;
+            try {
+                wv.evaluateJavascript("1", new android.webkit.ValueCallback<String>() {
+                    @Override public void onReceiveValue(String v) {
+                        if (token == alivePing85) rendererAnswered85 = true;
+                    }
+                });
+            } catch (Throwable tEval) { return; }
+            final WebView target = wv;
+            new java.util.Timer().schedule(new java.util.TimerTask() {
+                @Override public void run() {
+                    act.runOnUiThread(new Runnable() { @Override public void run() {
+                        if (token != alivePing85) return;      // a newer ping owns the verdict
+                        if (rendererAnswered85) return;        // renderer is alive: nothing to do
+                        log85("web", "renderer did not answer -- reloading the frozen page");
+                        try { target.reload(); } catch (Throwable t) { }
+                    }});
+                }
+            }, 4000L);
+        } catch (Throwable t) { }
     }
 
     // =======================================================================
