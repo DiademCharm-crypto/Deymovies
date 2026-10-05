@@ -295,8 +295,29 @@
   function googleLogin() {
     err($('si-err'), '');
     var get = bridge('getGoogleAccounts');
-    if (!get) {
+    var pick = bridge('pickGoogleAccount');
+    var take = bridge('takeGoogleEmail');
+    if (!get && !(pick && take)) {
       err($('si-err'), 'Google login works inside the DEYMFLIX app only.');
+      return;
+    }
+    // Preferred path: Android / Google Play services draw their own "Choose an
+    // account" sheet -- names AND photos, the sheet every Google app shows. It
+    // is also the only way to reach the accounts Android 14+ hides from apps,
+    // so it opens first; MainScreen85 hands the chosen address back through
+    // takeGoogleEmail() (and pushes it via DfxGooglePicked).
+    if (pick && take) {
+      err($('si-err'), 'Choose your Google account in the Android dialog.');
+      try { pick(); } catch (e0) { }
+      var pt = 0;
+      (function pollPick() {
+        pt++;
+        var v = null;
+        try { v = JSON.parse(take() || 'null'); } catch (e1) { v = null; }
+        if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
+        if (pt < 40) setTimeout(pollPick, 700);
+        else err($('si-err'), 'No account chosen. Tap "Log in with Google" to try again.');
+      })();
       return;
     }
     // GET_ACCOUNTS is a runtime permission: ask first, then keep checking so
