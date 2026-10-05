@@ -12614,7 +12614,7 @@ function renderBecauseYouWatched() {
           '<div><div style="font-weight:800;font-size:17px;">What\u2019s New</div>' +
           '<div style="font-size:12px;color:#9a9aa5;">DEYMFLIX app v' + esc(mf.version || '1.6') + (mf.released ? ' \u00b7 ' + esc(mf.released) : '') + '</div></div></div>' +
           '<ul style="list-style:none;margin:14px 0 4px;padding:0;font-size:13.5px;">' + items + '</ul>' +
-          '<button id="dfx-wn-ok" style="margin-top:14px;width:100%;padding:12px 0;border:0;border-radius:11px;background:#e50914;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;">Continue watching</button>';
+          '<button id="dfx-wn-ok" style="margin-top:14px;width:100%;padding:12px 0;border:0;border-radius:11px;background:#e50914;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;">Got it</button>';
         el.appendChild(card);
         var close = function () { try { el.remove(); } catch (e) {} };
         card.querySelector('#dfx-wn-ok').addEventListener('click', close);
