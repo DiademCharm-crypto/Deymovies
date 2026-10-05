@@ -155,26 +155,46 @@
     return a || null;
   }
 
+  // One place that turns a stored name into something safe to show. The first
+  // Google sign-in stored whatever the bridge handed over, so records exist
+  // that carry the TEXT "null"/"undefined" (sometimes with an invisible mark
+  // next to it, which is why an exact-equality check missed them). Every
+  // display path goes through here, and a repaired record is written back.
+  function nameOk(v) {
+    var nm = String(v == null ? '' : v)
+      // zero-width / bidi / control marks: invisible, so "null" + one of
+      // these still LOOKS like null while failing an equality check
+      .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202E\u2060-\u206F\uFEFF]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!nm) return '';
+    if (/^(null|undefined|nan|n\/a)$/i.test(nm)) return '';
+    return nm;
+  }
+  function fixName(acc, where) {
+    if (!acc) return '';
+    var raw = acc.name;
+    var nm = nameOk(raw);
+    if (!nm) {
+      nm = nameOk(String(acc.email || acc.phone || '').split('@')[0]) || 'DEYMFLIX user';
+      if (raw !== nm) {
+        acc.name = nm;
+        try { saveAccount(acc); } catch (e) { }
+        var lg = bridge('log');
+        if (lg) { try { lg('me', 'name repaired at ' + (where || 'display') + ' raw=' + JSON.stringify(String(raw)) + ' -> ' + nm); } catch (e) { } }
+      }
+    }
+    return nm;
+  }
+
   function renderHeader() {
     var me = currentUser();
     var list = readAccounts();
     if (me) {
-      // A legacy record can carry the literal text "null" / "undefined" /
-      // whitespace as the name (the first Google sign-in stored whatever the
-      // bridge handed over), so the header showed that word. Repair it in
-      // place -- null, the string "null" in any casing, and blanks all go to
-      // the address prefix.
-      var rawName = me.name;
-      var nm = String(rawName == null ? '' : rawName).trim();
-      if (!nm || /^(null|undefined|nan)$/i.test(nm)) {
-        nm = String(me.email || me.phone || '').split('@')[0] || 'DEYMFLIX user';
-        if (nm !== rawName) {
-          me.name = nm;
-          saveAccount(me);
-          var nlg = bridge('log');
-          if (nlg) { try { nlg('me', 'header name repaired: ' + String(rawName) + ' -> ' + nm); } catch (e) { } }
-        }
-      }
+      // nameOk()/fixName() repair the stored name in place: a record can carry
+      // the TEXT "null" (the first Google sign-in stored whatever the bridge
+      // handed over), with an invisible mark next to it in some cases.
+      var nm = fixName(me, 'header');
       if ($('me-title')) $('me-title').textContent = nm || 'DEYMFLIX user';
       if ($('me-sub')) $('me-sub').textContent = 'UID: ' + me.uid + (me.provider === 'google' ? ' · Google account' : '');
       if ($('me-av')) $('me-av').innerHTML = me.photo
@@ -478,7 +498,7 @@
   function avatarHtml(acc, size) {
     if (acc && acc.photo) return '<img src="' + esc(acc.photo) + '" alt="">';
     var s = size || 30;
-    var ch = String((acc && (acc.name || acc.email || acc.phone)) || '?').trim().charAt(0).toUpperCase() || '?';
+    var ch = String(fixName(acc, 'avatar') || acc.email || acc.phone || '?').trim().charAt(0).toUpperCase() || '?';
     if (!acc) {
       return '<svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="#54545f">' +
         '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/></svg>';
@@ -564,7 +584,7 @@
     if (!me) { openView('view-signin'); prepareSignIn(); return; }
     pendingPhoto = null;
     renderPeAvatar(me);
-    if ($('pe-name')) $('pe-name').value = me.name || '';
+    if ($('pe-name')) $('pe-name').value = fixName(me, 'editor') || '';
     if ($('pe-remove')) $('pe-remove').hidden = !me.photo;
     if ($('pe-photo')) $('pe-photo').textContent = me.photo ? 'Change photo' : 'Add photo';
     err($('pe-err'), '');
@@ -637,7 +657,7 @@
     deleteArmed = 0;
     signOutArmed = 0;
     if ($('ma-av')) $('ma-av').innerHTML = avatarHtml(me, 40);
-    if ($('ma-name')) $('ma-name').textContent = me.name || accountTarget(me);
+    if ($('ma-name')) $('ma-name').textContent = fixName(me, 'manage') || accountTarget(me);
     if ($('ma-method')) $('ma-method').textContent = me.provider === 'google' ? 'Google' : (me.phone ? 'phone' : 'email');
     if ($('ma-target')) $('ma-target').textContent = accountTarget(me);
     if ($('ma-uid')) $('ma-uid').textContent = String(me.uid);
@@ -812,7 +832,7 @@
   function renderSecurity() {
     var me = currentUser();
     if (!me) return;
-    if ($('se-name')) $('se-name').textContent = me.name || 'Not set';
+    if ($('se-name')) $('se-name').textContent = fixName(me, 'security') || 'Not set';
     if ($('se-mail')) $('se-mail').textContent = me.email ? maskMail(me.email) : (me.phone ? maskMail(me.phone) : '—');
     var box = $('se-devices');
     if (!box) return;
@@ -1025,13 +1045,22 @@
       // No click handler: the row is a plain "Continue Watching" strip now —
       // the user asked for the text without the button behaviour.
       strip.appendChild(card);
-      // A poster URL that 404s or is blocked would leave a silent empty card,
-      // so the strip reports the failure to the app's own log (Diagnostics).
+      // theme-v2.css keeps every poster image at opacity 0 until it carries
+      // .is-ready (the shimmer tile stays until then) -- app.js adds that
+      // class on the home feed, and me.html never loads app.js, so the strip
+      // has to reveal its own artwork. An image that fails is revealed too:
+      // a card must never be left blank, and the failure goes to the log.
       var im = card.querySelector('img');
-      if (im) im.addEventListener('error', function () {
-        var elg = bridge('log');
-        if (elg) { try { elg('cw', 'poster image failed: ' + im.getAttribute('src')); } catch (e) { } }
-      });
+      if (im) {
+        var reveal = function () { try { im.classList.add('is-ready'); } catch (e) { } };
+        im.addEventListener('load', reveal);
+        im.addEventListener('error', function () {
+          reveal();
+          var elg = bridge('log');
+          if (elg) { try { elg('cw', 'poster image failed: ' + im.getAttribute('src')); } catch (e) { } }
+        });
+        if (im.complete) reveal();     // cached images never fire load again
+      }
     });
     // One line per strip build once the catalog map is in: which titles got
     // artwork and which stayed on the placeholder (visible in Diagnostics).
