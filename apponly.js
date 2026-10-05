@@ -164,6 +164,7 @@
       if ($('me-av')) $('me-av').innerHTML = me.photo
         ? '<img src="' + me.photo + '" alt="">'
         : '<svg viewBox="0 0 24 24" width="30" height="30" fill="#54545f"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/></svg>';
+      if ($('me-edit')) $('me-edit').hidden = false;
       if ($('hist-gate-text')) $('hist-gate-text').textContent = 'Your watch history on this phone';
       if ($('btn-signin')) {
         $('btn-signin').textContent = 'Sign out';
@@ -175,6 +176,7 @@
     } else {
       if ($('me-title')) $('me-title').textContent = 'Sign In/Sign Up';
       if ($('me-sub')) $('me-sub').textContent = 'Sign in to keep your list, history and downloads';
+      if ($('me-edit')) $('me-edit').hidden = true;
       if ($('hist-gate-text')) $('hist-gate-text').textContent = 'Sign in to view watch history';
       if ($('btn-signin')) {
         $('btn-signin').textContent = 'Sign In';
@@ -197,6 +199,7 @@
 
   function signIn(acc, silent) {
     writeSession({ id: acc.email || acc.phone, at: Date.now() });
+    registerDevice(acc);
     renderHeader();
     if (!silent) toast('Signed in as ' + (acc.email || acc.phone));
   }
@@ -212,8 +215,10 @@
   // ══════════════════════════════════════════════════════════════════════════
   //  3) SIGN IN / CREATE ACCOUNT
   // ══════════════════════════════════════════════════════════════════════════
+  var VIEWS = ['view-signin', 'view-create', 'view-code', 'view-dl', 'view-diag',
+    'view-profile', 'view-manage', 'view-pass', 'view-secure'];
   function openView(id) {
-    ['view-signin', 'view-create', 'view-dl', 'view-diag'].forEach(function (v) {
+    VIEWS.forEach(function (v) {
       var el = $(v);
       if (el) el.classList.toggle('on', v === id);
     });
@@ -234,6 +239,7 @@
     var raw = ($('si-id') && $('si-id').value || '').trim();
     if (!raw) { err($('si-err'), 'Enter your email or phone number'); return; }
     if (!looksLikeId(raw)) { err($('si-err'), 'That does not look like an email or phone number'); return; }
+    if ($('si-forgot-wrap')) $('si-forgot-wrap').hidden = true;
     var acc = findAccount(raw);
     var passWrap = $('si-pass-wrap');
     if (!acc) {
@@ -252,6 +258,7 @@
     if (passWrap && passWrap.hidden) {           // ask for the password
       passWrap.hidden = false;
       if ($('si-next')) $('si-next').textContent = 'Log in';
+      if ($('si-forgot-wrap')) $('si-forgot-wrap').hidden = false;
       if ($('si-pass')) $('si-pass').focus();
       return;
     }
@@ -279,17 +286,8 @@
       provider: 'email',
       created: Date.now(),
     };
-    sha256(saltOf(acc) + ':' + p1).then(function (h) {
-      acc.hash = h;
-      var list = readAccounts();
-      list.push(acc);
-      writeAccounts(list);
-      signIn(acc);
-      closeViews();
-      if ($('ca-pass')) $('ca-pass').value = '';
-      if ($('ca-pass2')) $('ca-pass2').value = '';
-      toast('Account created — welcome!');
-    });
+    // A new account is confirmed with a 6-digit code before it is stored.
+    startVerify('create', id, { acc: acc, pass: p1 });
   }
 
   // ── Google: the phone's own account, no password, no popup ──────────────
@@ -418,6 +416,380 @@
     signIn(fresh);
     closeViews();
     toast('Logged in with ' + em);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  3b) PROFILE / MANAGE ACCOUNT / SECURITY / VERIFICATION CODE
+  //      Everything below is the Me screen's own settings, in the shape the
+  //      app's users asked for: an Edit button next to the name that opens a
+  //      profile editor, Manage Account, Account and Security with a device
+  //      list, and a 6-digit verification code step for new accounts and
+  //      password resets.
+  // ══════════════════════════════════════════════════════════════════════════
+  function saveAccount(acc) {
+    var list = readAccounts();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].uid === acc.uid) { list[i] = acc; break; }
+    }
+    writeAccounts(list);
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&"]/g, ''); }
+
+  function avatarHtml(acc, size) {
+    if (acc && acc.photo) return '<img src="' + esc(acc.photo) + '" alt="">';
+    var s = size || 30;
+    var ch = String((acc && (acc.name || acc.email || acc.phone)) || '?').trim().charAt(0).toUpperCase() || '?';
+    if (!acc) {
+      return '<svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="#54545f">' +
+        '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/></svg>';
+    }
+    return '<span class="me-initial" style="font-size:' + Math.round(s * 0.42) + 'px">' + esc(ch) + '</span>';
+  }
+
+  // demshots011@gmail.com -> demshots***@gmail.com (same masking the account
+  // screens are expected to show: the address is never fully on screen).
+  function maskMail(v) {
+    var m = /^([^@]*)@(.+)$/.exec(String(v || ''));
+    if (!m) return String(v || '—');
+    var head = m[1].length > 8 ? m[1].slice(0, 8) : m[1];
+    return head + '***@' + m[2];
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtStamp(ts) {
+    var d = new Date(ts || Date.now());
+    if (isNaN(d.getTime())) d = new Date();
+    return d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + ' '
+      + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+  }
+  function accountTarget(a) { return (a && (a.email || a.phone)) || '—'; }
+
+  // ── devices that logged into this account ────────────────────────────────
+  // NOTE (honest): the site has no account server, so this list is built on
+  // THIS phone. A device appears here once it signs in with the same account,
+  // which on a single phone is the phone itself -- cross-device lists need the
+  // account backend that is still to be connected.
+  var K_DEVICES = 'dfx_devices_v1';
+  function readDevices() {
+    try { return JSON.parse(localStorage.getItem(K_DEVICES) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function writeDevices(all) {
+    try { localStorage.setItem(K_DEVICES, JSON.stringify(all)); } catch (e) { }
+  }
+  function thisDeviceId() {
+    var id = '';
+    try { id = localStorage.getItem('dfx_device_v1') || ''; } catch (e) { }
+    if (!id) {
+      id = 'dev-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36);
+      try { localStorage.setItem('dfx_device_v1', id); } catch (e2) { }
+    }
+    return id;
+  }
+  function deviceSnapshot() {
+    var info = appInfo() || {};
+    if (!info.model && !info.device) {
+      // No app shell behind the page (harness / browser): keep the entry plain
+      return { id: thisDeviceId(), label: 'This phone', sys: 'Android', lastLogin: Date.now() };
+    }
+    var model = String(info.model || info.device);
+    var code = String(info.deviceCode || model).replace(/\s+/g, '_');
+    return {
+      id: thisDeviceId(),
+      label: model.replace(/\s+/g, '_') + '-OP_' + code,
+      sys: info.sys || ('android_' + (info.release || '?') + '_' + model.replace(/\s+/g, '_')),
+      lastLogin: Date.now()
+    };
+  }
+  function registerDevice(acc) {
+    if (!acc) return;
+    var all = readDevices();
+    var list = all[acc.uid] || [];
+    var snap = deviceSnapshot();
+    var found = null;
+    for (var i = 0; i < list.length; i++) { if (list[i] && list[i].id === snap.id) { found = list[i]; break; } }
+    if (found) {
+      found.label = snap.label; found.sys = snap.sys; found.lastLogin = snap.lastLogin;
+    } else {
+      snap.main = list.length === 0;          // first device = the main device
+      list.push(snap);
+      if (list.length > 3) list = list.slice(0, 3);   // 3-device limit
+    }
+    all[acc.uid] = list;
+    writeDevices(all);
+  }
+
+  // ── profile editor (name + picture) ──────────────────────────────────────
+  var pendingPhoto = null;
+  function openProfile() {
+    var me = currentUser();
+    if (!me) { openView('view-signin'); prepareSignIn(); return; }
+    pendingPhoto = null;
+    renderPeAvatar(me);
+    if ($('pe-name')) $('pe-name').value = me.name || '';
+    if ($('pe-remove')) $('pe-remove').hidden = !me.photo;
+    if ($('pe-photo')) $('pe-photo').textContent = me.photo ? 'Change photo' : 'Add photo';
+    err($('pe-err'), '');
+    openView('view-profile');
+  }
+  function renderPeAvatar(me) {
+    var box = $('pe-av');
+    if (!box) return;
+    if (pendingPhoto) { box.innerHTML = '<img src="' + esc(pendingPhoto) + '" alt="">'; return; }
+    box.innerHTML = avatarHtml(me, 42);
+  }
+  // The picked file is centre-cropped to 256x256 and stored as a JPEG data
+  // URL: small enough for localStorage, big enough for a 58px avatar.
+  function photoChosen(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type || '')) { err($('pe-err'), 'Pick an image file'); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var side = 256;
+          var c = document.createElement('canvas');
+          c.width = side; c.height = side;
+          var ctx = c.getContext('2d');
+          var s = Math.min(img.width, img.height) || side;
+          var sx = (img.width - s) / 2, sy = (img.height - s) / 2;
+          ctx.drawImage(img, sx, sy, s, s, 0, 0, side, side);
+          var url = c.toDataURL('image/jpeg', 0.82);
+          if (url.length > 400000) url = c.toDataURL('image/jpeg', 0.6);   // keep it tiny
+          pendingPhoto = url;
+          var me = currentUser();
+          if ($('pe-av')) $('pe-av').innerHTML = '<img src="' + url + '" alt="">';
+          if ($('pe-remove')) $('pe-remove').hidden = false;
+          if ($('pe-photo')) $('pe-photo').textContent = 'Change photo';
+          err($('pe-err'), '');
+        } catch (e) { err($('pe-err'), 'Could not read that picture'); }
+      };
+      img.onerror = function () { err($('pe-err'), 'Could not read that picture'); };
+      img.src = String(reader.result || '');
+    };
+    reader.onerror = function () { err($('pe-err'), 'Could not read that file'); };
+    try { reader.readAsDataURL(file); } catch (e) { err($('pe-err'), 'Could not read that file'); }
+  }
+  function saveProfile() {
+    var me = currentUser();
+    if (!me) return;
+    var name = ($('pe-name') && $('pe-name').value || '').trim();
+    if (name.length > 24) name = name.slice(0, 24);
+    if (name) me.name = name;
+    if (pendingPhoto) me.photo = pendingPhoto;
+    saveAccount(me);
+    pendingPhoto = null;
+    renderHeader();
+    closeViews();
+    toast('Profile saved');
+  }
+
+  // ── Manage Account ───────────────────────────────────────────────────────
+  var deleteArmed = 0;
+  function openManage() {
+    var me = currentUser();
+    if (!me) { openView('view-signin'); prepareSignIn(); return; }
+    renderManage();
+    openView('view-manage');
+  }
+  function renderManage() {
+    var me = currentUser();
+    if (!me) return;
+    deleteArmed = 0;
+    if ($('ma-av')) $('ma-av').innerHTML = avatarHtml(me, 40);
+    if ($('ma-name')) $('ma-name').textContent = me.name || accountTarget(me);
+    if ($('ma-method')) $('ma-method').textContent = me.provider === 'google' ? 'Google' : (me.phone ? 'phone' : 'email');
+    if ($('ma-target')) $('ma-target').textContent = accountTarget(me);
+    if ($('ma-uid')) $('ma-uid').textContent = String(me.uid);
+    if ($('ma-plan')) $('ma-plan').textContent = 'DEYMFLIX account · joined ' + fmtStamp(me.created).slice(0, 10);
+    if ($('ma-delete')) $('ma-delete').firstChild.textContent = 'Delete Account ';
+    if ($('ma-note')) $('ma-note').textContent = me.provider === 'google'
+      ? 'You sign in with the Google account on this phone, so there is no password to change here.'
+      : 'Your password is stored on this phone as a salted hash — never in clear text.';
+  }
+  function deleteAccount() {
+    var me = currentUser();
+    if (!me) return;
+    if (!deleteArmed) {
+      deleteArmed = Date.now();
+      if ($('ma-delete')) $('ma-delete').firstChild.textContent = 'Tap again to delete ';
+      if ($('ma-note')) $('ma-note').textContent = 'Deleting removes this account, its UID and its device list from this phone.';
+      return;
+    }
+    if (Date.now() - deleteArmed > 10000) { deleteArmed = 0; renderManage(); return; }
+    var list = readAccounts().filter(function (a) { return !a || a.uid !== me.uid; });
+    writeAccounts(list);
+    var all = readDevices();
+    delete all[me.uid];
+    writeDevices(all);
+    writeSession(null);
+    deleteArmed = 0;
+    closeViews();
+    renderHeader();
+    toast('Account deleted');
+  }
+
+  // ── Change Password ──────────────────────────────────────────────────────
+  var pwResetMode = false;
+  function openPass(reset) {
+    var me = currentUser();
+    if (!me) return;
+    if (me.provider === 'google') {
+      toast('Google accounts use your Google password');
+      return;
+    }
+    pwResetMode = !!reset;
+    if ($('pw-cur-wrap')) $('pw-cur-wrap').hidden = pwResetMode;
+    ['pw-cur', 'pw-new', 'pw-new2'].forEach(function (id) { if ($(id)) $(id).value = ''; });
+    err($('pw-err'), '');
+    openView('view-pass');
+  }
+  function savePassword() {
+    var me = currentUser();
+    if (!me) return;
+    var p1 = ($('pw-new') && $('pw-new').value) || '';
+    var p2 = ($('pw-new2') && $('pw-new2').value) || '';
+    if (p1.length < 4) { err($('pw-err'), 'Use at least 4 characters for the password'); return; }
+    if (p1 !== p2) { err($('pw-err'), 'The two passwords do not match'); return; }
+    var finish = function () {
+      sha256(saltOf(me) + ':' + p1).then(function (h) {
+        me.hash = h;
+        saveAccount(me);
+        closeViews();
+        renderHeader();
+        toast('Password updated');
+      });
+    };
+    if (pwResetMode) { finish(); return; }
+    var cur = ($('pw-cur') && $('pw-cur').value) || '';
+    if (!cur) { err($('pw-err'), 'Enter your current password'); return; }
+    sha256(saltOf(me) + ':' + cur).then(function (h) {
+      if (h !== me.hash) { err($('pw-err'), 'That is not the current password'); return; }
+      finish();
+    });
+  }
+
+  // ── verification code (6 digits) ─────────────────────────────────────────
+  // Used by "create account" and by "forgot password". The code is delivered
+  // as an Android notification when the app can post one; the site has no
+  // email/SMS sender yet, and the page says so instead of pretending a mail
+  // went out.
+  var PENDING_CODE = null;
+  function makeCode() {
+    var s = '';
+    for (var i = 0; i < 6; i++) s += Math.floor(Math.random() * 10);
+    return s;
+  }
+  function deliverCode(target, code) {
+    var send = bridge('sendCode');
+    if (!send) return false;
+    try { return String(send(String(target || ''), String(code)) || '') === 'sent'; } catch (e) { return false; }
+  }
+  function startVerify(kind, target, payload) {
+    var code = makeCode();
+    PENDING_CODE = { code: code, kind: kind, target: target, payload: payload || {}, expires: Date.now() + 10 * 60000, at: Date.now() };
+    var sent = deliverCode(target, code);
+    if ($('code-sub')) $('code-sub').textContent = 'Enter the 6-digit code for ' + target + '.';
+    if ($('code-note')) $('code-note').textContent = sent
+      ? 'The code was sent to this phone as a notification — open the shade to read it. It expires in 10 minutes.'
+      : 'Email/SMS delivery is not connected yet, so the code stays on this phone: ' + code;
+    if ($('code-input')) $('code-input').value = '';
+    err($('code-err'), '');
+    openView('view-code');
+  }
+  function verifyCode() {
+    err($('code-err'), '');
+    if (!PENDING_CODE) { err($('code-err'), 'Ask for a new code'); return; }
+    if (Date.now() > PENDING_CODE.expires) { err($('code-err'), 'That code expired — send a new one'); return; }
+    var got = String(($('code-input') && $('code-input').value) || '').replace(/\D/g, '');
+    if (got.length !== 6) { err($('code-err'), 'Enter all 6 digits'); return; }
+    if (got !== PENDING_CODE.code) { err($('code-err'), 'Wrong code. Check the digits and try again.'); return; }
+    var p = PENDING_CODE;
+    PENDING_CODE = null;
+    if (p.kind === 'create') {
+      var acc = p.payload.acc, pass = p.payload.pass;
+      sha256(saltOf(acc) + ':' + pass).then(function (h) {
+        acc.hash = h;
+        var list = readAccounts();
+        list.push(acc);
+        writeAccounts(list);
+        registerDevice(acc);
+        signIn(acc);
+        closeViews();
+        if ($('ca-pass')) $('ca-pass').value = '';
+        if ($('ca-pass2')) $('ca-pass2').value = '';
+        toast('Account created — welcome!');
+      });
+      return;
+    }
+    if (p.kind === 'reset') {
+      signIn(p.payload.acc, true);
+      openPass(true);
+      toast('Code accepted — set a new password');
+      return;
+    }
+    closeViews();
+  }
+  function resendCode() {
+    if (!PENDING_CODE) { return; }
+    var p = PENDING_CODE;
+    startVerify(p.kind, p.target, p.payload);
+    toast('New code sent');
+  }
+  function forgotPassword() {
+    err($('si-err'), '');
+    var raw = ($('si-id') && $('si-id').value || '').trim();
+    var acc = findAccount(raw);
+    if (!acc) { err($('si-err'), 'Type your email or phone number first, then tap again'); return; }
+    if (acc.provider === 'google') { err($('si-err'), 'That account signs in with Google — no password needed'); return; }
+    startVerify('reset', accountTarget(acc), { acc: acc });
+  }
+
+  // ── Account and Security (device management) ─────────────────────────────
+  function openSecurity() {
+    var me = currentUser();
+    if (!me) { openView('view-signin'); prepareSignIn(); return; }
+    renderSecurity();
+    openView('view-secure');
+  }
+  function renderSecurity() {
+    var me = currentUser();
+    if (!me) return;
+    if ($('se-name')) $('se-name').textContent = me.name || 'Not set';
+    if ($('se-mail')) $('se-mail').textContent = me.email ? maskMail(me.email) : (me.phone ? maskMail(me.phone) : '—');
+    var box = $('se-devices');
+    if (!box) return;
+    var list = (readDevices()[me.uid] || []).slice(0);
+    var mine = thisDeviceId();
+    if (!list.length) { box.innerHTML = '<p class="me-p">No device has signed in with this account yet.</p>'; return; }
+    var html = '';
+    list.forEach(function (d) {
+      var isThis = d.id === mine;
+      html += '<div class="me-dev">'
+        + '<div class="me-dev-top">'
+        + '<span class="me-dev-ico"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.5" x2="13" y2="18.5"></line></svg></span>'
+        + '<span class="me-dev-name">' + esc(d.label) + '</span>'
+        + (d.main ? '<span class="me-dev-badge">Main device</span>' : '')
+        + '</div>'
+        + '<div class="me-dev-line">System : ' + esc(d.sys) + '</div>'
+        + '<div class="me-dev-line now"><span>Last login time : ' + esc(fmtStamp(d.lastLogin)) + '</span>'
+        + (isThis ? '<span class="now-tag">Current Device</span>' : '') + '</div>'
+        + (isThis ? '<div class="me-dev-this">This is the phone you are using now</div>'
+          : '<button class="me-dev-out" data-dev="' + esc(d.id) + '">Log out this device</button>')
+        + '</div>';
+    });
+    box.innerHTML = html;
+    var outs = box.querySelectorAll('.me-dev-out');
+    for (var i = 0; i < outs.length; i++) {
+      outs[i].addEventListener('click', function () {
+        var id = this.getAttribute('data-dev');
+        var all = readDevices();
+        var list2 = (all[me.uid] || []).filter(function (d) { return d.id !== id; });
+        all[me.uid] = list2;
+        writeDevices(all);
+        renderSecurity();
+        toast('Device removed');
+      });
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -630,6 +1002,49 @@
       openView('view-diag');
       loadDiagnostics();
     };
+
+    // profile / account / security
+    if ($('me-edit')) $('me-edit').onclick = openProfile;
+    if ($('row-manage')) $('row-manage').onclick = openManage;
+    if ($('row-secure')) $('row-secure').onclick = openSecurity;
+    if ($('pe-photo')) $('pe-photo').onclick = function () {
+      if ($('pe-file')) { try { $('pe-file').click(); } catch (e) { } }
+    };
+    if ($('pe-file')) $('pe-file').onchange = function () {
+      var f = this.files && this.files[0];
+      photoChosen(f);
+    };
+    if ($('pe-remove')) $('pe-remove').onclick = function () {
+      pendingPhoto = null;
+      var me = currentUser();
+      if (me) { delete me.photo; saveAccount(me); }
+      renderPeAvatar(currentUser());
+      this.hidden = true;
+      if ($('pe-photo')) $('pe-photo').textContent = 'Add photo';
+      renderHeader();
+      toast('Photo removed');
+    };
+    if ($('pe-save')) $('pe-save').onclick = saveProfile;
+    if ($('pe-cancel')) $('pe-cancel').onclick = function (e) { e.preventDefault(); closeViews(); };
+    if ($('ma-pass')) $('ma-pass').onclick = function () { openPass(false); };
+    if ($('ma-delete')) $('ma-delete').onclick = deleteAccount;
+    if ($('ma-copy-uid')) $('ma-copy-uid').onclick = function () {
+      var me = currentUser();
+      if (!me) return;
+      var cp = bridge('copyText');
+      if (cp) { try { cp('DEYMFLIX UID', String(me.uid)); toast('UID copied'); return; } catch (e) { } }
+      toast('UID: ' + me.uid);
+    };
+    if ($('pw-save')) $('pw-save').onclick = savePassword;
+    if ($('pw-forgot')) $('pw-forgot').onclick = function (e) {
+      e.preventDefault();
+      var me = currentUser();
+      if (!me) return;
+      startVerify('reset', accountTarget(me), { acc: me });
+    };
+    if ($('code-go')) $('code-go').onclick = verifyCode;
+    if ($('code-again')) $('code-again').onclick = function (e) { e.preventDefault(); resendCode(); };
+    if ($('si-forgot')) $('si-forgot').onclick = function (e) { e.preventDefault(); forgotPassword(); };
     if ($('row-appinfo')) $('row-appinfo').onclick = function () {
       var i = appInfo() || {};
       toast('DEYMFLIX app v' + (i.version || '?') + ' · build ' + (i.code || '?'));
