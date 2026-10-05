@@ -159,12 +159,23 @@
     var me = currentUser();
     var list = readAccounts();
     if (me) {
-      // legacy records can carry the literal string "null" as the name
-      if (me.name === 'null' || me.name === 'undefined') {
-        me.name = String(me.email || me.phone || '').split('@')[0] || 'DEYMFLIX user';
-        saveAccount(me);
+      // A legacy record can carry the literal text "null" / "undefined" /
+      // whitespace as the name (the first Google sign-in stored whatever the
+      // bridge handed over), so the header showed that word. Repair it in
+      // place -- null, the string "null" in any casing, and blanks all go to
+      // the address prefix.
+      var rawName = me.name;
+      var nm = String(rawName == null ? '' : rawName).trim();
+      if (!nm || /^(null|undefined|nan)$/i.test(nm)) {
+        nm = String(me.email || me.phone || '').split('@')[0] || 'DEYMFLIX user';
+        if (nm !== rawName) {
+          me.name = nm;
+          saveAccount(me);
+          var nlg = bridge('log');
+          if (nlg) { try { nlg('me', 'header name repaired: ' + String(rawName) + ' -> ' + nm); } catch (e) { } }
+        }
       }
-      if ($('me-title')) $('me-title').textContent = me.name || me.email || me.phone || 'DEYMFLIX user';
+      if ($('me-title')) $('me-title').textContent = nm || 'DEYMFLIX user';
       if ($('me-sub')) $('me-sub').textContent = 'UID: ' + me.uid + (me.provider === 'google' ? ' · Google account' : '');
       if ($('me-av')) $('me-av').innerHTML = me.photo
         ? '<img src="' + me.photo + '" alt="">'
@@ -932,48 +943,55 @@
     return list;
   }
 
-  // ── catalog posters (same source index.html uses) ────────────────────────
-  // me.html loads no catalog, so a CW card whose saved poster is empty showed
-  // nothing at all. The catalogs are plain script files on the server, so load
-  // the same ones the home feed uses and look the title up there.
-  var CATALOGS = ['filipino-movies.js', 'kdramas.js', 'chinese-movies.js', 'chinese-series.js', 'reels-data.js'];
-  var catalogByTitle = null;
-  function ensureCatalogs() {
-    if (catalogByTitle) return;
-    catalogByTitle = {};
-    CATALOGS.forEach(function (f) {
-      var s = document.createElement('script');
-      s.src = f + '?v=me2';
-      s.onerror = function () { };
-      (document.head || document.documentElement).appendChild(s);
-    });
+  // ── catalog posters (the same artwork index.html shows) ──────────────────
+  // me.html loads none of the catalog files, so a CW card whose saved poster
+  // was empty showed nothing at all. The catalogs are 800 KB of page scripts
+  // (app.js holds the main 826-title list), so _tools/_poster_map.cjs turns
+  // them into posters.json (title -> poster) at build time and this screen
+  // downloads that one small file -- the same artwork the home feed uses.
+  var POSTER_MAP = null;
+  var posterMapStarted = false;
+  function ensurePosterMap() {
+    if (posterMapStarted) return;
+    posterMapStarted = true;
+    if (typeof fetch !== 'function') return;
+    fetch('posters.json?pm=1', { cache: 'no-cache' })
+      .then(function (r) { return (r && r.ok) ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.map || typeof j.map !== 'object') return;
+        POSTER_MAP = j.map;
+        var n = 0;
+        for (var k in POSTER_MAP) n++;
+        var lg = bridge('log');
+        if (lg) { try { lg('cw', 'poster map ready: ' + n + ' titles'); } catch (e) { } }
+        // The strip was drawn before the file arrived, so draw it again: the
+        // placeholders turn into posters without a reload.
+        renderContinue();
+      })
+      .catch(function () { });
   }
-  function collectCatalog() {
-    if (!catalogByTitle) catalogByTitle = {};
-    var pools = [typeof movies !== 'undefined' ? movies : [],
-      typeof kdramas !== 'undefined' ? kdramas : [],
-      typeof chineseMovies !== 'undefined' ? chineseMovies : [],
-      typeof chineseSeries !== 'undefined' ? chineseSeries : [],
-      typeof reelsData !== 'undefined' ? reelsData : []];
-    pools.forEach(function (pool) {
-      if (!pool || !pool.length) return;
-      pool.forEach(function (m) {
-        if (m && m.title && m.poster) {
-          var t = String(m.title).split(' - ')[0].trim().toLowerCase();
-          if (t && !catalogByTitle[t]) catalogByTitle[t] = m.poster;
-        }
-      });
-    });
-    return catalogByTitle;
-  }
-  // Look up a poster for a CW entry: saved value first, then the catalogs,
-  // then a same-size themoviedb URL built from a poster we know.
+  // Saved poster first, then the catalog map. A stored title is often longer
+  // than its catalog entry ("Batman: Knightfall Part 1: Knightfall" against
+  // the base "Batman: Knightfall"), so a catalog key matching up to a word
+  // boundary on either side is accepted and the longest one wins.
   function posterFor(it) {
     var p = String(it.poster || '').trim();
     if (p) return p;
-    var cat = collectCatalog();
+    if (!POSTER_MAP) { ensurePosterMap(); return ''; }
     var t = String(it.title || '').split(' - ')[0].trim().toLowerCase();
-    return (t && cat[t]) || '';
+    if (!t) return '';
+    if (POSTER_MAP[t]) return POSTER_MAP[t];
+    var best = '';
+    for (var k in POSTER_MAP) {
+      if (k.length < 4) continue;
+      var shorter = k.length <= t.length ? k : t;
+      var longer = k.length <= t.length ? t : k;
+      if (longer.indexOf(shorter) !== 0) continue;
+      var boundary = longer.charAt(shorter.length);
+      if (boundary && /[a-z0-9]/.test(boundary)) continue;
+      if (k.length > best.length) best = k;
+    }
+    return best ? POSTER_MAP[best] : '';
   }
 
   function renderContinue() {
@@ -983,7 +1001,7 @@
     var list = cwItems();
     if (!list.length) { if (sec) sec.hidden = true; return; }
     if (sec) sec.hidden = false;
-    ensureCatalogs();
+    ensurePosterMap();
     strip.innerHTML = '';
     list.forEach(function (it) {
       var card = document.createElement('div');
