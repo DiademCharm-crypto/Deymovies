@@ -36,7 +36,10 @@
 // v15: Watch Party — rooms + peer-to-peer voice with a mute/unmute mic and
 // host-driven playback sync, with the panel and mic dock living inside the
 // fullscreen element so they stay usable in fullscreen.
-const CACHE = 'deymflix-v21';
+// v22: the app's Me screen gained the profile editor, Manage Account, Account
+// and Security (device list) and the 6-digit verification code -- me.html now
+// loads me.css, and apponly.js is at v2.0 on every page that includes it.
+const CACHE = 'deymflix-v22';
 const SHELL = [
   'index.html',
   'player.html',
@@ -58,6 +61,9 @@ const SHELL = [
   'stats.js',
   'watch-party.css',
   'watch-party.js',
+  'me.html',
+  'me.css',
+  'apponly.js',
   'tv.js',
   'manifest.json',
   'favicon.svg',
