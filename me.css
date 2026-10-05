@@ -1,0 +1,188 @@
+/* ============================================================================
+   DEYMFLIX — ME SCREEN EXTRAS (v1.7 / r18)
+   Loaded by me.html only. The base Me styles live in me.html's <style> block;
+   this file adds the pieces that arrived with the profile editor, Manage
+   Account, Account and Security, password change and the verification code.
+   Everything is app-only (apponly.js bounces browsers off me.html).
+   ========================================================================== */
+
+/* ── header: the Edit button next to the account name ─────────────────────── */
+.me-edit {
+  margin-left: auto;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .14);
+  color: #fff;
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 700;
+  border-radius: 16px;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+.me-edit:active { background: rgba(255, 255, 255, .13); }
+
+/* ── shared bits for the sub views ────────────────────────────────────────── */
+.me-vhead { gap: 6px; }
+.me-vtitle {
+  color: #fff;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: .1px;
+}
+.me-sec-title.ml0 { margin-left: 2px; }
+.me-sec-title { font-size: .8rem; }
+
+/* label / value row (Login method, UID, User name, Mailbox) */
+.me-kv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 15px;
+  color: #fff;
+  font-size: .95rem;
+}
+.me-kv + .me-kv { border-top: 1px solid rgba(255, 255, 255, .05); }
+.me-kv .k { font-weight: 600; }
+.me-kv .v {
+  margin-left: auto;
+  color: #a9a9b4;
+  font-size: .88rem;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 62%;
+}
+.me-copy {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, .08);
+  border: 0;
+  color: #d8d8de;
+  font-family: inherit;
+  font-size: .72rem;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+
+/* initials fallback when an account has no photo */
+.me-initial {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .5px;
+  line-height: 1;
+}
+
+/* ── profile editor ───────────────────────────────────────────────────────── */
+.me-pav-wrap { text-align: center; padding: 10px 0 6px; }
+.me-pav {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  background: linear-gradient(145deg, #2a2a33, #17171d);
+  border: 2px solid rgba(255, 255, 255, .16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.me-pav img { width: 100%; height: 100%; object-fit: cover; }
+.me-photo-btn {
+  display: inline-block;
+  margin: 0 5px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .16);
+  color: #fff;
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 700;
+  border-radius: 18px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+/* ── manage account ───────────────────────────────────────────────────────── */
+.me-ma-top { text-align: center; padding: 6px 0 18px; }
+.me-ma-av {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  background: linear-gradient(145deg, #2a2a33, #17171d);
+  border: 2px solid rgba(255, 255, 255, .16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.me-ma-av img { width: 100%; height: 100%; object-fit: cover; }
+.me-ma-name { color: #fff; font-size: 1.1rem; font-weight: 800; }
+.me-ma-plan { color: #8b8b96; font-size: .78rem; margin-top: 7px; line-height: 1.5; }
+
+/* ── account and security: device cards ───────────────────────────────────── */
+.me-dev {
+  background: #131318;
+  border: 1px solid rgba(255, 255, 255, .055);
+  border-radius: 14px;
+  padding: 14px 15px;
+  margin-bottom: 10px;
+}
+.me-dev-top { display: flex; align-items: center; gap: 11px; }
+.me-dev-ico { flex: 0 0 22px; color: #e6e6ea; }
+.me-dev-ico svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.me-dev-name {
+  color: #fff;
+  font-weight: 700;
+  font-size: .95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.me-dev-badge {
+  margin-left: auto;
+  flex: 0 0 auto;
+  background: rgba(107, 92, 231, .18);
+  color: #9d90ff;
+  border: 1px solid rgba(107, 92, 231, .45);
+  border-radius: 9px;
+  padding: 4px 9px;
+  font-size: .68rem;
+  font-weight: 800;
+}
+.me-dev-line { color: #8b8b96; font-size: .76rem; margin-top: 9px; }
+.me-dev-line.now { display: flex; align-items: center; }
+.me-dev-line .now-tag { margin-left: auto; color: #e6e6ea; font-weight: 700; }
+.me-dev-out {
+  margin-top: 11px;
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(229, 9, 20, .55);
+  color: #ff7b80;
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 9px 0;
+  cursor: pointer;
+}
+.me-dev-out:active { background: rgba(229, 9, 20, .12); }
+.me-dev-this {
+  margin-top: 11px;
+  text-align: center;
+  color: #7f7f8b;
+  font-size: .74rem;
+  font-weight: 600;
+}
+
+/* ── verification code ────────────────────────────────────────────────────── */
+.me-code {
+  text-align: center;
+  letter-spacing: .55em;
+  font-size: 1.5rem;
+  font-weight: 800;
+  padding: 20px 10px 20px 22px;
+}
+.me-code::placeholder { color: #4a4a54; letter-spacing: .5em; }
