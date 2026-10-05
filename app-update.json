@@ -1,16 +1,12 @@
 {
   "version": "1.7",
-  "code": 14,
-  "released": "2026-10-04",
-  "url": "apk/Deymflix-v1.7-r14.apk",
+  "code": 15,
+  "released": "2026-10-05",
+  "url": "apk/Deymflix-v1.7-r15.apk",
   "notes": [
-    "Google login now uses the phone's own account list — pick an account and you are in",
-    "Wi-Fi-only downloads no longer stall on a Wi-Fi network Android marks metered",
-    "Sign in or create an account inside the app — one-tap Google login with your phone's account",
-    "Watch Party now works in the offline player: create or join a room by code and playback stays in sync",
-    "Microphone permission fixed — Watch Party voice works in the app",
-    "Downloads: Wi-Fi-only mode and a preferred quality setting (Me - Download settings)",
-    "Downloaded episodes always find their subtitles offline",
-    "New Me tab: watch history, My list, downloads and 'Diagnostics you can send' with Copy logs"
+    "Nav is now Home, Reels, Explore, History, Me",
+    "Me opens the new native screen (watch history, downloads, account)",
+    "Google login shows your phone's accounts to choose from",
+    "Continue Watching now lives on the Me screen"
   ]
 }

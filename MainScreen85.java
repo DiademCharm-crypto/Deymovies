@@ -331,6 +331,10 @@ public class MainScreen85 {
 
         // -- 1) WebView settings --
         wv.getSettings().setJavaScriptEnabled(true);
+        // HTML must never be served cache-only: a site deploy has to reach the
+        // app within its 10-minute window, not "whenever the cache expires".
+        try { wv.getSettings().setCacheMode(android.webkit.WebSettings.LOAD_DEFAULT); }
+        catch (Throwable tC) { }
         // BLACK FROM FRAME ONE: the WebView paints white until the site's dark
         // CSS arrives -- that was the white flash after the splash. Paint the
         // whole stack (webview + window) in the brand dark so even a broken
@@ -742,10 +746,20 @@ public class MainScreen85 {
         // -- 8b) Purge stale download-registry rows (older than 7 days) --
         purgeOldDlMeta86();
 
-        // -- 9) Load the site --
+        // -- 9) Load the site (the Me screen's tabs pass dfx_route) --
         log85("net", networkLabel85(act));
+        String route85 = "index.html";
+        try {
+            String r85 = act.getIntent() == null ? null
+                    : act.getIntent().getStringExtra("dfx_route");
+            if (r85 != null) {
+                r85 = r85.trim();
+                // only our own page names may arrive this way
+                if (r85.matches("[a-z0-9._-]+\\.html")) route85 = r85;
+            }
+        } catch (Throwable t) { }
         if (isNetworkAvailable()) {
-            wv.loadUrl("https://deymflix.eu.cc/index.html");
+            wv.loadUrl(siteUrl85(route85));
         } else {
             log85("net", "offline at boot -- bundled page");
             wv.loadUrl("file:///android_asset/offline.html");
@@ -753,6 +767,27 @@ public class MainScreen85 {
 
         // Remember the real content view so video-fullscreen can restore it
         mActivityRoot = ((android.view.ViewGroup) act.findViewById(android.R.id.content)).getChildAt(0);
+    }
+
+    // ── Site URLs: cache-busting token ───────────────────────────────────
+    // Cloudflare hands the app's WebView HTML with max-age=600 and the JS with
+    // 4 h, so after a site deploy the shell could keep rendering the RETIRED
+    // page for hours (users saw the old navbar long after the update). Every
+    // boot/route load now carries "dfxb=<installed build code>.<hour>": a brand
+    // new URL each hour, so the HTML is always the current deploy while the
+    // page's own assets keep their normal caching.
+    private String dfxCacheToken85() {
+        int code = 1;
+        try {
+            code = act.getPackageManager()
+                    .getPackageInfo(act.getPackageName(), 0).versionCode;
+        } catch (Throwable t) { }
+        return "dfxb=" + code + "." + (System.currentTimeMillis() / 3600000L);
+    }
+
+    private String siteUrl85(String route) {
+        String base = "https://deymflix.eu.cc/" + route;
+        return base + (base.indexOf('?') >= 0 ? "&" : "?") + dfxCacheToken85();
     }
 
     // Finds the project WebView without any R.id dependency (the library jar
@@ -788,16 +823,18 @@ public class MainScreen85 {
         }
         if (wvB == null) { act.finish(); return; }
         String currentUrl = wvB.getUrl() == null ? "" : wvB.getUrl();
-        boolean atHome = currentUrl.equals("https://deymflix.eu.cc/");
-        if (!atHome) atHome = currentUrl.equals("https://deymflix.eu.cc/index.html");
-        if (!atHome) atHome = currentUrl.endsWith("/index.html");
+        // the dfxb= cache-busting token must not hide "this is home" from Back
+        String cleanUrl = currentUrl.split("[?#]")[0];
+        boolean atHome = cleanUrl.equals("https://deymflix.eu.cc/");
+        if (!atHome) atHome = cleanUrl.equals("https://deymflix.eu.cc/index.html");
+        if (!atHome) atHome = cleanUrl.endsWith("/index.html");
         if (!atHome) atHome = currentUrl.startsWith("file:///android_asset/");
         if (atHome) {
             showExitDialog();
         } else if (wvB.canGoBack()) {
             wvB.goBack();
         } else {
-            wvB.loadUrl("https://deymflix.eu.cc/index.html");
+            wvB.loadUrl(siteUrl85("index.html"));
         }
     }
 
@@ -919,7 +956,7 @@ public class MainScreen85 {
         if (wvR != null && isNetworkAvailable()
                 && wvR.getUrl() != null
                 && wvR.getUrl().startsWith("file:///android_asset/offline.html")) {
-            wvR.loadUrl("https://deymflix.eu.cc/index.html");
+            wvR.loadUrl(siteUrl85("index.html"));
         }
     }
 
@@ -1424,13 +1461,7 @@ public class MainScreen85 {
             @android.webkit.JavascriptInterface
             public void setDownloadPrefs(final String quality, final boolean wifiOnly) {
                 act.runOnUiThread(new Runnable() { @Override public void run() {
-                    try {
-                        appPrefs(act).edit()
-                                .putString("dl_quality", quality == null ? "auto" : quality)
-                                .putBoolean("dl_wifi_only", wifiOnly).apply();
-                        log85("prefs", "download quality=" + (quality == null ? "auto" : quality)
-                                + " wifiOnly=" + wifiOnly);
-                    } catch (Throwable t) { }
+                    setDownloadPrefs85(act, quality, wifiOnly);
                 }});
             }
             // Diagnostics: everything a support reply needs, in one string.
@@ -1467,13 +1498,15 @@ public class MainScreen85 {
             // and is handed to the page as DfxGooglePicked(email).
             @android.webkit.JavascriptInterface
             public String takeGoogleEmail() {
-                try {
-                    String e = PENDING_GOOGLE85;
-                    PENDING_GOOGLE85 = null;
-                    if (e == null) return "null";
-                    if (e.length() == 0) return "\"\"";
-                    return "\"" + jesc85(e) + "\"";
-                } catch (Throwable t) { return "null"; }
+                return takeGoogleEmail85();
+            }
+            // The site's bottom bar now keeps History and points Me at the
+            // native Me screen (a real activity, red theme, same 5 tabs).
+            @android.webkit.JavascriptInterface
+            public void openMe() {
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try { openMeScreen(); } catch (Throwable t) { }
+                }});
             }
             @android.webkit.JavascriptInterface
             public void pickGoogleAccount() {
@@ -1575,7 +1608,43 @@ public class MainScreen85 {
                 LOG85.addLast(line);
                 while (LOG85.size() > 400) LOG85.removeFirst();
             }
+            // Mirror into logcat (tag DFX85) so a developer with USB debugging
+            // can read the very same diagnostics the Me screen offers to copy.
+            try { android.util.Log.i("DFX85", line); } catch (Throwable t2) { }
         } catch (Throwable t) { }
+    }
+
+    // Public wrappers so the native Me screen (a second activity with its own
+    // WebView + bridge) shows exactly the same data as the main shell.
+    public static String logsText85() { return logsText(); }
+    public static String appInfoJson85(Context c) { return appInfoJson(c); }
+    public static void openDownloads85(Activity act) {
+        try {
+            Intent it = new Intent();
+            it.setClassName(act.getApplicationContext(), act.getPackageName() + ".DownloadsActivity");
+            act.startActivity(it);
+        } catch (Exception e) {
+            Toast.makeText(act.getApplicationContext(),
+                    "Downloads screen unavailable", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public static void setDownloadPrefs85(Activity act, String quality, boolean wifiOnly) {
+        try {
+            appPrefs(act).edit()
+                    .putString("dl_quality", quality == null ? "auto" : quality)
+                    .putBoolean("dl_wifi_only", wifiOnly).apply();
+            log85("prefs", "download quality=" + (quality == null ? "auto" : quality)
+                    + " wifiOnly=" + wifiOnly);
+        } catch (Throwable t) { }
+    }
+    public static String takeGoogleEmail85() {
+        try {
+            String e = PENDING_GOOGLE85;
+            PENDING_GOOGLE85 = null;
+            if (e == null) return "null";
+            if (e.length() == 0) return "\"\"";
+            return "\"" + jesc85(e) + "\"";
+        } catch (Throwable t) { return "null"; }
     }
 
     private static String logsText() {
@@ -1730,12 +1799,27 @@ public class MainScreen85 {
     // which injects that one-line hook into the generated MainActivity).
     public static void pickGoogleAccount(final Activity act) {
         try {
-            android.accounts.AccountManager am = android.accounts.AccountManager.get(act);
-            android.content.Intent it = am.newChooseAccountIntent(null, null,
-                    new String[] { "com.google" }, true,
-                    "Choose the Google account to log in with", null, null, null);
-            act.startActivityForResult(it, REQ_PICK85);
-            log85("google", "opened the phone's account picker");
+            // Google Play services draws the modern "Choose an account" sheet
+            // (account names + photos) -- exactly what the sign-in screen
+            // shows. Phones without GMS fall back to the system dialog.
+            boolean started = false;
+            try {
+                android.content.Intent gms = com.google.android.gms.common.AccountPicker
+                        .newChooseAccountIntent(null, null, new String[] { "com.google" },
+                                true, null, null, null, null);
+                if (gms != null) {
+                    act.startActivityForResult(gms, REQ_PICK85);
+                    started = true;
+                }
+            } catch (Throwable tGms) { started = false; }
+            if (!started) {
+                android.accounts.AccountManager am = android.accounts.AccountManager.get(act);
+                android.content.Intent it = am.newChooseAccountIntent(null, null,
+                        new String[] { "com.google" }, true,
+                        "Choose the Google account to log in with", null, null, null);
+                act.startActivityForResult(it, REQ_PICK85);
+            }
+            log85("google", "opened the account picker");
         } catch (Throwable t) {
             log85("google", "picker unavailable: " + t.getMessage());
             jsGooglePicked(act, null);
@@ -1748,9 +1832,21 @@ public class MainScreen85 {
             if (requestCode != REQ_PICK85) return;
             String email = null;
             if (resultCode == Activity.RESULT_OK && data != null) {
+                // The GMS "Choose an account" sheet answers with
+                // AccountManager.KEY_ACCOUNT_NAME ("accountName"); the plain
+                // Android picker and some OEM builds use "authAccount", so read
+                // every key that has been seen in the wild instead of guessing.
                 email = data.getStringExtra(android.accounts.AccountManager.KEY_ACCOUNT_NAME);
+                if (email == null) email = data.getStringExtra("accountName");
+                if (email == null) email = data.getStringExtra("authAccount");
+                if (email == null) email = data.getStringExtra("ACCOUNT_NAME");
+                try {
+                    log85("google", "picker result rc=" + resultCode + " email="
+                            + (email == null ? "none" : email) + " extras=" + data.getExtras());
+                } catch (Throwable t4) { }
+            } else {
+                log85("google", "account picker dismissed (rc=" + resultCode + ")");
             }
-            log85("google", email == null ? "account picker dismissed" : "account picked");
             jsGooglePicked(act, email);
         } catch (Throwable t) { }
     }
@@ -1969,6 +2065,26 @@ public class MainScreen85 {
 
     // The Downloads screen is launched by NAME so this jar never needs a
     // compile-time reference to the app's generated classes.
+    // The Me tab lives in its own native activity (MeActivity): red theme, the
+    // same five tabs as the site bar, and the Me page inside a WebView.
+    private void openMeScreen() {
+        try {
+            Intent it = new Intent();
+            it.setClassName(act.getApplicationContext(), act.getPackageName() + ".MeActivity");
+            act.startActivity(it);
+            log85("nav", "opened the Me screen");
+        } catch (Exception e) {
+            // Fail safe: never dead-end on the Me tab -- show the same page in
+            // the shell WebView if the activity cannot start.
+            log85("nav", "Me activity failed: " + e.getMessage());
+            try { findWebView(act).loadUrl(siteUrl85("me.html")); }
+            catch (Throwable t) {
+                Toast.makeText(act.getApplicationContext(),
+                        "Me screen unavailable", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void openDownloadsScreen() {
         try {
             Intent it = new Intent();
