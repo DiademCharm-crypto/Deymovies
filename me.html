@@ -11,6 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
   <link rel="stylesheet" href="style.css?v=161.1">
   <link rel="stylesheet" href="theme-v2.css?v=1.3">
+  <link rel="stylesheet" href="me.css?v=1">
   <style>
     /* ── ME (app only, v1.7) ────────────────────────────────────────────────
        Opened from the app's bottom bar. Browsers are redirected away by
@@ -129,6 +130,8 @@
         <h1 id="me-title">Sign In/Sign Up</h1>
         <p id="me-sub">Sign in to keep your list, history and downloads</p>
       </div>
+      <!-- profile editor: name + picture (apponly.js opens the dialog) -->
+      <button class="me-edit" id="me-edit" hidden>Edit</button>
     </div>
 
     <div class="me-sec-title">Watch History</div>
@@ -164,6 +167,14 @@
 
     <div class="me-sec-title">Preferences</div>
     <div class="me-card">
+      <button class="me-row" id="row-manage">
+        <span class="me-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1c0-3.3 3.6-6 8-6s8 2.7 8 6v1"/></svg></span>
+        Manage Account <span class="me-chev">›</span>
+      </button>
+      <button class="me-row" id="row-secure">
+        <span class="me-ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 8.3-7 9-4-0.7-7-4.6-7-9V6z"/><path d="M9.5 12.2l1.9 1.9 3.4-3.6"/></svg></span>
+        Account and Security <span class="me-chev">›</span>
+      </button>
       <button class="me-row" id="row-dl-settings">
         <span class="me-ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
         Download settings <span class="me-new">NEW</span> <span class="me-chev">›</span>
@@ -194,6 +205,9 @@
       <div class="me-err" id="si-err"></div>
       <button class="me-primary" id="si-next">Next</button>
       <div class="me-create-line">New user? <a href="#" id="si-create">Create account ›</a></div>
+      <div class="me-create-line" id="si-forgot-wrap" hidden style="margin-top:-8px">
+        <a href="#" id="si-forgot">Forgot password? Verify with a code ›</a>
+      </div>
 
       <div id="si-recent" hidden>
         <div class="me-h3">Your recently logged-in account</div>
@@ -266,6 +280,101 @@
     </div>
   </section>
 
+  <!-- ── VERIFICATION CODE (email / phone) ───────────────────────────────── -->
+  <section class="me-view" id="view-code">
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vbody">
+      <h2>Verification code</h2>
+      <p class="me-p" id="code-sub">Enter the 6-digit code.</p>
+      <input class="me-field me-code" id="code-input" type="tel" inputmode="numeric" maxlength="6"
+             autocomplete="one-time-code" placeholder="______">
+      <div class="me-err" id="code-err"></div>
+      <button class="me-primary" id="code-go">Verify</button>
+      <div class="me-create-line"><a href="#" id="code-again">Send the code again ›</a></div>
+      <p class="me-legal" id="code-note"></p>
+    </div>
+  </section>
+
+  <!-- ── PROFILE EDIT (name + photo) ─────────────────────────────────────── -->
+  <section class="me-view" id="view-profile">
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Edit profile</div></div>
+    <div class="me-vbody">
+      <div class="me-pav-wrap">
+        <div class="me-pav" id="pe-av">
+          <svg viewBox="0 0 24 24" width="42" height="42" fill="#54545f"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/></svg>
+        </div>
+        <button class="me-photo-btn" id="pe-photo">Add photo</button>
+        <button class="me-photo-btn" id="pe-remove" hidden>Remove</button>
+        <input type="file" id="pe-file" accept="image/*" hidden>
+      </div>
+      <div class="me-h3">Name</div>
+      <input class="me-field" id="pe-name" type="text" maxlength="24" placeholder="Your name">
+      <p class="me-p" style="margin-top:10px">This is the name and picture shown on the Me screen and on each device in Account and Security.</p>
+      <div class="me-err" id="pe-err"></div>
+      <button class="me-primary" id="pe-save">Save changes</button>
+      <div class="me-create-line"><a href="#" id="pe-cancel">Cancel</a></div>
+    </div>
+  </section>
+
+  <!-- ── MANAGE ACCOUNT ──────────────────────────────────────────────────── -->
+  <section class="me-view" id="view-manage">
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Manage Account</div></div>
+    <div class="me-vbody">
+      <div class="me-ma-top">
+        <div class="me-ma-av" id="ma-av"></div>
+        <div class="me-ma-name" id="ma-name">—</div>
+        <div class="me-ma-plan" id="ma-plan">DEYMFLIX account</div>
+      </div>
+      <div class="me-sec-title ml0">Login Method</div>
+      <div class="me-card">
+        <div class="me-kv"><span class="k" id="ma-method">email</span><span class="v" id="ma-target">—</span></div>
+      </div>
+      <div class="me-sec-title ml0">DEYMFLIX UID</div>
+      <div class="me-card">
+        <div class="me-kv"><span class="k">UID</span><span class="v" id="ma-uid">—</span>
+          <button class="me-copy" id="ma-copy-uid">Copy</button></div>
+      </div>
+      <div class="me-card" style="margin-top:16px">
+        <button class="me-row" id="ma-pass">Change Password <span class="me-chev">›</span></button>
+        <button class="me-row" id="ma-delete">Delete Account <span class="me-chev">›</span></button>
+      </div>
+      <p class="me-p" style="margin-top:14px" id="ma-note"></p>
+    </div>
+  </section>
+
+  <!-- ── CHANGE PASSWORD ─────────────────────────────────────────────────── -->
+  <section class="me-view" id="view-pass">
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Change Password</div></div>
+    <div class="me-vbody">
+      <div id="pw-cur-wrap" style="margin-top:6px">
+        <input class="me-field" id="pw-cur" type="password" autocomplete="current-password" placeholder="Current password">
+      </div>
+      <div style="margin-top:12px">
+        <input class="me-field" id="pw-new" type="password" autocomplete="new-password" placeholder="New password">
+      </div>
+      <div style="margin-top:12px">
+        <input class="me-field" id="pw-new2" type="password" autocomplete="new-password" placeholder="Confirm new password">
+      </div>
+      <div class="me-err" id="pw-err"></div>
+      <button class="me-primary" id="pw-save">Save password</button>
+      <div class="me-create-line"><a href="#" id="pw-forgot">Forgot the current password? Verify with a code ›</a></div>
+    </div>
+  </section>
+
+  <!-- ── ACCOUNT AND SECURITY (devices) ──────────────────────────────────── -->
+  <section class="me-view" id="view-secure">
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Account and Security</div></div>
+    <div class="me-vbody">
+      <div class="me-card">
+        <div class="me-kv"><span class="k">User name</span><span class="v" id="se-name">—</span></div>
+        <div class="me-kv"><span class="k">Mailbox</span><span class="v" id="se-mail">—</span></div>
+      </div>
+      <div class="me-sec-title ml0">Device Management</div>
+      <div id="se-devices"></div>
+      <p class="me-p" id="se-note" style="margin-top:12px">The following are the devices that have logged into DEYMFLIX. After clicking Logout, the device will log out. The number of login devices is limited to 3.</p>
+    </div>
+  </section>
+
   <!-- ── DIAGNOSTICS ─────────────────────────────────────────────────────── -->
   <section class="me-view" id="view-diag">
     <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
@@ -309,6 +418,6 @@
   </nav>
 
   <script src="config.js?v=2.0"></script>
-  <script src="apponly.js?v=1.9" defer></script>
+  <script src="apponly.js?v=2.0" defer></script>
 </body>
 </html>
