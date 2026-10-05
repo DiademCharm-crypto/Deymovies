@@ -381,36 +381,5 @@
     sweep(); // clean out pre-fix garbage the moment we load, not 30s later
   })();
   </script>
-<!-- DFX_TEMP_PROBE v2 — REMOVE BEFORE RELEASE: reports live app-mode state to the dev beacon -->
-<script>
-(function(){
-  var EP='http://localhost:8899';
-  function b(s){try{s=String(s);for(var i=0;i<s.length;i+=1400){new Image().src=EP+'/b?d='+encodeURIComponent(s.slice(i,i+1400));}}catch(e){}}
-  function snap(tag){
-    try{
-      var items=document.querySelectorAll('.bottom-nav-item');
-      var labels=[];
-      for(var i=0;i<items.length;i++){
-        var L=items[i].querySelector('.bottom-nav-label');
-        labels.push((items[i].getAttribute('data-page')||'?')+':'+(L?L.textContent.trim():''));
-      }
-      var cw=document.getElementById('continue-watching-section');
-      var res=(performance.getEntriesByType('resource')||[]).filter(function(e){return /app\.js/.test(e.name);});
-      return tag+' html='+(document.documentElement.className||'none')+
-        ' isapp='+(window.DFX_IS_APP===undefined?'unset':String(window.DFX_IS_APP))+
-        ' rs='+document.readyState+' nav='+items.length+' ['+labels.join(' ')+']'+
-        ' me='+(document.querySelector('[data-page=\"me\"]')?'y':'n')+
-        ' req='+(document.querySelector('[data-page=\"request\"]')?'y':'n')+
-        ' footerreq='+(document.getElementById('dfx-app-request-btn')?'y':'n')+
-        ' cw='+(cw?(getComputedStyle(cw).display==='none'?'HIDDEN':'shown'):'absent')+
-        ' appjsres='+res.map(function(e){return e.name.replace(/^https?:\/\/[^/]+\//,'')+'|enc'+e.encodedBodySize+'|tr'+e.transferSize}).join(' ');
-    }catch(e){ return tag+' ERR '+(e&&e.message); }
-  }
-  b('IDXPROBE2 '+snap('t0'));
-  try{ document.title='P0 '+snap('t0'); }catch(e){}
-  setTimeout(function(){ b('IDXPROBE2 '+snap('t2')); try{ document.title='P1 '+snap('t2'); }catch(e){} },2500);
-  setTimeout(function(){ b('IDXPROBE2 '+snap('t8')); try{ document.title='P2 '+snap('t8'); }catch(e){} },8000);
-})();
-</script>
 </body>
 </html>
