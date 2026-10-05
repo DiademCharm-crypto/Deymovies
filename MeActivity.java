@@ -144,7 +144,15 @@ public class MeActivity extends AppCompatActivity {
         }
         wv.setBackgroundColor(BG);
         wv.addJavascriptInterface(new MeBridge(), "DeymflixApp");
-        wv.setWebChromeClient(new WebChromeClient());
+        wv.setWebChromeClient(new WebChromeClient() {
+            // "Change photo" in the profile editor: Android's own picker.
+            @Override
+            public boolean onShowFileChooser(WebView webView,
+                    android.webkit.ValueCallback<android.net.Uri[]> cb,
+                    FileChooserParams params) {
+                return MainScreen85.showFileChooser85(MeActivity.this, cb, params);
+            }
+        });
         wv.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, String url) {
@@ -168,9 +176,16 @@ public class MeActivity extends AppCompatActivity {
         outer.setOrientation(LinearLayout.VERTICAL);
         outer.setBackgroundColor(Color.TRANSPARENT);
         outer.setPadding((int) (16 * d), 0, (int) (16 * d), (int) (16 * d));
+        // The active tab's red marker is positioned OUTSIDE its tab (top: -8px
+        // on the site), i.e. it straddles the pill's top edge -- so nothing in
+        // this tree may clip its children.
+        outer.setClipChildren(false);
+        outer.setClipToPadding(false);
 
         LinearLayout bar = new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
+        bar.setClipChildren(false);
+        bar.setClipToPadding(false);
         android.graphics.drawable.GradientDrawable pill =
                 new android.graphics.drawable.GradientDrawable();
         pill.setColor(0xE6161616);                       // rgba(22,22,22,.75) over dark
@@ -182,16 +197,24 @@ public class MeActivity extends AppCompatActivity {
         for (int i = 0; i < LABELS.length; i++) {
             final int idx = i;
             boolean active = ROUTES[i] == null;          // Me
-            LinearLayout tab = new LinearLayout(this);
-            tab.setOrientation(LinearLayout.VERTICAL);
-            tab.setGravity(Gravity.CENTER);
-            tab.setClickable(true);
-            tab.setPadding((int) (2 * d), (int) (6 * d), (int) (2 * d), (int) (6 * d));
-            tab.setOnClickListener(new View.OnClickListener() {
+            // FrameLayout host: the marker is a free-floating child, exactly
+            // like the site's absolutely positioned ::after. Keeping it out of
+            // the flow is what makes the pill the same height as the site's
+            // (an in-flow marker made the native dock 3dp taller).
+            android.widget.FrameLayout host = new android.widget.FrameLayout(this);
+            host.setClipChildren(false);
+            host.setClipToPadding(false);
+            host.setClickable(true);
+            host.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) { go(ROUTES[idx]); }
             });
 
-            // the site's active marker: 20px wide, 3px tall, red, on the top edge
+            LinearLayout tab = new LinearLayout(this);
+            tab.setOrientation(LinearLayout.VERTICAL);
+            tab.setGravity(Gravity.CENTER);
+            tab.setPadding((int) (2 * d), (int) (6 * d), (int) (2 * d), (int) (6 * d));
+
+            // the site's active marker: 20px wide, 3px tall, red, top: -8px
             View marker = new View(this);
             if (active) {
                 android.graphics.drawable.GradientDrawable md =
@@ -200,13 +223,17 @@ public class MeActivity extends AppCompatActivity {
                 md.setCornerRadius(2 * d);
                 marker.setBackground(md);
             }
-            tab.addView(marker, new LinearLayout.LayoutParams(
-                    (int) (20 * d), Math.max(1, (int) (3 * d))));
+            android.widget.FrameLayout.LayoutParams mp =
+                    new android.widget.FrameLayout.LayoutParams(
+                            (int) (20 * d), Math.max(1, (int) (3 * d)));
+            mp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+            mp.topMargin = -(int) (8 * d);               // the site's top: -8px
+            host.addView(marker, mp);
 
             NavIcon icon = new NavIcon(this, PATHS[i], active ? RED : DIM, 22 * d);
             LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(
                     (int) (22 * d), (int) (22 * d));
-            tab.addView(icon, ip);   // the 3dp marker above already supplies the gap
+            tab.addView(icon, ip);
 
             TextView label = new TextView(this);
             label.setText(LABELS[i]);
@@ -223,7 +250,12 @@ public class MeActivity extends AppCompatActivity {
             lp.topMargin = (int) (4 * d);                // the site's 4px gap
             tab.addView(label, lp);
 
-            bar.addView(tab, new LinearLayout.LayoutParams(0,
+            android.widget.FrameLayout.LayoutParams hp =
+                    new android.widget.FrameLayout.LayoutParams(0,
+                            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT);
+            hp.gravity = Gravity.BOTTOM;
+            host.addView(tab, hp);
+            bar.addView(host, new LinearLayout.LayoutParams(0,
                     LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         }
         outer.addView(bar, new LinearLayout.LayoutParams(
@@ -236,6 +268,9 @@ public class MeActivity extends AppCompatActivity {
     // screen steps out of the way so the back stack stays flat.
     private void go(String route) {
         if (route == null) {
+            // "Me" on the native dock: already here, but re-push a picked
+            // Google account in case the sheet answered while the page slept.
+            try { MainScreen85.retryPendingGooglePick(this); } catch (Throwable t) { }
             try { web.reload(); } catch (Throwable t) { }
             return;
         }
@@ -266,7 +301,7 @@ public class MeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // the Google account picker answers here
+        // both the photo picker and the Google account picker answer here
         MainScreen85.onActivityResult(this, requestCode, resultCode, data);
     }
 
@@ -278,6 +313,14 @@ public class MeActivity extends AppCompatActivity {
 
     // NOTE: no reload on resume. Coming back from the account picker must land
     // on the very same page instance, or the picked address would be lost.
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // The page may have been parked behind Android's account sheet (or any
+        // other dialog) when the pick landed: hand the address over again.
+        try { MainScreen85.retryPendingGooglePick(this); } catch (Throwable t) { }
+    }
 
     // =======================================================================
     //  JS BRIDGE -- the same names me.html/apponly.js already call
@@ -338,6 +381,11 @@ public class MeActivity extends AppCompatActivity {
         @android.webkit.JavascriptInterface
         public String takeGoogleEmail() {
             return MainScreen85.takeGoogleEmail85();
+        }
+        @android.webkit.JavascriptInterface
+        public String sendCode(final String target, final String code) {
+            try { return MainScreen85.sendCode85(MeActivity.this, target, code); }
+            catch (Throwable t) { return "nosend"; }
         }
         @android.webkit.JavascriptInterface
         public boolean hasMic() {

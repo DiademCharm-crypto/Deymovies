@@ -702,6 +702,16 @@ public class MainScreen85 {
                 exitAppFullscreen();
             }
 
+            // ── PROFILE PHOTO ──
+            // <input type="file"> in the Me screen needs the host app to open
+            // Android's gallery picker and hand the chosen picture back.
+            @Override
+            public boolean onShowFileChooser(WebView webView,
+                    android.webkit.ValueCallback<android.net.Uri[]> filePathCallback,
+                    android.webkit.WebChromeClient.FileChooserParams fileChooserParams) {
+                return showFileChooser85(act, filePathCallback, fileChooserParams);
+            }
+
             // ── v1.7 -- MIC / MEDIA PERMISSION GRANT (Watch Party voice) ──
             // The site asks for the microphone through getUserMedia while the
             // Watch Party is live. A WebView routes that request HERE; if it
@@ -1584,6 +1594,12 @@ public class MainScreen85 {
             public String takeGoogleEmail() {
                 return takeGoogleEmail85();
             }
+            // Verification code: delivered as an Android notification while the
+            // site has no email/SMS sender (see sendCode85).
+            @android.webkit.JavascriptInterface
+            public String sendCode(final String target, final String code) {
+                try { return sendCode85(act, target, code); } catch (Throwable t) { return "nosend"; }
+            }
             // The site's bottom bar now keeps History and points Me at the
             // native Me screen (a real activity, red theme, same 5 tabs).
             @android.webkit.JavascriptInterface
@@ -1780,11 +1796,64 @@ public class MainScreen85 {
     }
 
     private static String appInfoJson(Context c) {
+        // model / deviceCode / release / sys feed the Me screen's device list,
+        // which shows the phone the way Android reports it (same shape the
+        // reference app uses: android_<release>_<model>_<build id>).
+        String sys = "android_" + android.os.Build.VERSION.RELEASE
+                + "_" + android.os.Build.MODEL + "_" + android.os.Build.ID;
         return "{\"version\":" + jesc85(versionName85(c))
                 + ",\"code\":" + versionCode85(c)
                 + ",\"package\":" + jesc85(c.getPackageName())
                 + ",\"android\":" + jesc85(String.valueOf(android.os.Build.VERSION.SDK_INT))
+                + ",\"release\":" + jesc85(android.os.Build.VERSION.RELEASE)
+                + ",\"build\":" + jesc85(android.os.Build.ID)
+                + ",\"model\":" + jesc85(android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL)
+                + ",\"deviceCode\":" + jesc85(android.os.Build.DEVICE)
+                + ",\"sys\":" + jesc85(sys)
                 + ",\"device\":" + jesc85(android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL) + "}";
+    }
+
+    // ── verification-code delivery ──────────────────────────────────────────
+    // The site has no email/SMS sender yet, so a code is handed to Android and
+    // posted as a notification on this phone. "sent" means the shade carries
+    // it; "nosend" (permission off, ancient device) makes the page say so in
+    // plain words instead of pretending a mail left the building.
+    public static String sendCode85(Context ctx, String target, String code) {
+        try {
+            if (ctx == null || code == null || code.length() == 0) return "nosend";
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                if (ctx.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                        != android.content.pm.PackageManager.PERMISSION_GRANTED) return "nosend";
+            }
+            android.app.NotificationManager nm = (android.app.NotificationManager)
+                    ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm == null) return "nosend";
+            String chId = "deymflix_codes";
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                android.app.NotificationChannel ch = new android.app.NotificationChannel(
+                        chId, "Sign-in codes", android.app.NotificationManager.IMPORTANCE_HIGH);
+                ch.setDescription("Verification codes for DEYMFLIX sign-in");
+                nm.createNotificationChannel(ch);
+            }
+            android.app.Notification.Builder b = android.os.Build.VERSION.SDK_INT >= 26
+                    ? new android.app.Notification.Builder(ctx, chId)
+                    : new android.app.Notification.Builder(ctx);
+            b.setSmallIcon(android.R.drawable.ic_lock_lock);
+            b.setContentTitle("DEYMFLIX verification code");
+            b.setContentText(code + " for " + (target == null ? "your account" : target));
+            try {
+                b.setStyle(new android.app.Notification.BigTextStyle().bigText(
+                        "Your DEYMFLIX code is " + code + " for "
+                        + (target == null ? "your account" : target)
+                        + ". It expires in 10 minutes."));
+            } catch (Throwable t) { }
+            b.setAutoCancel(true);
+            nm.notify(7801, b.build());
+            log85("code", "verification code posted for " + target);
+            return "sent";
+        } catch (Throwable t) {
+            return "nosend";
+        }
     }
 
     // Full diagnostics report: build info + network + storage + prefs + the
@@ -1913,6 +1982,7 @@ public class MainScreen85 {
     public static void onActivityResult(Activity act, int requestCode, int resultCode,
             android.content.Intent data) {
         try {
+            if (fileChooserResult85(requestCode, resultCode, data)) return;
             if (requestCode != REQ_PICK85) return;
             String email = null;
             if (resultCode == Activity.RESULT_OK && data != null) {
@@ -1943,17 +2013,97 @@ public class MainScreen85 {
     private static void jsGooglePicked(final Activity act, final String email) {
         try {
             PENDING_GOOGLE85 = email == null ? "" : email;
-            final WebView wv = findWebView(act);
-            if (wv == null) {
-                log85("google", "no WebView to hand the picked account to");
-                return;
-            }
-            final String code = "window.DfxGooglePicked&&window.DfxGooglePicked("
-                    + (email == null ? "null" : ("\"" + jesc85(email) + "\"")) + ");";
-            act.runOnUiThread(new Runnable() { @Override public void run() {
-                try { wv.evaluateJavascript(code, null); } catch (Throwable t) { }
-            }});
+            pushGooglePicked(act, 0);
         } catch (Throwable t) { log85("google", "relay failed: " + t.getMessage()); }
+    }
+
+    // One push is not enough: while the Android account sheet is up the page's
+    // own poll can already have timed out, and a WebView that is still paused
+    // drops the call. So the address is re-pushed a few times and the loop only
+    // stops once the page has consumed it (takeGoogleEmail clears the slot) --
+    // that is what makes "pick the account in the Android dialog" land.
+    private static void pushGooglePicked(final Activity act, final int attempt) {
+        try {
+            final String email = PENDING_GOOGLE85;
+            if (email == null) return;                    // the page took it: done
+            final WebView wv = findWebView(act);
+            if (wv != null && email.length() > 0) {
+                final String code = "window.DfxGooglePicked&&window.DfxGooglePicked(\""
+                        + jesc85(email) + "\");";
+                act.runOnUiThread(new Runnable() { @Override public void run() {
+                    try { wv.evaluateJavascript(code, null);
+                          log85("google", "handed the picked account to the page (try " + attempt + ")");
+                    } catch (Throwable t) { }
+                }});
+            }
+            if (attempt < PUSH_RETRY_MS.length) {
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
+                        new Runnable() { @Override public void run() { pushGooglePicked(act, attempt + 1); } },
+                        PUSH_RETRY_MS[attempt]);
+            }
+        } catch (Throwable t) { }
+    }
+
+    // 1.2s / 4s / 10s / 20s after the picker returns
+    private static final long[] PUSH_RETRY_MS = { 1200L, 4000L, 10000L, 20000L };
+
+    // MeActivity asks for this when the Me screen resumes (and when its own
+    // dock item is tapped): a pick that is still waiting for the page gets
+    // handed over again instead of being stranded in the shell's slot.
+    public static void retryPendingGooglePick(final Activity act) {
+        try {
+            String e = PENDING_GOOGLE85;
+            if (e == null || e.length() == 0) return;
+            log85("google", "re-queued the picked account for the page");
+            pushGooglePicked(act, 0);
+        } catch (Throwable t) { }
+    }
+
+    // ---- file chooser: the page's "change photo" needs a real picker ----
+    // A WebView cannot open Android's gallery on its own: onShowFileChooser asks
+    // the host app to do it and waits for the result. The Me screen uploads its
+    // profile picture through exactly this path.
+    private static final int REQ_FILE85 = 4321;
+    private static volatile android.webkit.ValueCallback<android.net.Uri[]> pendingFileCb85 = null;
+
+    public static boolean showFileChooser85(Activity act,
+            android.webkit.ValueCallback<android.net.Uri[]> cb,
+            android.webkit.WebChromeClient.FileChooserParams params) {
+        try {
+            if (pendingFileCb85 != null) {           // a second pick cancels the first
+                try { pendingFileCb85.onReceiveValue(null); } catch (Throwable t0) { }
+                pendingFileCb85 = null;
+            }
+            pendingFileCb85 = cb;
+            android.content.Intent it = null;
+            try { if (params != null) it = params.createIntent(); } catch (Throwable t1) { }
+            if (it == null) {
+                it = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                it.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+                it.setType("image/*");
+            }
+            act.startActivityForResult(it, REQ_FILE85);
+            return true;
+        } catch (Throwable t) {
+            log85("web", "file chooser unavailable: " + t.getMessage());
+            pendingFileCb85 = null;
+            return false;
+        }
+    }
+
+    /** @return true when the result belonged to the file chooser (already handled). */
+    public static boolean fileChooserResult85(int requestCode, int resultCode, android.content.Intent data) {
+        if (requestCode != REQ_FILE85) return false;
+        android.net.Uri[] out = null;
+        try {
+            if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+                out = new android.net.Uri[] { data.getData() };
+            }
+        } catch (Throwable t) { }
+        try { if (pendingFileCb85 != null) pendingFileCb85.onReceiveValue(out); } catch (Throwable t2) { }
+        pendingFileCb85 = null;
+        log85("web", "photo picker returned " + (out == null ? "nothing" : "a file"));
+        return true;
     }
 
     // ---- Google accounts: GET_ACCOUNTS is a runtime permission too ----

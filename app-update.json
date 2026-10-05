@@ -1,12 +1,15 @@
 {
   "version": "1.7",
-  "code": 17,
+  "code": 18,
   "released": "2026-10-05",
-  "url": "apk/Deymflix-v1.7-r17.apk",
+  "url": "apk/Deymflix-v1.7-r18.apk",
   "notes": [
-    "Fixed bugs on the Me tab",
-    "New features on Explore",
-    "Smoother navigation between tabs",
-    "Player: Refresh and Home buttons when a video fails"
+    "Fixed Google login",
+    "Profile editing with name and photo",
+    "Manage Account and Account Security settings",
+    "Device list with main device and logout",
+    "Watch history editing",
+    "Verification code on sign up",
+    "Nav bar matched to the site"
   ]
 }
