@@ -136,11 +136,11 @@
 
     <div class="me-sec-title">Watch History</div>
     <div class="me-card">
-      <button class="me-row" id="row-continue">
+      <!-- r19: plain label, no button -- the strip below is the content -->
+      <div class="me-row" id="row-continue" style="cursor:default">
         <span class="me-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span>
         Continue Watching
-        <span class="me-chev">›</span>
-      </button>
+      </div>
       <div class="me-row" id="row-history-gate" style="cursor:default">
         <span style="flex:1;color:#c9c9d1" id="hist-gate-text">Sign in to view watch history</span>
         <button class="me-pill" id="btn-signin">Sign In</button>
@@ -338,6 +338,9 @@
         <button class="me-row" id="ma-pass">Change Password <span class="me-chev">›</span></button>
         <button class="me-row" id="ma-delete">Delete Account <span class="me-chev">›</span></button>
       </div>
+      <div style="text-align:center;margin:26px 0 8px">
+        <button class="me-signout" id="ma-signout">Sign Out</button>
+      </div>
       <p class="me-p" style="margin-top:14px" id="ma-note"></p>
     </div>
   </section>
@@ -418,6 +421,6 @@
   </nav>
 
   <script src="config.js?v=2.0"></script>
-  <script src="apponly.js?v=2.2" defer></script>
+  <script src="apponly.js?v=2.3" defer></script>
 </body>
 </html>
