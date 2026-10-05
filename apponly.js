@@ -172,11 +172,11 @@
       if ($('me-edit')) $('me-edit').hidden = false;
       if ($('hist-gate-text')) $('hist-gate-text').textContent = 'Your watch history on this phone';
       if ($('btn-signin')) {
-        $('btn-signin').textContent = 'Sign out';
-        $('btn-signin').onclick = function () {
-          writeSession(null);
-          renderHeader();
-        };
+        // r19: the Me header no longer carries the red sign-out pill; sign-out
+        // lives at the bottom of Manage Account.
+        $('btn-signin').textContent = 'Signed in';
+        $('btn-signin').style.display = 'none';
+        $('btn-signin').onclick = null;
       }
     } else {
       if ($('me-title')) $('me-title').textContent = 'Sign In/Sign Up';
@@ -185,6 +185,7 @@
       if ($('hist-gate-text')) $('hist-gate-text').textContent = 'Sign in to view watch history';
       if ($('btn-signin')) {
         $('btn-signin').textContent = 'Sign In';
+        $('btn-signin').style.display = '';
         $('btn-signin').onclick = function () { openView('view-signin'); prepareSignIn(); };
       }
     }
@@ -229,6 +230,11 @@
     });
     var root = $('me-root');
     if (root) root.hidden = !!id;
+    // Tell the native shell which sub-view is showing: hardware Back then
+    // closes the view (exactly what the page's own top-left arrow does)
+    // instead of leaving the Me screen.
+    var report = bridge('dfxView');
+    if (report) { try { report(id || ''); } catch (e) { } }
   }
   function closeViews() { openView(null); }
 
@@ -618,6 +624,7 @@
     var me = currentUser();
     if (!me) return;
     deleteArmed = 0;
+    signOutArmed = 0;
     if ($('ma-av')) $('ma-av').innerHTML = avatarHtml(me, 40);
     if ($('ma-name')) $('ma-name').textContent = me.name || accountTarget(me);
     if ($('ma-method')) $('ma-method').textContent = me.provider === 'google' ? 'Google' : (me.phone ? 'phone' : 'email');
@@ -628,6 +635,23 @@
     if ($('ma-note')) $('ma-note').textContent = me.provider === 'google'
       ? 'You sign in with the Google account on this phone, so there is no password to change here.'
       : 'Your password is stored on this phone as a salted hash — never in clear text.';
+    if ($('ma-signout')) $('ma-signout').textContent = 'Sign Out';
+  }
+  // Sign out moved here from the Me header (r19): centered at the bottom of
+  // Manage Account. Two taps so a stray press cannot sign the user out.
+  var signOutArmed = 0;
+  function signOut() {
+    if (!currentUser()) { closeViews(); return; }
+    if (Date.now() - signOutArmed > 8000) {
+      signOutArmed = Date.now();
+      if ($('ma-signout')) $('ma-signout').textContent = 'Tap again to sign out';
+      return;
+    }
+    signOutArmed = 0;
+    writeSession(null);
+    closeViews();
+    renderHeader();
+    toast('Signed out');
   }
   function deleteAccount() {
     var me = currentUser();
@@ -908,6 +932,50 @@
     return list;
   }
 
+  // ── catalog posters (same source index.html uses) ────────────────────────
+  // me.html loads no catalog, so a CW card whose saved poster is empty showed
+  // nothing at all. The catalogs are plain script files on the server, so load
+  // the same ones the home feed uses and look the title up there.
+  var CATALOGS = ['filipino-movies.js', 'kdramas.js', 'chinese-movies.js', 'chinese-series.js', 'reels-data.js'];
+  var catalogByTitle = null;
+  function ensureCatalogs() {
+    if (catalogByTitle) return;
+    catalogByTitle = {};
+    CATALOGS.forEach(function (f) {
+      var s = document.createElement('script');
+      s.src = f + '?v=me2';
+      s.onerror = function () { };
+      (document.head || document.documentElement).appendChild(s);
+    });
+  }
+  function collectCatalog() {
+    if (!catalogByTitle) catalogByTitle = {};
+    var pools = [typeof movies !== 'undefined' ? movies : [],
+      typeof kdramas !== 'undefined' ? kdramas : [],
+      typeof chineseMovies !== 'undefined' ? chineseMovies : [],
+      typeof chineseSeries !== 'undefined' ? chineseSeries : [],
+      typeof reelsData !== 'undefined' ? reelsData : []];
+    pools.forEach(function (pool) {
+      if (!pool || !pool.length) return;
+      pool.forEach(function (m) {
+        if (m && m.title && m.poster) {
+          var t = String(m.title).split(' - ')[0].trim().toLowerCase();
+          if (t && !catalogByTitle[t]) catalogByTitle[t] = m.poster;
+        }
+      });
+    });
+    return catalogByTitle;
+  }
+  // Look up a poster for a CW entry: saved value first, then the catalogs,
+  // then a same-size themoviedb URL built from a poster we know.
+  function posterFor(it) {
+    var p = String(it.poster || '').trim();
+    if (p) return p;
+    var cat = collectCatalog();
+    var t = String(it.title || '').split(' - ')[0].trim().toLowerCase();
+    return (t && cat[t]) || '';
+  }
+
   function renderContinue() {
     var strip = $('cw-strip');
     var sec = $('cw-section');
@@ -915,26 +983,29 @@
     var list = cwItems();
     if (!list.length) { if (sec) sec.hidden = true; return; }
     if (sec) sec.hidden = false;
+    ensureCatalogs();
     strip.innerHTML = '';
     list.forEach(function (it) {
       var card = document.createElement('div');
       card.className = 'poster-card';
-      card.style.cssText = 'position:relative;cursor:pointer';
+      card.style.cssText = 'position:relative';
       var label = it.ep ? ('S' + (it.season || 1) + ' E' + it.ep) : '';
       var badge = label ? label
         : (it.progress > 0 ? (Math.round(it.progress) + '% watched') : '');
+      // Posters come from the saved record, else from the same catalog files
+      // the home feed uses ("downloaded from our server, same as index.html").
+      // A card still renders with a title bar while its poster is unknown.
+      var p = posterFor(it);
       card.innerHTML =
-        '<img src="' + String(it.poster).replace(/"/g, '') + '" alt="" loading="lazy" decoding="async">' +
+        (p ? '<img src="' + String(p).replace(/"/g, '') + '" alt="" loading="lazy" decoding="async">'
+           : '<div class="me-cw-nophoto"></div>') +
         '<div class="poster-card-overlay"><div class="poster-card-title">' +
         String(it.title).split(' - ')[0].replace(/[<>&]/g, '') + '</div></div>' +
         (badge ? '<div class="mylist-progress-badge">' + badge + '</div>' : '') +
         '<div style="position:absolute;bottom:0;left:0;width:100%;height:4px;background:rgba(255,255,255,.2)">' +
         '<div style="width:' + Math.min(100, Math.max(0, it.progress)) + '%;height:100%;background:#e50914"></div></div>';
-      card.addEventListener('click', function () {
-        var url = 'player.html?id=' + encodeURIComponent(it.base);
-        if (it.ep) url += '&s=' + (it.season || 1) + '&ep=' + it.ep;
-        window.location.href = url;
-      });
+      // No click handler: the row is a plain "Continue Watching" strip now —
+      // the user asked for the text without the button behaviour.
       strip.appendChild(card);
     });
   }
@@ -1007,7 +1078,9 @@
       if ($('me-foot')) $('me-foot').textContent = 'DEYMFLIX app v' + info.version + ' (build ' + info.code + ')';
     }
 
-    if ($('row-continue')) $('row-continue').onclick = function () { window.location.href = 'history.html'; };
+    // r19: "Continue Watching" is a plain label now -- the strip under it is
+    // the content, and the full history still lives on the History tab.
+    if ($('row-continue')) $('row-continue').onclick = null;
     if ($('row-mylist')) $('row-mylist').onclick = function () { window.location.href = 'mylist.html'; };
     if ($('row-download')) $('row-download').onclick = function () {
       var open = bridge('openDownloads');
@@ -1051,6 +1124,7 @@
     if ($('pe-cancel')) $('pe-cancel').onclick = function (e) { e.preventDefault(); closeViews(); };
     if ($('ma-pass')) $('ma-pass').onclick = function () { openPass(false); };
     if ($('ma-delete')) $('ma-delete').onclick = deleteAccount;
+    if ($('ma-signout')) $('ma-signout').onclick = signOut;
     if ($('ma-copy-uid')) $('ma-copy-uid').onclick = function () {
       var me = currentUser();
       if (!me) return;
@@ -1159,4 +1233,19 @@
 
   // Public hook: other app pages can ask about the signed-in user.
   window.DfxMe = { user: currentUser, isApp: true };
+
+  // Native Back (Me screen): close the open sub-view first, exactly like the
+  // page's own top-left arrow. MeActivity calls this when its slot says a
+  // view is showing.
+  window.DfxCloseView = function () {
+    var open = null;
+    VIEWS.forEach(function (v) {
+      var el = $(v);
+      if (el && el.classList.contains('on')) open = v;
+    });
+    if (!open) return false;
+    closeViews();
+    renderHeader();
+    return true;
+  };
 })();
