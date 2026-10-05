@@ -315,7 +315,7 @@
         var v = null;
         try { v = JSON.parse(take() || 'null'); } catch (e1) { v = null; }
         if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
-        if (pt < 40) setTimeout(pollPick, 700);
+        if (pt < 420) setTimeout(pollPick, 700); // ~5 min: a slow pick still lands
         else err($('si-err'), 'No account chosen. Tap "Log in with Google" to try again.');
       })();
       return;
@@ -343,7 +343,7 @@
               var v = null;
               try { v = JSON.parse(take() || 'null'); } catch (e3) { v = null; }
               if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
-              if (pt < 40) setTimeout(pollPick, 700);
+              if (pt < 420) setTimeout(pollPick, 700); // ~5 min: a slow pick still lands
               else err($('si-err'), 'No account chosen.');
             };
             setTimeout(pollPick, 700);
