@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DFX Diag</title>
+<style>
+ body{background:#0b0b0f;color:#e8e8ee;font:13px/1.45 monospace;margin:0;padding:14px}
+ #tap{margin:10px 0;padding:18px 22px;font:700 18px sans-serif;background:#e11;color:#fff;border:0;border-radius:12px}
+ pre{white-space:pre-wrap;word-break:break-all;font-size:11px;color:#9ad}
+</style></head>
+<body>
+<h3 style="color:#e11;font-family:sans-serif;margin:0 0 8px">DFX DIAGNOSTICS</h3>
+<button id="tap">TAP ME</button>
+<pre id="out"></pre>
+<script>
+(function () {
+  var out = document.getElementById('out');
+  function L(tag, obj) {
+    var s = (typeof obj === 'string') ? obj : JSON.stringify(obj);
+    try { out.textContent += '\n[' + tag + '] ' + s; } catch (e) {}
+    try { if (window.DeymflixApp && DeymflixApp.log) DeymflixApp.log('imgdiag', tag + ' ' + s); } catch (e) {}
+    try { console.log('imgdiag ' + tag + ' ' + s); } catch (e) {}
+  }
+  window.onerror = function (m, s, l) { L('jserr', m + ' @' + l); };
+
+  // ── 0) environment ─────────────────────────────────────────────────
+  var env = {
+    ua: navigator.userAgent,
+    win: window.innerWidth + 'x' + window.innerHeight,
+    dpr: window.devicePixelRatio,
+    onLine: navigator.onLine,
+    bridge: !!window.DeymflixApp,
+    dfxApp: (document.documentElement.className || '').indexOf('dfx-app') >= 0,
+    reloadFlag: (function(){ try { return sessionStorage.getItem('dfx_reloaded'); } catch(e){ return 'n/a'; } })(),
+    alive: window.__dfxAlive || 0,
+    sw: (navigator.serviceWorker && navigator.serviceWorker.controller) ? 'ctl' : 'none'
+  };
+  L('env', env);
+
+  // ── 1) input path: log every input event that reaches the page ─────
+  var seen = {};
+  ['pointerdown','touchstart','mousedown','click','touchmove','keydown'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      var t = e.target && e.target.id ? e.target.id : (e.target && e.target.tagName);
+      var k = ev + ':' + t;
+      if (seen[k]) { seen[k]++; return; }
+      seen[k] = 1;
+      L('evt', ev + ' target=' + t + ' y=' + Math.round(e.clientY || 0));
+    }, true);
+  });
+  document.getElementById('tap').addEventListener('click', function () { L('evt', 'BUTTON CLICKED'); });
+
+  // ── 2) image probes ────────────────────────────────────────────────
+  function probe(name, url, opts) {
+    opts = opts || {};
+    return new Promise(function (res) {
+      var t0 = Date.now(), done = false;
+      var img = new Image();
+      if (opts.referrerPolicy) img.referrerPolicy = opts.referrerPolicy;
+      var to = setTimeout(function () {
+        if (done) return; done = true;
+        res({ name: name, result: 'TIMEOUT', ms: Date.now() - t0 });
+      }, opts.timeout || 12000);
+      img.onload = function () {
+        if (done) return; done = true; clearTimeout(to);
+        res({ name: name, result: 'load', w: img.naturalWidth, h: img.naturalHeight, ms: Date.now() - t0 });
+      };
+      img.onerror = function () {
+        if (done) return; done = true; clearTimeout(to);
+        res({ name: name, result: 'error', ms: Date.now() - t0 });
+      };
+      img.src = url;
+    });
+  }
+  function fetchProbe(name, url) {
+    var t0 = Date.now();
+    var ac = ('AbortController' in window) ? new AbortController() : null;
+    var to = ac ? setTimeout(function () { try { ac.abort(); } catch (e) {} }, 12000) : null;
+    return fetch(url, { cache: 'reload', signal: ac ? ac.signal : undefined })
+      .then(function (r) {
+        return r.arrayBuffer().then(function (b) {
+          if (to) clearTimeout(to);
+          L('fetch', { name: name, status: r.status, type: r.headers.get('content-type'), bytes: b.byteLength, ms: Date.now() - t0 });
+        });
+      })
+      .catch(function (e) {
+        if (to) clearTimeout(to);
+        L('fetch', { name: name, FAILED: String(e && (e.name || e.message)), ms: Date.now() - t0 });
+      });
+  }
+
+  var TMDB_MEDIA = 'https://media.themoviedb.org/t/p/w600_and_h900_face/360qdtu2hLnqMu8SVHMywn420w1.jpg';
+  var TMDB_IMAGE = 'https://image.tmdb.org/t/p/w1280/vyG93jhmPL7tBIhRtCLa5mdBKob.jpg';
+  var WIKI = 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png';
+
+  var probes = [
+    ['data-uri', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII=', {}],
+    ['same-origin-svg', 'favicon.svg?v=2', {}],
+    ['tmdb-media', TMDB_MEDIA, {}],
+    ['tmdb-media-noref', TMDB_MEDIA, { referrerPolicy: 'no-referrer' }],
+    ['tmdb-image', TMDB_IMAGE, {}],
+    ['wikimedia', WIKI, {}]
+  ];
+  Promise.all(probes.map(function (p) { return probe(p[0], p[1], p[2]); })).then(function (rs) {
+    rs.forEach(function (r) { L('img', r); });
+  });
+
+  setTimeout(function () {
+    fetchProbe('tmdb-media', TMDB_MEDIA);
+    fetchProbe('tmdb-image', TMDB_IMAGE);
+  }, 1500);
+
+  // ── 3) run the REAL home page in an iframe and inspect its posters ──
+  var ifr = null;
+  setTimeout(function () {
+    ifr = document.createElement('iframe');
+    ifr.id = 'realframe';
+    ifr.style.cssText = 'width:360px;height:640px;border:1px solid #333;margin-top:8px;background:#111';
+    ifr.src = 'index.html';
+    document.body.appendChild(ifr);
+    L('iframe', 'created -> index.html');
+  }, 3000);
+
+  setTimeout(function () {
+    var d = null;
+    try { d = ifr && ifr.contentDocument; } catch (e) { L('iframe', 'no access: ' + e.message); }
+    if (!d) { L('iframe', 'contentDocument unavailable'); L('imgdiag', 'DONE'); return; }
+    var imgs = Array.prototype.slice.call(d.images);
+    var loaded = imgs.filter(function (i) { return i.complete && i.naturalWidth > 0; });
+    var broken = imgs.filter(function (i) { return i.complete && !i.naturalWidth; });
+    var pending = imgs.filter(function (i) { return !i.complete; });
+    L('iframe', {
+      url: (ifr.contentWindow && ifr.contentWindow.location.href) || '?',
+      imgs: imgs.length, loaded: loaded.length, broken: broken.length, pending: pending.length,
+      cards: d.querySelectorAll('.poster-card').length,
+      ready: d.querySelectorAll('img.is-ready').length,
+      htmlClass: d.documentElement.className,
+      rows: d.querySelectorAll('.horizontal-scroll, .row-scroll, .movie-row').length
+    });
+    var sample = (broken.concat(pending)).slice(0, 4).map(function (i) {
+      var card = i.closest('.poster-card') || i.parentElement;
+      var cs = card ? getComputedStyle(card) : null;
+      var is = getComputedStyle(i);
+      return {
+        src: (i.currentSrc || i.src || '').slice(0, 78),
+        complete: i.complete, nw: i.naturalWidth,
+        loading: i.getAttribute('loading'),
+        box: i.getBoundingClientRect().width.toFixed(0) + 'x' + i.getBoundingClientRect().height.toFixed(0),
+        op: is.opacity, disp: is.display,
+        cardH: card ? card.getBoundingClientRect().height.toFixed(0) : '?',
+        cardOp: cs ? cs.opacity : '?'
+      };
+    });
+    L('iframe-sample', sample);
+    if (loaded.length) {
+      L('iframe-ok', (loaded[0].currentSrc || loaded[0].src || '').slice(0, 78));
+    }
+    L('imgdiag', 'DONE');
+  }, 23000);
+})();
+</script>
+</body></html>
