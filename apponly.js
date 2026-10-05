@@ -291,6 +291,23 @@
   }
 
   // ── Google: the phone's own account, no password, no popup ──────────────
+  // The shell's takeGoogleEmail slot holds the picked address as a RAW string
+  // ("name@gmail.com"). Older builds of this page JSON.parsed it, which always
+  // threw -- and because the slot read is destructive, the throw ATE the pick:
+  // the address vanished, the native retry loop saw an empty slot and stopped,
+  // and the sign-in died with "No account chosen". Read it as plain text and
+  // just tolerate a JSON-quoted value for safety.
+  function takePickEmail(take) {
+    var raw = '';
+    try { raw = String(take() || ''); } catch (e) { raw = ''; }
+    raw = raw.trim();
+    if (!raw) return null;
+    var v = raw;
+    try { var j = JSON.parse(raw); if (typeof j === 'string') v = j; } catch (e) { }
+    v = String(v).trim().replace(/^"|"$/g, '').trim();
+    return v || null;
+  }
+
   function googleLogin() {
     err($('si-err'), '');
     var get = bridge('getGoogleAccounts');
@@ -311,9 +328,8 @@
       var pt = 0;
       (function pollPick() {
         pt++;
-        var v = null;
-        try { v = JSON.parse(take() || 'null'); } catch (e1) { v = null; }
-        if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
+        var v = takePickEmail(take);
+        if (v) { err($('si-err'), ''); googleUse(v); return; }
         if (pt < 420) setTimeout(pollPick, 700); // ~5 min: a slow pick still lands
         else err($('si-err'), 'No account chosen. Tap "Log in with Google" to try again.');
       })();
@@ -339,9 +355,8 @@
             var pt = 0;
             var pollPick = function () {
               pt++;
-              var v = null;
-              try { v = JSON.parse(take() || 'null'); } catch (e3) { v = null; }
-              if (v) { err($('si-err'), ''); googleUse(String(v)); return; }
+              var v = takePickEmail(take);
+              if (v) { err($('si-err'), ''); googleUse(v); return; }
               if (pt < 420) setTimeout(pollPick, 700); // ~5 min: a slow pick still lands
               else err($('si-err'), 'No account chosen.');
             };
@@ -1127,9 +1142,8 @@
     var take = bridge('takeGoogleEmail');
     if (!take) return;
     function read() {
-      var v = null;
-      try { v = JSON.parse(take() || 'null'); } catch (e) { v = null; }
-      if (v) { err($('si-err'), ''); googleUse(String(v)); }
+      var v = takePickEmail(take);
+      if (v) { err($('si-err'), ''); googleUse(v); }
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', read);
     else read();
