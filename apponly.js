@@ -159,6 +159,11 @@
     var me = currentUser();
     var list = readAccounts();
     if (me) {
+      // legacy records can carry the literal string "null" as the name
+      if (me.name === 'null' || me.name === 'undefined') {
+        me.name = String(me.email || me.phone || '').split('@')[0] || 'DEYMFLIX user';
+        saveAccount(me);
+      }
       if ($('me-title')) $('me-title').textContent = me.name || me.email || me.phone || 'DEYMFLIX user';
       if ($('me-sub')) $('me-sub').textContent = 'UID: ' + me.uid + (me.provider === 'google' ? ' · Google account' : '');
       if ($('me-av')) $('me-av').innerHTML = me.photo
@@ -420,6 +425,9 @@
     var acc = findAccount(em);
     if (acc) {
       if (acc.provider !== 'google') { err($('si-err'), 'That address already has a password account.'); return; }
+      // A name of "null" (the string) means a broken first attempt stored the
+      // text "null": repair it here so the header never shows it again.
+      if (!acc.name || acc.name === 'null') acc.name = em.split('@')[0];
       signIn(acc);
       closeViews();
       return;
