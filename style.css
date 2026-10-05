@@ -2181,6 +2181,14 @@ html.dfx-app .dfx-app-request-btn:active { background: #1E1E24; }
 
 /* Belt-and-braces: also hide the nav Request item if the JS removal didn't run */
 html.dfx-app .bottom-nav-item[data-page="request"] { display: none !important; }
+/* Downloads also left the dock in app mode -- the Me screen owns it now. */
+html.dfx-app .bottom-nav-item[data-page="downloads"] { display: none !important; }
+/* Static app-only dock items (the Me tab): present in every page's markup but
+   shown only inside the app. CSS performs the swap so the dock is correct even
+   while the page's JS init is still waiting -- a WebView can hold a heavy page
+   in "loading" long after paint. app.js runs the same swap as a backup. */
+.dfx-app-only { display: none !important; }
+html.dfx-app .bottom-nav-item.dfx-app-only { display: flex !important; }
 /* App-mode pages sit flush at the bottom (no browser chrome to clear) */
 html.dfx-app body { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
 .app-dl-btn {
