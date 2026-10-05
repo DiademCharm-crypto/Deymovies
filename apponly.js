@@ -703,6 +703,22 @@
     googleUse(String(email));
   };
 
+  // A pick can also land while this page sits parked behind the Android sheet
+  // (WebViews are paused/frozen in the background), which would strand the
+  // choice the user already made in the phone's own dialog. So every load of
+  // the Me screen adopts a pick the app shell is still holding.
+  (function adoptPendingPick() {
+    var take = bridge('takeGoogleEmail');
+    if (!take) return;
+    function read() {
+      var v = null;
+      try { v = JSON.parse(take() || 'null'); } catch (e) { v = null; }
+      if (v) { err($('si-err'), ''); googleUse(String(v)); }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', read);
+    else read();
+  })();
+
   // Public hook: other app pages can ask about the signed-in user.
   window.DfxMe = { user: currentUser, isApp: true };
 })();
