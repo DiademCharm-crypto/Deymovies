@@ -90,6 +90,14 @@ public class MeActivity extends AppCompatActivity {
     private static final String[] PATHS = { P_HOME, P_REELS, P_EXPLORE, P_HISTORY, P_ME };
 
     private WebView web;
+    private LinearLayout topBar;          // native back arrow row (dock removed r19)
+    private android.widget.ImageButton backBtn;
+
+    // Which sub-view the Me page is showing right now. The page reports every
+    // change through dfxView(); hardware Back closes the view first and only
+    // leaves the Me screen when the root list is showing -- the same thing the
+    // page's own top-left arrow does.
+    private volatile String curView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,16 +108,47 @@ public class MeActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG);
 
+        // ── native top bar with the back arrow (r19) ────────────────────────
+        // The Me screen no longer carries the five-tab dock: it is reached
+        // from the shell's own dock, so its tabs were redundant. The arrow is
+        // the way back to the main activity, exactly like the Downloads screen.
+        topBar = new LinearLayout(this);
+        topBar.setOrientation(LinearLayout.HORIZONTAL);
+        topBar.setGravity(Gravity.CENTER_VERTICAL);
+        topBar.setPadding((int) (10 * d), (int) (8 * d), (int) (10 * d), (int) (8 * d));
+        topBar.setBackgroundColor(BG);
+
+        backBtn = new android.widget.ImageButton(this);
+        backBtn.setBackground(null);
+        backBtn.setImageResource(android.R.drawable.ic_media_previous);
+        // tint the glyph white; ic_media_previous is a themed vector, so a
+        // plain setColorFilter keeps it crisp on every API level
+        backBtn.setColorFilter(0xFFFFFFFF);
+        backBtn.setPadding((int) (12 * d), (int) (12 * d), (int) (12 * d), (int) (12 * d));
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { leaveMe(); }
+        });
+        android.widget.FrameLayout bwrap = new android.widget.FrameLayout(this);
+        bwrap.addView(backBtn, new android.widget.FrameLayout.LayoutParams(
+                (int) (44 * d), (int) (44 * d)));
+        topBar.addView(bwrap, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        TextView topTitle = new TextView(this);
+        topTitle.setText("Me");
+        topTitle.setTextSize(18f);
+        topTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        topTitle.setTextColor(0xFFFFFFFF);
+        topTitle.setPadding((int) (8 * d), 0, 0, 0);
+        topBar.addView(topTitle, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        root.addView(topBar, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
         web = buildWebView();
         root.addView(web, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
-
-        // The dock is the SITE's dock, not a flat native strip: it floats as a
-        // rounded pill with 16px side and bottom margins (see buildBar), so the
-        // pill itself carries the spacing -- no hairline above it any more.
-        root.addView(buildBar(d), new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
 
         setContentView(root);
         web.loadUrl(meUrl());
@@ -165,12 +204,11 @@ public class MeActivity extends AppCompatActivity {
         return wv;
     }
 
-    // ── the dock: an exact copy of the site's floating pill ────────────────
-    // style.css: .bottom-nav = 16px side/bottom margins, 28px radius, 6px vertical
-    // padding, rgba(22,22,22,.75) over a 1px rgba(255,255,255,.12) border.
-    // .bottom-nav-item = 6px 2px padding, 4px gap, 22px stroked icon, 9.6px
-    // semibold label; the ACTIVE tab is brand red and carries the 20x3 red
-    // indicator across its top edge.
+    // ── (unused since r19) the site-pill dock ───────────────────────────────
+    // The five-tab dock is no longer added to the Me screen: Me is reached
+    // from the shell's own dock, and the user asked for the bar to go. Kept
+    // for reference / quick restore; nothing calls it.
+    @SuppressWarnings("unused")
     private LinearLayout buildBar(float d) {
         LinearLayout outer = new LinearLayout(this);
         outer.setOrientation(LinearLayout.VERTICAL);
@@ -274,28 +312,24 @@ public class MeActivity extends AppCompatActivity {
             try { web.reload(); } catch (Throwable t) { }
             return;
         }
-        // Preferred: hand the route to the shell that is already alive
-        // underneath. Same activity, same WebView -- the page swaps in place and
-        // Me closes, so no loading splash is replayed (it used to restart the
-        // whole shell and replay the logo on every tab tap).
-        if (MainScreen85.navigateFromMe(this, route)) {
-            finish();
-            overridePendingTransition(0, 0);
-            return;
-        }
+        leaveMe();
+    }
+
+    // Leave the Me screen for the main activity (back arrow, or a dock tab if
+    // one ever comes back). Keeps one exit path so the behaviour stays uniform.
+    private void leaveMe() {
         try {
             Intent it = new Intent();
             it.setClassName(this, getPackageName() + ".MainActivity");
-            it.putExtra("dfx_route", route);
-            // No live shell to reuse: a fresh one still must not replay the logo.
+            it.putExtra("dfx_route", "index.html");
             it.putExtra("dfx_nosplash", true);
-            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(it);
-            finish();
-            overridePendingTransition(0, 0);
         } catch (Throwable t) {
-            MainScreen85.log85("nav", "could not open " + route);
+            try { MainScreen85.log85("nav", "back to main failed: " + t.getMessage()); } catch (Throwable t2) { }
         }
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -307,7 +341,17 @@ public class MeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // back leaves the Me screen exactly like the Downloads screen does
+        // A sub-view (Manage Account, Account and Security, Diagnostics,
+        // Download settings, Sign in, ...) must close first and land back on
+        // the Me root -- exactly what the page's own top-left arrow does.
+        // Only when the root list is showing does Back leave the Me screen.
+        if (curView != null) {
+            try {
+                web.evaluateJavascript(
+                        "window.DfxCloseView&&window.DfxCloseView()", null);
+                return;                        // page closes the view itself
+            } catch (Throwable t) { }
+        }
         finish();
     }
 
@@ -398,6 +442,12 @@ public class MeActivity extends AppCompatActivity {
         @android.webkit.JavascriptInterface
         public void openMe() {
             // already here
+        }
+        // The page reports which sub-view is open so hardware Back closes it
+        // (see onBackPressed) instead of leaving the Me screen.
+        @android.webkit.JavascriptInterface
+        public void dfxView(final String id) {
+            curView = (id == null || id.length() == 0) ? null : id;
         }
     }
 
