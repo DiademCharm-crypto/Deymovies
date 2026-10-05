@@ -1360,18 +1360,22 @@ header, .navbar, .top-nav {
 
 .bottom-nav-item {
   display: flex;
+  /* Share the dock evenly instead of sizing to content: with 5 tabs on a
+     360px phone the content-sized items overflowed and the LAST tab (Me)
+     sat off-screen. flex-basis 0 keeps every tab on the bar at any width. */
+  flex: 1 1 0;
+  min-width: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 6px 10px;
+  padding: 6px 2px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
   text-decoration: none;
   color: #888888;
   position: relative;
-  min-width: 56px;
 }
 
 .bottom-nav-item:hover {
@@ -1416,12 +1420,16 @@ header, .navbar, .top-nav {
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.3px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Center item - same as other items */
 .bottom-nav-item.center-item {
   margin-top: 0;
-  padding: 6px 10px;
+  padding: 6px 2px;
 }
 
 /* Coming Soon Tooltip */
