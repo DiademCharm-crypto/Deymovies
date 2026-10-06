@@ -1,11 +1,12 @@
 {
   "version": "1.7",
-  "code": 21,
+  "code": 22,
   "released": "2026-10-06",
-  "url": "apk/Deymflix-v1.7-r21.apk",
+  "url": "apk/Deymflix-v1.7-r22.apk",
   "notes": [
-    "Google sign-in no longer signs you in as an account named null",
-    "the Me screen repairs a stored name/address saved as the text null (Manage Account showed Google | null)",
-    "signing in can never create a second ghost account from an empty pick"
+    "Titles open in a native Player screen: its own bar (back chevron + title) over a light player page, so the video page no longer waits for app.js and every catalog file",
+    "The player's Download button works again in the app (its icon had gone missing from app.js, so the button was never built)",
+    "Me screen back arrow is a plain back chevron",
+    "The owner's stats and the new signed-in users log now actually receive writes from devices (they were being sent with a content type the database preflights away)"
   ]
 }
