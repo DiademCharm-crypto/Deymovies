@@ -56,7 +56,9 @@
     .me-view { position: fixed; inset: 0; background: #0B0B0F; z-index: 1200; overflow-y: auto; display: none; }
     .me-view.on { display: block; }
     .me-vhead { display: flex; align-items: center; padding: 16px 14px 4px; }
-    .me-back { background: transparent; border: 0; color: #fff; font-size: 1.7rem; line-height: 1; cursor: pointer; padding: 4px 10px 4px 0; }
+    /* the back glyph is a plain "<" (the owner asked for the simple chevron,
+       not the typographic single guillemet) -- sized so it reads at a glance */
+    .me-back { background: transparent; border: 0; color: #fff; font-size: 1.9rem; font-weight: 700; line-height: 1; cursor: pointer; padding: 4px 12px 4px 0; }
     .me-vbody { max-width: 520px; margin: 0 auto; padding: 4px 18px 60px; }
     .me-vbody h2 { color: #fff; font-size: 1.9rem; margin: 12px 0 22px; font-weight: 800; }
     .me-field {
@@ -194,7 +196,7 @@
 
   <!-- ── SIGN IN ─────────────────────────────────────────────────────────── -->
   <section class="me-view" id="view-signin">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button></div>
     <div class="me-vbody">
       <h2>Sign In</h2>
       <input class="me-field" id="si-id" type="text" inputmode="email" autocomplete="username"
@@ -236,7 +238,7 @@
 
   <!-- ── CREATE ACCOUNT ──────────────────────────────────────────────────── -->
   <section class="me-view" id="view-create">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button></div>
     <div class="me-vbody">
       <h2>Create account</h2>
       <input class="me-field" id="ca-id" type="text" inputmode="email" autocomplete="username"
@@ -255,7 +257,7 @@
 
   <!-- ── DOWNLOAD SETTINGS ───────────────────────────────────────────────── -->
   <section class="me-view" id="view-dl">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button></div>
     <div class="me-vbody">
       <h2>Download settings</h2>
       <div class="me-h3">Download quality</div>
@@ -282,7 +284,7 @@
 
   <!-- ── VERIFICATION CODE (email / phone) ───────────────────────────────── -->
   <section class="me-view" id="view-code">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button></div>
     <div class="me-vbody">
       <h2>Verification code</h2>
       <p class="me-p" id="code-sub">Enter the 6-digit code.</p>
@@ -297,7 +299,7 @@
 
   <!-- ── PROFILE EDIT (name + photo) ─────────────────────────────────────── -->
   <section class="me-view" id="view-profile">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Edit profile</div></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button><div class="me-vtitle">Edit profile</div></div>
     <div class="me-vbody">
       <div class="me-pav-wrap">
         <div class="me-pav" id="pe-av">
@@ -318,7 +320,7 @@
 
   <!-- ── MANAGE ACCOUNT ──────────────────────────────────────────────────── -->
   <section class="me-view" id="view-manage">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Manage Account</div></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button><div class="me-vtitle">Manage Account</div></div>
     <div class="me-vbody">
       <div class="me-ma-top">
         <div class="me-ma-av" id="ma-av"></div>
@@ -347,7 +349,7 @@
 
   <!-- ── CHANGE PASSWORD ─────────────────────────────────────────────────── -->
   <section class="me-view" id="view-pass">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Change Password</div></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button><div class="me-vtitle">Change Password</div></div>
     <div class="me-vbody">
       <div id="pw-cur-wrap" style="margin-top:6px">
         <input class="me-field" id="pw-cur" type="password" autocomplete="current-password" placeholder="Current password">
@@ -366,7 +368,7 @@
 
   <!-- ── ACCOUNT AND SECURITY (devices) ──────────────────────────────────── -->
   <section class="me-view" id="view-secure">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button><div class="me-vtitle">Account and Security</div></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button><div class="me-vtitle">Account and Security</div></div>
     <div class="me-vbody">
       <div class="me-card">
         <div class="me-kv"><span class="k">User name</span><span class="v" id="se-name">—</span></div>
@@ -380,7 +382,7 @@
 
   <!-- ── DIAGNOSTICS ─────────────────────────────────────────────────────── -->
   <section class="me-view" id="view-diag">
-    <div class="me-vhead"><button class="me-back" data-me-close="1">&lsaquo;</button></div>
+    <div class="me-vhead"><button class="me-back" data-me-close="1">&lt;</button></div>
     <div class="me-vbody">
       <h2>Diagnostics</h2>
       <p class="me-p">Everything below stays on your phone until you copy it and send it yourself.</p>
