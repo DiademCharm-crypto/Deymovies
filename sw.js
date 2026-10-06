@@ -59,9 +59,13 @@
 // v28: analytics + sign-in writes never actually left the device: the JSON
 // content type made every beacon a PREFLIGHTED request, and the database
 // refuses the preflight of a credentialed one -- so the owner's stats and the
-// new sign-in log stayed empty. The body now goes out as a CORS-simple
-// text/plain beacon (analytics.js v1.2 on every page that loads it).
-const CACHE = 'deymflix-v28';
+// new sign-in log stayed empty.
+// v29: the write path is one keepalive fetch with a CORS-simple text/plain
+// body. sendBeacon could only POST, and a POST to /analytics/.json pushes a
+// generated child key instead of merging the counters (verified on the live
+// database: the data landed, just in a shape the dashboard never reads).
+// analytics.js is v1.3 on every page that loads it.
+const CACHE = 'deymflix-v29';
 const SHELL = [
   'index.html',
   'player.html',
