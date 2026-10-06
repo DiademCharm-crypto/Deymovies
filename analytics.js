@@ -86,25 +86,28 @@
   // Firebase REST + atomic increment. keepalive so the beacon survives the
   // page being closed mid-navigation; sendBeacon is the fallback.
   //
-  // CONTENT TYPE IS ON PURPOSE: 'text/plain' is a CORS-SIMPLE type, so no
-  // preflight is sent. With 'application/json' every write was preflighted,
-  // and the preflight of a credentialed request (sendBeacon always sends
-  // credentials) is rejected by the database because its CORS answer has no
-  // Access-Control-Allow-Credentials header -- the write never left the
-  // device. The database parses the body as JSON whatever the header says
-  // (verified: a text/plain PATCH stores the same value as application/json).
+  // TWO THINGS ARE LOAD-BEARING HERE (both found the hard way):
+  //  1. 'text/plain' is a CORS-SIMPLE content type, so the request is not
+  //     PREFLIGHTED. With 'application/json' the browser sent an OPTIONS
+  //     first, and the database answers our origins without an
+  //     Access-Control-Allow-Credentials header -- the write never left the
+  //     device (the owner's stats and sign-in log stayed empty).
+  //  2. The method must stay PATCH. sendBeacon can only POST: posting to
+  //     /analytics/.json PUSHES a generated child key instead of merging the
+  //     counters, so the dashboard's totals/pages/titles nodes stay null.
+  //     keepalive on the fetch survives the page closing, which is all
+  //     sendBeacon was ever used for.
   var CT = 'text/plain;charset=UTF-8';
+  function beacon(url, json) {
+    try {
+      var r = fetch(url, {
+        method: 'PATCH', headers: { 'Content-Type': CT }, body: json, keepalive: true, mode: 'cors'
+      });
+      if (r && r.catch) r.catch(function () { });
+    } catch (e) { }
+  }
   function patch(path, body) {
-    var url = DB + '/analytics/' + path + '.json';
-    var json = JSON.stringify(body);
-    try {
-      var ok = false;
-      if (navigator.sendBeacon) ok = navigator.sendBeacon(url, new Blob([json], { type: CT }));
-      if (ok) return;
-    } catch (e) {}
-    try {
-      fetch(url, { method: 'PATCH', headers: { 'Content-Type': CT }, body: json, keepalive: true, mode: 'cors' });
-    } catch (e) {}
+    beacon(DB + '/analytics/' + path + '.json', JSON.stringify(body));
   }
 
   var inc = function (n) { return { '.sv': { increment: n || 1 } }; };
@@ -204,21 +207,12 @@
     } catch (e) { return {}; }
   }
 
-  // Same CORS-simple content type as patch() above -- see the comment there:
-  // an application/json body is preflighted, and a credentialed preflight to
-  // the database is refused, so nothing was ever written.
+  // Same PATCH + CORS-simple body as patch() above -- see the comment there.
+  // A sign-in row is written once per account, so it has to actually land:
+  // an application/json body was preflighted and dropped, and a sendBeacon
+  // POST landed under a generated key the owner's page never reads.
   function write(path, body) {
-    var json = JSON.stringify(body);
-    var url = DB + '/signins/' + path + '.json';
-    try {
-      if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([json], { type: CT }))) return;
-    } catch (e) { }
-    try {
-      var r = fetch(url, {
-        method: 'PATCH', headers: { 'Content-Type': CT }, body: json, keepalive: true, mode: 'cors'
-      });
-      if (r && r.catch) r.catch(function () { });
-    } catch (e) { }
+    beacon(DB + '/signins/' + path + '.json', JSON.stringify(body));
   }
 
   function signInLog(acc, where) {
