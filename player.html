@@ -419,7 +419,7 @@
       background: transparent !important;
       border: none !important;
       color: #ffffff !important;
-      font-size: 1.1rem !important;
+      font-size: 1.5rem !important;
       font-weight: 700 !important;
       cursor: pointer !important;
       padding: 0 !important;
@@ -1336,7 +1336,7 @@
       }
 
       .icon-btn-back {
-        font-size: 1.8rem !important;
+        font-size: 2rem !important;
       }
 
       .overlay-title-text {
@@ -2763,7 +2763,7 @@
     <div id="speed-badge" class="loklok-speed-badge">2.0x Speed</div>      <div id="player-gesture-overlay" class="player-overlay active">
         <!-- TOP-LEFT BACK HEADER -->
         <div class="player-top-bar" onclick="forceBackToHome()">
-          <button id="btn-back-nav" class="icon-btn-back">❮</button>
+          <button id="btn-back-nav" class="icon-btn-back">&lt;</button>
           <span id="overlay-movie-title" class="overlay-title-text">Loading...</span>
           <!-- PC/SERIES: episode number, centered on the same line as the title -->
           <div id="pc-ep-num-top" class="pc-ep-num-top"></div>
@@ -6561,7 +6561,9 @@
         // Labeled when there is a movie to go back to, bare chevron otherwise
         const canReturnToMovie = (typeof hasOwnVideoFile === 'function') && hasOwnVideoFile();
         backBtn.classList.toggle('labeled', canReturnToMovie);
-        backBtn.innerHTML = canReturnToMovie ? '<span>❮</span><span>Back to Movie</span>' : '❮';
+        // a plain "<" chevron, the same glyph the Me screen and the app's own
+        // bars use (the old three-step ❮ looked like a media button)
+        backBtn.innerHTML = canReturnToMovie ? '<span>&lt;</span><span>Back to Movie</span>' : '&lt;';
         backBtn.title = canReturnToMovie ? 'Back to the movie' : 'Back';
         backBtn.onclick = (e) => {
           e.stopPropagation();
