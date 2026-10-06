@@ -85,16 +85,25 @@
 
   // Firebase REST + atomic increment. keepalive so the beacon survives the
   // page being closed mid-navigation; sendBeacon is the fallback.
+  //
+  // CONTENT TYPE IS ON PURPOSE: 'text/plain' is a CORS-SIMPLE type, so no
+  // preflight is sent. With 'application/json' every write was preflighted,
+  // and the preflight of a credentialed request (sendBeacon always sends
+  // credentials) is rejected by the database because its CORS answer has no
+  // Access-Control-Allow-Credentials header -- the write never left the
+  // device. The database parses the body as JSON whatever the header says
+  // (verified: a text/plain PATCH stores the same value as application/json).
+  var CT = 'text/plain;charset=UTF-8';
   function patch(path, body) {
     var url = DB + '/analytics/' + path + '.json';
     var json = JSON.stringify(body);
     try {
       var ok = false;
-      if (navigator.sendBeacon) ok = navigator.sendBeacon(url, new Blob([json], { type: 'application/json' }));
+      if (navigator.sendBeacon) ok = navigator.sendBeacon(url, new Blob([json], { type: CT }));
       if (ok) return;
     } catch (e) {}
     try {
-      fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: json, keepalive: true, mode: 'cors' });
+      fetch(url, { method: 'PATCH', headers: { 'Content-Type': CT }, body: json, keepalive: true, mode: 'cors' });
     } catch (e) {}
   }
 
@@ -186,18 +195,27 @@
 
   function appInfoSafe() {
     try {
-      var a = (window.DeymflixApp && typeof window.DeymflixApp.appInfo === 'function')
-        ? JSON.parse(window.DeymflixApp.appInfo()) : null;
+      var br = window.DeymflixApp || null;
+      var fn = br && (typeof br.appInfo === 'function' ? br.appInfo
+                    : (typeof br.getAppInfo === 'function' ? br.getAppInfo : null));
+      var a = fn ? JSON.parse(fn.call(br)) : null;
       if (!a) return {};
       return { version: clean(a.version, 12), code: clean(a.code, 6), device: clean(a.device, 40), android: clean(a.android, 12) };
     } catch (e) { return {}; }
   }
 
+  // Same CORS-simple content type as patch() above -- see the comment there:
+  // an application/json body is preflighted, and a credentialed preflight to
+  // the database is refused, so nothing was ever written.
   function write(path, body) {
     var json = JSON.stringify(body);
+    var url = DB + '/signins/' + path + '.json';
     try {
-      var r = fetch(DB + '/signins/' + path + '.json', {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: json, keepalive: true, mode: 'cors'
+      if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([json], { type: CT }))) return;
+    } catch (e) { }
+    try {
+      var r = fetch(url, {
+        method: 'PATCH', headers: { 'Content-Type': CT }, body: json, keepalive: true, mode: 'cors'
       });
       if (r && r.catch) r.catch(function () { });
     } catch (e) { }
