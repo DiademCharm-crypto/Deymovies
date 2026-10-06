@@ -180,7 +180,12 @@ function hostOf(u) {
 }
 // keys that carry the playable/downloadable media (not posters/trailers)
 const LINKISH_KEYS = /(embed|url|src|file|link|source|download|video|stream)/i;
-const IGNORE_HOST = /(themoviedb\.org|youtube\.com|youtube-nocookie\.com|ytimg|m\.media-amazon\.com|mydramalist\.com|gstatic\.com|googleusercontent|via\.placeholder\.com|web3forms\.com|cinema8\.com|deymflix\.eu\.cc|^localhost$)/i;
+// Keys that can only ever hold artwork or a promo clip -- never the thing the
+// user actually plays or downloads. Their hosts (tmdb, youtube, image CDNs...)
+// must not show up as "our" media hosts.
+const IMAGE_KEYS = /^(poster|backdrop|image|thumb|thumbnail|cover|logo|avatar|photo|trailer|trailerEmbed|videoThumb)/i;
+// Pure plumbing: a contact form endpoint, our own site, loopback.
+const IGNORE_HOST = /(web3forms\.com|deymflix\.eu\.cc|^localhost$|^127\.0\.0\.1$)/i;
 
 const groups = new Map();   // host -> [{title,id,kind,key,url}]
 const otherLinks = [];
@@ -202,6 +207,7 @@ for (const { item, kind } of catalog) {
     const h = hostOf(url);
     if (!h) return;
     if (IGNORE_HOST.test(h)) return;
+    if (IMAGE_KEYS.test(key)) return;
     if (!LINKISH_KEYS.test(key)) return;
     const rec = { title, id, kind, key, url, host: h };
     if (!groups.has(h)) groups.set(h, []);
@@ -216,7 +222,9 @@ const CDN = /\.b-cdn\.net$/i;
 function label(h) {
   if (BACKBLAZE.test(h)) return 'BACKBLAZE (paid / working)';
   if (CDN.test(h)) return 'CDN -- b-cdn.net (the unpaid account)';
-  return 'other';
+  if (/(youtube|youtu\.be|ytimg)/i.test(h)) return 'youtube (trailer only)';
+  if (/(themoviedb|tmdb|media-amazon|mydramalist|gstatic|googleusercontent|dmcdn|anyshort|farsunpteltd|nsstorage|placeholder)/i.test(h)) return 'artwork / promo (not the play link)';
+  return 'OTHER -- embed or third-party host (not Cloudflare, not Backblaze)';
 }
 
 const ordered = [...groups.entries()]
@@ -319,9 +327,39 @@ if (OUT) {
   md.push('');
   md.push('## Already on Backblaze (working)');
   md.push('');
-  for (const [h, v] of ordered) {
-    if (!BACKBLAZE.test(h)) continue;
-    for (const r of v) md.push('- ' + r.title + '  --  ' + r.key);
+  {
+    const seen = new Set();
+    for (const [h, v] of ordered) {
+      if (!BACKBLAZE.test(h)) continue;
+      for (const r of v) {
+        if (seen.has(r.title)) continue;
+        seen.add(r.title);
+        md.push('- ' + r.title + '  --  ' + r.key + '  --  `' + r.url.slice(0, 110) + '`');
+      }
+    }
+  }
+  md.push('');
+  md.push('## Every other host (neither Cloudflare nor Backblaze)');
+  md.push('');
+  md.push('These titles are not affected by the unpaid balance, but their play link');
+  md.push('does not come from Backblaze either -- mostly third-party embed players.');
+  md.push('');
+  {
+    let any = false;
+    for (const [h, v] of ordered) {
+      if (CDN.test(h) || BACKBLAZE.test(h) || /artwork \/ promo/.test(label(h)) || /trailer only/.test(label(h))) continue;
+      any = true;
+      md.push('| Title | Host | Key |');
+      md.push('|-------|------|-----|');
+      const seen = new Set();
+      for (const r of v) {
+        if (seen.has(r.title + r.key)) continue;
+        seen.add(r.title + r.key);
+        md.push('| ' + r.title + ' | `' + h + '` | ' + r.key + ' |');
+      }
+      md.push('');
+    }
+    if (!any) md.push('(none)');
   }
   md.push('');
   fs.writeFileSync(OUT, md.join('\n'), 'utf8');
