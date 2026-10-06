@@ -12180,6 +12180,10 @@ try {
 
   const ME_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"></path><path d="M4 21v-1c0-2.76 3.58-5 8-5s8 2.24 8 5v1"></path></svg>';
   const REQ_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>';
+  // The Download button's own icon. It went missing in a refactor, which made
+  // addDownloadButton() throw a ReferenceError — so the player had NO Download
+  // button inside the app at all. Same markup as the dock icon (backup_app.js).
+  const DL_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
 
   // ── 1) Bottom nav (app mode): Home, Reels, Explore, History, Me ──
   //  The Request item is replaced by Me; Downloads leaves the bar and lives
