@@ -262,9 +262,35 @@
     }
   }
 
+  // ── the owner's sign-in log ("who is using my app") ─────────────────────
+  // analytics.js owns the database URL and the writer; this file owns the
+  // accounts, so every successful sign-in is handed over. Best-effort: a slow
+  // or blocked network can never hold up the sign-in itself.
+  function logSignIn(acc, where) {
+    try {
+      var log = window.DfxSignInLog || (window.DfxAnalytics && window.DfxAnalytics.signIn);
+      if (log && acc && acc.uid != null) log(acc, where || 'signin');
+    } catch (e) { }
+  }
+
+  // "last seen" while a session is open: once per 6 hours per account, so the
+  // log shows real use without one row per page load.
+  var HB_MS = 6 * 60 * 60 * 1000;
+  function signInHeartbeat() {
+    var me = currentUser();
+    if (!me) return;
+    var key = 'dfx_signin_hb_' + me.uid;
+    var last = 0;
+    try { last = Number(localStorage.getItem(key) || 0) || 0; } catch (e) { }
+    if (Date.now() - last < HB_MS) return;
+    try { localStorage.setItem(key, String(Date.now())); } catch (e) { }
+    logSignIn(me, 'open');
+  }
+
   function signIn(acc, silent) {
     writeSession({ id: acc.email || acc.phone || String(acc.uid), uid: acc.uid, at: Date.now() });
     registerDevice(acc);
+    logSignIn(acc, 'signin');
     renderHeader();
     if (!silent) toast('Signed in as ' + accountTarget(acc));
   }
@@ -1306,6 +1332,7 @@
 
     readPrefs();
     renderContinue();
+    signInHeartbeat();
   }
 
   document.addEventListener('error', function (e) {
