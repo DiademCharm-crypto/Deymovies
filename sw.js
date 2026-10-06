@@ -56,7 +56,12 @@
 // over player-lite.html, the player page stripped of app.js/catalogs/watch-party
 // (its data lives in play-index.js), and app.js got its missing DL_ICON back so
 // the player's Download button works again in the app.
-const CACHE = 'deymflix-v27';
+// v28: analytics + sign-in writes never actually left the device: the JSON
+// content type made every beacon a PREFLIGHTED request, and the database
+// refuses the preflight of a credentialed one -- so the owner's stats and the
+// new sign-in log stayed empty. The body now goes out as a CORS-simple
+// text/plain beacon (analytics.js v1.2 on every page that loads it).
+const CACHE = 'deymflix-v28';
 const SHELL = [
   'index.html',
   'player.html',
