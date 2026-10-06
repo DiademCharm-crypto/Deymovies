@@ -52,10 +52,16 @@
 // v26: every successful sign-in is written to the owner's Firebase database
 // (signins/users + signins/events) and shows up in stats.html -- apponly.js is
 // at v2.9 and analytics.js at v1.1 on every page that loads them.
-const CACHE = 'deymflix-v26';
+// v27: the app opens titles in PlayerActivity now -- a native bar ("<" + title)
+// over player-lite.html, the player page stripped of app.js/catalogs/watch-party
+// (its data lives in play-index.js), and app.js got its missing DL_ICON back so
+// the player's Download button works again in the app.
+const CACHE = 'deymflix-v27';
 const SHELL = [
   'index.html',
   'player.html',
+  'player-lite.html',
+  'play-index.js',
   'style.css',
   'theme-v2.css',
   'halloween.css',
