@@ -76,6 +76,11 @@
     var t = withToken === undefined ? token : withToken;
     return DB + '/analytics.json' + (t ? '?auth=' + encodeURIComponent(t) : '');
   }
+  // The sign-in log apponly.js/analytics.js write (signins/users + .events).
+  function signInsUrl(node, withToken) {
+    var t = withToken === undefined ? token : withToken;
+    return DB + '/signins/' + node + '.json' + (t ? '?auth=' + encodeURIComponent(t) : '');
+  }
   function probeUrl() { return DB + '/analytics.json?shallow=true'; }
 
   // 200 = readable. A locked node answers 401/403 for an anonymous read.
@@ -190,6 +195,7 @@
         snapshot = data || {};
         render(snapshot);
         if (status) status.textContent = '';
+        loadSignIns();
       })
       .catch(function (e) {
         if (e && e.code === 'unauthorized') { showGate('The database refused the read — the token is stale or the rules changed.'); return; }
@@ -347,6 +353,64 @@
 
     var stamp = $('stat-stamp');
     if (stamp) stamp.textContent = 'Updated ' + clock() + (liveOk ? ' (live)' : '');
+  }
+
+  // ── who is signed in (accounts, not anonymous visitors) ─────────────────
+  // Reads the two nodes the app writes: signins/users/<uid> (one row per
+  // account, with last-seen and a sign-in count) and signins/events (the log).
+  function whenOf(ms) {
+    if (!ms) return '—';
+    var d = new Date(num(ms)), diff = Date.now() - num(ms);
+    var ago = diff < 60000 ? 'just now'
+      : diff < 3600000 ? Math.round(diff / 60000) + ' min ago'
+      : diff < 86400000 ? Math.round(diff / 3600000) + ' h ago'
+      : Math.round(diff / 86400000) + ' d ago';
+    return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) +
+           ' (' + ago + ')';
+  }
+
+  function loadSignIns() {
+    var box = $('stat-users'), log = $('stat-signins'), sub = $('stat-users-sub');
+    if (!box) return;
+    Promise.all([
+      fetch(signInsUrl('users'), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch(signInsUrl('events'), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (both) {
+      var users = both[0], events = both[1];
+      if (users === null) {
+        box.innerHTML = '<p class="st-none">The database refused the read — paste the owner token, and make sure the rules allow ' +
+          '<code>signins</code> (see _tools/_stats_rules.md).</p>';
+        if (log) log.innerHTML = '';
+        if (sub) sub.textContent = '';
+        return;
+      }
+      var rows = Object.keys(users || {}).map(function (k) { return users[k] || {}; })
+        .sort(function (a, b) { return num(b.lastSeen) - num(a.lastSeen); });
+      box.innerHTML = rows.length
+        ? '<table class="st-table"><thead><tr><th>Account</th><th>Signed in with</th>' +
+          '<th class="st-num">Sign-ins</th><th>Last seen</th><th>Phone / app</th></tr></thead><tbody>' +
+          rows.map(function (u) {
+            return '<tr><td>' + esc(u.name || 'DEYMFLIX user') + '<div class="st-dim">UID ' + esc(u.uid || '') + '</div></td>' +
+                   '<td class="st-dim">' + esc(u.provider === 'google' ? 'Google' : (u.provider || 'email')) + '</td>' +
+                   '<td class="st-num">' + fmt(u.count) + '</td>' +
+                   '<td class="st-dim">' + esc(whenOf(u.lastSeen)) + '</td>' +
+                   '<td class="st-dim">' + esc(u.device || '') + (u.app ? ' · v' + esc(u.app) + (u.code ? ' (' + esc(u.code) + ')' : '') : '') + '</td></tr>';
+          }).join('') + '</tbody></table>'
+        : '<p class="st-none">Nobody has signed in yet. Every successful sign-in from now on appears here.</p>';
+      if (sub) sub.textContent = rows.length ? (rows.length + ' account(s) on record — accounts only, never anonymous visitors.') : '';
+
+      if (log) {
+        var ev = Object.keys(events || {}).map(function (k) { return events[k] || {}; })
+          .sort(function (a, b) { return num(b.at) - num(a.at); }).slice(0, 15);
+        log.innerHTML = ev.length
+          ? ev.map(function (e) {
+              return '<div class="st-row"><span>' + esc(whenOf(e.at)) + ' — ' + esc(e.name || 'DEYMFLIX user') +
+                     '<span class="st-dim"> (UID ' + esc(e.uid || '') + ', ' + esc(e.where || 'signin') + ' on ' + esc(e.page || '') + ')</span></span>' +
+                     '<span class="st-dim">' + esc(e.device || '') + '</span></div>';
+            }).join('')
+          : '<p class="st-none">No sign-in events yet.</p>';
+      }
+    });
   }
 
   function kpi(value, label, sub) {
