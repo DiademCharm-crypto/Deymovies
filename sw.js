@@ -42,7 +42,11 @@
 // v23: the app's Me screen lost its dock (native back arrow instead), Continue
 // Watching is a plain poster strip (posters looked up from the catalogs) and
 // Sign Out moved under Manage Account -- apponly.js is at v2.3 on every page.
-const CACHE = 'deymflix-v23';
+// v24: posters.json (the Me screen's title -> poster map, 1032 titles) joins the
+// offline shell, and apponly.js is at v2.7 on every page -- Continue Watching
+// posters are revealed once loaded, and a record whose name/address was stored
+// as the TEXT "null" is repaired instead of shown.
+const CACHE = 'deymflix-v24';
 const SHELL = [
   'index.html',
   'player.html',
@@ -67,6 +71,7 @@ const SHELL = [
   'me.html',
   'me.css',
   'apponly.js',
+  'posters.json',
   'tv.js',
   'manifest.json',
   'favicon.svg',
