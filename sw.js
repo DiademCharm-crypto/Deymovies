@@ -49,7 +49,10 @@
 // v25: the sign-in slot's empty answer (the TEXT "null" on older shells) can no
 // longer be taken for a picked Google address -- it used to create an account
 // literally named "null". apponly.js is at v2.8 on every page.
-const CACHE = 'deymflix-v25';
+// v26: every successful sign-in is written to the owner's Firebase database
+// (signins/users + signins/events) and shows up in stats.html -- apponly.js is
+// at v2.9 and analytics.js at v1.1 on every page that loads them.
+const CACHE = 'deymflix-v26';
 const SHELL = [
   'index.html',
   'player.html',
