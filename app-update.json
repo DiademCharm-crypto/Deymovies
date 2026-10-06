@@ -1,12 +1,11 @@
 {
   "version": "1.7",
-  "code": 20,
-  "released": "2026-10-05",
-  "url": "apk/Deymflix-v1.7-r20.apk",
+  "code": 21,
+  "released": "2026-10-06",
+  "url": "apk/Deymflix-v1.7-r21.apk",
   "notes": [
-    "Me screen: back arrow goes home (tab bar removed)",
-    "Back closes Manage Account/Account and Security/Diagnostics/Download settings instead of exiting",
-    "Continue Watching is a plain strip and its posters download from the DEYMFLIX catalog",
-    "Sign Out moved to the bottom of Manage Account"
+    "Google sign-in no longer signs you in as an account named null",
+    "the Me screen repairs a stored name/address saved as the text null (Manage Account showed Google | null)",
+    "signing in can never create a second ghost account from an empty pick"
   ]
 }
