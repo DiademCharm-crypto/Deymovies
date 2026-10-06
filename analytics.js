@@ -162,10 +162,91 @@
     patch('', body);
   }
 
+  // ── SIGNED-IN USERS (what the owner asked for: "who is using my app") ────
+  // The accounts live in apponly.js, but the database URL, the resilient
+  // writer and "this phone" details live here -- and this file is the only one
+  // loaded by every page (index, player, me, category, ...). So apponly.js
+  // calls this when an account signs in:
+  //     window.DfxSignInLog(account, 'signin' | 'open')
+  // Stored (twice, so both questions are cheap to answer):
+  //   signins/users/<uid>   one row per account -- lastSeen, count, device, app
+  //   signins/events/<key>  the chronological log of every sign-in
+  // What is NOT stored: passwords, the typed address (only the account's own
+  // display name and DEYMFLIX uid), IP, location, or anything about a visitor
+  // who never signed in. Timestamps are server-side, so a wrong phone clock
+  // cannot invent history.
+  function deviceModel() {
+    try {
+      var ua = navigator.userAgent || '';
+      var m = /Android[^;]*;\s*([^;)]+?)(?:\s+Build|\s*\))/.exec(ua);
+      if (m && m[1]) return clean(m[1], 40);
+      return clean(ua.split(')')[0].split('(').pop(), 40) || 'unknown';
+    } catch (e) { return 'unknown'; }
+  }
+
+  function appInfoSafe() {
+    try {
+      var a = (window.DeymflixApp && typeof window.DeymflixApp.appInfo === 'function')
+        ? JSON.parse(window.DeymflixApp.appInfo()) : null;
+      if (!a) return {};
+      return { version: clean(a.version, 12), code: clean(a.code, 6), device: clean(a.device, 40), android: clean(a.android, 12) };
+    } catch (e) { return {}; }
+  }
+
+  function write(path, body) {
+    var json = JSON.stringify(body);
+    try {
+      var r = fetch(DB + '/signins/' + path + '.json', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: json, keepalive: true, mode: 'cors'
+      });
+      if (r && r.catch) r.catch(function () { });
+    } catch (e) { }
+  }
+
+  function signInLog(acc, where) {
+    try {
+      if (!acc || acc.uid == null) return;
+      var uid = String(acc.uid).replace(/[.#$/\[\]]/g, '_');
+      var row = {
+        uid: String(acc.uid),
+        name: clean(acc.name, 60) || 'DEYMFLIX user',
+        provider: clean(acc.provider, 12) || 'email',
+        where: clean(where, 12) || 'signin',
+        page: pageName(),
+        lastSeen: { '.sv': 'timestamp' },
+        count: inc(1)
+      };
+      var app = appInfoSafe();
+      if (app.version) row.app = app.version;
+      if (app.code) row.code = app.code;
+      row.device = app.device || deviceModel();
+      // firstSeen only ever goes once per account per device
+      var mark = 'dfx_signin_mark_' + uid;
+      try {
+        if (!localStorage.getItem(mark)) { row.firstSeen = { '.sv': 'timestamp' }; localStorage.setItem(mark, String(Date.now())); }
+      } catch (e) { }
+      write('users/' + uid, row);
+
+      var ev = {
+        uid: String(acc.uid), name: row.name, provider: row.provider,
+        where: row.where, page: row.page, device: row.device,
+        app: row.app || '', at: { '.sv': 'timestamp' }
+      };
+      var key;
+      try { key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
+      catch (e) { key = String(Date.now()); }
+      write('events/' + key, ev);
+      return key;
+    } catch (e) { return ''; }
+  }
+
+  window.DfxSignInLog = signInLog;
+
   window.DfxAnalytics = {
     pageView: countView,
     play: countPlay,
     titleView: countTitleView,
+    signIn: signInLog,
     enabled: true
   };
 
