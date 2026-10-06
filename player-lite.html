@@ -3269,6 +3269,23 @@
     });
 
     function forceBackToHome() {
+      // In the app's native player the page IS the whole screen, so "back"
+      // means leaving the player: the bridge finishes the activity and the
+      // screen the user came from is revealed. (The app draws no header of
+      // its own -- this control is the only back button.) Outside the app
+      // bridge, or on the website, fall through to the normal navigation.
+      if (window.DFX_IS_APP && window.DeymflixApp
+          && typeof window.DeymflixApp.closePlayer === 'function') {
+        try {
+          const isFSApp = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+          if (isFSApp) {
+            exitFullscreen();
+          }
+          destroyAllPlayers();
+          window.DeymflixApp.closePlayer();
+          return;
+        } catch (eAppBack) { }
+      }
       const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
       if (isFS) {
         exitFullscreen();
