@@ -375,7 +375,10 @@
     var v = raw;
     try { var j = JSON.parse(raw); if (typeof j === 'string') v = j; } catch (e) { }
     v = String(v).trim().replace(/^"|"$/g, '').trim();
-    return v || null;
+    // The shell used to answer an empty slot with the TEXT "null", which is a
+    // perfectly good-looking address to this page: it signed the user into an
+    // account called "null". Anything null-ish is "no pick".
+    return nameOk(v) || null;
   }
 
   function googleLogin() {
@@ -485,14 +488,16 @@
   }
 
   function googleUse(email) {
-    var em = String(email || '').trim();
+    // Last line of defence: a null-ish address ("null", "undefined", "" or one
+    // of the invisible-mark variants) must never become an account record.
+    var em = nameOk(email);
     if (!em) return;
     var acc = findAccount(em);
     if (acc) {
       if (acc.provider !== 'google') { err($('si-err'), 'That address already has a password account.'); return; }
       // A name of "null" (the string) means a broken first attempt stored the
       // text "null": repair it here so the header never shows it again.
-      if (!acc.name || acc.name === 'null') acc.name = em.split('@')[0];
+      if (!nameOk(acc.name)) acc.name = em.split('@')[0];
       signIn(acc);
       closeViews();
       return;
@@ -1313,9 +1318,10 @@
   // The phone's account picker answers through the app shell
   // (MainScreen85.pickGoogleAccount -> MainActivity.onActivityResult).
   window.DfxGooglePicked = function (email) {
-    if (!email) { err($('si-err'), 'No account chosen.'); return; }
+    var v = nameOk(email);                       // never trust the TEXT "null"
+    if (!v) { err($('si-err'), 'No account chosen.'); return; }
     err($('si-err'), '');
-    googleUse(String(email));
+    googleUse(v);
   };
 
   // A pick can also land while this page sits parked behind the Android sheet
