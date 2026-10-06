@@ -95,10 +95,14 @@
     } catch (e) { }
   }
   function findAccount(id) {
+    var want = String(id == null ? '' : id);
+    if (!want) return null;
     var l = readAccounts();
     for (var i = 0; i < l.length; i++) {
       var a = l[i];
-      if (a && (a.email === id || a.phone === id)) return a;
+      // uid too: an account whose address was repaired away is keyed by its
+      // DEYMFLIX uid in the session instead (see fixName / signIn).
+      if (a && (a.email === want || a.phone === want || String(a.uid) === want)) return a;
     }
     return null;
   }
@@ -184,6 +188,30 @@
         if (lg) { try { lg('me', 'name repaired at ' + (where || 'display') + ' raw=' + JSON.stringify(String(raw)) + ' -> ' + nm); } catch (e) { } }
       }
     }
+    // The same first sign-in stored the TEXT "null" for email/phone, which
+    // then showed verbatim on Manage Account ("Google | null"). Clear it once
+    // here, on every display pass, so each reader falls back to its own label.
+    var badMail = acc.email != null && acc.email !== '' && !nameOk(acc.email);
+    var badPhone = acc.phone != null && acc.phone !== '' && !nameOk(acc.phone);
+    if (badMail || badPhone) {
+      var rawE = String(acc.email), rawP = String(acc.phone);
+      if (badMail) acc.email = '';
+      if (badPhone) acc.phone = '';
+      try { saveAccount(acc); } catch (e) { }
+      // the session is keyed by the address that just went away: re-key it so
+      // clearing a bogus "null" email cannot sign the user out
+      try {
+        var sess = readSession();
+        if (sess && (String(sess.id) === rawE || String(sess.id) === rawP)) {
+          sess.id = acc.email || acc.phone || String(acc.uid);
+          sess.uid = acc.uid;
+          sess.at = Date.now();
+          writeSession(sess);
+        }
+      } catch (e) { }
+      var lg2 = bridge('log');
+      if (lg2) { try { lg2('me', 'contact cleared at ' + (where || 'display') + ' email=' + JSON.stringify(rawE) + ' phone=' + JSON.stringify(rawP)); } catch (e) { } }
+    }
     return nm;
   }
 
@@ -225,7 +253,7 @@
     if ($('si-recent')) {
       if (recent && (!me || recent.uid !== me.uid)) {
         $('si-recent').hidden = false;
-        if ($('recent-email')) $('recent-email').textContent = recent.email || recent.phone || 'Account';
+        if ($('recent-email'))            $('recent-email').textContent = nameOk(recent.email) || nameOk(recent.phone) || 'Account';
         if ($('recent-uid')) $('recent-uid').textContent = 'UID: ' + recent.uid +
           (recent.provider === 'google' ? '  (Google)' : '');
       } else {
@@ -235,10 +263,10 @@
   }
 
   function signIn(acc, silent) {
-    writeSession({ id: acc.email || acc.phone, at: Date.now() });
+    writeSession({ id: acc.email || acc.phone || String(acc.uid), uid: acc.uid, at: Date.now() });
     registerDevice(acc);
     renderHeader();
-    if (!silent) toast('Signed in as ' + (acc.email || acc.phone));
+    if (!silent) toast('Signed in as ' + accountTarget(acc));
   }
 
   function toast(msg) {
@@ -498,7 +526,7 @@
   function avatarHtml(acc, size) {
     if (acc && acc.photo) return '<img src="' + esc(acc.photo) + '" alt="">';
     var s = size || 30;
-    var ch = String(fixName(acc, 'avatar') || acc.email || acc.phone || '?').trim().charAt(0).toUpperCase() || '?';
+    var ch = String(fixName(acc, 'avatar') || nameOk(acc.email) || nameOk(acc.phone) || '?').trim().charAt(0).toUpperCase() || '?';
     if (!acc) {
       return '<svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="#54545f">' +
         '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/></svg>';
@@ -521,7 +549,12 @@
     return d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + ' '
       + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
   }
-  function accountTarget(a) { return (a && (a.email || a.phone)) || '—'; }
+  // Never show a null-ish address: nameOk() filters the TEXT "null" left by an
+  // old sign-in, and a Google account with no usable address says so plainly.
+  function accountTarget(a) {
+    if (!a) return '—';
+    return nameOk(a.email) || nameOk(a.phone) || (a.provider === 'google' ? 'Google account' : '—');
+  }
 
   // ── devices that logged into this account ────────────────────────────────
   // NOTE (honest): the site has no account server, so this list is built on
@@ -833,7 +866,7 @@
     var me = currentUser();
     if (!me) return;
     if ($('se-name')) $('se-name').textContent = fixName(me, 'security') || 'Not set';
-    if ($('se-mail')) $('se-mail').textContent = me.email ? maskMail(me.email) : (me.phone ? maskMail(me.phone) : '—');
+    if ($('se-mail')) $('se-mail').textContent = nameOk(me.email) ? maskMail(me.email) : (nameOk(me.phone) ? maskMail(me.phone) : '—');
     var box = $('se-devices');
     if (!box) return;
     var list = (readDevices()[me.uid] || []).slice(0);
