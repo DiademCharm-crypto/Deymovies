@@ -1741,10 +1741,14 @@ public class MainScreen85 {
         try {
             String e = PENDING_GOOGLE85;
             PENDING_GOOGLE85 = null;
-            if (e == null) return "null";
-            if (e.length() == 0) return "\"\"";
+            // The page reads this return value as the picked address, so the old
+            // "null" text for an empty slot was taken for a real login and made
+            // a ghost Google account literally named "null" (email "null") -- the
+            // record that showed up as a null header and a "Google | null" row on
+            // the Me screen. Empty must mean empty.
+            if (e == null || e.length() == 0) return "\"\"";
             return "\"" + jesc85(e) + "\"";
-        } catch (Throwable t) { return "null"; }
+        } catch (Throwable t) { return "\"\""; }
     }
 
     private static String logsText() {
