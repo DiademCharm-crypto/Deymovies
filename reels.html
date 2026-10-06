@@ -148,8 +148,9 @@
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.5rem;
-      font-weight: 800;
+      /* a plain "<" chevron -- the same back glyph as the rest of the app */
+      font-size: 1.9rem;
+      font-weight: 700;
       cursor: pointer;
       padding: 6px 12px;
       display: flex;
@@ -912,7 +913,7 @@
           <div class="reel-circular-spinner" id="circle-spinner-${index}"></div>
 
           <header class="reels-top-nav">
-            <button class="reels-back-btn" onclick="goBackToHome(event)" ontouchstart="goBackToHome(event)">❮</button>
+            <button class="reels-back-btn" onclick="goBackToHome(event)" ontouchstart="goBackToHome(event)">&lt;</button>
             <span class="reels-header-title">${sanitizeHTML(reel.title)}</span>
             <button class="reels-mute-btn fade-clear-mode" id="mute-btn-${index}" onclick="toggleReelMute(${index})" ontouchstart="event.stopPropagation()" aria-label="Toggle mute">
               <svg viewBox="0 0 24 24" fill="#fff" id="mute-icon-${index}"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
