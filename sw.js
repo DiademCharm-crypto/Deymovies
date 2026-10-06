@@ -46,7 +46,10 @@
 // offline shell, and apponly.js is at v2.7 on every page -- Continue Watching
 // posters are revealed once loaded, and a record whose name/address was stored
 // as the TEXT "null" is repaired instead of shown.
-const CACHE = 'deymflix-v24';
+// v25: the sign-in slot's empty answer (the TEXT "null" on older shells) can no
+// longer be taken for a picked Google address -- it used to create an account
+// literally named "null". apponly.js is at v2.8 on every page.
+const CACHE = 'deymflix-v25';
 const SHELL = [
   'index.html',
   'player.html',
