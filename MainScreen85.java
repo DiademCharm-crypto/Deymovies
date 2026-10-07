@@ -454,6 +454,7 @@ public class MainScreen85 {
             }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (openAppPlayerIfPlayerUrl(url)) return true;
                 if (!isInternalNavigation(url)) {
                     // cancel silently — never let the page leave our player
                     return true;
@@ -463,6 +464,7 @@ public class MainScreen85 {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest req) {
                 String u = req.getUrl() == null ? "" : req.getUrl().toString();
+                if (openAppPlayerIfPlayerUrl(u)) return true;
                 if (!isInternalNavigation(u)) {
                     return true;
                 }
@@ -2381,6 +2383,29 @@ public class MainScreen85 {
         return u != null && u.toLowerCase().indexOf("player.html") >= 0;
     }
 
+    // ── r22: TITLES OPEN IN THE NATIVE PLAYER ACTIVITY ─────────────────────
+    // The website player page used to load inside THIS WebView: app.js, every
+    // catalog file, watch-party and the seasonal theme all had to arrive before
+    // the first frame of the video page. The app now hands the same request to
+    // PlayerActivity -- a native bar ("<" + title) over player-lite.html, the
+    // player page with the site shell stripped out (see _tools/_player_lite.cjs).
+    // Everything the page then opens (the "More Like This" rail, an episode
+    // switch) is handled inside that activity.
+    private boolean openAppPlayerIfPlayerUrl(String url) {
+        try {
+            if (url == null) return false;
+            String low = url.toLowerCase();
+            if (low.indexOf("player.html") < 0) return false;
+            if (low.indexOf("deymflix.eu.cc") < 0) return false;
+            PlayerActivity.open(act, url);
+            log85("nav", "title -> PlayerActivity");
+            return true;
+        } catch (Throwable t) {
+            // never lose the tap: fall back to loading it in this WebView
+            return false;
+        }
+    }
+
     private void updateSwipeGate() {
         try {
             if (swipeRef == null) return;
@@ -2545,7 +2570,14 @@ public class MainScreen85 {
     // landscape. Pinning it with inline styles guarantees the movie covers
     // the whole screen; exiting restores the exact previous styles.
     private void jsClassToggle(boolean on) {
-        WebView wvJ = findWebView(act);
+        jsClassToggle85(findWebView(act), on);
+    }
+
+    // (r22) The SAME pin/unpin JS for any player WebView: PlayerActivity's
+    // light player page carries the same markup, so it needs the same
+    // fullscreen treatment without going through this activity's WebView
+    // lookup (that lookup only ever finds the shell's own page).
+    static void jsClassToggle85(WebView wvJ, boolean on) {
         if (wvJ == null) return;
         String js;
         if (on) {
@@ -2607,7 +2639,8 @@ public class MainScreen85 {
     //  CinemaOS embeds and any third-party provider -- streams but never
     //  downloads, and the app says so.
     // ─────────────────────────────────────────────────────────────────────
-    private static boolean isOwnMediaHost(String u) {
+    // (r22) public so PlayerActivity's bridge gates downloads identically.
+    public static boolean isOwnMediaHost(String u) {
         if (u == null) return false;
         try {
             String h = android.net.Uri.parse(u.trim()).getHost();
@@ -3090,7 +3123,8 @@ public class MainScreen85 {
     // either finished in the engine registry or successful in
     // DownloadManager. Deleting the download removes the record, so the
     // user can download it again.
-    private static String alreadyOwnedMessage(String title) {
+    // (r22) public so PlayerActivity's Download button reuses this check.
+    public static String alreadyOwnedMessage(String title) {
         if (title == null) return null;
         if (title.length() == 0) return null;
         try {

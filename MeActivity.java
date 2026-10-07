@@ -91,7 +91,7 @@ public class MeActivity extends AppCompatActivity {
 
     private WebView web;
     private LinearLayout topBar;          // native back arrow row (dock removed r19)
-    private android.widget.ImageButton backBtn;
+    private TextView backBtn;                    // plain "<" chevron (r22)
 
     // Which sub-view the Me page is showing right now. The page reports every
     // change through dfxView(); hardware Back closes the view first and only
@@ -118,13 +118,16 @@ public class MeActivity extends AppCompatActivity {
         topBar.setPadding((int) (10 * d), (int) (8 * d), (int) (10 * d), (int) (8 * d));
         topBar.setBackgroundColor(BG);
 
-        backBtn = new android.widget.ImageButton(this);
+        // A plain "<" chevron -- the owner asked for the simple glyph, not the
+        // three-step media icon (ic_media_previous) this bar used before.
+        backBtn = new TextView(this);
+        backBtn.setText("<");
+        backBtn.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 26);
+        backBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        backBtn.setTextColor(0xFFFFFFFF);
         backBtn.setBackground(null);
-        backBtn.setImageResource(android.R.drawable.ic_media_previous);
-        // tint the glyph white; ic_media_previous is a themed vector, so a
-        // plain setColorFilter keeps it crisp on every API level
-        backBtn.setColorFilter(0xFFFFFFFF);
-        backBtn.setPadding((int) (12 * d), (int) (12 * d), (int) (12 * d), (int) (12 * d));
+        backBtn.setGravity(Gravity.CENTER);
+        backBtn.setContentDescription("Back");
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { leaveMe(); }
         });

@@ -69,7 +69,11 @@
 // with the title above the WebView, which duplicated the player's own top bar
 // and stole the first ~90px of the video. The page fills the screen now, and
 // its own back control finishes the player activity (bridge closePlayer).
-const CACHE = 'deymflix-v30';
+// v31: a wrong-folder upload replaced index.html/style.css/app.js with another
+// app's files, so any client that loaded the site in that window cached the
+// wrong shell under deymflix-v30. Changing the cache name deletes it on the
+// next activate, which is the only way to purge it -- the URLs are the same.
+const CACHE = 'deymflix-v31';
 const SHELL = [
   'index.html',
   'player.html',
