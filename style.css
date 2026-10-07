@@ -543,6 +543,26 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(229, 9, 20, 0.4);
 }
 
+/* "Unavailable" — every play link for this title sits on a suspended host, so
+   it cannot be watched right now. Bottom-left so it never collides with the
+   HD / Complete / NEW EP badge in the top-right corner, and muted rather than
+   alarming: the title is coming back, it is not gone. */
+.dfx-unavailable-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 10;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.82);
+  color: #cfcfcf;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
 .tag-badge-top-right.quality-cam {
   background: rgba(0, 0, 0, 0.85);
   color: #ff9800;
