@@ -73,7 +73,11 @@
 // app's files, so any client that loaded the site in that window cached the
 // wrong shell under deymflix-v30. Changing the cache name deletes it on the
 // next activate, which is the only way to purge it -- the URLs are the same.
-const CACHE = 'deymflix-v31';
+// v32: the rows and the hero stop promoting titles whose only play links sit on
+// a suspended host (108 of 1286 were 403), they come back on their own when a
+// host answers again, and app.js/style.css carry new ?v= so no client can keep
+// serving the unguarded copies out of its HTTP cache.
+const CACHE = 'deymflix-v32';
 const SHELL = [
   'index.html',
   'player.html',
