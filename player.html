@@ -4964,6 +4964,72 @@
     // showToast(message) — plain pill. showToast(message, {label, onClick}) —
     // same pill plus one action button ("Start over" after a resume). The
     // actionable form lives longer: it must be readable AND tappable.
+    // ── Suspended-host guard ────────────────────────────────────────────────
+    // Some play links live on Bunny pull zones that are suspended, so every
+    // request to them answers 403. The rows and the hero stop promoting those
+    // titles (see DFX_UNPAID_HOSTS in app.js), but search results, My List,
+    // History and bookmarked URLs can still land here — and a 403 makes the
+    // <video> fire MEDIA_ERR_SRC_NOT_SUPPORTED, which left a player stuck at
+    // 00:00:00 with no explanation. Say it plainly instead.
+    // Renamed from DFX_UNPAID_HOSTS on purpose: this page also loads app.js,
+    // and a top-level `const` is shared across classic scripts — declaring the
+    // same name here threw "Identifier has already been declared" and killed
+    // the whole inline script (the player then failed silently).
+    const DFX_PLAYER_DEAD_HOSTS = [
+      'deymflix-media.b-cdn.net',
+      'deymflix-r2-1.b-cdn.net',
+      'deymflix-r2-2.b-cdn.net'
+    ];
+
+    function dfxPlayerHostOf(u) {
+      const m = /^[a-z][a-z0-9+.-]*:\/\/([^/?#]+)/i.exec(String(u || ''));
+      return m ? m[1].toLowerCase() : '';
+    }
+
+    function dfxPlayerSuspendedHost(u) {
+      const host = dfxPlayerHostOf(u);
+      if (!host) return '';
+      for (let i = 0; i < DFX_PLAYER_DEAD_HOSTS.length; i++) {
+        const h = DFX_PLAYER_DEAD_HOSTS[i];
+        if (host === h || host.endsWith('.' + h)) return h;
+      }
+      return '';
+    }
+
+    function dfxPlayerShowUnavailable() {
+      if (document.getElementById('dfx-unavailable-panel')) return;
+      const panel = document.createElement('div');
+      panel.id = 'dfx-unavailable-panel';
+      panel.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;' +
+        'align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;' +
+        'background:rgba(11,11,15,0.96);color:#fff;';
+      const title = document.createElement('div');
+      title.textContent = (currentMovie && currentMovie.title) ? currentMovie.title : 'This title';
+      title.style.cssText = 'font-size:1.15rem;font-weight:800;';
+      const msg = document.createElement('div');
+      msg.textContent = 'is temporarily unavailable — its video host is offline while we restore it. Please try another title.';
+      msg.style.cssText = 'max-width:34ch;line-height:1.5;color:#c9c9c9;font-size:0.95rem;';
+      const back = document.createElement('button');
+      back.type = 'button';
+      back.textContent = '\u2190 Browse other titles';
+      back.style.cssText = 'margin-top:6px;padding:11px 22px;border:0;border-radius:999px;' +
+        'background:#e50914;color:#fff;font-weight:800;font-size:0.9rem;cursor:pointer;';
+      back.addEventListener('click', function () {
+        try {
+          if (window.DFX_IS_APP && window.DeymflixApp &&
+              typeof window.DeymflixApp.closePlayer === 'function') {
+            window.DeymflixApp.closePlayer();
+            return;
+          }
+        } catch (e) {}
+        window.location.href = 'index.html';
+      });
+      panel.appendChild(title);
+      panel.appendChild(msg);
+      panel.appendChild(back);
+      document.body.appendChild(panel);
+    }
+
     function showToast(message, action) {
       const toast = document.getElementById('loading-toast');
       if (!toast) return;
@@ -7641,6 +7707,13 @@
 
       if (!targetUrl || targetUrl.trim() === '') {
         showToast("No stream or trailer available.");
+        return;
+      }
+
+      // Suspended host: explain, instead of leaving a black player stuck at
+      // 00:00:00. Applies to episode links too — rawUrl already resolved.
+      if (dfxPlayerSuspendedHost(targetUrl)) {
+        dfxPlayerShowUnavailable();
         return;
       }
 
