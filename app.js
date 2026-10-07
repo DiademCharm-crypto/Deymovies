@@ -6,6 +6,207 @@
 // App-mode (Sketchware WebView) tweaks live at the BOTTOM of this file.
 // Never overwrite this file with a partial copy — see the warning near the end.
 
+// ──────────────────────────────────────────────────────────────────────────
+// WATCHABILITY GUARD
+// The three Bunny/Cloudflare pull zones listed below are suspended, so every
+// request to them answers 403 and any title whose ONLY play links live there
+// cannot be watched. That is 108 of 1286 titles — and because the catalogue is
+// ordered newest-first it hit the worst possible places: 4 of the 5 hero
+// slides and 8 of the first 10 "Recently Added" cards.
+//
+// Nothing is deleted here. The rows and the hero simply stop promoting titles
+// with no reachable link, and each one returns by itself the moment its host
+// answers again (dfxStartWatchabilityProbe, once per session).
+//
+// To lift the guard by hand after paying: empty this array and deploy.
+// ──────────────────────────────────────────────────────────────────────────
+const DFX_UNPAID_HOSTS = [
+  'deymflix-media.b-cdn.net',
+  'deymflix-r2-1.b-cdn.net',
+  'deymflix-r2-2.b-cdn.net'
+];
+
+// Every field on a catalogue record that can hold a playable link. Series keep
+// theirs inside seasons[].episodes[], so this walks the tree.
+function dfxPlayLinks(item, out) {
+  out = out || [];
+  if (!item || typeof item !== 'object') return out;
+  for (const key of ['manualEmbed', 'embedUrl', 'videoUrl']) {
+    const v = item[key];
+    if (typeof v === 'string' && v.trim()) out.push(v.trim());
+  }
+  if (Array.isArray(item.episodes)) item.episodes.forEach(e => dfxPlayLinks(e, out));
+  if (Array.isArray(item.seasons)) item.seasons.forEach(s => dfxPlayLinks(s, out));
+  return out;
+}
+
+function dfxHostOf(url) {
+  const m = /^[a-z][a-z0-9+.-]*:\/\/([^/?#]+)/i.exec(String(url || ''));
+  return m ? m[1].toLowerCase() : '';
+}
+
+// Hosts that answered again during THIS browser session, so the guard lifts on
+// its own once the account is back in good standing. Session-scoped on purpose:
+// a fresh visit re-checks rather than trusting a stale verdict forever.
+function dfxRevivedHosts() {
+  try {
+    const raw = sessionStorage.getItem('dfx_hosts_back');
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+
+function dfxDeadHosts() {
+  const back = dfxRevivedHosts();
+  return DFX_UNPAID_HOSTS.filter(h => back.indexOf(h) === -1);
+}
+
+// One verdict per title, cached until a host comes back.
+const dfxPlayCache = new Map();
+
+// A title is watchable when at least one of its play links is NOT on a
+// suspended host. A series with one working episode stays visible — only a
+// title where EVERY link is stranded gets held back.
+function dfxIsPlayable(item) {
+  try {
+    if (!item) return true;
+    const key = String(item.id || item.title || '');
+    if (key && dfxPlayCache.has(key)) return dfxPlayCache.get(key);
+    let ok = true;                       // no play links at all: not our call to hide
+    const links = dfxPlayLinks(item);
+    if (links.length) {
+      const dead = dfxDeadHosts();
+      ok = links.some(u => {
+        const host = dfxHostOf(u);
+        if (!host) return true;          // cos:/drive: style embeds resolve elsewhere
+        return !dead.some(d => host === d || host.endsWith('.' + d));
+      });
+    }
+    if (key) dfxPlayCache.set(key, ok);
+    return ok;
+  } catch (e) {
+    return true;                         // on any doubt, never hide a title
+  }
+}
+
+function dfxPlayable(list) {
+  return (Array.isArray(list) ? list : []).filter(dfxIsPlayable);
+}
+
+// The hero shows the owner's curated picks that are actually watchable, topped
+// up with the best-rated playable 2026 titles so the carousel never runs thin.
+// The curated list itself is never edited — pay the bill and the original five
+// slides come straight back.
+function dfxHeroSlides(limit) {
+  limit = limit || 5;
+  const out = [];
+  const seen = {};
+  const take = (item) => {
+    if (!item || !item.id || seen[item.id]) return;
+    if (!dfxIsPlayable(item)) return;
+    seen[item.id] = 1;
+    out.push(item);
+  };
+  (typeof featuredMovies !== 'undefined' && featuredMovies ? featuredMovies : []).forEach(take);
+  if (out.length < limit) {
+    dfxPlayable(typeof movies !== 'undefined' && movies ? movies : [])
+      .filter(m => /^2026/.test(String(m.releaseDate || '')) && m.poster && Number(m.rating) > 0)
+      .sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0))
+      .forEach(take);
+  }
+  return out.slice(0, limit);
+}
+
+// ── SELF-HEALING PROBE ────────────────────────────────────────────────────
+// A cross-origin <video> can distinguish "loads" from "403" where fetch cannot
+// (these hosts send no CORS headers, so fetch only ever returns an opaque
+// response). So we ask each suspended host once per session whether it is
+// serving again — and if it is, the guard lifts and the rows rebuild. The
+// catalogue heals itself without a deploy.
+function dfxHostProbeUrl(host) {
+  const all = (typeof movies !== 'undefined' && movies) ? movies : [];
+  for (const item of all) {
+    for (const link of dfxPlayLinks(item)) {
+      if (dfxHostOf(link) === host) return link;
+    }
+  }
+  return '';
+}
+
+function dfxProbeHost(host) {
+  return new Promise(resolve => {
+    const src = dfxHostProbeUrl(host);
+    if (!src) return resolve(false);
+    let settled = false;
+    const video = document.createElement('video');
+    const finish = (alive) => {
+      if (settled) return;
+      settled = true;
+      try { video.removeAttribute('src'); video.load(); video.remove(); } catch (e) {}
+      resolve(alive);
+    };
+    video.muted = true;
+    video.preload = 'metadata';
+    video.setAttribute('playsinline', '');
+    // Off-screen but NOT display:none — browsers defer metadata for hidden video.
+    video.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+    video.addEventListener('loadedmetadata', () => finish(true));
+    video.addEventListener('error', () => finish(false));
+    // Generous on purpose: the first request to a cold host pays DNS + TLS
+    // before a single byte arrives, and 8s was measurably not enough — a cold
+    // probe timed out at 8114ms on a host that then answered in ~100ms warm.
+    // A timeout is deliberately NOT cached (see dfxStartWatchabilityProbe).
+    setTimeout(() => finish(false), 15000);
+    try {
+      document.body.appendChild(video);
+      video.src = src;
+      video.load();
+    } catch (e) { finish(false); }
+  });
+}
+
+function dfxRerenderRows() {
+  try {
+    setupHeroBanner();
+    renderContinueWatching();
+    renderTopPicks();
+    renderFilipinoMovies();
+    renderChinese();
+    renderKdramas();
+    renderAllMoviesGrid();
+    renderBecauseYouWatched();
+  } catch (e) {}
+}
+
+let dfxProbeRunning = false;
+
+function dfxStartWatchabilityProbe() {
+  try {
+    if (!DFX_UNPAID_HOSTS.length) return;
+    if (sessionStorage.getItem('dfx_hosts_probed') === '1') return;
+    if (dfxProbeRunning) return;            // one sweep at a time per tab
+    const hosts = dfxDeadHosts();
+    if (!hosts.length) return;
+    dfxProbeRunning = true;
+    Promise.all(hosts.map(h => dfxProbeHost(h).then(alive => ({ h, alive }))))
+      .then(results => {
+        // Only a COMPLETED sweep is remembered. A probe that is interrupted or
+        // that times out leaves the flag clear, so the next page load retries
+        // instead of caching a wrong "still dead" verdict for the session.
+        try { sessionStorage.setItem('dfx_hosts_probed', '1'); } catch (e) {}
+        dfxProbeRunning = false;
+        const back = results.filter(r => r.alive).map(r => r.h);
+        if (!back.length) return;
+        const known = dfxRevivedHosts().concat(back).filter((h, i, a) => a.indexOf(h) === i);
+        sessionStorage.setItem('dfx_hosts_back', JSON.stringify(known));
+        dfxPlayCache.clear();
+        dfxRerenderRows();
+        console.log('[deymflix] back in service: ' + back.join(', ') + ' — those titles are visible again');
+      })
+      .catch(() => { dfxProbeRunning = false; });
+  } catch (e) { dfxProbeRunning = false; }
+}
+
 // Polyfill: requestIdleCallback is not supported in Safari/iOS
 if (!window.requestIdleCallback) {
   window.requestIdleCallback = function (cb, opts) {
@@ -10760,6 +10961,11 @@ function createMovieCard(movie, rankNumber = null) {
   card.onclick = () => {
     // First-party analytics: interest in a title (no cookies, no personal data).
     try { if (window.DfxAnalytics) window.DfxAnalytics.titleView(movie); } catch (e) {}
+    // Don't walk the visitor into a player that has nothing to play.
+    if (!dfxIsPlayable(movie)) {
+      showToast('"' + String(movie.title || 'This title') + '" is temporarily unavailable — we are restoring it.');
+      return;
+    }
     window.location.href = `player.html?id=${encodeURIComponent(movie.id)}`;
   };
 
@@ -10795,9 +11001,17 @@ function createMovieCard(movie, rankNumber = null) {
   const safeTitle = sanitizeHTML(movie.title);
   const safePoster = sanitizeHTML(movie.poster);
 
+  // Temporarily unwatchable (every play link sits on a suspended host): say so
+  // on the poster rather than letting the player fail silently later.
+  const unavailable = !dfxIsPlayable(movie);
+  const unavailableBadge = unavailable
+    ? '<div class="dfx-unavailable-badge">Unavailable</div>'
+    : '';
+
   card.innerHTML = `
     ${rankHTML}
     <div class="tag-badge-top-right ${qualityClass}">${qualityLabel}</div>
+    ${unavailableBadge}
     <img src="${safePoster}" 
          srcset="${posterSrcset(safePoster)}" sizes="(min-width: 1024px) 160px, 140px"
          alt="${safeTitle}" 
@@ -11260,6 +11474,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(dfxMarkEpisodesSeen, 6000);
   }, { timeout: 500 });
 
+  // Ask each suspended host once per session whether it is serving again, so
+  // the catalogue heals itself when the balance is paid — no deploy needed.
+  requestIdleCallback(() => dfxStartWatchabilityProbe(), { timeout: 3000 });
+
   // Continue-watching cards are built inline (not via createMovieCard) —
   // bind hover previews to them after the DOM settles.
   if (typeof HOVER_PREVIEW !== 'undefined' && HOVER_PREVIEW.isEnabled && HOVER_PREVIEW.isEnabled()) {
@@ -11359,7 +11577,20 @@ function renderContinueWatching() {
   const items = Object.keys(byBase).map(b => byBase[b]);
   items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
-  if (items.length === 0) {
+  // A title on a suspended host cannot be resumed, so it does not belong in a
+  // "pick up where you left off" row. The saved progress itself is untouched —
+  // paying the bill brings the card straight back with its old position.
+  const resumable = items.filter(item => {
+    try {
+      const baseId = String(item._baseId || item.id || '')
+        .replace(/-s\d+-ep\d+$/, '').replace(/-ep\d+$/, '');
+      const rec = (typeof movies !== 'undefined' ? movies : []).find(m =>
+        String(m.id) === baseId || String(m.id) === String(item.id) || m.title === item.title);
+      return !rec || dfxIsPlayable(rec);
+    } catch (e) { return true; }
+  });
+
+  if (resumable.length === 0) {
     section.style.display = 'none';
     return;
   }
@@ -11367,7 +11598,7 @@ function renderContinueWatching() {
   section.style.display = 'block';
   container.innerHTML = '';
 
-  items.forEach(item => {
+  resumable.forEach(item => {
     const card = document.createElement('div');
     card.className = 'poster-card';
     card.style.position = 'relative';
@@ -11502,10 +11733,16 @@ function dfxTmdbBase() {
 function setupHeroBanner() {
   const heroWrapper = document.getElementById('hero-billboard-wrapper') || document.querySelector('.hero-wrapper');
   if (!heroWrapper || !featuredMovies || featuredMovies.length === 0) return;
+  // Re-rendering (the watchability probe can ask for one) must not stack timers.
+  if (heroCarouselTimer) { clearInterval(heroCarouselTimer); heroCarouselTimer = null; }
+  // Curated slides that are actually watchable, topped up if the carousel
+  // would otherwise run thin — see DFX_UNPAID_HOSTS at the top of this file.
+  const heroSlides = dfxHeroSlides();
+  if (!heroSlides.length) return;
 
   heroWrapper.innerHTML = `
     <div class="hero-carousel-track" id="hero-carousel-track">
-      ${featuredMovies.map((item, idx) => `
+      ${heroSlides.map((item, idx) => `
         <div class="hero-slide-item" data-hero-idx="${idx}" onclick="window.location.href='player.html?id=${encodeURIComponent(item.id)}'">
           <img class="hero-backdrop-img" src="${sanitizeHTML(item.backdrop || item.poster)}" alt="${sanitizeHTML(item.title)}" loading="lazy">
           <div class="hero-fade-overlay"></div>
@@ -11527,7 +11764,7 @@ function setupHeroBanner() {
       `).join('')}
     </div>
     <div class="hero-dots" id="hero-dots">
-      ${featuredMovies.map((_, i) => `<button class="hero-dot${i === 0 ? ' active' : ''}" data-dot-idx="${i}" aria-label="Featured ${i + 1}"></button>`).join('')}
+      ${heroSlides.map((_, i) => `<button class="hero-dot${i === 0 ? ' active' : ''}" data-dot-idx="${i}" aria-label="Featured ${i + 1}"></button>`).join('')}
     </div>
   `;
 
@@ -11537,7 +11774,7 @@ function setupHeroBanner() {
   // ── HERO ENRICHMENT: match% / year / genres / synopsis per slide ──
   // Uses the same TMDB details endpoint as the hover-preview panel; local
   // fallbacks keep the rows useful when TMDB is unavailable.
-  featuredMovies.forEach((item, idx) => {
+  heroSlides.forEach((item, idx) => {
     const slide = track.querySelector('[data-hero-idx="' + idx + '"]');
     if (!slide) return;
     const matchEl = slide.querySelector('.hero-match');
@@ -11576,7 +11813,7 @@ function setupHeroBanner() {
       e.stopPropagation();
       const slide = btn.closest('.hero-slide-item');
       const idx = slide ? slide.getAttribute('data-hero-idx') : '0';
-      const item = featuredMovies[Number(idx)];
+      const item = heroSlides[Number(idx)];
       if (item) window.location.href = 'player.html?id=' + encodeURIComponent(item.id);
     });
   });
@@ -11624,7 +11861,10 @@ function renderTopPicks() {
   if (!container) return;
   container.innerHTML = '';
 
-  const picks = movies.slice(0, 10);
+  // "Recently Added" is the first row a visitor sees, so it must never lead
+  // with a title that cannot play (8 of its first 10 were stranded on a
+  // suspended host before this filter).
+  const picks = dfxPlayable(movies).slice(0, 10);
   picks.forEach((movie, index) => {
     container.appendChild(createMovieCard(movie, index + 1));
   });
@@ -11665,7 +11905,7 @@ function renderFilipinoMovies() {
   container.innerHTML = '';
 
   const filipinoMovies = movies.filter(m => m.isFilipino || m.genre?.includes('Filipino') || m.country === 'PH');
-  const displayList = filipinoMovies.slice(0, 10);
+  const displayList = dfxPlayable(filipinoMovies).slice(0, 10);
 
   displayList.forEach(movie => {
     container.appendChild(createMovieCard(movie));
@@ -11687,7 +11927,7 @@ function renderChinese() {
   if (section) section.style.display = '';
 
   // Newest releases first — the same ordering rule as the K-Drama row
-  dfxSortByNewest(chineseTitles).slice(0, 10).forEach(movie => {
+  dfxPlayable(dfxSortByNewest(chineseTitles)).slice(0, 10).forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }
@@ -11709,7 +11949,7 @@ function renderKdramas() {
 
   // Newest releases first so freshly added titles surface in the row
   // (dfxSortByNewest is hoisted below and keeps catalog order for undated entries).
-  dfxSortByNewest(kdramas).slice(0, 10).forEach(movie => {
+  dfxPlayable(dfxSortByNewest(kdramas)).slice(0, 10).forEach(movie => {
     container.appendChild(createMovieCard(movie));
   });
 }
@@ -11735,7 +11975,7 @@ function renderAllMoviesGrid() {
   if (!allMoviesGrid) return;
   allMoviesGrid.innerHTML = '';
 
-  const displayBatch = dfxSortByNewest(movies).slice(0, 16);
+  const displayBatch = dfxPlayable(dfxSortByNewest(movies)).slice(0, 16);
   displayBatch.forEach(movie => {
     allMoviesGrid.appendChild(createMovieCard(movie));
   });
@@ -12453,7 +12693,7 @@ function renderBecauseYouWatched() {
   const watched = dfxWatchedIds();
   const picks = movies
     .filter(m => m && m.id !== seed.id && !watched.has(String(m.id)) && m.poster
-      && Number(m.rating) > 0 && dfxShelfOf(m) === shelf)
+      && Number(m.rating) > 0 && dfxShelfOf(m) === shelf && dfxIsPlayable(m))
     .sort((a, b) => (Number(b.rating) - Number(a.rating)) || (dfxReleaseTimestamp(b) - dfxReleaseTimestamp(a)))
     .slice(0, 12);
   if (picks.length < 4) return kill();   // too few to look like a real row
