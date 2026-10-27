@@ -323,6 +323,17 @@ const featuredMovies = [
 
 const movies = [
   { 
+    id: "Forgotten Island", 
+    imdbId: "tt36583977",
+    title: "Forgotten Island", 
+    releaseDate: "2026-09-25",
+    rating: 7.7,
+    poster: "https://media.themoviedb.org/t/p/w600_and_h900_face/myd1K3gefdNAWFsGNRDdMeiK9Qg.jpg",
+    manualEmbed: "https://deymflix01.s3.us-east-005.backblazeb2.com/Forgotten.Island.2026.1080p.MA.WEBRip.DDP5.1.x265-GubrakZ.mkv",
+    trailerEmbed: "https://www.youtube.com/watch?v=a8RHqN93qfo",
+    isSeries: false
+  },
+  { 
     id: "The Runner", 
     imdbId: "tt34564059",
     title: "The Runner", 
